@@ -16,7 +16,7 @@ setup(
     license='BSD',
     packages=find_packages('src'),
     package_dir={'': 'src'},
-    namespace_packages=['jd'],
+    namespace_packages=['space'],
     include_package_data=True,
     zip_safe=False,
     install_requires=install_requires,
