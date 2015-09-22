@@ -10,6 +10,8 @@ def _split_state_vector(state_vector):
 
 def inertial_to_tnw(state_vector):
     """
+    Args:
+        state_vector (list): Array of length 6
     Returns:
         numpy.ndarray: matrix to convert from inertial frame to TNW.
 
@@ -35,6 +37,11 @@ def inertial_to_tnw(state_vector):
 
 def inertial_to_qsw(state_vector):
     """
+    Args:
+        state_vector (list): Array of length 6
+    Returns:
+        numpy.ndarray: matrix to convert from inertial frame to QSW
+
     >>> import numpy as np
     >>> delta_qsw = [1, 0, 0]
     >>> p = [-6142438.668, 3492467.560, -25767.25680]
