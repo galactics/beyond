@@ -12,10 +12,14 @@ c = 299792458  # m.s⁻²
 g0 = 9.80665  # m.s⁻²
 """Standart Earth gravity"""
 
-G = 6.67384e-11  # m³.kg⁻¹.s⁻² ou N.m².kg⁻²
+G = 6.67384e-11  # m³.kg⁻¹.s⁻² or N.m².kg⁻²
 """Gravitational constant"""
 
-m_earth = 5.9736e24  # kg
+m_e = 5.9736e24  # kg
+"""Earth mass"""
 
-mu_earth = G * m_earth
-#mu_earth = 398600.4418  # km³.s⁻²
+µ_e = 3.986004418e14  # m³.s⁻²
+"""Earth gravitational constant"""
+
+r_e = 6378137.0  # m
+"""Earth Radius"""

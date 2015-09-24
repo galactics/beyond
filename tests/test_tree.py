@@ -55,6 +55,8 @@ def test_path():
     assert tree.path('F', 'A') == ['F', 'E', 'A']
     assert tree.path('A', 'F') == ['A', 'E', 'F']
 
+    assert tree.path("L", "L") == ['L']
+
 
 def test_wrong_arg():
 
