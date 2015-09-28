@@ -47,13 +47,13 @@ def test_coord_unit_transform():
 
     ref = Coord(ref_coord, ref_form)
 
-    kep = Coord.keplerian_m_to_keplerian(ref)
+    kep = Coord._keplerian_m_to_keplerian(ref)
     assert np.allclose(ref[:5], kep[:5])
 
-    new = Coord.keplerian_to_keplerian_m(kep)
+    new = Coord._keplerian_to_keplerian_m(kep)
     assert np.allclose(ref, new)
 
-    tle = Coord.keplerian_m_to_tle(ref)
+    tle = Coord._keplerian_m_to_tle(ref)
     tle_dict = dict(zip(Coord.F_TLE.param_names, tle))
     ref_dict = dict(ref._to_list())
     assert tle_dict['i'] == ref_dict['i']
@@ -62,13 +62,13 @@ def test_coord_unit_transform():
     assert tle_dict['ω'] == ref_dict['ω']
     assert tle_dict['M'] == ref_dict['M']
 
-    new = Coord.tle_to_keplerian_m(tle)
+    new = Coord._tle_to_keplerian_m(tle)
     assert np.allclose(new, ref)
 
-    cart = Coord.keplerian_to_cartesian(kep)
+    cart = Coord._keplerian_to_cartesian(kep)
     assert np.allclose(cart, ref_cart)
 
-    new = Coord.cartesian_to_keplerian(cart)
+    new = Coord._cartesian_to_keplerian(cart)
     assert np.allclose(new, kep)
 
 

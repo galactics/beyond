@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# from space.constants import µ_e
 import numpy as np
 from numpy import cos, arccos, sin, arcsin, arctan2, sqrt, arccosh, sinh
 from datetime import datetime
@@ -74,34 +73,35 @@ class Coord(np.ndarray):
             for i in range(len(path) - 1):
                 a = path[i].lower()
                 b = path[i + 1].lower()
-                coord = getattr(self, "{}_to_{}".format(a, b))(coord)
+                coord = getattr(self, "_{}_to_{}".format(a, b))(coord)
 
             self.base.setfield(coord, dtype=float)
             self.form = to
 
     @classmethod
-    def cartesian_to_keplerian(cls, coord):
+    def _cartesian_to_keplerian(cls, coord):
 
         r_, v_ = coord[:3], coord[3:]
-        h_ = np.cross(r_, v_)  # angular momentum vector
+        h_ = np.cross(r_, v_)                     # angular momentum vector
         h = np.linalg.norm(h_)
         r = np.linalg.norm(r_)
         v = np.linalg.norm(v_)
 
-        K = v ** 2 / 2 - µ_e / r               # specific energy
-        a = - µ_e / (2 * K)                    # semi-major axis
-        e = sqrt(1 - h ** 2 / (a * µ_e))    # eccentricity
+        K = v ** 2 / 2 - µ_e / r                  # specific energy
+        a = - µ_e / (2 * K)                       # semi-major axis
+        e = sqrt(1 - h ** 2 / (a * µ_e))          # eccentricity
         p = a * (1 - e ** 2)
-        i = arccos(h_[2] / h)               # inclination
+        i = arccos(h_[2] / h)                     # inclination
         Ω = arctan2(h_[0], -h_[1]) % (2 * np.pi)  # right ascencion of the ascending node
+
         ω_ν = arctan2(r_[2] / sin(i), r_[0] * cos(Ω) + r_[1] * sin(Ω))
         ν = arctan2(sqrt(p / µ_e) * np.dot(v_, r_), p - r)
-        ω = (ω_ν - ν) % (2 * np.pi)                           # argument of the perigee
+        ω = (ω_ν - ν) % (2 * np.pi)               # argument of the perigee
 
         return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
     @classmethod
-    def keplerian_to_cartesian(cls, coord):
+    def _keplerian_to_cartesian(cls, coord):
 
         a, e, i, Ω, ω, ν = coord
 
@@ -118,7 +118,7 @@ class Coord(np.ndarray):
         return np.array([x, y, z, vx, vy, vz], dtype=float)
 
     @classmethod
-    def keplerian_to_keplerian_m(cls, coord):
+    def _keplerian_to_keplerian_m(cls, coord):
         a, e, i, Ω, ω, ν = coord
         if e < 1:
             # Elliptic case
@@ -132,15 +132,15 @@ class Coord(np.ndarray):
         return np.array([a, e, i, Ω, ω, M], dtype=float)
 
     @classmethod
-    def keplerian_m_to_keplerian(cls, coord):
+    def _keplerian_m_to_keplerian(cls, coord):
         a, e, i, Ω, ω, M = coord
-        E = cls.M_to_E(e, M)
+        E = cls._m_to_e(e, M)
         ν = arccos((cos(E) - e) / (1 - e * cos(E)))
 
         return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
     @classmethod
-    def M_to_E(cls, e, M):
+    def _m_to_e(cls, e, M):
         """Conversion from Mean Anomaly to Excetric anomaly
         """
 
@@ -171,7 +171,7 @@ class Coord(np.ndarray):
                 f = (E - fdd) - m1
                 fd = 1 - fddd
             else:
-                f = cls.e_e_sin_e(e, E) - m1
+                f = cls._e_e_sin_e(e, E) - m1
                 s = sin(E / 2)
                 fd = e1 + 2 * e * s ** 2
             dee = f * fd / (0.5 * f * fdd - fd ** 2)
@@ -185,7 +185,7 @@ class Coord(np.ndarray):
         return E
 
     @classmethod
-    def e_e_sin_e(cls, e, E):
+    def _e_e_sin_e(cls, e, E):
         x = (1 - e) * sin(E)
         term = float(E)
         d = 0
@@ -198,14 +198,14 @@ class Coord(np.ndarray):
         return x
 
     @classmethod
-    def tle_to_keplerian_m(cls, coord):
+    def _tle_to_keplerian_m(cls, coord):
         i, Ω, e, ω, M, n = coord
         a = (µ_e / n ** 2) ** (1 / 3)
 
         return np.array([a, e, i, Ω, ω, M], dtype=float)
 
     @classmethod
-    def keplerian_m_to_tle(cls, coord):
+    def _keplerian_m_to_tle(cls, coord):
         a, e, i, Ω, ω, M = coord
         n = sqrt(µ_e / a ** 3)
 
