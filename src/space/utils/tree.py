@@ -6,7 +6,7 @@ hierarchy
 """
 
 # TODO
-#   Possibly merge Node and Tree into a sole class that could walk itself
+#   Merger Node et Tree
 
 
 class Node:
@@ -21,21 +21,11 @@ class Node:
         self.name = name
         self.subtree = subtree
 
-
-class Tree:
-    """Class representing the tree to search for nodes
-    """
-
-    def __init__(self, top_node):
-
-        if not isinstance(top_node, Node):
-            raise TypeError("top_node should be a Node object")
-
-        self.tree = [top_node]
-
     def __contains__(self, item):
-        """Special method for membership test (e.g. ``if 'B' in tree``).
+        """Special method for membership test (e.g. ``if 'B' in node``).
         """
+        if item == self.name:
+            return True
         try:
             self._walk(item)
         except ValueError:
@@ -53,7 +43,7 @@ class Tree:
         """
 
         if subtree is None:
-            subtree = self.tree
+            subtree = self.subtree
 
         for node in subtree:
             if node.name == goal:
@@ -67,7 +57,7 @@ class Tree:
                 else:
                     return res + [node.name]
         else:
-            raise ValueError(goal + " introuvable")
+            raise ValueError("'{}' unfindable".format(goal))
 
     def _merge(self, x, y):
         """Remove commons ancestors and concatenate two passes
@@ -106,8 +96,10 @@ class Tree:
         start = start.name if type(start) is Node else start
         stop = stop.name if type(stop) is Node else stop
 
-        x = self._walk(start)
-        y = self._walk(stop)
+        # Not very happy with this kind of direct patch, but it's the simplest
+        # way I could find in order to include the top node to the tree.
+        x = self._walk(start) + [self.name] if start != self.name else [self.name]
+        y = self._walk(stop) + [self.name] if stop != self.name else [self.name]
 
         final = self._merge(x, y)
 

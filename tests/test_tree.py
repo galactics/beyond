@@ -1,6 +1,6 @@
 from pytest import raises
 
-from space.utils.tree import Tree, Node
+from space.utils.tree import Node
 
 M = Node("M", None)
 L = Node("L", None)
@@ -41,27 +41,25 @@ A = Node("A", [B, E, K])
 
 def test_path():
 
-    tree = Tree(A)
+    assert A.path('B', 'E') == ['B', 'A', 'E']
+    assert A.path('H', 'E') == ['H', 'F', 'E']
+    assert A.path('H', 'G') == ['H', 'F', 'E', 'G']
+    assert A.path('H', 'A') == ['H', 'F', 'E', 'A']
+    assert A.path('B', 'A') == ['B', 'A']
+    assert A.path('J', 'I') == ['J', 'H', 'F', 'I']
+    assert A.path('C', 'B') == ['C', 'B']
+    assert A.path('J', 'M') == ['J', 'H', 'F', 'E', 'A', 'K', 'M']
+    assert A.path('M', 'J') == ['M', 'K', 'A', 'E', 'F', 'H', 'J']
+    assert A.path('F', 'A') == ['F', 'E', 'A']
+    assert A.path('A', 'F') == ['A', 'E', 'F']
 
-    assert tree.path('B', 'E') == ['B', 'A', 'E']
-    assert tree.path('H', 'E') == ['H', 'F', 'E']
-    assert tree.path('H', 'G') == ['H', 'F', 'E', 'G']
-    assert tree.path('H', 'A') == ['H', 'F', 'E', 'A']
-    assert tree.path('B', 'A') == ['B', 'A']
-    assert tree.path('J', 'I') == ['J', 'H', 'F', 'I']
-    assert tree.path('C', 'B') == ['C', 'B']
-    assert tree.path('J', 'M') == ['J', 'H', 'F', 'E', 'A', 'K', 'M']
-    assert tree.path('M', 'J') == ['M', 'K', 'A', 'E', 'F', 'H', 'J']
-    assert tree.path('F', 'A') == ['F', 'E', 'A']
-    assert tree.path('A', 'F') == ['A', 'E', 'F']
-
-    assert tree.path("L", "L") == ['L']
+    assert A.path("L", "L") == ['L']
 
 
 def test_wrong_arg():
 
     with raises(TypeError):
-        Tree([A])
+        A([A])
 
     with raises(TypeError):
         Node("X", (Node("Y", (Node("Z")))))
@@ -69,7 +67,6 @@ def test_wrong_arg():
 
 def test_contain():
 
-    tree = Tree(A)
-
-    assert ("Z" in tree) is False
-    assert ("G" in tree) is True
+    assert ("Z" in A) is False
+    assert ("G" in A) is True
+    assert ("A" in A) is True

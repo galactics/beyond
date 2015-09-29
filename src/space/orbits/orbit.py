@@ -4,7 +4,7 @@
 import numpy as np
 from numpy import cos, arccos, sin, arcsin, arctan, arctan2, sqrt, arccosh, sinh
 
-from space.utils.tree import Tree, Node
+from space.utils.tree import Node
 from space.constants import µ_e
 
 
@@ -31,7 +31,7 @@ class Coord(np.ndarray):
     F_SPHE = CoordForm("Spherical", ["r", "φ", "θ", "r_dot", "φ_dot", "θ_dot"])
     F_CART = CoordForm("Cartesian", ["x", "y", "z", "vx", "vy", "vz"], [F_KEPL, F_SPHE])
 
-    _tree = Tree(F_CART)
+    _tree = F_CART
 
     def __new__(cls, coord, form, **kwargs):
 
