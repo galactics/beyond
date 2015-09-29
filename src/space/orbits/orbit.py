@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from numpy import cos, arccos, sin, arcsin, arctan2, sqrt, arccosh, sinh
-from datetime import datetime
+from numpy import cos, arccos, sin, arcsin, arctan, arctan2, sqrt, arccosh, sinh
 
 from space.utils.tree import Tree, Node
 from space.constants import µ_e
@@ -29,7 +28,8 @@ class Coord(np.ndarray):
     F_TLE = CoordForm("TLE", ["i", "Ω", "e", "ω", "M", "n"])
     F_KEPL_M = CoordForm("Keplerian_M", ["a", "e", "i", "Ω", "ω", "M"], [F_TLE])
     F_KEPL = CoordForm("Keplerian", ["a", "e", "i", "Ω", "ω", "ν"], [F_KEPL_M])
-    F_CART = CoordForm("Cartesian", ["x", "y", "z", "vx", "vy", "vz"], [F_KEPL])
+    F_SPHE = CoordForm("Spherical", ["r", "φ", "θ", "r_dot", "φ_dot", "θ_dot"])
+    F_CART = CoordForm("Cartesian", ["x", "y", "z", "vx", "vy", "vz"], [F_KEPL, F_SPHE])
 
     _tree = Tree(F_CART)
 
@@ -210,6 +210,34 @@ class Coord(np.ndarray):
         n = sqrt(µ_e / a ** 3)
 
         return np.array([i, Ω, e, ω, M, n], dtype=float)
+
+    @classmethod
+    def _cartesian_to_spherical(cls, coord):
+        x, y, z, vx, vy, vz = coord
+        r = np.linalg.norm(coord[:3])
+        lat = arcsin(z / r)
+        lon = arctan(y / x)
+
+        # Not very sure about this
+        r_dot = (x * vx + y * vy + z * vz) / r
+        lat_dot = (z * (x * vx + y * vy) - vz * (x ** 2 + y ** 2)) / (r ** 2 * sqrt(x ** 2 + y ** 2))
+        lon_dot = (y * vx - x * vy) / (x ** 2 + y ** 2)
+
+        return np.array([r, lat, lon, r_dot, lat_dot, lon_dot], dtype=float)
+
+    @classmethod
+    def _spherical_to_cartesian(cls, coord):
+        r, lat, lon, r_dot, lat_dot, lon_dot = coord
+        x = r * cos(lat) * cos(lon)
+        y = r * cos(lat) * sin(lon)
+        z = r * sin(lat)
+
+        # Not very sure about that either
+        vx = r_dot * x / r + y * lon_dot + z * lat_dot * cos(lon)
+        vy = r_dot * y / r - x * lon_dot + z * lat_dot * sin(lon)
+        vz = r_dot * z / r - r * lat_dot * cos(lat)
+
+        return np.array([x, y, z, vx, vy, vz], dtype=float)
 
 
 class Orbit:
