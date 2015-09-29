@@ -58,11 +58,37 @@ class Coord(np.ndarray):
         return list(zip(self.names, self))
 
     def __getattr__(self, name):
+
+        convert = {
+            'theta': 'θ',
+            'phi': 'φ',
+            'Omega': "Ω",
+            'omega': 'ω',
+            'nu': "ν",
+            'theta_dot': 'θ_dot',
+            'phi_dot': 'φ_dot',
+        }
+
+        # Conversion of variable name to utf-8
+        if name in convert:
+            name = convert[name]
+
+        # Verification if the variable is available in the current form
         if name not in self.names:
             raise AttributeError("{name} unknow for this form of Coord")
 
         i = self.names.index(name)
         return self[i]
+
+    def __getitem__(self, key):
+
+        if type(key) in (int, slice):
+            return super().__getitem__(key)
+        else:
+            try:
+                return self.__getattr__(key)
+            except AttributeError as e:
+                raise KeyError(str(e))
 
     def transform(self, to):
 

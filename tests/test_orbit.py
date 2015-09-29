@@ -24,13 +24,12 @@ def test_coord_init():
 
     coord = Coord(ref_coord, ref_form)
 
-    dic = dict(coord._to_list())
-    assert dic['a'] == 7192631.11295
-    assert dic['e'] == 0.00218439
-    assert dic['i'] == 1.7192610104468178
-    assert dic['Ω'] == 5.5104444999812001
-    assert dic['ω'] == 1.1789060198505055
-    assert dic['M'] == 3.043341444376126
+    assert coord['a'] == 7192631.11295
+    assert coord['e'] == 0.00218439
+    assert coord['i'] == 1.7192610104468178
+    assert coord['Ω'] == 5.5104444999812001
+    assert coord['ω'] == 1.1789060198505055
+    assert coord['M'] == 3.043341444376126
 
     unknown_form = CoordForm("Dummy", None, None)
 
@@ -55,12 +54,11 @@ def test_coord_unit_transform():
 
     tle = Coord._keplerian_m_to_tle(ref)
     tle_dict = dict(zip(Coord.F_TLE.param_names, tle))
-    ref_dict = dict(ref._to_list())
-    assert tle_dict['i'] == ref_dict['i']
-    assert tle_dict['Ω'] == ref_dict['Ω']
-    assert tle_dict['e'] == ref_dict['e']
-    assert tle_dict['ω'] == ref_dict['ω']
-    assert tle_dict['M'] == ref_dict['M']
+    assert tle_dict['i'] == ref['i']
+    assert tle_dict['Ω'] == ref['Ω']
+    assert tle_dict['e'] == ref['e']
+    assert tle_dict['ω'] == ref['ω']
+    assert tle_dict['M'] == ref['M']
 
     new = Coord._tle_to_keplerian_m(tle)
     assert np.allclose(new, ref)
@@ -85,17 +83,24 @@ def test_coord_global_transform():
     assert np.allclose(coord, ref_cart)
 
 
-def test_coord_getattr():
+def test_coord_attributes_access():
     coord = Coord(ref_coord, ref_form)
     assert coord.a == coord[0]
     assert coord.e == coord[1]
     assert coord.i == coord[2]
     assert coord.Ω == coord[3]
+    assert coord.Omega == coord[3]
+    assert coord['Omega'] == coord[3]
     assert coord.ω == coord[4]
+    assert coord.omega == coord[4]
+    assert coord['omega'] == coord[4]
     assert coord.M == coord[5]
 
     with raises(AttributeError):
         coord.ν == coord[5]
+
+    with raises(KeyError):
+        coord["ν"]
 
     coord.transform(Coord.F_KEPL)
     assert coord.ν == coord[5]
