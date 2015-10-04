@@ -9,23 +9,26 @@ from space.orbits.tle import Tle
 
 class WGS72Old:
     µ_e = 3.9860079964e5       # in km³.s⁻²
-    r_e = 6378.135              # km
+    r_e = 6378.135             # km
+    k_e = 0.0743669161
     j2 = 0.001082616
     j3 = -0.00000253881
     j4 = -0.00000165597
 
 
 class WGS72:
-    µ_e = 3.986008e9           # in km³.s⁻²
-    r_e = 6378.135              # km
+    µ_e = 3.986008e5           # in km³.s⁻²
+    r_e = 6378.135             # km
+    k_e = 60.0 / sqrt(r_e ** 3 / µ_e)
     j2 = 0.001082616
     j3 = -0.00000253881
     j4 = -0.00000165597
 
 
 class WGS84:
-    µ_e = 3.986005e9           # in km³.s⁻²
-    r_e = 6378.137              # in km
+    µ_e = 3.986005e5           # in km³.s⁻²
+    r_e = 6378.137             # in km
+    k_e = 60.0 / sqrt(r_e ** 3 / µ_e)
     j2 = 0.00108262998905
     j3 = -0.00000253215306
     j4 = -0.00000161098761
@@ -48,44 +51,56 @@ class SGP4:
         j2 = self.gravity.j2
         j3 = self.gravity.j3
         j4 = self.gravity.j4
-        µ = self.gravity.µ_e  # * 10 ** -9  # earth gravity in km³.s⁻²
-        r_e = self.gravity.r_e  # / 1000.  # earth radius in km
+        µ = self.gravity.µ_e
+        r_e = self.gravity.r_e
+        k_e = self.gravity.k_e
         i0, Ω0, e0, ω0, M0, n0 = self.tle.to_list()
         t0 = self.tle.epoch
-        tdiff = (date - t0).total_seconds()  # / 60.
-        bstar = self.tle.bstar / r_e
+        tdiff = (date - t0).total_seconds() / 60.
+        bstar = self.tle.bstar
 
-        delta = 3 / 2 * j2 * (3.0 * cos(i0) ** 2 - 1.0) / ((1. - e0 ** 2) ** (3. / 2.))
+        # We work in dimensionless variables
+        A30 = -j3
+        k2 = 1 / 2 * j2
+        k4 = - 3 / 8 * j4
 
-        a1 = (µ / n0 ** 2) ** (1 / 3)
+        # print("bstar =", bstar)
+        # print("e =", e0)
+        # print("ω0 =", ω0)
+        # print("i0 =", i0)
+        # print("M0 =", M0)
+        # print("n0 =", n0)
+        # print("Ω0 =", Ω0)
+
+        delta = 3 / 2 * k2 * (3.0 * cos(i0) ** 2 - 1.0) / ((1. - e0 ** 2) ** (3. / 2.))
+
+        a1 = (k_e / n0) ** (2 / 3)
         delta_1 = delta / a1 ** 2
-        a0 = a1 * (1.0 - delta_1 ** 2 - delta_1 * (1.0 / 3. + 134. * delta_1 ** 3 / 81.))
+        a0 = a1 * (1 - 1 / 3 * delta_1 - delta_1 ** 2 - 134. * delta_1 ** 3 / 81.)
         delta_0 = delta / a0 ** 2
-        n0 = n0 / (1.0 + delta_0)
-        a0 = a0 / (1 + delta_0)
-        rp = a0 * (1 - e0 ** 2)  # perigee
-        rp_alt = rp - r_e  # altitude of the perigee
+        n0 = n0 / (1 + delta_0)
+        a0 = a0 / (1 - delta_0)
+        rp = a0 * (1 - e0)  # perigee in fraction of earth radius
+        rp_alt = (rp - 1) * r_e # altitude of the perigee in km
 
-        s = 78000. + r_e
-        q0 = 120000. + r_e
+        s = 78. / r_e + 1
+        q0 = 120. / r_e + 1
 
-        if rp_alt < 156000:
-            if rp_alt < 98000:
-                s = 20000 + r_e
-            else:
-                s = rp - s + r_e
+        if rp_alt < 156:
+            s = rp_alt - 78
+            if rp_alt < 98:
+                s = 20
+
+            s = s / r_e + 1
 
         θ = cos(i0)
         ξ = 1 / (a0 - s)
         β_0 = sqrt(1 - e0 ** 2)
         η = a0 * e0 * ξ
 
-        A30 = -j3 * r_e ** 3
-        k2 = 1 / 2 * j2 * r_e ** 2
-        k4 = - 3 / 8 * j4 * r_e ** 4
-
         C2 = (q0 - s) ** 4 * ξ ** 4 * n0 * (1 - η ** 2) ** (- 7 / 2) * (a0 * (1 + 3 / 2 * η ** 2 + 4 * e0 * η + e0 * η ** 3) + 3 * k2 * ξ * (- 0.5 + 3 / 2 * θ ** 2) * (8 + 24 * η ** 2 + 3 * η ** 4) / (2 * (1 - η ** 2)))
         C1 = bstar * C2
+        print(C2)
         C3 = (q0 - s) ** 4 * ξ ** 5 * A30 * n0 * r_e * sin(i0) / (k2 * e0)
         C4 = 2 * n0 * (q0 - s) ** 4 * ξ ** 4 * a0 * β_0 ** 2 * (1 - η ** 2) ** (7 / 2) * ((2 * η * (1 + e0 * η) + 0.5 * e0 + 0.5 * η ** 2) - 2 * k2 * ξ / (a0 * (1 - η ** 2)) * (3 * (1 - 3 * θ ** 2) * (1 + 3 / 2 * η ** 2 - 2 * e0 * η - 0.5 * e0 * η ** 3) + (3 / 4 * (1 - θ ** 2) * (2 * η ** 2 - e0 * η - e0 * η ** 3) * cos(2 * ω0))))
         C5 = 2 * (q0 - s) ** 4 * ξ ** 4 * a0 * β_0 ** 2 * (1 - η ** 2) ** (7 / 2) * (1 + 11 / 4 * η * (η + e0) + (e0 * η ** 3))
