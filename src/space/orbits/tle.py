@@ -72,14 +72,14 @@ class Tle:
         self.epoch = datetime(2000 + int(first[3][:2]), 1, 1) + timedelta(days=float(first[3][2:]))
         self.ndot = float(first[4])
         self.ndotdot = _float(first[5])
-        self.drag = _float(first[6])
+        self.bstar = _float(first[6])
 
-        self.i = float(second[2])       # inclination
-        self.Ω = float(second[3])       # right ascencion of the acending node
-        self.e = _float(second[4])      # excentricity
-        self.ω = float(second[5])       # argument of periapsis
-        self.M = float(second[6])       # mean anomaly
-        self.n = float(second[7][:11])  # mean motion (rev/day)
+        self.i = np.deg2rad(float(second[2]))   # inclination
+        self.Ω = np.deg2rad(float(second[3]))   # right ascencion of the acending node
+        self.e = _float(second[4])              # excentricity
+        self.ω = np.deg2rad(float(second[5]))   # argument of periapsis
+        self.M = np.deg2rad(float(second[6]))   # mean anomaly
+        self.n = float(second[7][:11]) * 2 * np.pi / 1440.  # mean motion (rev/day converted to min⁻¹)
 
     @classmethod
     def _check_validity(cls, text):
@@ -91,12 +91,9 @@ class Tle:
             if checksum != line[-1]:
                 raise ValueError("Checksum validation failed")
 
+    def to_list(self):
+        return [self.i, self.Ω, self.e, self.ω, self.M, self.n]
+
     def orbit(self):
 
-        i = np.deg2rad(self.i)  # conversion to radians
-        Ω = np.deg2rad(self.Ω)
-        e = self.e
-        ω = np.deg2rad(self.ω)
-        M = np.deg2rad(self.M)
-        n = self.n * 2 * np.pi / 86400.  # conversion to s⁻¹
-        return Orbit(self.epoch, [i, Ω, e, ω, M, n], Coord.F_TLE)
+        return Orbit(self.epoch, self.to_list(), Coord.F_TLE)
