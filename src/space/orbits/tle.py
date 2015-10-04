@@ -69,7 +69,7 @@ class Tle:
         year += 1900 if self.norad_id < 26052 else 2000
         self.cospar_id = "%d-%s" % (year, first[2][2:])
 
-        self.epoch = datetime(2000 + int(first[3][:2]), 1, 1) + timedelta(days=float(first[3][2:]))
+        self.epoch = datetime(2000 + int(first[3][:2]), 1, 1) + timedelta(days=float(first[3][2:]) - 1)
         self.ndot = float(first[4])
         self.ndotdot = _float(first[5])
         self.bstar = _float(first[6])
