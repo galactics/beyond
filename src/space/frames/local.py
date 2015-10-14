@@ -1,6 +1,5 @@
 import numpy as np
-
-norm = np.linalg.norm
+from numpy.linalg import norm as norm
 
 
 def _split_state_vector(state_vector):
