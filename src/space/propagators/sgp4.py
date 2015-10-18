@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from numpy import cos, sqrt, sin, arctan
+from numpy import cos, sqrt, sin, arctan2
 
 from space.orbits.tle import Tle
 
@@ -46,8 +46,6 @@ class SGP4:
 
     def propagate(self, date):
 
-        # ----------------------- earth constants ---------------------- */
-        # sgp4fix identify constants and allow alternate values
         j2 = self.gravity.j2
         j3 = self.gravity.j3
         j4 = self.gravity.j4
@@ -128,7 +126,7 @@ class SGP4:
         ayN = e * sin(ω) + ayNL
 
         # Resolving of kepler equation
-        U = L_T - Ω
+        U = (L_T - Ω) % (2 * np.pi)
         Epω = U
         for xxx in range(10):
             delta_Epω = (U - ayN * cos(Epω) + axN * sin(Epω) - Epω) / (1 - ayN * sin(Epω) - axN * cos(Epω))
@@ -147,7 +145,7 @@ class SGP4:
 
         cosu = a / r * (cos(Epω) - axN + ayN * esinE / (1 + sqrt(1 - e_L ** 2)))
         sinu = a / r * (sin(Epω) - ayN - axN * esinE / (1 + sqrt(1 - e_L ** 2)))
-        u = arctan(sinu / cosu)
+        u = arctan2(sinu, cosu)
 
         Delta_r = k2 / (2 * p_L) * (1 - θ ** 2) * cos(2 * u)
         Delta_u = - k2 / (4 * p_L ** 2) * (7 * θ ** 2 - 1) * sin(2 * u)
