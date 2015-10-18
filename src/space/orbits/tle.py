@@ -45,7 +45,14 @@ def _float(text):
         text = "-.%s" % text[1:]
     else:
         text = ".%s" % text
-    return float('e-'.join(text.rsplit('-', 1)))
+
+    if "+" in text or "-" in text:
+        value, sign, expo = text.rpartition('+') if '+' in text else text.rpartition('-')
+        v = float('{value}e{sign}{expo}'.format(value=value, sign=sign, expo=expo))
+    else:
+        v = float(text)
+
+    return v
 
 
 class Tle:
@@ -84,7 +91,7 @@ class Tle:
     @classmethod
     def _check_validity(cls, text):
 
-        tr_table = str.maketrans({c: None for c in (ascii_uppercase + " .")})
+        tr_table = str.maketrans({c: None for c in (ascii_uppercase + "+ .")})
         for line in text:
             no_letters = line.translate(tr_table).replace("-", "1")
             checksum = str(sum([int(l) for l in no_letters[:-1]]))[-1]
