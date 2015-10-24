@@ -97,7 +97,11 @@ class SGP4:
 
         C2 = (self._init.q0 - self._init.s) ** 4 * self._init.ξ ** 4 * self._init.n0 * (1 - self._init.η ** 2) ** (- 7 / 2) * (self._init.a0 * (1 + 3 / 2 * self._init.η ** 2 + 4 * e0 * self._init.η + e0 * self._init.η ** 3) + 3 * self._init.k2 * self._init.ξ * (- 0.5 + 3 / 2 * self._init.θ ** 2) * (8 + 24 * self._init.η ** 2 + 3 * self._init.η ** 4) / (2 * (1 - self._init.η ** 2)))
         self._init.C1 = bstar * C2
-        self._init.C3 = (self._init.q0 - self._init.s) ** 4 * self._init.ξ ** 5 * self._init.A30 * self._init.n0 * sin(i0) / (self._init.k2 * e0)
+
+        self._init.C3 = 0.
+        if e0  > 1e-4:
+            self._init.C3 = (self._init.q0 - self._init.s) ** 4 * self._init.ξ ** 5 * self._init.A30 * self._init.n0 * sin(i0) / (self._init.k2 * e0)
+
         self._init.C4 = 2 * self._init.n0 * (self._init.q0 - self._init.s) ** 4 * self._init.ξ ** 4 * self._init.a0 * self._init.β_0 ** 2 * (1 - self._init.η ** 2) ** (- 7 / 2) * ((2 * self._init.η * (1 + e0 * self._init.η) + 0.5 * e0 + 0.5 * self._init.η ** 3) - 2 * self._init.k2 * self._init.ξ / (self._init.a0 * (1 - self._init.η ** 2)) * (3 * (1 - 3 * self._init.θ ** 2) * (1 + 3 / 2 * self._init.η ** 2 - 2 * e0 * self._init.η - 0.5 * e0 * self._init.η ** 3) + (3 / 4 * (1 - self._init.θ ** 2) * (2 * self._init.η ** 2 - e0 * self._init.η - e0 * self._init.η ** 3) * cos(2 * ω0))))
         self._init.C5 = 2 * (self._init.q0 - self._init.s) ** 4 * self._init.ξ ** 4 * self._init.a0 * self._init.β_0 ** 2 * (1 - self._init.η ** 2) ** (- 7 / 2) * (1 + 11 / 4 * self._init.η * (self._init.η + e0) + (e0 * self._init.η ** 3))
         self._init.D2 = 4 * self._init.a0 * self._init.ξ * self._init.C1 ** 2
@@ -127,12 +131,18 @@ class SGP4:
         Ωdf = Ω0 + _i.Ωdot * n0 * tdiff
 
         delta_ω = bstar * _i.C3 * cos(ω0) * tdiff
-        delta_M = - 2 / 3 * (_i.q0 - _i.s) ** 4 * bstar * _i.ξ ** 4 / (e0 * _i.η) * ((1 + _i.η * cos(Mdf)) ** 3 - (1 + _i.η * cos(M0)) ** 3)
+        delta_M = 0.
+        if e0 > 1e-4:
+            delta_M = - 2 / 3 * (_i.q0 - _i.s) ** 4 * bstar * _i.ξ ** 4 / (e0 * _i.η) * ((1 + _i.η * cos(Mdf)) ** 3 - (1 + _i.η * cos(M0)) ** 3)
 
         Mp = (Mdf + delta_ω + delta_M) % (2 * np.pi)
         ω = ωdf - delta_ω - delta_M
         Ω = Ωdf - 21 * n0 * _i.k2 * _i.θ / (2 * _i.a0 ** 2 * _i.β_0 ** 2) * _i.C1 * tdiff ** 2
         e = e0 - bstar * _i.C4 * tdiff - bstar * _i.C5 * (sin(Mp) - sin(M0))
+
+        if e < 1e-6:
+            e = 1e-6
+
         a = _i.a0 * (1 - _i.C1 * tdiff - _i.D2 * tdiff ** 2 - _i.D3 * tdiff ** 3 - _i.D4 * tdiff ** 4) ** 2
 
         L = Mp + ω + Ω + n0 * (3 / 2 * _i.C1 * tdiff ** 2 + (_i.D2 + 2 * _i.C1 ** 2) * tdiff ** 3 + 1 / 4 * (3 * _i.D3 + 12 * _i.C1 * _i.D2 + 10 * _i.C1 ** 3) * tdiff ** 4 + 1 / 5 * (3 * _i.D4 + 12 * _i.C1 * _i.D3 + 6 * _i.D2 ** 2 + 30 * _i.C1 ** 2 * _i.D2 + 15 * _i.C1 ** 4) * tdiff ** 5)
@@ -143,7 +153,8 @@ class SGP4:
         # Long-period terms
         axN = e * cos(ω)
         ayNL = _i.A30 * sin(i0) / (4 * _i.k2 * a * β ** 2)
-        L_L = ayNL / 2 * axN * ((3 + 5 * _i.θ) / (1 + _i.θ))
+        tmp = (1 + _i.θ) if (1 + _i.θ) > 1.5e-12 else 1.5e-12
+        L_L = ayNL / 2 * axN * ((3 + 5 * _i.θ) / tmp)
 
         L_T = L + L_L
         ayN = e * sin(ω) + ayNL
