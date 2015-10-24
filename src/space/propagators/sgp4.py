@@ -34,6 +34,10 @@ class WGS84:
     j4 = -0.00000161098761
 
 
+class Init:
+    pass
+
+
 class SGP4:
 
     def __init__(self, tle, gravity=WGS72):
@@ -43,8 +47,15 @@ class SGP4:
 
         self.gravity = gravity
         self.tle = tle
+        _i = None
+        self._sgp4_init()
 
-    def propagate(self, date):
+    def _sgp4_init(self):
+
+        self._init = Init()
+
+        i0, Ω0, e0, ω0, M0, n0 = self.tle.to_list()
+        bstar = self.tle.bstar
 
         j2 = self.gravity.j2
         j3 = self.gravity.j3
@@ -52,75 +63,87 @@ class SGP4:
         µ = self.gravity.µ_e
         r_e = self.gravity.r_e
         k_e = self.gravity.k_e
+
+        # We work in dimensionless variables
+        self._init.A30 = -j3
+        self._init.k2 = 1 / 2 * j2
+        k4 = - 3 / 8 * j4
+
+        delta = 3 / 2 * self._init.k2 * (3.0 * cos(i0) ** 2 - 1.0) / ((1. - e0 ** 2) ** (3. / 2.))
+
+        a1 = (k_e / n0) ** (2 / 3)
+        delta_1 = delta / a1 ** 2
+        self._init.a0 = a1 * (1 - 1 / 3 * delta_1 - delta_1 ** 2 - 134. * delta_1 ** 3 / 81.)
+        delta_0 = delta / self._init.a0 ** 2
+        self._init.n0 = n0 / (1 + delta_0)
+        self._init.a0 = self._init.a0 / (1 - delta_0)
+        rp = self._init.a0 * (1 - e0)  # perigee in fraction of earth radius
+        rp_alt = (rp - 1) * r_e        # altitude of the perigee in km
+
+        self._init.s = 78. / r_e + 1
+        self._init.q0 = 120. / r_e + 1
+
+        if rp_alt < 156:
+            self._init.s = rp_alt - 78
+            if rp_alt < 98:
+                self._init.s = 20
+
+            self._init.s = self._init.s / r_e + 1
+
+        self._init.θ = cos(i0)
+        self._init.ξ = 1 / (self._init.a0 - self._init.s)
+        self._init.β_0 = sqrt(1 - e0 ** 2)
+        self._init.η = self._init.a0 * e0 * self._init.ξ
+
+        C2 = (self._init.q0 - self._init.s) ** 4 * self._init.ξ ** 4 * self._init.n0 * (1 - self._init.η ** 2) ** (- 7 / 2) * (self._init.a0 * (1 + 3 / 2 * self._init.η ** 2 + 4 * e0 * self._init.η + e0 * self._init.η ** 3) + 3 * self._init.k2 * self._init.ξ * (- 0.5 + 3 / 2 * self._init.θ ** 2) * (8 + 24 * self._init.η ** 2 + 3 * self._init.η ** 4) / (2 * (1 - self._init.η ** 2)))
+        self._init.C1 = bstar * C2
+        self._init.C3 = (self._init.q0 - self._init.s) ** 4 * self._init.ξ ** 5 * self._init.A30 * self._init.n0 * sin(i0) / (self._init.k2 * e0)
+        self._init.C4 = 2 * self._init.n0 * (self._init.q0 - self._init.s) ** 4 * self._init.ξ ** 4 * self._init.a0 * self._init.β_0 ** 2 * (1 - self._init.η ** 2) ** (- 7 / 2) * ((2 * self._init.η * (1 + e0 * self._init.η) + 0.5 * e0 + 0.5 * self._init.η ** 3) - 2 * self._init.k2 * self._init.ξ / (self._init.a0 * (1 - self._init.η ** 2)) * (3 * (1 - 3 * self._init.θ ** 2) * (1 + 3 / 2 * self._init.η ** 2 - 2 * e0 * self._init.η - 0.5 * e0 * self._init.η ** 3) + (3 / 4 * (1 - self._init.θ ** 2) * (2 * self._init.η ** 2 - e0 * self._init.η - e0 * self._init.η ** 3) * cos(2 * ω0))))
+        self._init.C5 = 2 * (self._init.q0 - self._init.s) ** 4 * self._init.ξ ** 4 * self._init.a0 * self._init.β_0 ** 2 * (1 - self._init.η ** 2) ** (- 7 / 2) * (1 + 11 / 4 * self._init.η * (self._init.η + e0) + (e0 * self._init.η ** 3))
+        self._init.D2 = 4 * self._init.a0 * self._init.ξ * self._init.C1 ** 2
+        self._init.D3 = 4 / 3 * self._init.a0 * self._init.ξ ** 2 * (17 * self._init.a0 + self._init.s) * self._init.C1 ** 3
+        self._init.D4 = 2 / 3 * self._init.a0 * self._init.ξ ** 3 * (221 * self._init.a0 + 31 * self._init.s) * self._init.C1 ** 4
+
+        self._init.Mdot = (1 + (3 * self._init.k2 * (3 * self._init.θ ** 2 - 1)) / (2 * self._init.a0 ** 2 * self._init.β_0 ** 3) + (3 * self._init.k2 ** 2 * (13 - 78 * self._init.θ ** 2 + 137 * self._init.θ ** 4)) / (16 * self._init.a0 ** 4 * self._init.β_0 ** 7))
+        self._init.ωdot = (- 3 * self._init.k2 * (1 - 5 * self._init.θ ** 2) / (2 * self._init.a0 ** 2 * self._init.β_0 ** 4) + 3 * self._init.k2 ** 2 * (7 - 114 * self._init.θ ** 2 + 395 * self._init.θ ** 4) / (16 * self._init.a0 ** 4 * self._init.β_0 ** 8) + 5 * k4 * (3 - 36 * self._init.θ ** 2 + 49 * self._init.θ ** 4) / (4 * self._init.a0 ** 4 * self._init.β_0 ** 8))
+        self._init.Ωdot = (- 3 * self._init.k2 * self._init.θ / (self._init.a0 ** 2 * self._init.β_0 ** 4) + 3 * self._init.k2 ** 2 * (4 * self._init.θ - 19 * self._init.θ ** 3) / (2 * self._init.a0 ** 4 * self._init.β_0 ** 8) + 5 * k4 * self._init.θ * (3 - 7 * self._init.θ ** 2) / (2 * self._init.a0 ** 4 * self._init.β_0 ** 8))
+
+    def propagate(self, date):
+
         i0, Ω0, e0, ω0, M0, n0 = self.tle.to_list()
         t0 = self.tle.epoch
         tdiff = (date - t0).total_seconds() / 60.
         bstar = self.tle.bstar
+        µ = self.gravity.µ_e
+        r_e = self.gravity.r_e
+        k_e = self.gravity.k_e
 
-        # We work in dimensionless variables
-        A30 = -j3
-        k2 = 1 / 2 * j2
-        k4 = - 3 / 8 * j4
+        # retrieve initialised variables
+        _i = self._init
+        n0 = _i.n0
 
-        delta = 3 / 2 * k2 * (3.0 * cos(i0) ** 2 - 1.0) / ((1. - e0 ** 2) ** (3. / 2.))
+        Mdf = M0 + _i.Mdot * n0 * tdiff
+        ωdf = ω0 + _i.ωdot * n0 * tdiff
+        Ωdf = Ω0 + _i.Ωdot * n0 * tdiff
 
-        a1 = (k_e / n0) ** (2 / 3)
-        delta_1 = delta / a1 ** 2
-        a0 = a1 * (1 - 1 / 3 * delta_1 - delta_1 ** 2 - 134. * delta_1 ** 3 / 81.)
-        delta_0 = delta / a0 ** 2
-        n0 = n0 / (1 + delta_0)
-        a0 = a0 / (1 - delta_0)
-        rp = a0 * (1 - e0)  # perigee in fraction of earth radius
-        rp_alt = (rp - 1) * r_e # altitude of the perigee in km
-
-        s = 78. / r_e + 1
-        q0 = 120. / r_e + 1
-
-        if rp_alt < 156:
-            s = rp_alt - 78
-            if rp_alt < 98:
-                s = 20
-
-            s = s / r_e + 1
-
-        θ = cos(i0)
-        ξ = 1 / (a0 - s)
-        β_0 = sqrt(1 - e0 ** 2)
-        η = a0 * e0 * ξ
-
-        C2 = (q0 - s) ** 4 * ξ ** 4 * n0 * (1 - η ** 2) ** (- 7 / 2) * (a0 * (1 + 3 / 2 * η ** 2 + 4 * e0 * η + e0 * η ** 3) + 3 * k2 * ξ * (- 0.5 + 3 / 2 * θ ** 2) * (8 + 24 * η ** 2 + 3 * η ** 4) / (2 * (1 - η ** 2)))
-        C1 = bstar * C2
-        C3 = (q0 - s) ** 4 * ξ ** 5 * A30 * n0 * sin(i0) / (k2 * e0)
-        C4 = 2 * n0 * (q0 - s) ** 4 * ξ ** 4 * a0 * β_0 ** 2 * (1 - η ** 2) ** (- 7 / 2) * ((2 * η * (1 + e0 * η) + 0.5 * e0 + 0.5 * η ** 3) - 2 * k2 * ξ / (a0 * (1 - η ** 2)) * (3 * (1 - 3 * θ ** 2) * (1 + 3 / 2 * η ** 2 - 2 * e0 * η - 0.5 * e0 * η ** 3) + (3 / 4 * (1 - θ ** 2) * (2 * η ** 2 - e0 * η - e0 * η ** 3) * cos(2 * ω0))))
-        C5 = 2 * (q0 - s) ** 4 * ξ ** 4 * a0 * β_0 ** 2 * (1 - η ** 2) ** (- 7 / 2) * (1 + 11 / 4 * η * (η + e0) + (e0 * η ** 3))
-
-        D2 = 4 * a0 * ξ * C1 ** 2
-        D3 = 4 / 3 * a0 * ξ ** 2 * (17 * a0 + s) * C1 ** 3
-        D4 = 2 / 3 * a0 * ξ ** 3 * (221 * a0 + 31 * s) * C1 ** 4
-
-        Mdot = (1 + (3 * k2 * (3 * θ ** 2 - 1)) / (2 * a0 ** 2 * β_0 ** 3) + (3 * k2 ** 2 * (13 - 78 * θ ** 2 + 137 * θ ** 4)) / (16 * a0 ** 4 * β_0 ** 7))
-        Mdf = M0 + Mdot * n0 * tdiff
-        ωdf = ω0 + (- 3 * k2 * (1 - 5 * θ ** 2) / (2 * a0 ** 2 * β_0 ** 4) + 3 * k2 ** 2 * (7 - 114 * θ ** 2 + 395 * θ ** 4) / (16 * a0 ** 4 * β_0 ** 8) + 5 * k4 * (3 - 36 * θ ** 2 + 49 * θ ** 4) / (4 * a0 ** 4 * β_0 ** 8)) * n0 * tdiff
-        Ωdf = Ω0 + (- 3 * k2 * θ / (a0 ** 2 * β_0 ** 4) + 3 * k2 ** 2 * (4 * θ - 19 * θ ** 3) / (2 * a0 ** 4 * β_0 ** 8) + 5 * k4 * θ * (3 - 7 * θ ** 2) / (2 * a0 ** 4 * β_0 ** 8)) * n0 * tdiff
-
-        delta_ω = bstar * C3 * cos(ω0) * tdiff
-        delta_M = - 2 / 3 * (q0 - s) ** 4 * bstar * ξ ** 4 / (e0 * η) * ((1 + η * cos(Mdf)) ** 3 - (1 + η * cos(M0)) ** 3)
+        delta_ω = bstar * _i.C3 * cos(ω0) * tdiff
+        delta_M = - 2 / 3 * (_i.q0 - _i.s) ** 4 * bstar * _i.ξ ** 4 / (e0 * _i.η) * ((1 + _i.η * cos(Mdf)) ** 3 - (1 + _i.η * cos(M0)) ** 3)
 
         Mp = (Mdf + delta_ω + delta_M) % (2 * np.pi)
         ω = ωdf - delta_ω - delta_M
-        Ω = Ωdf - 21 * n0 * k2 * θ / (2 * a0 ** 2 * β_0 ** 2) * C1 * tdiff ** 2
-        e = e0 - bstar * C4 * tdiff - bstar * C5 * (sin(Mp) - sin(M0))
-        a = a0 * (1 - C1 * tdiff - D2 * tdiff ** 2 - D3 * tdiff ** 3 - D4 * tdiff ** 4) ** 2
+        Ω = Ωdf - 21 * n0 * _i.k2 * _i.θ / (2 * _i.a0 ** 2 * _i.β_0 ** 2) * _i.C1 * tdiff ** 2
+        e = e0 - bstar * _i.C4 * tdiff - bstar * _i.C5 * (sin(Mp) - sin(M0))
+        a = _i.a0 * (1 - _i.C1 * tdiff - _i.D2 * tdiff ** 2 - _i.D3 * tdiff ** 3 - _i.D4 * tdiff ** 4) ** 2
 
-        L = Mp + ω + Ω + n0 * (3 / 2 * C1 * tdiff ** 2 + (D2 + 2 * C1 ** 2) * tdiff ** 3 + 1 / 4 * (3 * D3 + 12 * C1 * D2 + 10 * C1 ** 3) * tdiff ** 4 + 1 / 5 * (3 * D4 + 12 * C1 * D3 + 6 * D2 ** 2 + 30 * C1 ** 2 * D2 + 15 * C1 ** 4) * tdiff ** 5)
+        L = Mp + ω + Ω + n0 * (3 / 2 * _i.C1 * tdiff ** 2 + (_i.D2 + 2 * _i.C1 ** 2) * tdiff ** 3 + 1 / 4 * (3 * _i.D3 + 12 * _i.C1 * _i.D2 + 10 * _i.C1 ** 3) * tdiff ** 4 + 1 / 5 * (3 * _i.D4 + 12 * _i.C1 * _i.D3 + 6 * _i.D2 ** 2 + 30 * _i.C1 ** 2 * _i.D2 + 15 * _i.C1 ** 4) * tdiff ** 5)
 
         β = sqrt(1 - e ** 2)
         n = µ / (a ** (3 / 2))
 
         # Long-period terms
         axN = e * cos(ω)
-        ayNL = A30 * sin(i0) / (4 * k2 * a * β ** 2)
-        L_L = ayNL / 2 * axN * ((3 + 5 * θ) / (1 + θ))
+        ayNL = _i.A30 * sin(i0) / (4 * _i.k2 * a * β ** 2)
+        L_L = ayNL / 2 * axN * ((3 + 5 * _i.θ) / (1 + _i.θ))
 
         L_T = L + L_L
         ayN = e * sin(ω) + ayNL
@@ -147,14 +170,14 @@ class SGP4:
         sinu = a / r * (sin(Epω) - ayN - axN * esinE / (1 + sqrt(1 - e_L ** 2)))
         u = arctan2(sinu, cosu)
 
-        Delta_r = k2 / (2 * p_L) * (1 - θ ** 2) * cos(2 * u)
-        Delta_u = - k2 / (4 * p_L ** 2) * (7 * θ ** 2 - 1) * sin(2 * u)
-        Delta_Ω = 3 * k2 * θ / (2 * p_L ** 2) * sin(2 * u)
-        Delta_i = 3 * k2 * θ / (2 * p_L ** 2) * sin(i0) * cos(2 * u)
-        Delta_rdot = - n * k2 * (1 - θ ** 2) * sin(2 * u) / (p_L * µ)
-        Delta_rfdot = k2 * n * ((1 - θ ** 2) * cos(2 * u) - 3 / 2 * (1 - 3 * θ ** 2)) / (p_L * µ)
+        Delta_r = _i.k2 / (2 * p_L) * (1 - _i.θ ** 2) * cos(2 * u)
+        Delta_u = - _i.k2 / (4 * p_L ** 2) * (7 * _i.θ ** 2 - 1) * sin(2 * u)
+        Delta_Ω = 3 * _i.k2 * _i.θ / (2 * p_L ** 2) * sin(2 * u)
+        Delta_i = 3 * _i.k2 * _i.θ / (2 * p_L ** 2) * sin(i0) * cos(2 * u)
+        Delta_rdot = - n * _i.k2 * (1 - _i.θ ** 2) * sin(2 * u) / (p_L * µ)
+        Delta_rfdot = _i.k2 * n * ((1 - _i.θ ** 2) * cos(2 * u) - 3 / 2 * (1 - 3 * _i.θ ** 2)) / (p_L * µ)
 
-        rk = r * (1 - 3 / 2 * k2 * sqrt(1 - e_L ** 2) / (p_L ** 2) * (3 * θ ** 2 - 1)) + Delta_r
+        rk = r * (1 - 3 / 2 * _i.k2 * sqrt(1 - e_L ** 2) / (p_L ** 2) * (3 * _i.θ ** 2 - 1)) + Delta_r
         uk = u + Delta_u
         Ωk = Ω + Delta_Ω
         ik = i0 + Delta_i
@@ -172,7 +195,3 @@ class SGP4:
         vRdot = (rdotk * vU + rfdotk * vV) * (r_e * k_e / 60.)
 
         return vR, vRdot
-
-
-class Satellite:
-    pass
