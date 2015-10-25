@@ -87,19 +87,31 @@ class Coord(np.ndarray):
             except AttributeError as e:
                 raise KeyError(str(e))
 
-    def transform(self, to):
+    def pv(self):
+        pv = self._transform(self.F_CART)
+        return pv[:3], pv[3:]
 
+    def _transform(self, to):
+        """Gives the result of the transformation without inplace modifications
+
+        Returns:
+            Coord
+        """
+        coord = self.copy()
         if to != self.form:
             path = self._tree.path(self.form.name, to.name)
 
-            coord = self.copy()
             for i in range(len(path) - 1):
                 a = path[i].lower()
                 b = path[i + 1].lower()
                 coord = getattr(self, "_{}_to_{}".format(a, b))(coord)
 
-            self.base.setfield(coord, dtype=float)
-            self.form = to
+        return coord
+
+    def transform(self, to):
+        coord = self._transform(to)
+        self.base.setfield(coord, dtype=float)
+        self.form = to
 
     @classmethod
     def _cartesian_to_keplerian(cls, coord):
