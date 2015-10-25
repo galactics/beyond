@@ -54,9 +54,6 @@ class Coord(np.ndarray):
     def names(self):
         return self.form.param_names
 
-    def _to_list(self):
-        return list(zip(self.names, self))
-
     def __getattr__(self, name):
 
         convert = {
@@ -271,9 +268,10 @@ class Orbit:
     epoch = None
     coord = None
 
-    def __init__(self, epoch, coord, form):
+    def __init__(self, epoch, form, coord, data=None):
         self.epoch = epoch
         self.coord = Coord(coord, form)
+        self.data = data
 
     def __repr__(self):  # pragma: no cover
         coord_str = '\n'.join([" " * 4 + "%s = %s" % (name, arg) for name, arg in zip(self.coord.names, self.coord)])

@@ -38,6 +38,7 @@ from string import ascii_uppercase
 from datetime import datetime, timedelta
 
 from space.orbits.orbit import Orbit, Coord
+from space.propagators.sgp4 import Sgp4
 
 
 def _float(text):
@@ -102,5 +103,5 @@ class Tle:
         return [self.i, self.Ω, self.e, self.ω, self.M, self.n]
 
     def orbit(self):
-
-        return Orbit(self.epoch, self.to_list(), Coord.F_TLE)
+        data = [self.bstar, self.ndot, self.ndotdot]
+        return Orbit(self.epoch, Coord.F_TLE, self.to_list(), data)

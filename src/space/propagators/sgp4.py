@@ -3,8 +3,11 @@
 
 import numpy as np
 from numpy import cos, sqrt, sin, arctan2
+from datetime import datetime, timedelta
 
-from space.orbits.tle import Tle
+from space.orbits.orbit import Orbit, Coord
+
+__all__ = ['Sgp4']
 
 
 class WGS72Old:
@@ -38,24 +41,26 @@ class Init:
     pass
 
 
-class SGP4:
+class Sgp4:
 
-    def __init__(self, tle, gravity=WGS72):
+    def __init__(self, orbit, gravity=WGS72):
 
-        if type(tle) is not Tle:
-            raise TypeError("tle")
+        if not isinstance(orbit, Orbit):
+            raise TypeError("Not Orbit")
+
+        if orbit.coord.form != Coord.F_TLE:
+            raise TypeError("Not TLE")
 
         self.gravity = gravity
-        self.tle = tle
-        _i = None
+        self.tle = orbit
         self._sgp4_init()
 
     def _sgp4_init(self):
 
         self._init = Init()
 
-        i0, Ω0, e0, ω0, M0, n0 = self.tle.to_list()
-        bstar = self.tle.bstar
+        i0, Ω0, e0, ω0, M0, n0 = self.tle.coord
+        bstar = self.tle.data[0]
 
         j2 = self.gravity.j2
         j3 = self.gravity.j3
@@ -114,10 +119,13 @@ class SGP4:
 
     def propagate(self, date):
 
-        i0, Ω0, e0, ω0, M0, n0 = self.tle.to_list()
-        t0 = self.tle.epoch
-        tdiff = (date - t0).total_seconds() / 60.
-        bstar = self.tle.bstar
+        i0, Ω0, e0, ω0, M0, n0 = self.tle.coord
+        if isinstance(date, datetime):
+            t0 = self.tle.epoch
+            tdiff = (date - t0).total_seconds() / 60.
+        elif isinstance(date, timedelta):
+            tdiff = date.total_seconds() / 60.
+        bstar = self.tle.data[0]
         µ = self.gravity.µ_e
         r_e = self.gravity.r_e
         k_e = self.gravity.k_e
@@ -205,4 +213,4 @@ class SGP4:
         vR = rk * vU * r_e
         vRdot = (rdotk * vU + rfdotk * vV) * (r_e * k_e / 60.)
 
-        return vR, vRdot
+        return Coord(np.concatenate((vR, vRdot)) * 1000, Coord.F_CART)
