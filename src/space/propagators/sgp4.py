@@ -106,7 +106,7 @@ class SGP4:
         self._init.C5 = 2 * (self._init.q0 - self._init.s) ** 4 * self._init.ξ ** 4 * self._init.a0 * self._init.β_0 ** 2 * (1 - self._init.η ** 2) ** (- 7 / 2) * (1 + 11 / 4 * self._init.η * (self._init.η + e0) + (e0 * self._init.η ** 3))
         self._init.D2 = 4 * self._init.a0 * self._init.ξ * self._init.C1 ** 2
         self._init.D3 = 4 / 3 * self._init.a0 * self._init.ξ ** 2 * (17 * self._init.a0 + self._init.s) * self._init.C1 ** 3
-        self._init.D4 = 2 / 3 * self._init.a0 * self._init.ξ ** 3 * (221 * self._init.a0 + 31 * self._init.s) * self._init.C1 ** 4
+        self._init.D4 = 2 / 3 * self._init.a0 ** 2 * self._init.ξ ** 3 * (221 * self._init.a0 + 31 * self._init.s) * self._init.C1 ** 4
 
         self._init.Mdot = (1 + (3 * self._init.k2 * (3 * self._init.θ ** 2 - 1)) / (2 * self._init.a0 ** 2 * self._init.β_0 ** 3) + (3 * self._init.k2 ** 2 * (13 - 78 * self._init.θ ** 2 + 137 * self._init.θ ** 4)) / (16 * self._init.a0 ** 4 * self._init.β_0 ** 7))
         self._init.ωdot = (- 3 * self._init.k2 * (1 - 5 * self._init.θ ** 2) / (2 * self._init.a0 ** 2 * self._init.β_0 ** 4) + 3 * self._init.k2 ** 2 * (7 - 114 * self._init.θ ** 2 + 395 * self._init.θ ** 4) / (16 * self._init.a0 ** 4 * self._init.β_0 ** 8) + 5 * k4 * (3 - 36 * self._init.θ ** 2 + 49 * self._init.θ ** 4) / (4 * self._init.a0 ** 4 * self._init.β_0 ** 8))
