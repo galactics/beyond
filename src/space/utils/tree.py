@@ -21,6 +21,9 @@ class Node:
         self.name = name
         self.subtree = subtree
 
+    def __repr__(self):
+        return "<{} '{}'>".format(self.__class__.__name__, self.name)
+
     def __contains__(self, item):
         """Special method for membership test (e.g. ``if 'B' in node``).
         """
@@ -47,7 +50,7 @@ class Node:
 
         for node in subtree:
             if node.name == goal:
-                return [node.name]
+                return [node]
             elif node.subtree:
                 try:
                     res = self._walk(goal, node.subtree)
@@ -55,7 +58,7 @@ class Node:
                     # print("Not in %s" % node.name)
                     continue
                 else:
-                    return res + [node.name]
+                    return res + [node]
         else:
             raise ValueError("'{}' unfindable".format(goal))
 
@@ -83,6 +86,11 @@ class Node:
 
         return x + list(reversed(y))
 
+    def walk(self, goal):
+
+        # This method is only here to insert the top node in the loop
+        return self._walk(goal) + [self] if goal != self.name else [self]
+
     def path(self, start, stop):
         """Get the sortest path to go from one node to an other
 
@@ -96,10 +104,8 @@ class Node:
         start = start.name if type(start) is Node else start
         stop = stop.name if type(stop) is Node else stop
 
-        # Not very happy with this kind of direct patch, but it's the simplest
-        # way I could find in order to include the top node to the tree.
-        x = self._walk(start) + [self.name] if start != self.name else [self.name]
-        y = self._walk(stop) + [self.name] if stop != self.name else [self.name]
+        x = self.walk(start)
+        y = self.walk(stop)
 
         final = self._merge(x, y)
 

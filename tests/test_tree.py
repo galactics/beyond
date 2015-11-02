@@ -41,19 +41,19 @@ A = Node("A", [B, E, K])
 
 def test_path():
 
-    assert A.path('B', 'E') == ['B', 'A', 'E']
-    assert A.path('H', 'E') == ['H', 'F', 'E']
-    assert A.path('H', 'G') == ['H', 'F', 'E', 'G']
-    assert A.path('H', 'A') == ['H', 'F', 'E', 'A']
-    assert A.path('B', 'A') == ['B', 'A']
-    assert A.path('J', 'I') == ['J', 'H', 'F', 'I']
-    assert A.path('C', 'B') == ['C', 'B']
-    assert A.path('J', 'M') == ['J', 'H', 'F', 'E', 'A', 'K', 'M']
-    assert A.path('M', 'J') == ['M', 'K', 'A', 'E', 'F', 'H', 'J']
-    assert A.path('F', 'A') == ['F', 'E', 'A']
-    assert A.path('A', 'F') == ['A', 'E', 'F']
+    assert A.path('B', 'E') == [B, A, E]
+    assert A.path('H', 'E') == [H, F, E]
+    assert A.path('H', 'G') == [H, F, E, G]
+    assert A.path('H', 'A') == [H, F, E, A]
+    assert A.path('B', 'A') == [B, A]
+    assert A.path('J', 'I') == [J, H, F, I]
+    assert A.path('C', 'B') == [C, B]
+    assert A.path('J', 'M') == [J, H, F, E, A, K, M]
+    assert A.path('M', 'J') == [M, K, A, E, F, H, J]
+    assert A.path('F', 'A') == [F, E, A]
+    assert A.path('A', 'F') == [A, E, F]
 
-    assert A.path("L", "L") == ['L']
+    assert A.path("L", "L") == [L]
 
 
 def test_wrong_arg():

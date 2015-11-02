@@ -99,7 +99,7 @@ class Coord(np.ndarray):
         """
         coord = self.copy()
         if to != self.form:
-            path = self._tree.path(self.form.name, to.name)
+            path = [el.name for el in self._tree.path(self.form.name, to.name)]
 
             for i in range(len(path) - 1):
                 a = path[i].lower()
