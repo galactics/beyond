@@ -88,6 +88,12 @@ class Coord(np.ndarray):
                 raise KeyError(str(e))
 
     def pv(self):
+        """Get the coordinates of the orbit in terms of position and velocity
+
+        Returns:
+            tuple: 2-length, first element is position, second is velocity.
+                The frame is unchanged
+        """
         pv = self._transform(self.F_CART)
         return pv[:3], pv[3:]
 
