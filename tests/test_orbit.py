@@ -76,7 +76,7 @@ def test_coord_global_transform():
     backup = coord.copy()
 
     # Useless transformation, no effect
-    coord.transform(Coord.F_KEPL_M)
+    coord.transform('Keplerian_M')
     assert all(coord == backup)
 
     coord.transform(Coord.F_CART)

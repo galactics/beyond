@@ -38,12 +38,15 @@ class Coord(np.ndarray):
         if len(coord) != 6:
             raise ValueError("Should be 6 in length")
 
-        if form.name not in cls._tree:
+        if type(form) is str:
+            form = cls._tree[form]
+        elif form.name not in cls._tree:
             raise ValueError("Unknown form")
 
         obj = np.ndarray.__new__(cls, (6,), buffer=np.array(coord), dtype=float)
         obj.form = form
         obj.other = kwargs
+
         return obj
 
     def copy(self):
@@ -97,15 +100,21 @@ class Coord(np.ndarray):
         pv = self._transform(self.F_CART)
         return pv[:3], pv[3:]
 
-    def _transform(self, to):
+    def _transform(self, new_form):
         """Gives the result of the transformation without inplace modifications
 
+        Args:
+            new_form (str or CoordForm):
         Returns:
             Coord
         """
+
+        if isinstance(new_form, CoordForm):
+            new_form = new_form.name
+
         coord = self.copy()
-        if to != self.form:
-            path = [el.name for el in self._tree.path(self.form.name, to.name)]
+        if new_form != self.form.name:
+            path = [el.name for el in self._tree.path(self.form.name, new_form)]
 
             for i in range(len(path) - 1):
                 a = path[i].lower()
@@ -114,10 +123,19 @@ class Coord(np.ndarray):
 
         return coord
 
-    def transform(self, to):
-        coord = self._transform(to)
+    def transform(self, new_form):
+        """Changes the form of the coordinates in-place
+
+        Args:
+            new_form (str or CoordForm)
+        """
+        if type(new_form) is str:
+            # retrivial of the instance corresponding to the name
+            new_form = self._tree[new_form]
+
+        coord = self._transform(new_form)
         self.base.setfield(coord, dtype=float)
-        self.form = to
+        self.form = new_form
 
     @classmethod
     def _cartesian_to_keplerian(cls, coord):
