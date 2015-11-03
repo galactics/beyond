@@ -108,7 +108,7 @@ def test_coord_attributes_access():
 
 def test_orbit_change_form():
 
-    orb = Orbit(ref_date, ref_coord, ref_form)
+    orb = Orbit(ref_date, ref_form, ref_coord)
 
     orb.change_form(Coord.F_CART)
     assert orb.coord.form == Coord.F_CART
@@ -120,7 +120,7 @@ def test_orbit_properties():
     ref_apoapsis = 7208342.6244268175
     ref_periapsis = 7176919.6014731824
 
-    orb = Orbit(ref_date, ref_coord, ref_form)
+    orb = Orbit(ref_date, ref_form, ref_coord)
     assert orb.apoapsis == ref_apoapsis
     assert orb.periapsis == ref_periapsis
     assert orb.apoapsis > orb.periapsis
