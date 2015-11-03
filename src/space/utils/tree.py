@@ -13,6 +13,9 @@ class Node:
     """Class representing a child in the tree
     """
 
+    _case = True
+    """If True, the search trought the tree is case sensitive"""
+
     def __init__(self, name, subtree=None):
 
         if type(subtree) not in (list, type(None)):
@@ -23,6 +26,9 @@ class Node:
 
     def __repr__(self):
         return "<{} '{}'>".format(self.__class__.__name__, self.name)
+
+    def __getitem__(self, item):
+        return self._walk(item)[0]
 
     def __contains__(self, item):
         """Special method for membership test (e.g. ``if 'B' in node``).
@@ -49,7 +55,7 @@ class Node:
             subtree = self.subtree
 
         for node in subtree:
-            if node.name == goal:
+            if node.name == goal or (not self._case and node.name.lower() == goal.lower()):
                 return [node]
             elif node.subtree:
                 try:
