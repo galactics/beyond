@@ -75,7 +75,7 @@ class Coord(np.ndarray):
 
         # Verification if the variable is available in the current form
         if name not in self.names:
-            raise AttributeError("{name} unknow for this form of Coord")
+            raise AttributeError("{} unknow for this form of Coord".format(name))
 
         i = self.names.index(name)
         return self[i]

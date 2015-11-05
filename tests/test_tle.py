@@ -28,7 +28,7 @@ def test_read():
     assert tle.e == 6.703e-4
     assert tle.ω == np.deg2rad(130.5360)
     assert tle.M == np.deg2rad(325.0288)
-    assert tle.n == 15.72125391 * 2 * np.pi / 1440.
+    assert tle.n == 15.72125391 * 2 * np.pi / 86400.
 
     tle = Tle(ref.splitlines()[1:])
 
@@ -51,4 +51,4 @@ def test_convert_to_orbit():
     assert coord['e'] == 6.703e-4
     assert coord['ω'] == np.deg2rad(130.5360)
     assert coord['M'] == np.deg2rad(325.0288)
-    assert coord['n'] == 15.72125391 * 2 * np.pi / 1440.
+    assert coord['n'] == 15.72125391 * 2 * np.pi / 86400.

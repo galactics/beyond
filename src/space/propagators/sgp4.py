@@ -60,6 +60,7 @@ class Sgp4:
         self._init = Init()
 
         i0, Ω0, e0, ω0, M0, n0 = self.tle.coord
+        n0 *= 60  # conversion to min⁻¹
         bstar = self.tle.data[0]
 
         j2 = self.gravity.j2
@@ -104,7 +105,7 @@ class Sgp4:
         self._init.C1 = bstar * C2
 
         self._init.C3 = 0.
-        if e0  > 1e-4:
+        if e0 > 1e-4:
             self._init.C3 = (self._init.q0 - self._init.s) ** 4 * self._init.ξ ** 5 * self._init.A30 * self._init.n0 * sin(i0) / (self._init.k2 * e0)
 
         self._init.C4 = 2 * self._init.n0 * (self._init.q0 - self._init.s) ** 4 * self._init.ξ ** 4 * self._init.a0 * self._init.β_0 ** 2 * (1 - self._init.η ** 2) ** (- 7 / 2) * ((2 * self._init.η * (1 + e0 * self._init.η) + 0.5 * e0 + 0.5 * self._init.η ** 3) - 2 * self._init.k2 * self._init.ξ / (self._init.a0 * (1 - self._init.η ** 2)) * (3 * (1 - 3 * self._init.θ ** 2) * (1 + 3 / 2 * self._init.η ** 2 - 2 * e0 * self._init.η - 0.5 * e0 * self._init.η ** 3) + (3 / 4 * (1 - self._init.θ ** 2) * (2 * self._init.η ** 2 - e0 * self._init.η - e0 * self._init.η ** 3) * cos(2 * ω0))))
@@ -120,6 +121,7 @@ class Sgp4:
     def propagate(self, date):
 
         i0, Ω0, e0, ω0, M0, n0 = self.tle.coord
+        n0 *= 60  # conversion to min⁻¹
         if isinstance(date, datetime):
             t0 = self.tle.epoch
             tdiff = (date - t0).total_seconds() / 60.
