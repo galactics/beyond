@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from space.utils.tree import Node
+from space.frames.poleandtimes import nutation
 
 
 class Frame(Node):
@@ -58,6 +59,10 @@ class FrameTranform:
     EME2000 = Frame('EME2000', [MOD, GCRF])
 
     _top = EME2000
+
+    @classmethod
+    def TOD_to_MOD(cls, date):
+        return nutation(1980, date)
 
     @classmethod
     def register(cls, frame, parent=None):
