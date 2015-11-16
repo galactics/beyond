@@ -3,99 +3,14 @@
 
 
 import datetime
-import numpy as np
 from pathlib import Path
 
 import space.utils.interpol as interpol
 
-__all__ = ['PolePosition', 'TimeScales']
-
-obliquity_j2000 = 23.439291
-TT_TAI = 32.184  # TT - TAI (seconds)
+# __all__ = ['PolePosition', 'TimeScales']
 
 
-def rot1(x):
-    return np.array([
-        [1, 0, 0],
-        [0, np.cos(x), np.sin(x)],
-        [0, -np.sin(x), np.cos(x)]
-    ])
-
-
-def rot2(x):
-    return np.array([
-        [np.cos(x), 0, -np.sin(x)],
-        [0, 1, 0],
-        [np.sin(x), 0, np.cos(x)]
-    ])
-
-
-def rot3(x):
-    return np.array([
-        [np.cos(x), np.sin(x), 0],
-        [-np.sin(x), np.cos(x), 0],
-        [0, 0, 1]
-    ])
-
-
-def jd(d):
-    """From a date, compute the Julian Date, which is the number of days from
-    the January 1, 4712 B.C., 12:00.
-
-    Args:
-        d (datetime.datetime)
-    Return:
-        float
-
-    Example:
-        >>> import datetime
-        >>> jd(datetime.datetime(1980, 1, 6))
-        2444244.5
-        >>> jd(datetime.datetime(2000, 1, 1, 12))
-        2451545.0
-        >>> jd(datetime.datetime(1949, 12, 31, 22, 9, 46, 862000))
-        2433282.4234590507
-        >>> jd(datetime.datetime(2004, 4, 6, 7, 52, 32, 570009))
-        2453101.8281547455
-    """
-    seconds = d.second + d.microsecond / 1e6
-
-    leap = 60
-    year, month = d.year, d.month
-    if d.month in (1, 2):
-        year -= 1
-        month += 12
-    B = 2 - year // 100 + year // 100 // 4
-    C = ((seconds / leap + d.minute) / 60 + d.hour) / 24
-    return int(365.25 * (year + 4716)) + int(30.6001 * (month + 1)) + d.day + B - 1524.5 + C
-
-
-def t_tt(date):
-    """Transform to Julian Century (T_TT)
-
-    Example:
-        >>> import datetime
-        >>> t_tt(datetime.datetime(2004, 4, 6, 7, 51, 28, 386009))
-        0.04262363188899416
-    """
-    tai = date + datetime.timedelta(seconds=TimeScales.get(date)[-1])
-    tt = tai + datetime.timedelta(seconds=TT_TAI)
-    return (jd(tt) - 2451545.0) / 36525
-
-
-def nutation(model, date):
-    t = t_tt(date)
-    if model == 1980:
-        # Model 1980
-        epsilon_bar = np.deg2rad(23.439291 - 0.0130042 * t - 1.64e-7 * t ** 2 + 5.04e-7 * t ** 3)
-        pole = PolePosition.get(date)
-        delta_epsilon = np.deg2rad(pole['deps'])
-        delta_psi = np.deg2rad(pole['dpsi'])
-        epsilon = epsilon_bar + delta_epsilon
-        return rot1(-epsilon_bar) @ rot3(Delta_Psi) @ rot1(epsilon)
-
-
-def day_boundaries(d):
+def _day_boundaries(d):
     """
     Args:
         d (datetime.datetime)
@@ -124,7 +39,7 @@ class TimeScales:
             date = date.date() if type(date) is datetime.datetime else date
             return cls._get(date)
         else:
-            dates = day_boundaries(date)
+            dates = _day_boundaries(date)
             start = cls._get(dates[0].date())
             stop = cls._get(dates[1].date())
 
@@ -157,7 +72,7 @@ class PolePosition:
         else:
             # linear interpolation
 
-            dates = day_boundaries(date)
+            dates = _day_boundaries(date)
 
             start = cls._get(dates[0].date())
             stop = cls._get(dates[1].date())
@@ -260,7 +175,7 @@ class Finals(Finals2000A):
 
 if __name__ == '__main__':
 
-    dates = [
+    date_list = [
         datetime.date(1992, 1, 1),
         datetime.date(1999, 1, 1),
         datetime.date(2014, 8, 12),
@@ -268,5 +183,5 @@ if __name__ == '__main__':
         datetime.date.today(),
     ]
 
-    for date in dates:
+    for date in date_list:
         print(date, TimeScales.get(date))
