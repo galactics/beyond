@@ -15,9 +15,38 @@ def t_tt(date):
         >>> t_tt(datetime.datetime(2004, 4, 6, 7, 51, 28, 386009))
         0.04262363188899416
     """
-    tai = date + datetime.timedelta(seconds=TimeScales.get(date)[-1])
+    tai = date + datetime.timedelta(seconds=TimeScales.get(date).tai_utc)
     tt = tai + datetime.timedelta(seconds=TT_TAI)
-    return (jd(tt) - 2451545.0) / 36525.
+    return julian_century(tt)
+
+
+def julian_century(date):
+    return (jd(date) - 2451545.0) / 36525.
+
+
+def change_scale(date, to):
+    """Change the time scale used for a datetime object
+    Args:
+        date (datetime.datetime)
+        to (str): The time scale to convert to
+    Return:
+        datetime
+    """
+    to = to.upper()
+
+    if to not in ('TAI', 'UT1', 'TT'):
+        raise ValueError("")
+
+    ut1_tai, ut1_utc, tai_utc = [datetime.timedelta(seconds=x) for x in TimeScales.get(date)]
+
+    if to == 'UT1':
+        delta = ut1_utc
+    elif to == 'TAI':
+        delta = tai_utc
+    elif to == 'TT':
+        delta = tai_utc + datetime.timedelta(seconds=TT_TAI)
+
+    return date + delta
 
 
 def jd(d):

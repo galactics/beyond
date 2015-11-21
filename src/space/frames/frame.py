@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from space.utils.tree import Node
-from space.frames.poleandtimes import nutation
+from .nutation import precesion, nutation
 
 
 class Frame(Node):
@@ -63,6 +63,10 @@ class FrameTranform:
     @classmethod
     def TOD_to_MOD(cls, date):
         return nutation(1980, date)
+
+    @classmethod
+    def MOD_to_GCRF(cls, date):
+        return precesion(date)
 
     @classmethod
     def register(cls, frame, parent=None):

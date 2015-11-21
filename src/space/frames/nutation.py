@@ -3,7 +3,7 @@
 import numpy as np
 from pathlib import Path
 
-from space.utils.dates import t_tt
+from space.utils.dates import t_tt, julian_century, change_scale
 from space.utils.matrix import rot1, rot2, rot3
 
 
@@ -93,3 +93,22 @@ def nutation(model, date, eop_correction=True, terms=106):
 
         epsilon = epsilon_bar + delta_epsilon
         return rot1(-epsilon_bar) @ rot3(delta_psi) @ rot1(epsilon)
+
+
+def precesion(date):
+
+    t = t_tt(date)
+    zeta = np.deg2rad((2306.2181 * t + 0.30188 * t ** 2 + 0.017998 * t ** 3) / 3600.)
+    theta = np.deg2rad((2004.3109 * t - 0.42665 * t ** 2 - 0.041833 * t ** 3) / 3600.)
+    z = np.deg2rad((2306.2181 * t + 1.09468 * t ** 2 + 0.018203 * t ** 3) / 3600.)
+
+    return rot3(zeta) @ rot2(-theta) @ rot3(z)
+
+
+def sideral(date):
+
+    date = change_scale(date, 'UT1')
+    t = julian_century(date)
+
+    return 67310.54841 + (876600 * 3600 + 8640184.812866) * t + 0.093104 * t ** 2\
+        - 6.2e-6 * t ** 3

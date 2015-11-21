@@ -4,10 +4,13 @@
 
 import datetime
 from pathlib import Path
+from collections import namedtuple
 
 import space.utils.interpol as interpol
 
 # __all__ = ['PolePosition', 'TimeScales']
+
+ScalesDiff = namedtuple('ScalesDiff', ('ut1_tai', 'ut1_utc', 'tai_utc'))
 
 
 def _day_boundaries(d):
@@ -43,7 +46,7 @@ class TimeScales:
             start = cls._get(dates[0].date())
             stop = cls._get(dates[1].date())
 
-            result = (
+            result = ScalesDiff(
                 interpol.linear(date, dates, (start[0], stop[0])),
                 interpol.linear(date, dates, (start[1], stop[1])),
                 start[-1]
