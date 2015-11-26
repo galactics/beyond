@@ -4,4 +4,6 @@ __pycache__
 
 *.swp
 htmlcov/
+dist/
 .cache/
+*.pyc
