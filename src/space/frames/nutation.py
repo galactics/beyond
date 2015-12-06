@@ -3,7 +3,7 @@
 import numpy as np
 from pathlib import Path
 
-from space.utils.dates import t_tt, julian_century, change_scale
+from space.utils.dates import Date
 from space.utils.matrix import rot1, rot2, rot3
 
 
@@ -39,7 +39,7 @@ def _nut_1980(date, terms=106):
             3. eps
     """
 
-    jj_cent = t_tt(date)
+    jj_cent = Date(date).julian_century
 
     r = 360.  # * 3600.
 
@@ -107,8 +107,7 @@ def precesion(date):
 
 def sideral(date):
 
-    date = change_scale(date, 'UT1')
-    t = julian_century(date)
+    t = Date(date).change_scale('UT1').julian_century
 
     return 67310.54841 + (876600 * 3600 + 8640184.812866) * t + 0.093104 * t ** 2\
         - 6.2e-6 * t ** 3
