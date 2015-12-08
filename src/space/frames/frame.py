@@ -25,6 +25,7 @@ class TopocentricFrame(Frame):
         self.coordinates = coordinates
         self.body = body
         super().__init__(name)
+        FrameTranform.register(self)
 
 
 class FrameTranform:
