@@ -3,6 +3,11 @@
 import datetime as _datetime
 
 from space.frames.poleandtimes import TimeScales
+from .tree import Node
+
+
+class _Scale(Node):
+    pass
 
 
 class Date:
@@ -17,9 +22,17 @@ class Date:
 
     __slots__ = ["d", "s", "scale", "_cache"]
 
-    SCALES = ('UTC', 'TAI', 'TT')
     MJD_T0 = _datetime.datetime(1858, 11, 17)
-    TT_TAI = _datetime.timedelta(seconds=32.184)  # TT - TAI
+
+    UT1 = _Scale('UT1')
+    GPS = _Scale('GPS')
+    UTC = _Scale('UTC', [UT1])
+    TAI = _Scale('TAI', [UTC, GPS])
+    TT = _Scale('TT', [TAI])
+
+    # Used to find the relations between scales, also contains
+    # the list of all scales
+    SCALES = TT
 
     def __init__(self, *args, **kwargs):
 
@@ -67,19 +80,22 @@ class Date:
         super().__setattr__('scale', scale)
         super().__setattr__('_cache', {})
 
-    def __setattr__(self, *args):
+    def __setattr__(self, *args):  # pragma: no cover
         raise TypeError("Can not modify attributes of immutable object")
 
-    def __delattr__(self, *args):
+    def __delattr__(self, *args):  # pragma: no cover
         raise TypeError("Can not modify attributes of immutable object")
 
     def __add__(self, other):
-        if type(other) is float:
+        if type(other) in (int, float):
             # number of days
             days = int(other)
-            sec = (other - days) / 86400.
+            sec = (other - days) * 86400.
         elif type(other) is _datetime.timedelta:
             days, sec = divmod(other.total_seconds() + self.s, 86400)
+        else:
+            raise TypeError("Unknown operation with {} type".format(type(other)))
+
         return self.__class__(self.d + int(days), sec, scale=self.scale)
 
     def __str__(self):
@@ -89,8 +105,8 @@ class Date:
 
     @classmethod
     def _convert_dt(cls, dt):
-        # TODO: Handle timezone aware datetime objects (ie: convert to UTC)
-        delta = dt - cls.MJD_T0
+        tz = _datetime.timedelta(0) if dt.tzinfo is None else dt.utcoffset
+        delta = dt - cls.MJD_T0 - tz
         return delta.days, delta.seconds + delta.microseconds * 1e-6
 
     @property
@@ -109,35 +125,45 @@ class Date:
     def now(cls, scale="UTC"):
         return cls(_datetime.datetime.now(), scale=scale)
 
-    def change_scale(self, scale):
+    def _scale_ut1_to_utc(self):
+        ut1_tai, ut1_utc, tai_utc = TimeScales.get(self.datetime)
+        return ut1_utc
+
+    def _scale_utc_to_tai(self):
+        ut1_tai, ut1_utc, tai_utc = TimeScales.get(self.datetime)
+        return tai_utc
+
+    def _scale_tai_to_tt(self):
+        return 32.184
+
+    def _scale_gps_to_tai(self):
+        return 19.
+
+    def change_scale(self, new_scale):
         """Create an object representing the same time as ``self`` but in a
         different scale
         """
-        scale = scale.upper()
-        if scale == self.scale:
-            return self
 
-        if scale not in self.SCALES:
-            raise ValueError("Scale {} unknown".format(scale))
+        path = self.SCALES.path(self.scale, new_scale)
+        delta = 0
+        for i in range(len(path) - 1):
+            one = path[i].name.lower()
+            two = path[i + 1].name.lower()
+            # find the operation
+            oper = "_scale_{}_to_{}".format(one, two)
+            # find the reverse operation
+            roper = "_scale_{}_to_{}".format(two, one)
+            if hasattr(self, oper):
+                delta += getattr(self, oper)()
+            elif hasattr(self, roper):
+                delta -= getattr(self, roper)()
+            else:  # pragma: no cover
+                raise ValueError("Unknown convertion {} => {}".format(one, two))
 
-        ut1_tai, ut1_utc, tai_utc = [_datetime.timedelta(seconds=x) for x in TimeScales.get(self.datetime)]
+        delta = _datetime.timedelta(seconds=delta)
+        result = self + delta
 
-        if self.scale == 'UTC':
-            delta = tai_utc
-            if scale == 'TT':
-                delta += tai_utc + self.TT_TAI
-        if self.scale == 'TAI':
-            if scale == 'UTC':
-                delta = - tai_utc
-            elif scale == 'TT':
-                delta = self.TT_TAI
-        if self.scale == 'TT':
-            delta = - self.TT_TAI
-            if scale == "UTC":
-                delta -= tai_utc
-
-        new = self + delta
-        return self.__class__(new.d, new.s, scale=scale)
+        return Date(result.d, result.s, scale=new_scale)
 
     @property
     def julian_century(self):
