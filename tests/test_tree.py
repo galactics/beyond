@@ -38,6 +38,9 @@ A = Node("A", [B, E, K])
 #     ])
 # ])
 
+def test_repr():
+    assert repr(A) == "<Node 'A'>"
+
 
 def test_path():
 
