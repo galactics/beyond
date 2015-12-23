@@ -5,7 +5,8 @@ from pathlib import Path
 
 from space.utils.dates import Date
 from space.utils.matrix import rot1, rot2, rot3
-
+from space.utils.memoize import memoize
+from .poleandtimes import PolePosition
 
 def _tab(max_i=None):
 
@@ -25,12 +26,12 @@ def _tab(max_i=None):
                 break
             # print(i)
 
-
-def _nut_1980(date, terms=106):
+@memoize
+def _nut_1980(date, eop_correction=True, terms=106):
     """Model 1980 of nutation as described in Vallado
 
     Args:
-        date (datetime.datetime)
+        date (space.utils.dates.Date)
         terms (int)
     Return:
         tuple : 3-elements, all floats in radians
@@ -39,7 +40,7 @@ def _nut_1980(date, terms=106):
             3. eps
     """
 
-    jj_cent = Date(date).julian_century
+    jj_cent = date.change_scale('TT').julian_century
 
     r = 360.  # * 3600.
 
@@ -77,27 +78,27 @@ def _nut_1980(date, terms=106):
         delta_psi += (A + B * jj_cent) * np.sin(np.deg2rad(a_p)) / 36000000.
         delta_eps += (C + D * jj_cent) * np.cos(np.deg2rad(a_p)) / 36000000.
 
+    if eop_correction:
+        pole = PolePosition.get(date.datetime)
+        delta_eps += np.deg2rad(pole['deps'] / 3600000.)
+        delta_psi += np.deg2rad(pole['dpsi'] / 3600000.)
+
     return np.deg2rad((epsilon_bar, delta_psi, delta_eps))
 
 
 def nutation(model, date, eop_correction=True, terms=106):
-    t = t_tt(date)
     if model == 1980:
         # Model 1980
-        epsilon_bar, delta_psi, delta_epsilon = _nut_1980(date, terms)
 
-        if eop_correction:
-            pole = PolePosition.get(date)
-            delta_epsilon += np.deg2rad(pole['deps'] / 3600000.)
-            delta_psi += np.deg2rad(pole['dpsi'] / 3600000.)
-
+        epsilon_bar, delta_psi, delta_eps = _nut_1980(date, eop_correction, terms)
         epsilon = epsilon_bar + delta_epsilon
         return rot1(-epsilon_bar) @ rot3(delta_psi) @ rot1(epsilon)
 
 
 def precesion(date):
 
-    t = t_tt(date)
+    t = date.change_scale('TT').julian_century
+
     zeta = np.deg2rad((2306.2181 * t + 0.30188 * t ** 2 + 0.017998 * t ** 3) / 3600.)
     theta = np.deg2rad((2004.3109 * t - 0.42665 * t ** 2 - 0.041833 * t ** 3) / 3600.)
     z = np.deg2rad((2306.2181 * t + 1.09468 * t ** 2 + 0.018203 * t ** 3) / 3600.)
@@ -105,9 +106,38 @@ def precesion(date):
     return rot3(zeta) @ rot2(-theta) @ rot3(z)
 
 
-def sideral(date):
+def sideral(date, longitude=0., model='mean'):
+    """Get the sideral time at a defined date
 
-    t = Date(date).change_scale('UT1').julian_century
+    Args:
+        date (~Date):
+        longitude (float): Longitude of the observer (in degrees)
+            East positive/West negative.
+    Return:
+        float: Sideral time in degrees
 
-    return 67310.54841 + (876600 * 3600 + 8640184.812866) * t + 0.093104 * t ** 2\
+    GMST: Greenwich Mean Sideral time
+    LST: Local Sideral Time (Mean)
+    GAST: Greenwich Apparent Sideral Time
+    """
+
+    t = date.change_scale('UT1').julian_century
+    # Compute GMST
+    res = 67310.54841 + (876600 * 3600 + 8640184.812866) * t + 0.093104 * t ** 2\
         - 6.2e-6 * t ** 3
+
+    if model == 'apparent':
+        ttt = date.change_scale('TT').julian_century
+
+        epsilon_bar, delta_psi, delta_eps = _nut_1980(date)
+        res += delta_psi * np.cos(epsilon_bar + delta_eps)
+
+        if date.d >= 50506:
+            # After the 1992-02-27, we apply the effect of the moon
+            om_m = 125.04455501 - (5 * 360. + 134.1361851) * ttt\
+                + 0.0020756 * ttt ** 2 + 2.139e-6 * ttt ** 3
+            res += 0.00264 * np.sin(om_m) + 0.000063 * np.sin(2 * om_m)
+
+    res = ((res % 86400) / 240. + longitude) % 360.
+
+    return res
