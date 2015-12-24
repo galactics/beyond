@@ -28,10 +28,12 @@ def _tab(max_i=None):
 
 @memoize
 def _nut_1980(date, eop_correction=True, terms=106):
-    """Model 1980 of nutation as described in Vallado
+    """Model 1980 of nutation as described in Vallado p. 224
 
     Args:
         date (space.utils.dates.Date)
+        eop_correction (bool): set to ``True`` to include model correction
+            from 'finals' files.
         terms (int)
     Return:
         tuple : 3-elements, all floats in radians
@@ -122,22 +124,32 @@ def sideral(date, longitude=0., model='mean'):
     """
 
     t = date.change_scale('UT1').julian_century
-    # Compute GMST
+
+    # Compute GMST in seconds
     res = 67310.54841 + (876600 * 3600 + 8640184.812866) * t + 0.093104 * t ** 2\
         - 6.2e-6 * t ** 3
 
+    # GMST in arcsecond
+    res *= 15.
+
     if model == 'apparent':
-        ttt = date.change_scale('TT').julian_century
 
         epsilon_bar, delta_psi, delta_eps = _nut_1980(date)
         res += delta_psi * np.cos(epsilon_bar + delta_eps)
 
         if date.d >= 50506:
-            # After the 1992-02-27, we apply the effect of the moon
+            # Starting 1992-02-27, we apply the effect of the moon
+            ttt = date.change_scale('TT').julian_century
             om_m = 125.04455501 - (5 * 360. + 134.1361851) * ttt\
                 + 0.0020756 * ttt ** 2 + 2.139e-6 * ttt ** 3
-            res += 0.00264 * np.sin(om_m) + 0.000063 * np.sin(2 * om_m)
+            res += 0.00264 * 360. * np.sin(om_m) + 6.3e-5 * np.sin(2 * om_m)
 
-    res = ((res % 86400) / 240. + longitude) % 360.
+    # Conversion from arcsecond to degrees
+    res /= 3600.
+    # Add local longitude to the sideral time
+    res += longitude
+    # Force to 0-360 degrees range
+    res %= 360.
 
     return res
+    # return rot3(np.deg2rad(-res))
