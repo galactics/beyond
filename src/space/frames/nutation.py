@@ -135,14 +135,14 @@ def sideral(date, longitude=0., model='mean'):
     if model == 'apparent':
 
         epsilon_bar, delta_psi, delta_eps = _nut_1980(date)
-        res += delta_psi * np.cos(epsilon_bar + delta_eps)
+        res += np.rad2deg(delta_psi) * 3600. * np.cos(epsilon_bar + delta_eps)
 
         if date.d >= 50506:
             # Starting 1992-02-27, we apply the effect of the moon
             ttt = date.change_scale('TT').julian_century
             om_m = 125.04455501 - (5 * 360. + 134.1361851) * ttt\
                 + 0.0020756 * ttt ** 2 + 2.139e-6 * ttt ** 3
-            res += 0.00264 * 360. * np.sin(om_m) + 6.3e-5 * np.sin(2 * om_m)
+            res += 0.00264 * np.sin(np.deg2rad(om_m)) + 6.3e-5 * np.sin(np.deg2rad(2 * om_m))
 
     # Conversion from arcsecond to degrees
     res /= 3600.
