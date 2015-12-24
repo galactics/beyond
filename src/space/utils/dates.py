@@ -125,7 +125,7 @@ class Date:
     def now(cls, scale="UTC"):
         return cls(_datetime.datetime.now(), scale=scale)
 
-    def _scale_ut1_to_utc(self):
+    def _scale_utc_to_ut1(self):
         ut1_tai, ut1_utc, tai_utc = TimeScales.get(self.datetime)
         return ut1_utc
 
