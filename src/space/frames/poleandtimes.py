@@ -68,6 +68,11 @@ class PolePosition:
 
     @classmethod
     def get(cls, date):
+        """
+        X and Y in arcsecond
+        dpsi, deps, dX and dY in milli-arcsecond
+        """
+
         if type(date) is datetime.date or date.timestamp() % 86400 == 0:
             # no need for interpolation
             date = date.date() if type(date) is datetime.datetime else date
