@@ -125,18 +125,18 @@ class Date:
     def now(cls, scale="UTC"):
         return cls(_datetime.datetime.now(), scale=scale)
 
-    def _scale_utc_to_ut1(self):
+    def _scale_ut1_minus_utc(self):
         ut1_tai, ut1_utc, tai_utc = TimeScales.get(self.datetime)
         return ut1_utc
 
-    def _scale_utc_to_tai(self):
+    def _scale_tai_minus_utc(self):
         ut1_tai, ut1_utc, tai_utc = TimeScales.get(self.datetime)
         return tai_utc
 
-    def _scale_tai_to_tt(self):
+    def _scale_tt_minus_tai(self):
         return 32.184
 
-    def _scale_gps_to_tai(self):
+    def _scale_tai_minus_gps(self):
         return 19.
 
     def change_scale(self, new_scale):
@@ -150,9 +150,9 @@ class Date:
             one = path[i].name.lower()
             two = path[i + 1].name.lower()
             # find the operation
-            oper = "_scale_{}_to_{}".format(one, two)
+            oper = "_scale_{}_minus_{}".format(two, one)
             # find the reverse operation
-            roper = "_scale_{}_to_{}".format(two, one)
+            roper = "_scale_{}_minus_{}".format(one, two)
             if hasattr(self, oper):
                 delta += getattr(self, oper)()
             elif hasattr(self, roper):
