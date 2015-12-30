@@ -5,7 +5,7 @@ from pytest import fixture, yield_fixture
 from unittest.mock import patch
 from numpy.testing import assert_almost_equal
 
-from space.utils.dates import Date
+from space.utils.date import Date
 from space.frames.iau1980 import _pole_motion, _precesion, _nutation, _sideral
 
 
@@ -34,7 +34,7 @@ def pole_position(time):
 
 
 def test_pole_motion(date, pole_position):
-    x, y = _pole_motion(date.datetime)
+    x, y = _pole_motion(date)
     assert x == -3.9078333333333335e-05
     assert y == 9.258583333333334e-05
 

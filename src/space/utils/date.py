@@ -98,6 +98,12 @@ class Date:
 
         return self.__class__(self.d + int(days), sec, scale=self.scale)
 
+    def __sub__(self, other):
+        if type(other) is _datetime.timedelta:
+            other = _datetime.timedelta(seconds=-other.total_seconds())
+
+        return self.__add__(other)
+
     def __str__(self):
         if 'str' not in self._cache.keys():
             self._cache['str'] = "{} {}".format(self.datetime.isoformat(), self.scale)
@@ -122,15 +128,19 @@ class Date:
         return self._cache['dt']
 
     @classmethod
+    def strptime(cls, data, format, scale='UTC'):
+        return Date(_datetime.datetime.strptime(data, format), scale=scale)
+
+    @classmethod
     def now(cls, scale="UTC"):
-        return cls(_datetime.datetime.now(), scale=scale)
+        return cls(_datetime.datetime.utcnow()).change_scale(scale)
 
     def _scale_ut1_minus_utc(self):
-        ut1_tai, ut1_utc, tai_utc = TimeScales.get(self.datetime)
+        ut1_tai, ut1_utc, tai_utc = TimeScales.get(self.mjd)
         return ut1_utc
 
     def _scale_tai_minus_utc(self):
-        ut1_tai, ut1_utc, tai_utc = TimeScales.get(self.datetime)
+        ut1_tai, ut1_utc, tai_utc = TimeScales.get(self.mjd)
         return tai_utc
 
     def _scale_tt_minus_tai(self):
@@ -178,3 +188,7 @@ class Date:
             float
         """
         return self.d + 2400000.5 + self.s / 86400.
+
+    @property
+    def mjd(self):
+        return self.d + self.s / 86400.

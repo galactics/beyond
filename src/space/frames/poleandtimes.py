@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
-import datetime
+import math
 from pathlib import Path
 from collections import namedtuple
 
@@ -16,11 +15,9 @@ ScalesDiff = namedtuple('ScalesDiff', ('ut1_tai', 'ut1_utc', 'tai_utc'))
 def _day_boundaries(d):
     """
     Args:
-        d (datetime.datetime)
+        d (Date): Date as a MJD
     """
-    start_d = d.replace(hour=0, minute=0, second=0, microsecond=0)
-    stop_d = start_d + datetime.timedelta(days=1)
-    return start_d, stop_d
+    return int(math.floor(d)), int(math.ceil(d))
 
 
 class TimeScales:
@@ -29,22 +26,21 @@ class TimeScales:
     def _get(cls, date):
         """
         Args:
-            date (datetime.date)
+            date (float)
         """
         ut1_utc = Finals2000A().data[date]['time']['UT1-UTC']
         tai_utc = TaiUtc.get(date)
         ut1_tai = ut1_utc - tai_utc
-        return ut1_tai, ut1_utc, tai_utc
+        return ScalesDiff(ut1_tai, ut1_utc, tai_utc)
 
     @classmethod
     def get(cls, date):
-        if type(date) is datetime.date or date.timestamp() % 86400 == 0:
-            date = date.date() if type(date) is datetime.datetime else date
+        if date == int(date):
             return cls._get(date)
         else:
             dates = _day_boundaries(date)
-            start = cls._get(dates[0].date())
-            stop = cls._get(dates[1].date())
+            start = cls._get(dates[0])
+            stop = cls._get(dates[1])
 
             result = ScalesDiff(
                 interpol.linear(date, dates, (start[0], stop[0])),
@@ -60,7 +56,7 @@ class PolePosition:
     def _get(cls, date):
         """
         Args:
-            date (datetime.date)
+            date (int): Date in MJD
         """
         values = Finals2000A().data[date]['pole'].copy()
         values.update(Finals().data[date]['pole'])
@@ -69,21 +65,24 @@ class PolePosition:
     @classmethod
     def get(cls, date):
         """
+        Args:
+            date (float): Date in MJD
+        Return:
+            dict
         X and Y in arcsecond
         dpsi, deps, dX and dY in milli-arcsecond
         """
 
-        if type(date) is datetime.date or date.timestamp() % 86400 == 0:
+        if date == int(date):
             # no need for interpolation
-            date = date.date() if type(date) is datetime.datetime else date
             return cls._get(date)
         else:
             # linear interpolation
 
             dates = _day_boundaries(date)
 
-            start = cls._get(dates[0].date())
-            stop = cls._get(dates[1].date())
+            start = cls._get(dates[0])
+            stop = cls._get(dates[1])
 
             result = {}
             for k in start.keys():
@@ -101,19 +100,17 @@ class TaiUtc():
     def _initialise(cls):
         if not cls._data:
 
-            _date = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d').date()
             with cls.path.open() as f:
                 lines = f.read().splitlines()
 
             for line in lines:
-                if line.startswith("#"):
+                if line.startswith("#") or not line:
                     continue
 
-                start, stop, value = line.split()
-                start, stop = _date(start), _date(stop)
+                start, stop, value, *_ = line.split()
                 value = int(value)
                 cls._data.append(
-                    (start, stop, value)
+                    (int(start), int(stop), value)
                 )
 
     @classmethod
@@ -143,10 +140,9 @@ class Finals2000A():
             for line in lines:
                 line = line.rstrip()
                 mjd = int(float(line[7:15]))
-                date = datetime.date.fromordinal(678576 + mjd)
 
                 try:
-                    cls._instance.data[date] = {
+                    cls._instance.data[mjd] = {
                         'mjd': mjd,
                         'pole': {
                             # 'flag': line[16],
@@ -165,8 +161,8 @@ class Finals2000A():
                     break
                 else:
                     try:
-                        cls._instance.data[date]['pole'][cls._deltas[0]] = float(line[97:106])
-                        cls._instance.data[date]['pole'][cls._deltas[1]] = float(line[116:125])
+                        cls._instance.data[mjd]['pole'][cls._deltas[0]] = float(line[97:106])
+                        cls._instance.data[mjd]['pole'][cls._deltas[1]] = float(line[116:125])
                     except ValueError:
                         # dX and dY are not available for this date
                         pass
@@ -179,17 +175,3 @@ class Finals(Finals2000A):
     path = Path(__file__).parent / "data" / "finals.all"
     _instance = None
     _deltas = ('dpsi', 'deps')
-
-
-if __name__ == '__main__':
-
-    date_list = [
-        datetime.date(1992, 1, 1),
-        datetime.date(1999, 1, 1),
-        datetime.date(2014, 8, 12),
-        datetime.date(2015, 2, 27),
-        datetime.date.today(),
-    ]
-
-    for date in date_list:
-        print(date, TimeScales.get(date))

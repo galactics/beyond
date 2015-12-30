@@ -1,10 +1,10 @@
 space.utils
 ===========
 
-space.utils.dates
+space.utils.date
 -----------------
 
-.. automodule:: space.utils.dates
+.. automodule:: space.utils.date
     :members:
     :undoc-members:
     :show-inheritance:

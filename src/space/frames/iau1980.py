@@ -3,7 +3,7 @@
 import numpy as np
 from pathlib import Path
 
-from space.utils.dates import Date
+from space.utils.date import Date
 from space.utils.matrix import rot1, rot2, rot3
 from space.utils.memoize import memoize
 from .poleandtimes import PolePosition
@@ -31,7 +31,7 @@ def _tab(max_i=None):
 def _pole_motion(date):
     """Pole motion in degrees
     """
-    p = PolePosition.get(date)
+    p = PolePosition.get(date.mjd)
     return p['X'] / 3600., p['Y'] / 3600.
 
 
@@ -67,7 +67,7 @@ def _nutation(date, eop_correction=True, terms=106):
     """Model 1980 of nutation as described in Vallado p. 224
 
     Args:
-        date (space.utils.dates.Date)
+        date (space.utils.date.Date)
         eop_correction (bool): set to ``True`` to include model correction
             from 'finals' files.
         terms (int)
@@ -122,7 +122,7 @@ def _nutation(date, eop_correction=True, terms=106):
         delta_eps += (C + D * ttt) * np.cos(np.deg2rad(a_p))
 
     if eop_correction:
-        pole = PolePosition.get(date.datetime)
+        pole = PolePosition.get(date.mjd)
         delta_eps += pole['deps'] / 3600000.
         delta_psi += pole['dpsi'] / 3600000.
 
@@ -134,7 +134,7 @@ def nutation(date, eop_correction=True, terms=106):  # pragma: no cover
     """
     nut = _nutation(date, eop_correction, terms)
     epsilon_bar, delta_psi, delta_eps = np.deg2rad(nut)
-    epsilon = epsilon_bar + delta_epsilon
+    epsilon = epsilon_bar + delta_eps
 
     return rot1(-epsilon_bar) @ rot3(delta_psi) @ rot1(epsilon)
 

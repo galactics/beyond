@@ -4,7 +4,7 @@
 from pytest import raises
 import datetime
 
-from space.utils.dates import Date
+from space.utils.date import Date
 
 
 def test_creation():
