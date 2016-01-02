@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .iau1980 import precesion, nutation
+import numpy as np
+
 from space.utils.node import Node
+from . import iau1980
 
 
 class Frame(Node):
+
+    def __str__(self):
+        return self.name
 
     def add(self, frame):
         """Dynamically add a sub-frame to an existing one.
@@ -25,10 +30,10 @@ class TopocentricFrame(Frame):
         self.coordinates = coordinates
         self.body = body
         super().__init__(name)
-        FrameTranform.register(self)
+        FrameTransform.register(self)
 
 
-class FrameTranform:
+class FrameTransform:
 
     TEME = Frame('TEME')
     """True Equator Mean Equinox"""
@@ -45,13 +50,13 @@ class FrameTranform:
     PEF = Frame('PEF', [TEME, ITRF])
     """Pseudo Earth Fixed"""
 
-    TOD = Frame('TOD', [GTOD, PEF])
+    TOD = Frame('TOD', [PEF])
     """True (Equator) Of Date"""
 
     MOD = Frame('MOD', [TOD])
     """Mean (Equator) Of Date"""
 
-    TIRF = Frame('TIRF', [ITRF])
+    TIRF = Frame('TIRF')
     """Terrestrial Intermediate Reference Frame"""
 
     CIRF = Frame('CIRF', [TIRF])
@@ -62,15 +67,50 @@ class FrameTranform:
 
     EME2000 = Frame('EME2000', [MOD, GCRF])
 
-    _top = EME2000
+    _tree = EME2000
 
-    @classmethod
-    def TOD_to_MOD(cls, date):
-        return nutation(1980, date)
+    def __init__(self, orbit):
+        self.orbit = orbit
 
-    @classmethod
-    def MOD_to_GCRF(cls, date):
-        return precesion(date)
+    def _itrf_to_pef(self):
+        m = iau1980.pole_motion(self.orbit.date)
+        return m, m
+
+    def _pef_to_tod(self):
+        m = iau1980.sideral(self.orbit.date, model='apparent', eop_correction=False)
+        return m, m + np.cross(iau1980.rate(self.orbit.date), self.orbit[:3])
+
+    def _tod_to_mod(self):
+        return iau1980.nutation(self.orbit.date)
+
+    def _mod_to_gcrf(self):
+        return iau1980.precesion(self.orbit.date)
+
+    def transform(self, new_frame: str):
+
+        old_frame = self.orbit.frame
+
+        p_matrix = np.identity(3)
+        v_matrix = np.identity(3)
+        for a, b in self._tree.steps(old_frame, new_frame):
+            oper = "_{}_to_{}".format(a.name.lower(), b.name.lower())
+            roper = "_{}_to_{}".format(b.name.lower(), a.name.lower())
+
+            if hasattr(self, oper):
+                unit_p_matrix, unit_v_matrix = getattr(self, oper)()
+            elif hasattr(self, roper):
+                unit_p_matrix, unit_v_matrix = getattr(self, roper)().T
+            else:
+                raise ValueError("Unknown transformation: {}".format(oper))
+
+            p_matrix = p_matrix @ unit_p_matrix
+            v_matrix = v_matrix @ unit_v_matrix
+
+        p = self.orbit[:3]
+        v = self.orbit[3:]
+
+        final = np.concatenate((p_matrix @ p, v_matrix @ v))
+        return self.orbit.__class__(self.orbit.date, final, self.orbit.form, new_frame, **self.orbit.complements)
 
     @classmethod
     def register(cls, frame, parent=None):
@@ -80,6 +120,6 @@ class FrameTranform:
             else:
                 raise ValueError("Please specify a parent frame")
         elif type(parent) is str:
-            parent = cls._top.walk(parent)[0]
+            parent = cls._tree.walk(parent)[0]
 
         parent.add(frame)

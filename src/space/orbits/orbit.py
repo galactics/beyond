@@ -4,6 +4,7 @@
 import numpy as np
 
 from .forms import FormTransform
+from space.frames.frame import FrameTransform
 
 
 class Orbit(np.ndarray):
@@ -19,6 +20,11 @@ class Orbit(np.ndarray):
             form = FormTransform._tree[form]
         elif form.name not in FormTransform._tree:
             raise ValueError("Unknown form '{}'".format(form))
+
+        if type(frame) is str:
+            frame = FrameTransform._tree[frame]
+        elif frame.name not in FrameTransform._tree:
+            raise ValueError("Unknown frame '{}'".format(frame))
 
         obj = np.ndarray.__new__(cls, (6,), buffer=np.array(coord), dtype=float)
         obj.date = date
@@ -105,6 +111,19 @@ class Orbit(np.ndarray):
         ft = FormTransform(self)
         self.base.setfield(ft.transform(new_form), dtype=float)
         self.form = new_form
+
+    def change_frame(self, new_frame):
+        """Convert the orbit to a new frame of reference
+
+        Args:
+            new_frame (str or Frame)
+        """
+        if type(new_frame) is str:
+            new_frame = FrameTransform._tree[new_frame]
+
+        ft = FrameTransform(self)
+        self.base.setfield(ft.transform(new_frame), dtype=float)
+        self.frame = new_frame
 
     # @property
     # def apoapsis(self):

@@ -69,8 +69,10 @@ class PolePosition:
             date (float): Date in MJD
         Return:
             dict
+
         X and Y in arcsecond
         dpsi, deps, dX and dY in milli-arcsecond
+        LOD in millisecond
         """
 
         if date == int(date):
@@ -124,6 +126,9 @@ class TaiUtc():
 
 
 class Finals2000A():
+    """
+
+    """
 
     path = Path(__file__).parent / "data" / "finals2000A.all"
     _instance = None
@@ -151,13 +156,15 @@ class Finals2000A():
                             # 'Xerror': float(line[27:36]),
                             'Y': float(line[37:46]),
                             cls._deltas[1]: None,
-                            # 'Yerror': float(line[46:55])
+                            # 'Yerror': float(line[46:55]),
+                            'LOD': None,
                         },
                         'time': {
                             'UT1-UTC': float(line[58:68])
                         }
                     }
                 except ValueError:
+                    # Common values (X, Y, UT1-UTC) are not available anymore
                     break
                 else:
                     try:
@@ -165,6 +172,11 @@ class Finals2000A():
                         cls._instance.data[mjd]['pole'][cls._deltas[1]] = float(line[116:125])
                     except ValueError:
                         # dX and dY are not available for this date
+                        pass
+                    try:
+                        cls._instance.data[mjd]['pole']['LOD'] = float(line[79:86])
+                    except ValueError:
+                        # LOD is not available for this date
                         pass
 
         return cls._instance

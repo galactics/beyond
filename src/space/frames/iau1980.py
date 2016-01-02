@@ -28,6 +28,13 @@ def _tab(max_i=None):
                 break
 
 
+def rate(date):
+    """Return the rotation rate vector of the earth for a given date
+    """
+    lod = PolePosition.get(date)['LOD'] / 1000.
+    return np.array([0, 0, 7.292115146706979e-5 * (1 - lod / 86400.)])
+
+
 def _pole_motion(date):
     """Pole motion in degrees
     """
@@ -194,8 +201,8 @@ def _sideral(date, longitude=0., model='mean', eop_correction=True, terms=106):
 
     return theta
 
-def sideral(date, longitude=0., model='mean'):  # pragma: no cover
+def sideral(date, longitude=0., model='mean', eop_correction=True, terms=106):  # pragma: no cover
     """Sideral time as a rotation matrix
     """
-    theta = _sideral(date, longitude, model)
+    theta = _sideral(date, longitude, model, eop_correction, terms)
     return rot3(np.deg2rad(-theta))

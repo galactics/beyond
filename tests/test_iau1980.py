@@ -21,14 +21,15 @@ def time():
         yield
 
 
-@yield_fixture
+@yield_fixture()
 def pole_position(time):
     with patch('space.frames.poleandtimes.PolePosition.get') as mock_pole:
         mock_pole.return_value = {
             'X': -0.140682,
             'Y': 0.333309,
             'dpsi': -52.195,
-            'deps': -3.875
+            'deps': -3.875,
+            'LOD': 1.5563,
         }
         yield
 
