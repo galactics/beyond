@@ -74,3 +74,9 @@ def test_contain():
     assert ("Z" in A) is False
     assert ("G" in A) is True
     assert ("A" in A) is True
+
+
+def test_getitem():
+
+    assert A["G"] is G
+    assert A["A"] is A

@@ -154,11 +154,10 @@ class Date:
         different scale
         """
 
-        path = self.SCALES.path(self.scale, new_scale)
         delta = 0
-        for i in range(len(path) - 1):
-            one = path[i].name.lower()
-            two = path[i + 1].name.lower()
+        for one, two in self.SCALES.steps(self.scale, new_scale):
+            one = one.name.lower()
+            two = two.name.lower()
             # find the operation
             oper = "_scale_{}_minus_{}".format(two, one)
             # find the reverse operation

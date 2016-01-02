@@ -114,11 +114,9 @@ class Coord(np.ndarray):
 
         coord = self.copy()
         if new_form != self.form.name:
-            path = [el.name for el in self._tree.path(self.form.name, new_form)]
-
-            for i in range(len(path) - 1):
-                a = path[i].lower()
-                b = path[i + 1].lower()
+            for a, b in self._tree.steps(self.form.name, new_form):
+                a = a.name.lower()
+                b = b.name.lower()
                 coord = getattr(self, "_{}_to_{}".format(a, b))(coord)
 
         return coord

@@ -25,7 +25,7 @@ class Node:
         return "<{} '{}'>".format(self.__class__.__name__, self.name)
 
     def __getitem__(self, item):
-        return self._walk(item)[0]
+        return self.walk(item)[0]
 
     def __contains__(self, item):
         """Special method for membership test (e.g. ``if 'B' in node``).
@@ -90,9 +90,13 @@ class Node:
         return x + list(reversed(y))
 
     def walk(self, goal):
-
         # This method is only here to insert the top node in the loop
-        return self._walk(goal) + [self] if goal != self.name else [self]
+        name = self.name
+        if not self._case:
+            goal = goal.lower()
+            name = self.name.lower()
+
+        return self._walk(goal) + [self] if goal != name else [self]
 
     def path(self, start, stop):
         """Get the sortest path to go from one node to an other
@@ -104,8 +108,8 @@ class Node:
             list: List of nodes names
         """
 
-        start = start.name if type(start) is Node else start
-        stop = stop.name if type(stop) is Node else stop
+        start = start.name if type(start) is self.__class__ else start
+        stop = stop.name if type(stop) is self.__class__ else stop
 
         x = self.walk(start)
         y = self.walk(stop)
@@ -113,3 +117,8 @@ class Node:
         final = self._merge(x, y)
 
         return final
+
+    def steps(self, start, stop):
+        path = self.path(start, stop)
+        for i in range(len(path) - 1):
+            yield path[i], path[i + 1]
