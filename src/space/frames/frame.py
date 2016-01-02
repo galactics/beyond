@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from space.utils.tree import Node
 from .iau1980 import precesion, nutation
+from space.utils.node import Node
 
 
 class Frame(Node):

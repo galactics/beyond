@@ -5,9 +5,6 @@
 hierarchy
 """
 
-# TODO
-#   Merger Node et Tree
-
 
 class Node:
     """Class representing a child in the tree

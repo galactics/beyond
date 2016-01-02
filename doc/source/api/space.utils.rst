@@ -25,10 +25,10 @@ space.utils.matrix
     :undoc-members:
     :show-inheritance:
 
-space.utils.tree
+space.utils.node
 ----------------
 
-.. automodule:: space.utils.tree
+.. automodule:: space.utils.node
     :members:
     :undoc-members:
     :show-inheritance:

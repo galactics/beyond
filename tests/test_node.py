@@ -1,6 +1,6 @@
 from pytest import raises
 
-from space.utils.tree import Node
+from space.utils.node import Node
 
 M = Node("M", None)
 L = Node("L", None)
@@ -37,6 +37,7 @@ A = Node("A", [B, E, K])
 #         Node("M", None)
 #     ])
 # ])
+
 
 def test_repr():
     assert repr(A) == "<Node 'A'>"

@@ -3,7 +3,7 @@
 import datetime as _datetime
 
 from space.frames.poleandtimes import TimeScales
-from .tree import Node
+from .node import Node
 
 
 class _Scale(Node):

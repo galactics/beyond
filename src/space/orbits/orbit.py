@@ -4,7 +4,7 @@
 import numpy as np
 from numpy import cos, arccos, sin, arcsin, arctan, arctan2, sqrt, arccosh, sinh
 
-from space.utils.tree import Node
+from space.utils.node import Node
 from space.constants import µ_e
 
 
