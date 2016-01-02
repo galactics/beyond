@@ -101,8 +101,18 @@ class Date:
     def __sub__(self, other):
         if type(other) is _datetime.timedelta:
             other = _datetime.timedelta(seconds=-other.total_seconds())
+        elif type(other) is _datetime.datetime:
+            return self.datetime - other
+        elif type(other) is self.__class__:
+            return self.datetime - other.datetime
 
         return self.__add__(other)
+
+    def __eq__(self, other):
+        return self.d == other.d and self.s == other.s and self.scale == other.scale
+
+    def __repr__(self):
+        return "<{} '{}'>".format(self.__class__.__name__, self)
 
     def __str__(self):
         if 'str' not in self._cache.keys():

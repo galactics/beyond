@@ -37,7 +37,8 @@ import numpy as np
 from string import ascii_uppercase
 from datetime import datetime, timedelta
 
-from space.orbits.orbit import Orbit, Coord
+from space.utils.date import Date
+from space.orbits.orbit import Orbit
 from space.propagators.sgp4 import Sgp4
 
 
@@ -77,7 +78,8 @@ class Tle:
         year += 1900 if self.norad_id < 26052 else 2000
         self.cospar_id = "%d-%s" % (year, first[2][2:])
 
-        self.epoch = datetime(2000 + int(first[3][:2]), 1, 1) + timedelta(days=float(first[3][2:]) - 1)
+        epoch = datetime(2000 + int(first[3][:2]), 1, 1) + timedelta(days=float(first[3][2:]) - 1)
+        self.epoch = Date(epoch)
         self.ndot = float(first[4])
         self.ndotdot = _float(first[5])
         self.bstar = _float(first[6])
@@ -103,5 +105,5 @@ class Tle:
         return [self.i, self.Ω, self.e, self.ω, self.M, self.n]
 
     def orbit(self):
-        data = [self.bstar, self.ndot, self.ndotdot]
-        return Orbit(self.epoch, Coord.F_TLE, self.to_list(), data)
+        data = {'bstar': self.bstar, 'ndot': self.ndot, 'ndotdot': self.ndotdot}
+        return Orbit(self.epoch, self.to_list(), "TLE", "TEME", **data)

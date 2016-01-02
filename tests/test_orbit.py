@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pytest import raises
+from pytest import raises, fixture
 
-from datetime import datetime
 import numpy as np
 
-from space.orbits.orbit import Orbit, Coord, CoordForm
+from space.utils.date import Date
+from space.orbits.orbit import Orbit
+from space.orbits.forms import FormTransform, Form
 
 ref_coord = [
     7192631.11295, 0.00218439, np.deg2rad(98.50639978),
@@ -16,116 +17,118 @@ ref_cart = np.array([
     -1.77079285e+06, 3.04066799e+06, -6.29108469e+06,
     5.05386500e+03, -4.20539671e+03, -3.45695733e+03
 ])
-ref_date = datetime(2015, 9, 21, 12)
-ref_form = Coord.F_KEPL_M
+ref_date = Date(2015, 9, 21, 12)
+ref_form = FormTransform.KEPL_M
+ref_frame = "EME2000"
 
 
-def test_coord_init():
+@fixture
+def ref_orbit():
+    return Orbit(ref_date, ref_coord, ref_form, ref_frame)
 
-    coord = Coord(ref_coord, ref_form)
 
-    assert coord['a'] == 7192631.11295
-    assert coord['e'] == 0.00218439
-    assert coord['i'] == 1.7192610104468178
-    assert coord['Ω'] == 5.5104444999812001
-    assert coord['ω'] == 1.1789060198505055
-    assert coord['M'] == 3.043341444376126
+def test_coord_init(ref_orbit):
 
-    unknown_form = CoordForm("Dummy", None, None)
+    assert ref_orbit['a'] == 7192631.11295
+    assert ref_orbit['e'] == 0.00218439
+    assert ref_orbit['i'] == 1.7192610104468178
+    assert ref_orbit['Ω'] == 5.5104444999812001
+    assert ref_orbit['ω'] == 1.1789060198505055
+    assert ref_orbit['M'] == 3.043341444376126
+
+    unknown_form = Form("Dummy", None, None)
 
     with raises(ValueError) as e:
-        Coord(ref_coord, unknown_form)
-    assert str(e.value) == "Unknown form"
+        Orbit(ref_date, ref_coord, unknown_form, ref_frame)
+    assert str(e.value) == "Unknown form 'Dummy'"
 
     with raises(ValueError) as e:
-        Coord(ref_coord[:-1], ref_form)
+        Orbit(ref_date, ref_coord[:-1], ref_form, ref_frame)
     assert str(e.value) == "Should be 6 in length"
 
 
-def test_coord_unit_transform():
+def test_init_cart():
+    a = Orbit(ref_date, ref_cart, FormTransform.CART.name, ref_frame)
+    assert a.form == FormTransform.CART
 
-    ref = Coord(ref_coord, ref_form)
 
-    kep = Coord._keplerian_m_to_keplerian(ref)
-    assert np.allclose(ref[:5], kep[:5])
+def test_coord_unit_transform(ref_orbit):
 
-    new = Coord._keplerian_to_keplerian_m(kep)
-    assert np.allclose(ref, new)
+    kep = FormTransform._keplerian_m_to_keplerian(ref_orbit)
+    assert np.allclose(ref_orbit[:5], kep[:5])
 
-    tle = Coord._keplerian_m_to_tle(ref)
-    tle_dict = dict(zip(Coord.F_TLE.param_names, tle))
-    assert tle_dict['i'] == ref['i']
-    assert tle_dict['Ω'] == ref['Ω']
-    assert tle_dict['e'] == ref['e']
-    assert tle_dict['ω'] == ref['ω']
-    assert tle_dict['M'] == ref['M']
+    new = FormTransform._keplerian_to_keplerian_m(kep)
+    assert np.allclose(ref_orbit, new)
 
-    new = Coord._tle_to_keplerian_m(tle)
-    assert np.allclose(new, ref)
+    tle = FormTransform._keplerian_m_to_tle(ref_orbit)
+    tle_dict = dict(zip(FormTransform.TLE.param_names, tle))
+    assert tle_dict['i'] == ref_orbit['i']
+    assert tle_dict['Ω'] == ref_orbit['Ω']
+    assert tle_dict['e'] == ref_orbit['e']
+    assert tle_dict['ω'] == ref_orbit['ω']
+    assert tle_dict['M'] == ref_orbit['M']
 
-    cart = Coord._keplerian_to_cartesian(kep)
+    new = FormTransform._tle_to_keplerian_m(tle)
+    assert np.allclose(new, ref_orbit)
+
+    cart = FormTransform._keplerian_to_cartesian(kep)
     assert np.allclose(cart, ref_cart)
 
-    new = Coord._cartesian_to_keplerian(cart)
+    new = FormTransform._cartesian_to_keplerian(cart)
     assert np.allclose(new, kep)
 
 
-def test_coord_global_transform():
+def test_coord_global_transform(ref_orbit):
 
-    coord = Coord(ref_coord, ref_form)
-    backup = coord.copy()
+    backup = ref_orbit.copy()
 
     # Useless transformation, no effect
-    coord.transform('Keplerian_M')
-    assert all(coord == backup)
+    ref_orbit.change_form('keplerian_m')
+    assert all(ref_orbit == backup)
 
-    coord.transform(Coord.F_CART)
-    assert np.allclose(coord, ref_cart)
+    ref_orbit.change_form(FormTransform.CART)
+    assert np.allclose(ref_orbit, ref_cart)
 
 
-def test_coord_attributes_access():
-    coord = Coord(ref_coord, ref_form)
-    assert coord.a == coord[0]
-    assert coord.e == coord[1]
-    assert coord.i == coord[2]
-    assert coord.Ω == coord[3]
-    assert coord.Omega == coord[3]
-    assert coord['Omega'] == coord[3]
-    assert coord.ω == coord[4]
-    assert coord.omega == coord[4]
-    assert coord['omega'] == coord[4]
-    assert coord.M == coord[5]
+def test_coord_attributes_access(ref_orbit):
+    assert ref_orbit.a == ref_orbit[0]
+    assert ref_orbit.e == ref_orbit[1]
+    assert ref_orbit.i == ref_orbit[2]
+    assert ref_orbit.Ω == ref_orbit[3]
+    assert ref_orbit.Omega == ref_orbit[3]
+    assert ref_orbit['Omega'] == ref_orbit[3]
+    assert ref_orbit.ω == ref_orbit[4]
+    assert ref_orbit.omega == ref_orbit[4]
+    assert ref_orbit['omega'] == ref_orbit[4]
+    assert ref_orbit.M == ref_orbit[5]
 
     with raises(AttributeError):
-        coord.ν == coord[5]
+        ref_orbit.ν == ref_orbit[5]
 
     with raises(KeyError):
-        coord["ν"]
+        ref_orbit["ν"]
 
-    coord.transform(Coord.F_KEPL)
-    assert coord.ν == coord[5]
-
-
-def test_orbit_change_form():
-
-    orb = Orbit(ref_date, ref_form, ref_coord)
-
-    orb.change_form(Coord.F_CART)
-    assert orb.coord.form == Coord.F_CART
-    assert np.allclose(orb.coord, ref_cart)
+    ref_orbit.change_form(FormTransform.KEPL)
+    assert ref_orbit.ν == ref_orbit[5]
 
 
-def test_orbit_properties():
+def test_orbit_change_form(ref_orbit):
 
-    ref_apoapsis = 7208342.6244268175
-    ref_periapsis = 7176919.6014731824
+    ref_orbit.change_form(FormTransform.CART.name)
+    assert ref_orbit.form == FormTransform.CART
+    assert np.allclose(ref_orbit, ref_cart)
 
-    orb = Orbit(ref_date, ref_form, ref_coord)
-    assert orb.apoapsis == ref_apoapsis
-    assert orb.periapsis == ref_periapsis
-    assert orb.apoapsis > orb.periapsis
 
-    orb.change_form(Coord.F_CART)
-    assert np.allclose(orb.apoapsis, ref_apoapsis)
-    assert np.allclose(orb.periapsis, ref_periapsis)
-    assert orb.apoapsis > orb.periapsis
+# def test_orbit_properties(ref_orbit):
+
+#     ref_apoapsis = 7208342.6244268175
+#     ref_periapsis = 7176919.6014731824
+
+#     assert ref_orbit.apoapsis == ref_apoapsis
+#     assert ref_orbit.periapsis == ref_periapsis
+#     assert ref_orbit.apoapsis > ref_orbit.periapsis
+
+#     ref_orbit.change_form("Cartesian")
+#     assert np.allclose(ref_orbit.apoapsis, ref_apoapsis)
+#     assert np.allclose(ref_orbit.periapsis, ref_periapsis)
+#     assert ref_orbit.apoapsis > ref_orbit.periapsis

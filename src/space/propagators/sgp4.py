@@ -5,7 +5,9 @@ import numpy as np
 from numpy import cos, sqrt, sin, arctan2
 from datetime import datetime, timedelta
 
-from space.orbits.orbit import Orbit, Coord
+from space.utils.date import Date
+from space.orbits.orbit import Orbit
+from space.orbits.forms import FormTransform
 
 __all__ = ['Sgp4']
 
@@ -48,7 +50,7 @@ class Sgp4:
         if not isinstance(orbit, Orbit):
             raise TypeError("Not Orbit")
 
-        if orbit.coord.form != Coord.F_TLE:
+        if orbit.form != FormTransform.TLE:
             raise TypeError("Not TLE")
 
         self.gravity = gravity
@@ -59,9 +61,9 @@ class Sgp4:
 
         self._init = Init()
 
-        i0, Ω0, e0, ω0, M0, n0 = self.tle.coord
+        i0, Ω0, e0, ω0, M0, n0 = self.tle
         n0 *= 60  # conversion to min⁻¹
-        bstar = self.tle.data[0]
+        bstar = self.tle.complements['bstar']
 
         j2 = self.gravity.j2
         j3 = self.gravity.j3
@@ -120,14 +122,17 @@ class Sgp4:
 
     def propagate(self, date):
 
-        i0, Ω0, e0, ω0, M0, n0 = self.tle.coord
+        i0, Ω0, e0, ω0, M0, n0 = self.tle
         n0 *= 60  # conversion to min⁻¹
         if isinstance(date, datetime):
-            t0 = self.tle.epoch
+            t0 = self.tle.date.datetime
             tdiff = (date - t0).total_seconds() / 60.
         elif isinstance(date, timedelta):
             tdiff = date.total_seconds() / 60.
-        bstar = self.tle.data[0]
+        else:
+            raise TypeError("aargh")
+
+        bstar = self.tle.complements['bstar']
         µ = self.gravity.µ_e
         r_e = self.gravity.r_e
         k_e = self.gravity.k_e
@@ -215,4 +220,4 @@ class Sgp4:
         vR = rk * vU * r_e
         vRdot = (rdotk * vU + rfdotk * vV) * (r_e * k_e / 60.)
 
-        return Coord(np.concatenate((vR, vRdot)) * 1000, Coord.F_CART)
+        return np.concatenate((vR, vRdot)) * 1000
