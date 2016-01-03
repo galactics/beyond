@@ -43,10 +43,8 @@ def ref_orbit():
 
 
 def state_vector_testing(ref, pv):
-    # Position
-    np.testing.assert_almost_equal(ref[:3], pv[:3], 2)
-    # Velocity
-    np.testing.assert_almost_equal(ref[3:], pv[3:], 6)
+    np.testing.assert_almost_equal(ref[:3], pv[:3], 4)  # Position
+    np.testing.assert_almost_equal(ref[3:], pv[3:], 6)  # Velocity
 
 
 def test_unit_change(ref_orbit, pole_position):
@@ -61,7 +59,7 @@ def test_unit_change(ref_orbit, pole_position):
 
     state_vector_testing(pef, pv)
 
-    # ITRF to TOD
+    # PEF to TOD
     ft = FrameTransform(pv)
     pv = ft.transform('TOD')
     tod = np.array([

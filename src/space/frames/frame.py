@@ -72,13 +72,25 @@ class FrameTransform:
     def __init__(self, orbit):
         self.orbit = orbit
 
+    @classmethod
+    def _convert_matrix(cls, x=None, y=None):
+        x = np.identity(3) if x is None else x
+        y = np.identity(3) if y is None else y
+
+        m = np.identity(6)
+        m[:3, :3] = x
+        m[3:, 3:] = y
+        return m
+
     def _itrf_to_pef(self):
         m = iau1980.pole_motion(self.orbit.date)
-        return m, m
+        return self._convert_matrix(m, m), np.zeros(6)
 
     def _pef_to_tod(self):
         m = iau1980.sideral(self.orbit.date, model='apparent', eop_correction=False)
-        return m, m + np.cross(iau1980.rate(self.orbit.date), self.orbit[:3])
+        offset = np.zeros(6)
+        offset[3:] = np.cross(iau1980.rate(self.orbit.date), self.orbit[:3])
+        return self._convert_matrix(m, m), offset
 
     def _tod_to_mod(self):
         return iau1980.nutation(self.orbit.date)
@@ -88,29 +100,27 @@ class FrameTransform:
 
     def transform(self, new_frame: str):
 
-        old_frame = self.orbit.frame
+        matrix = np.identity(6)
+        orb = self.orbit.base
 
-        p_matrix = np.identity(3)
-        v_matrix = np.identity(3)
-        for a, b in self._tree.steps(old_frame, new_frame):
+        for a, b in self._tree.steps(self.orbit.frame, new_frame):
             oper = "_{}_to_{}".format(a.name.lower(), b.name.lower())
             roper = "_{}_to_{}".format(b.name.lower(), a.name.lower())
 
             if hasattr(self, oper):
-                unit_p_matrix, unit_v_matrix = getattr(self, oper)()
+                unit_matrix, offset = getattr(self, oper)()
             elif hasattr(self, roper):
-                unit_p_matrix, unit_v_matrix = getattr(self, roper)().T
+                unit_matrix, offset = getattr(self, roper)()
+                unit_matrix = unit_matrix.T
+                offset = - offeset
             else:
-                raise ValueError("Unknown transformation: {}".format(oper))
+                raise ValueError("Unknown frame transformation: {} => {}".format(a, b))
 
-            p_matrix = p_matrix @ unit_p_matrix
-            v_matrix = v_matrix @ unit_v_matrix
 
-        p = self.orbit[:3]
-        v = self.orbit[3:]
+            orb = unit_matrix @ (orb + offset)
 
-        final = np.concatenate((p_matrix @ p, v_matrix @ v))
-        return self.orbit.__class__(self.orbit.date, final, self.orbit.form, new_frame, **self.orbit.complements)
+        # final = matrix @ self.orbit
+        return self.orbit.__class__(self.orbit.date, orb, self.orbit.form, new_frame, **self.orbit.complements)
 
     @classmethod
     def register(cls, frame, parent=None):

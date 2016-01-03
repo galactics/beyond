@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import numpy as np
 from pytest import fixture, yield_fixture
 from unittest.mock import patch
 from numpy.testing import assert_almost_equal
 
 from space.utils.date import Date
-from space.frames.iau1980 import _pole_motion, _precesion, _nutation, _sideral
+from space.frames.iau1980 import _pole_motion, _precesion, _nutation, _sideral, rate
 
 
 @fixture
@@ -67,3 +68,7 @@ def test_sideral(date, pole_position):
 
     gast = _sideral(date, model='apparent', eop_correction=False)
     assert_almost_equal(gast, 312.8067654)
+
+
+def test_rate(date, pole_position):
+    assert_almost_equal(rate(date), np.array([0, 0, 7.2921150153560662e-05]))

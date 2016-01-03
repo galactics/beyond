@@ -151,7 +151,7 @@ def equinox(date, eop_correction=True, terms=106, kinematic=True):
     """
     epsilon_bar, delta_psi, delta_eps = _nutation(date, eop_correction, terms)
 
-    equin = delta_psi * 3600. * np.cos(np.deg2rad(epsilon_bar + delta_eps))
+    equin = delta_psi * 3600. * np.cos(np.deg2rad(epsilon_bar))
 
     if date.d >= 50506 and kinematic:
         # Starting 1992-02-27, we apply the effect of the moon
@@ -186,10 +186,8 @@ def _sideral(date, longitude=0., model='mean', eop_correction=True, terms=106):
     theta = 67310.54841 + (876600 * 3600 + 8640184.812866) * t + 0.093104 * t ** 2\
         - 6.2e-6 * t ** 3
 
-    # GMST in arcsecond
-    theta *= 15.
-    # Conversion from arcsecond to degrees
-    theta /= 3600.
+    # Conversion from second (time) to degrees (angle)
+    theta /= 240.
 
     if model == 'apparent':
         theta += equinox(date, eop_correction, terms)
