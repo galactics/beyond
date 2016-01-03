@@ -94,8 +94,12 @@ def _nutation(date, eop_correction=True, terms=106):
 
     r = 360.
 
-    epsilon_bar = 23.439291 - 0.0130042 * ttt - 1.64e-7 * ttt ** 2\
-        + 5.04e-7 * ttt ** 3
+    # in arcsecond
+    epsilon_bar = 84381.448 - 46.8150 * ttt - 5.9e-4 * ttt ** 2\
+        + 1.813e-3 * ttt ** 3
+
+    # Conversion to degrees
+    epsilon_bar /= 3600.
 
     # mean anomaly of the moon
     m_m = 134.96298139 + (1325 * r + 198.8673981) * ttt\
@@ -139,8 +143,7 @@ def _nutation(date, eop_correction=True, terms=106):
 def nutation(date, eop_correction=True, terms=106):  # pragma: no cover
     """Nutation as a rotation matrix
     """
-    nut = _nutation(date, eop_correction, terms)
-    epsilon_bar, delta_psi, delta_eps = np.deg2rad(nut)
+    epsilon_bar, delta_psi, delta_eps = np.deg2rad(_nutation(date, eop_correction, terms))
     epsilon = epsilon_bar + delta_eps
 
     return rot1(-epsilon_bar) @ rot3(delta_psi) @ rot1(epsilon)

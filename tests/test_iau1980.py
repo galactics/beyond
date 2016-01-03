@@ -7,6 +7,7 @@ from unittest.mock import patch
 from numpy.testing import assert_almost_equal
 
 from space.utils.date import Date
+from space.frames.poleandtimes import ScalesDiff
 from space.frames.iau1980 import _pole_motion, _precesion, _nutation, _sideral, rate
 
 
@@ -18,7 +19,7 @@ def date():
 @yield_fixture
 def time():
     with patch('space.frames.poleandtimes.TimeScales.get') as mock_ts:
-        mock_ts.return_value = (-32.4399519, -0.4399619, 32)
+        mock_ts.return_value = ScalesDiff(-32.4399519, -0.4399619, 32)
         yield
 
 
@@ -52,12 +53,7 @@ def test_precesion(date, time):
 def test_nutation(date, pole_position):
     epsilon_bar, delta_psi, delta_eps = _nutation(date, eop_correction=False)
 
-    assert_almost_equal(epsilon_bar, 23.4387367)
-    # According to Vallado it should be more like:
-    # assert_almost_equal(epsilon_bar, 23.4387368)
-    # but, as it only an error on the last digit, we can (maybe)
-    # ignore it safely
-
+    assert_almost_equal(epsilon_bar, 23.4387368)
     assert_almost_equal(delta_psi, -0.0034108)
     assert_almost_equal(delta_eps, 0.0020316)
 
