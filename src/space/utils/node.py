@@ -30,7 +30,7 @@ class Node:
     def __contains__(self, item):
         """Special method for membership test (e.g. ``if 'B' in node``).
         """
-        if item == self.name:
+        if self.name == item or (not self._case and self.name.lower() == item.lower()):
             return True
         try:
             self._walk(item)
