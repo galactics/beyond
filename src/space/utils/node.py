@@ -122,3 +122,80 @@ class Node:
         path = self.path(start, stop)
         for i in range(len(path) - 1):
             yield path[i], path[i + 1]
+
+
+class Route:
+
+    def __init__(self, direction, steps):
+        self.direction = direction
+        self.steps = steps
+
+    def __repr__(self):
+        return "<d={0}, s={1}>".format(self.direction, self.steps)
+
+
+class Node2:
+
+    def __init__(self, name):
+        self.name = name
+        self.neighbors = set()
+        self.routes = {}
+        self._updating = False
+
+    def __add__(self, other):
+        self.neighbors.add(other)
+        other.neighbors.add(self)
+        self._update()
+        return other
+
+    def _update(self, already_updated=None):
+
+        if already_updated is None:
+            already_updated = set()
+
+        self.routes = {}
+        for node in self.neighbors:
+            self.routes[node.name] = Route(node, 1)
+
+            # Retrieve route from neighbors
+            for name, route in node.routes.items():
+                if name in [self.name] + [x.name for x in self.neighbors]:
+                    continue
+
+                if name in self.routes.keys() and self.routes[name].steps <= route.steps:
+                    continue
+
+                self.routes[name] = Route(node, route.steps + 1)
+
+        # Recursive update (with lock)
+        already_updated.add(self)
+        for node in self.neighbors:
+            if node not in already_updated:
+                node._update(already_updated)
+
+    def path(self, goal):
+        if goal == self.name:
+            return [self]
+
+        if goal not in self.routes:
+            raise ValueError("Unknown '{0}'".format(goal))
+
+        obj = self
+        path = [obj]
+        while True:
+            obj = obj.routes[goal].direction
+            path.append(obj)
+            if obj.name is goal:
+                break
+        return path
+
+    def steps(self, goal):
+        path = self.path(goal)
+        for i in range(len(path) - 1):
+            yield path[i], path[i + 1]
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return "<{} '{}'>".format(self.__class__.__name__, self.name)
