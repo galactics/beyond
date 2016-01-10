@@ -192,7 +192,7 @@ class FormTransform:
         x, y, z, vx, vy, vz = coord
         r = np.linalg.norm(coord[:3])
         lat = arcsin(z / r)
-        lon = arctan(y / x)
+        lon = arctan2(y, x)
 
         # Not very sure about this
         r_dot = (x * vx + y * vy + z * vz) / r
