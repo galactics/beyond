@@ -9,7 +9,7 @@ from space.frames.poleandtimes import ScalesDiff
 
 from space.utils.date import Date
 from space.orbits.orbit import Orbit
-from space.frames.frame import FrameTransform
+from space.frames.frame import *
 
 
 @yield_fixture
@@ -50,8 +50,7 @@ def state_vector_testing(ref, pv):
 def test_unit_change(ref_orbit, pole_position):
     """These reference data are extracted from Vallado §3.7.3.
     """
-    ft = FrameTransform(ref_orbit)
-    pv = ft.transform('PEF')
+    pv = ITRF(ref_orbit.date, ref_orbit).transform('PEF')
     pef = np.array([
         -1033475.03131, 7901305.5856, 6380344.5328,
         -3225.632747, -2872.442511, 5531.931288
@@ -60,11 +59,28 @@ def test_unit_change(ref_orbit, pole_position):
     state_vector_testing(pef, pv)
 
     # PEF to TOD
-    ft = FrameTransform(pv)
-    pv = ft.transform('TOD')
+    pv = PEF(pv.date, pv).transform('TOD')
     tod = np.array([
         5094514.7804, 6127366.4612, 6380344.5328,
         -4746.088567, 786.077222, 5531.931288
     ])
 
     state_vector_testing(tod, pv)
+
+    # TOD to MOD
+    pv = TOD(pv.date, pv).transform('MOD')
+    mod = np.array([
+        5094028.3745, 6127870.8164, 6380248.5164,
+        -4746.263052, 786.014045, 5531.790562
+    ])
+
+    state_vector_testing(mod, pv)
+
+    # MOD to GCRF
+    pv = MOD(pv.date, pv).transform('GCRF')
+    gcrf = np.array([
+        5102508.958, 6123011.401, 6378136.928,
+        -4743.22016, 790.53650, 5533.75528
+    ])
+
+    state_vector_testing(gcrf, pv)

@@ -4,7 +4,7 @@
 import numpy as np
 
 from .forms import FormTransform
-from space.frames.frame import FrameTransform
+from space.frames.frame import *
 
 
 class Orbit(np.ndarray):
@@ -22,9 +22,9 @@ class Orbit(np.ndarray):
             raise ValueError("Unknown form '{}'".format(form))
 
         if type(frame) is str:
-            frame = FrameTransform._tree[frame]
-        elif frame.name not in FrameTransform._tree:
-            raise ValueError("Unknown frame '{}'".format(frame))
+            frame = eval(frame)
+        # elif frame.name not in FrameTransform._tree:
+            # raise ValueError("Unknown frame '{}'".format(frame))
 
         obj = np.ndarray.__new__(cls, (6,), buffer=np.array(coord), dtype=float)
         obj.date = date
@@ -118,12 +118,14 @@ class Orbit(np.ndarray):
         Args:
             new_frame (str or Frame)
         """
-        if type(new_frame) is str:
-            new_frame = FrameTransform._tree[new_frame]
-
-        ft = FrameTransform(self)
-        self.base.setfield(ft.transform(new_frame), dtype=float)
-        self.frame = new_frame
+        old_form = self.form
+        try:
+            self.change_form('cartesian')
+            new_coord = self.frame(self.date, self).transform(new_frame)
+            self.base.setfield(new_coord, dtype=float)
+            self.frame = new_frame
+        finally:
+            self.change_form(old_form)
 
     # @property
     # def apoapsis(self):

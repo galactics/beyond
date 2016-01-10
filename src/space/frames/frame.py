@@ -3,133 +3,150 @@
 
 import numpy as np
 
-from space.utils.node import Node
-from . import iau1980
+from space.utils.matrix import rot3
+from space.utils.node import Node2
+from space.frames import iau1980
+
+CIO = ['ITRF', 'TIRF', 'CIRF', 'GCRF']
+IAU1980 = ['TOD', 'MOD']
+
+__all__ = CIO + IAU1980 + ['EME2000', 'TEME', 'WGS84', 'PEF']
 
 
-class Frame(Node):
+class _MetaFrame(type, Node2):
+    def __init__(self, name, bases, dct):
+        super(_MetaFrame, self).__init__(name, bases, dct)
+        super(type, self).__init__(name)
+
+    def __repr__(self):
+        return "<Frame '{}'>".format(self.name)
+
+
+class _Frame(metaclass=_MetaFrame):
+
+    def __init__(self, date, orbit):
+        self.date = date
+        self.orbit = orbit
 
     def __str__(self):
         return self.name
 
-    def add(self, frame):
-        """Dynamically add a sub-frame to an existing one.
-
-        The most common example is setting a station on the surface of the
-        Earth.
-        """
-
-        if self.subtree is None:
-            self.subtree = []
-        self.subtree.append(frame)
-
-
-class TopocentricFrame(Frame):
-
-    def __init__(self, name, coordinates, body='earth'):
-        self.coordinates = coordinates
-        self.body = body
-        super().__init__(name)
-        FrameTransform.register(self)
-
-
-class FrameTransform:
-
-    TEME = Frame('TEME')
-    """True Equator Mean Equinox"""
-
-    GTOD = Frame('GTOD')
-    """Greenwich True Of Date"""
-
-    WGS84 = Frame('WGS84')
-    """World Geodetic System 1984"""
-
-    ITRF = Frame('ITRF', [WGS84])
-    """International Terrestrial Reference Frame"""
-
-    PEF = Frame('PEF', [TEME, ITRF])
-    """Pseudo Earth Fixed"""
-
-    TOD = Frame('TOD', [PEF])
-    """True (Equator) Of Date"""
-
-    MOD = Frame('MOD', [TOD])
-    """Mean (Equator) Of Date"""
-
-    TIRF = Frame('TIRF')
-    """Terrestrial Intermediate Reference Frame"""
-
-    CIRF = Frame('CIRF', [TIRF])
-    """Celestial Intermediate Reference Frame"""
-
-    GCRF = Frame('GCRF', [CIRF])
-    """Geocentric Celestial Reference Frame"""
-
-    EME2000 = Frame('EME2000', [MOD, GCRF])
-
-    _tree = EME2000
-
-    def __init__(self, orbit):
-        self.orbit = orbit
+    def __repr__(self):
+        return "<Frame '{}'>".format(self.__class__.__name__)
 
     @classmethod
-    def _convert_matrix(cls, x=None, y=None):
+    def _convert(cls, x=None, y=None):
         x = np.identity(3) if x is None else x
         y = np.identity(3) if y is None else y
 
-        m = np.identity(6)
+        m = np.identity(7)
         m[:3, :3] = x
-        m[3:, 3:] = y
+        m[3:6, 3:6] = y
         return m
 
-    def _itrf_to_pef(self):
-        m = iau1980.pole_motion(self.orbit.date)
-        return self._convert_matrix(m, m), np.zeros(6)
+    def transform(self, new_frame):
+        steps = self.__class__.steps(new_frame)
 
-    def _pef_to_tod(self):
-        m = iau1980.sideral(self.orbit.date, model='apparent', eop_correction=False)
-        offset = np.zeros(6)
-        offset[3:] = np.cross(iau1980.rate(self.orbit.date), self.orbit[:3])
-        return self._convert_matrix(m, m), offset
+        orbit = np.ones(7)
+        orbit[:6] = self.orbit
+        date = self.orbit.date
+        for _from, _to in steps:
+            oper = "_{}_to_{}".format(_from, _to)
+            matrix = getattr(_from(date, orbit), oper)()
+            orbit = matrix @ orbit
 
-    def _tod_to_mod(self):
-        return iau1980.nutation(self.orbit.date)
-
-    def _mod_to_gcrf(self):
-        return iau1980.precesion(self.orbit.date)
-
-    def transform(self, new_frame: str):
-
-        matrix = np.identity(6)
-        orb = self.orbit.base
-
-        for a, b in self._tree.steps(self.orbit.frame, new_frame):
-            oper = "_{}_to_{}".format(a.name.lower(), b.name.lower())
-            roper = "_{}_to_{}".format(b.name.lower(), a.name.lower())
-
-            if hasattr(self, oper):
-                unit_matrix, offset = getattr(self, oper)()
-            elif hasattr(self, roper):
-                unit_matrix, offset = getattr(self, roper)()
-                unit_matrix = unit_matrix.T
-                offset = - offeset
-            else:
-                raise ValueError("Unknown frame transformation: {} => {}".format(a, b))
+        return self.orbit.__class__(date, orbit[:6], 'cartesian', new_frame, **self.orbit.complements)
 
 
-            orb = unit_matrix @ (orb + offset)
+class TEME(_Frame):
+    """True Equator Mean Equinox"""
 
-        # final = matrix @ self.orbit
-        return self.orbit.__class__(self.orbit.date, orb, self.orbit.form, new_frame, **self.orbit.complements)
+    def _TEME_to_TOD(self):
+        equin = iau1980.equinox(self.date, eop_correction=False, terms=4, kinematic=False)
+        m = rot3(-np.deg2rad(equin))
+        return self._convert(m, m)
 
-    @classmethod
-    def register(cls, frame, parent=None):
-        if parent is None:
-            if isinstance(frame, TopocentricFrame) and frame.body.lower() == 'earth':
-                parent = cls.WGS84
-            else:
-                raise ValueError("Please specify a parent frame")
-        elif type(parent) is str:
-            parent = cls._tree.walk(parent)[0]
+    def _TEME_to_PEF(self):
+        sid = iau1980.sideral(self.date)
+        return self._convert(sid, sid)
 
-        parent.add(frame)
+
+class GTOD(_Frame):
+    """Greenwich True Of Date"""
+    pass
+
+
+class WGS84(_Frame):
+    """World Geodetic System 1984"""
+    pass
+
+
+class PEF(_Frame):
+    """Pseudo Earth Fixed"""
+
+    def _PEF_to_TOD(self):
+        m = iau1980.sideral(self.date, model='apparent', eop_correction=False)
+        offset = np.identity(7)
+        offset[3:6, -1] = np.cross(iau1980.rate(self.date), self.orbit[:3])
+        return self._convert(m, m) @ offset
+
+    def _PEF_to_ITRF(self):
+        m = iau1980.pole_motion(self.date)
+        return self._convert(m.T, m.T)
+
+class TOD(_Frame):
+    """True (Equator) Of Date"""
+
+    def _TOD_to_MOD(self):
+        m = iau1980.nutation(self.date)
+        return self._convert(m, m)
+
+
+class MOD(_Frame):
+    """Mean (Equator) Of Date"""
+    def _MOD_to_GCRF(self):
+        m = iau1980.precesion(self.date)
+        return self._convert(m, m)
+
+
+class EME2000(_Frame):
+    pass
+
+
+class ITRF(_Frame):
+    """International Terrestrial Reference Frame"""
+
+    def _ITRF_to_PEF(self):
+        m = iau1980.pole_motion(self.date)
+        return self._convert(m, m)
+
+
+class TIRF(_Frame):
+    """Terrestrial Intermediate Reference Frame"""
+    pass
+
+
+class CIRF(_Frame):
+    """Celestial Intermediate Reference Frame"""
+    pass
+
+
+class GCRF(_Frame):
+    """Geocentric Celestial Reference Frame"""
+    pass
+
+
+class TopocentricFrame(_Frame):
+
+    def __new__(cls, name, coordinates, parent_frame):
+
+        obj = super().__new__(name, coordinates, parent_frame)
+        self.name = name
+        self.coordinates = coordinates
+        parent_frame + self
+
+
+ITRF + PEF + TOD + MOD + EME2000
+MOD + GCRF
+TOD + TEME + PEF
+ITRF + TIRF + CIRF + GCRF
