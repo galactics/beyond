@@ -50,37 +50,34 @@ def state_vector_testing(ref, pv):
 def test_unit_change(ref_orbit, pole_position):
     """These reference data are extracted from Vallado §3.7.3.
     """
-    pv = ITRF(ref_orbit.date, ref_orbit).transform('PEF')
-    pef = np.array([
-        -1033475.03131, 7901305.5856, 6380344.5328,
-        -3225.632747, -2872.442511, 5531.931288
-    ])
+    pef_ref = np.array([-1033475.03131, 7901305.5856, 6380344.5328,
+                        -3225.632747, -2872.442511, 5531.931288])
+    tod_ref = np.array([5094514.7804, 6127366.4612, 6380344.5328,
+                        -4746.088567, 786.077222, 5531.931288])
+    mod_ref = np.array([5094028.3745, 6127870.8164, 6380248.5164,
+                        -4746.263052, 786.014045, 5531.790562])
+    gcrf_ref = np.array([5102508.958, 6123011.401, 6378136.928,
+                         -4743.22016, 790.53650, 5533.75528])
 
-    state_vector_testing(pef, pv)
+    pv = ITRF(ref_orbit.date, ref_orbit).transform('PEF')
+    state_vector_testing(pef_ref, pv)
+
+    # Going back to ITRF
+    pv2 = PEF(pv.date, pv).transform('ITRF')
+    state_vector_testing(ref_orbit, pv2)
 
     # PEF to TOD
     pv = PEF(pv.date, pv).transform('TOD')
-    tod = np.array([
-        5094514.7804, 6127366.4612, 6380344.5328,
-        -4746.088567, 786.077222, 5531.931288
-    ])
+    state_vector_testing(tod_ref, pv)
 
-    state_vector_testing(tod, pv)
+    # Going back to PEF
+    pv2 = TOD(pv.date, pv).transform("PEF")
+    state_vector_testing(pef_ref, pv2)
 
     # TOD to MOD
     pv = TOD(pv.date, pv).transform('MOD')
-    mod = np.array([
-        5094028.3745, 6127870.8164, 6380248.5164,
-        -4746.263052, 786.014045, 5531.790562
-    ])
-
-    state_vector_testing(mod, pv)
+    state_vector_testing(mod_ref, pv)
 
     # MOD to GCRF
     pv = MOD(pv.date, pv).transform('GCRF')
-    gcrf = np.array([
-        5102508.958, 6123011.401, 6378136.928,
-        -4743.22016, 790.53650, 5533.75528
-    ])
-
-    state_vector_testing(gcrf, pv)
+    state_vector_testing(gcrf_ref, pv)

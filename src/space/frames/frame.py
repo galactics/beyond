@@ -51,8 +51,7 @@ class _Frame(metaclass=_MetaFrame):
         orbit[:6] = self.orbit
         date = self.orbit.date
         for _from, _to in steps:
-            oper = "_{}_to_{}".format(_from, _to)
-            matrix = getattr(_from(date, orbit), oper)()
+            matrix = getattr(_from(date, orbit), "_to_{}".format(_to))()
             orbit = matrix @ orbit
 
         return self.orbit.__class__(date, orbit[:6], 'cartesian', new_frame, **self.orbit.complements)
@@ -61,12 +60,12 @@ class _Frame(metaclass=_MetaFrame):
 class TEME(_Frame):
     """True Equator Mean Equinox"""
 
-    def _TEME_to_TOD(self):
+    def _to_TOD(self):
         equin = iau1980.equinox(self.date, eop_correction=False, terms=4, kinematic=False)
         m = rot3(-np.deg2rad(equin))
         return self._convert(m, m)
 
-    def _TEME_to_PEF(self):
+    def _to_PEF(self):
         sid = iau1980.sideral(self.date)
         return self._convert(sid, sid)
 
@@ -84,27 +83,33 @@ class WGS84(_Frame):
 class PEF(_Frame):
     """Pseudo Earth Fixed"""
 
-    def _PEF_to_TOD(self):
+    def _to_TOD(self):
         m = iau1980.sideral(self.date, model='apparent', eop_correction=False)
         offset = np.identity(7)
         offset[3:6, -1] = np.cross(iau1980.rate(self.date), self.orbit[:3])
         return self._convert(m, m) @ offset
 
-    def _PEF_to_ITRF(self):
+    def _to_ITRF(self):
         m = iau1980.pole_motion(self.date)
         return self._convert(m.T, m.T)
 
 class TOD(_Frame):
     """True (Equator) Of Date"""
 
-    def _TOD_to_MOD(self):
+    def _to_MOD(self):
         m = iau1980.nutation(self.date)
         return self._convert(m, m)
+
+    def _to_PEF(self):
+        m = iau1980.sideral(self.date, model='apparent', eop_correction=False)
+        offset = np.identity(7)
+        offset[3:6, -1] = - np.cross(iau1980.rate(self.date), self.orbit[:3])
+        return self._convert(m, m).T @ offset
 
 
 class MOD(_Frame):
     """Mean (Equator) Of Date"""
-    def _MOD_to_GCRF(self):
+    def _to_GCRF(self):
         m = iau1980.precesion(self.date)
         return self._convert(m, m)
 
@@ -116,7 +121,7 @@ class EME2000(_Frame):
 class ITRF(_Frame):
     """International Terrestrial Reference Frame"""
 
-    def _ITRF_to_PEF(self):
+    def _to_PEF(self):
         m = iau1980.pole_motion(self.date)
         return self._convert(m, m)
 
