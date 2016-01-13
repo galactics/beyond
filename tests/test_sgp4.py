@@ -32,7 +32,7 @@ def test_one():
         tle = Tle(lines).orbit()
 
         sgp4 = Sgp4(tle)
-        pv = sgp4.propagate(tle.date.datetime + timedelta(days=1))
+        pv = sgp4.propagate(tle.date + timedelta(days=1))
         r, v = pv[:3], pv[3:]
 
         assert list(r) == expected[0]

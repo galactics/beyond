@@ -124,11 +124,12 @@ class Sgp4:
 
         i0, Ω0, e0, ω0, M0, n0 = self.tle
         n0 *= 60  # conversion to min⁻¹
-        if isinstance(date, datetime):
+        if isinstance(date, Date):
             t0 = self.tle.date.datetime
-            tdiff = (date - t0).total_seconds() / 60.
+            tdiff = (date.datetime - t0).total_seconds() / 60.
         elif isinstance(date, timedelta):
             tdiff = date.total_seconds() / 60.
+            date = self.tle.date + date
         else:
             raise TypeError("aargh")
 
@@ -220,4 +221,4 @@ class Sgp4:
         vR = rk * vU * r_e
         vRdot = (rdotk * vU + rfdotk * vV) * (r_e * k_e / 60.)
 
-        return np.concatenate((vR, vRdot)) * 1000
+        return Orbit(date, np.concatenate((vR, vRdot)) * 1000, 'cartesian', 'TEME', self.__class__)
