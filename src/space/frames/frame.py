@@ -45,16 +45,22 @@ class _Frame(metaclass=_MetaFrame):
         return m
 
     def transform(self, new_frame):
+        """Change the frame of the given orbit
+
+        Args:
+            new_frame (str)
+        Return:
+            numpy.ndarray
+        """
         steps = self.__class__.steps(new_frame)
 
         orbit = np.ones(7)
         orbit[:6] = self.orbit
-        date = self.orbit.date
         for _from, _to in steps:
-            matrix = getattr(_from(date, orbit), "_to_{}".format(_to))()
+            matrix = getattr(_from(self.date, orbit), "_to_{}".format(_to))()
             orbit = matrix @ orbit
 
-        return self.orbit.__class__(date, orbit[:6], 'cartesian', new_frame, **self.orbit.complements)
+        return orbit[:6]
 
 
 class TEME(_Frame):
