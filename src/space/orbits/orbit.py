@@ -11,7 +11,7 @@ class Orbit(np.ndarray):
     """Coordinate representation
     """
 
-    def __new__(cls, date, coord, form, frame, **kwargs):
+    def __new__(cls, date, coord, form, frame, propagator, **kwargs):
 
         if len(coord) != 6:
             raise ValueError("Should be 6 in length")
@@ -30,6 +30,7 @@ class Orbit(np.ndarray):
         obj.date = date
         obj.form = form
         obj.frame = frame
+        obj.propagator = propagator
         obj.complements = kwargs
 
         return obj
@@ -37,7 +38,7 @@ class Orbit(np.ndarray):
     def copy(self):
         new_obj = self.__class__(
             self.date, self.base.copy(), self.form,
-            self.frame, **self.complements)
+            self.frame, self.propagator, **self.complements)
         return new_obj
 
     @property

@@ -106,4 +106,4 @@ class Tle:
 
     def orbit(self):
         data = {'bstar': self.bstar, 'ndot': self.ndot, 'ndotdot': self.ndotdot}
-        return Orbit(self.epoch, self.to_list(), "TLE", "TEME", **data)
+        return Orbit(self.epoch, self.to_list(), "TLE", "TEME", Sgp4, **data)
