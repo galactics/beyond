@@ -120,7 +120,10 @@ class Date:
         return self._cache['str']
 
     def __format__(self, fmt):
-        return self.datetime.__format__(fmt)
+        if fmt:
+            return self.datetime.__format__(fmt)
+        else:
+            return str(self)
 
     @classmethod
     def _convert_dt(cls, dt):
