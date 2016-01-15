@@ -31,7 +31,7 @@ def _tab(max_i=None):
 def rate(date):
     """Return the rotation rate vector of the earth for a given date
     """
-    lod = PolePosition.get(date)['LOD'] / 1000.
+    lod = PolePosition.get(date.mjd)['LOD'] / 1000.
     return np.array([0, 0, 7.292115146706979e-5 * (1 - lod / 86400.)])
 
 
@@ -59,6 +59,7 @@ def _precesion(date):
     theta = (2004.3109 * t - 0.42665 * t ** 2 - 0.041833 * t ** 3) / 3600.
     z = (2306.2181 * t + 1.09468 * t ** 2 + 0.018203 * t ** 3) / 3600.
 
+    # print("zeta = {}\ntheta = {}\nz = {}\n".format(zeta, theta, z))
     return zeta, theta, z
 
 
@@ -137,6 +138,7 @@ def _nutation(date, eop_correction=True, terms=106):
         delta_eps += pole['deps'] / 3600000.
         delta_psi += pole['dpsi'] / 3600000.
 
+    # print("eps_bar = {}\ndelta_psi = {}\ndelta_eps = {}\n".format(epsilon_bar, delta_psi, delta_eps))
     return epsilon_bar, delta_psi, delta_eps
 
 
@@ -164,6 +166,7 @@ def equinox(date, eop_correction=True, terms=106, kinematic=True):
 
         equin += 0.00264 * np.sin(np.deg2rad(om_m)) + 6.3e-5 * np.sin(np.deg2rad(2 * om_m))
 
+    # print("esquinox = {}\n".format(equin / 3600))
     return equin / 3600.
 
 

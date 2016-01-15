@@ -10,7 +10,7 @@ from space.frames import iau1980
 CIO = ['ITRF', 'TIRF', 'CIRF', 'GCRF']
 IAU1980 = ['TOD', 'MOD']
 
-__all__ = CIO + IAU1980 + ['EME2000', 'TEME', 'WGS84', 'PEF']
+__all__ = CIO + IAU1980 + ['EME2000', 'TEME', 'WGS84', 'PEF', 'MODbis']
 
 
 class _MetaFrame(type, Node2):
@@ -57,6 +57,7 @@ class _Frame(metaclass=_MetaFrame):
         orbit = np.ones(7)
         orbit[:6] = self.orbit
         for _from, _to in steps:
+            # print(_from, "=>", _to)
             matrix = getattr(_from(self.date, orbit), "_to_{}".format(_to))()
             orbit = matrix @ orbit
 
@@ -70,10 +71,6 @@ class TEME(_Frame):
         equin = iau1980.equinox(self.date, eop_correction=False, terms=4, kinematic=False)
         m = rot3(-np.deg2rad(equin))
         return self._convert(m, m)
-
-    def _to_PEF(self):
-        sid = iau1980.sideral(self.date)
-        return self._convert(sid, sid)
 
 
 class GTOD(_Frame):
@@ -102,8 +99,12 @@ class PEF(_Frame):
 class TOD(_Frame):
     """True (Equator) Of Date"""
 
-    def _to_MOD(self):
+    def _to_MODbis(self):
         m = iau1980.nutation(self.date)
+        return self._convert(m, m)
+
+    def _to_MOD(self):
+        m = iau1980.nutation(self.date, eop_correction=False)
         return self._convert(m, m)
 
     def _to_PEF(self):
@@ -115,13 +116,29 @@ class TOD(_Frame):
 
 class MOD(_Frame):
     """Mean (Equator) Of Date"""
+
+    def _to_EME2000(self):
+        m = iau1980.precesion(self.date)
+        return self._convert(m, m)
+
+    def _to_TOD(self):
+        m = iau1980.nutation(self.date, eop_correction=False)
+        return self._convert(m, m).T
+
+
+class MODbis(_Frame):
+    """Mean (Equator) Of Date"""
+
     def _to_GCRF(self):
         m = iau1980.precesion(self.date)
         return self._convert(m, m)
 
 
 class EME2000(_Frame):
-    pass
+
+    def _to_MOD(self):
+        m = iau1980.precesion(self.date)
+        return self._convert(m, m).T
 
 
 class ITRF(_Frame):
@@ -158,6 +175,7 @@ class TopocentricFrame(_Frame):
 
 
 ITRF + PEF + TOD + MOD + EME2000
-MOD + GCRF
-TOD + TEME + PEF
-ITRF + TIRF + CIRF + GCRF
+TOD + MODbis + GCRF
+TOD + TEME
+EME2000 + GCRF
+#ITRF + TIRF + CIRF + GCRF
