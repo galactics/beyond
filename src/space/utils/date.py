@@ -119,6 +119,9 @@ class Date:
             self._cache['str'] = "{} {}".format(self.datetime.isoformat(), self.scale)
         return self._cache['str']
 
+    def __format__(self, fmt):
+        return self.datetime.__format__(fmt)
+
     @classmethod
     def _convert_dt(cls, dt):
         tz = _datetime.timedelta(0) if dt.tzinfo is None else dt.utcoffset
