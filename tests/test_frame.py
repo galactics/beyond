@@ -43,7 +43,7 @@ def ref_orbit():
     )
 
 
-def state_vector_testing(ref, pv, precision=(4, 6)):
+def assert_vector(ref, pv, precision=(4, 6)):
     np.testing.assert_almost_equal(ref[:3], pv[:3], precision[0])  # Position
     np.testing.assert_almost_equal(ref[3:], pv[3:], precision[1])  # Velocity
 
@@ -65,40 +65,41 @@ def test_unit_change(ref_orbit, pole_position):
     """
 
     pv = ITRF(ref_orbit.date, ref_orbit).transform('PEF')
-    state_vector_testing(pef_ref, pv)
+    assert_vector(pef_ref, pv)
 
     # Going back to ITRF
     pv2 = PEF(ref_orbit.date, pv).transform('ITRF')
-    state_vector_testing(ref_orbit, pv2)
+    assert_vector(ref_orbit, pv2)
 
     # PEF to TOD
     pv = PEF(ref_orbit.date, pv).transform('TOD')
-    state_vector_testing(tod_ref, pv)
+    assert_vector(tod_ref, pv)
 
     # Going back to PEF
     pv2 = TOD(ref_orbit.date, pv).transform("PEF")
-    state_vector_testing(pef_ref, pv2)
+    assert_vector(pef_ref, pv2)
 
     # TOD to EME2000 (via MOD)
     pv2 = TOD(ref_orbit.date, tod_ref).transform('EME2000')
-    state_vector_testing(eme_ref, pv2)
+    assert_vector(eme_ref, pv2)
 
     # # TOD to MOD
     # pv = TOD(ref_orbit.date, pv).transform('MODbis')
-    # state_vector_testing(mod_ref, pv, (3, 4))
+    # assert_vector(mod_ref, pv, (3, 4))
 
     # # MOD to GCRF
     # pv = MODbis(ref_orbit.date, pv).transform('GCRF')
-    # state_vector_testing(gcrf_ref, pv, (3, 5))
+    # assert_vector(gcrf_ref, pv, (3, 5))
 
 
 def test_global_change(ref_orbit, pole_position):
 
     # pv = ITRF(ref_orbit.date, ref_orbit).transform('GCRF')
-    # state_vector_testing(gcrf_ref, pv)
+    # assert_vector(gcrf_ref, pv)
 
     pv = ITRF(ref_orbit.date, ref_orbit).transform('EME2000')
-    state_vector_testing(eme_ref, pv)
+    assert_vector(eme_ref, pv)
 
     pv = EME2000(ref_orbit.date, pv).transform('ITRF')
-    state_vector_testing(ref_orbit, pv)
+    assert_vector(ref_orbit, pv)
+
