@@ -6,9 +6,11 @@ from unittest.mock import patch
 
 import numpy as np
 from space.frames.poleandtimes import ScalesDiff
+from datetime import timedelta
 
 from space.utils.date import Date
 from space.orbits.orbit import Orbit
+from space.orbits.tle import Tle
 from space.frames.frame import *
 
 
@@ -103,3 +105,23 @@ def test_global_change(ref_orbit, pole_position):
     pv = EME2000(ref_orbit.date, pv).transform('ITRF')
     assert_vector(ref_orbit, pv)
 
+
+def test_change_tle():
+
+    # lines = """1 00005U 58002B   00179.78495062  .00000023  00000-0  28098-4 0  4753
+    #            2 00005  34.2682 348.7242 1859667 331.7664  19.3264 10.82419157413667"""
+    # tle = Tle(lines).orbit()
+    # tle = tle.propagate(timedelta(days=3))
+
+    tle = Orbit(
+        Date(2000, 6, 30, 18, 50, 19, 733568),
+        [-9060473.7357, 4658709.52502, 813686.731536,
+         -2232.83278274, -4110.45348994, -3157.34543346],
+        "cartesian", "TEME", None
+    )
+    tle.change_frame('EME2000')
+
+    eme2000_ref = [-9059942.6552, 4659694.9162, 813957.7525,
+                   -2233.346698, -4110.136822, -3157.394202]
+
+    assert_vector(eme2000_ref, tle)
