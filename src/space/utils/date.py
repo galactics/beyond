@@ -108,6 +108,18 @@ class Date:
 
         return self.__add__(other)
 
+    def __gt__(self, other):
+        return self.mjd > other.mjd
+
+    def __ge__(self, other):
+        return self.mjd >= other.mjd
+
+    def __lt__(self, other):
+        return self.mjd < other.mjd
+
+    def __le__(self, other):
+        return self.mjd <= other.mjd
+
     def __eq__(self, other):
         return self.d == other.d and self.s == other.s and self.scale == other.scale
 

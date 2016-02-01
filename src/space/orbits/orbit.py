@@ -3,6 +3,8 @@
 
 import numpy as np
 
+from datetime import timedelta
+
 from .forms import FormTransform
 from space.frames.frame import *
 
@@ -139,6 +141,25 @@ class Orbit(np.ndarray):
         """
         propag_obj = self.propagator(self)
         return propag_obj.propagate(date)
+
+    def ephemeris(self, start, stop, step):
+        """Generator giving the propagation of the orbit at different dates
+
+        Args:
+            start (Date)
+            stop (Date or timedelta)
+            step (timedelta)
+        Yield:
+            Orbit
+        """
+
+        if isinstance(stop, timedelta):
+            stop = start + stop
+
+        cursor = start
+        while cursor < stop:
+            yield self.propagate(cursor)
+            cursor += step
 
     # @property
     # def apoapsis(self):
