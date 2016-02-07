@@ -7,6 +7,7 @@ from datetime import timedelta
 
 from .forms import FormTransform
 from space.frames.frame import *
+from space.propagators import *
 
 
 class Orbit(np.ndarray):
@@ -24,9 +25,13 @@ class Orbit(np.ndarray):
             raise ValueError("Unknown form '{}'".format(form))
 
         if type(frame) is str:
-            frame = eval(frame)
-        # elif frame.name not in FrameTransform._tree:
-            # raise ValueError("Unknown frame '{}'".format(frame))
+            try:
+                frame = eval(frame)
+            except NameError:
+                frame = dynamic[frame]
+
+        if type(propagator) is str:
+            propagator = eval(propagator)
 
         obj = np.ndarray.__new__(cls, (6,), buffer=np.array(coord), dtype=float)
         obj.date = date

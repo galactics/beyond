@@ -21,5 +21,11 @@ m_e = 5.9736e24  # kg
 µ_e = 3.986004418e14  # m³.s⁻²
 """Earth gravitational constant"""
 
-r_e = 6378137.0  # m
+r_e = 6378136.3  # m
 """Earth Radius"""
+
+f_e = 1 / 298.257
+"""Flattening of the earth"""
+
+e_e = 0.081819221456
+"""Eccentricity of Earth surface"""

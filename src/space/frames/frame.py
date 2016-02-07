@@ -2,15 +2,23 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+from abc import abstractmethod
 
-from space.utils.matrix import rot3
+from space.constants import e_e, r_e
+from space.utils.matrix import rot2, rot3
 from space.utils.node import Node2
 from space.frames import iau1980
 
 CIO = ['ITRF', 'TIRF', 'CIRF', 'GCRF']
 IAU1980 = ['TOD', 'MOD']
+other = ['EME2000', 'TEME', 'WGS84', 'PEF', 'MODbis']
+topo = ['Station', 'dynamic']
 
-__all__ = CIO + IAU1980 + ['EME2000', 'TEME', 'WGS84', 'PEF', 'MODbis']
+__all__ = CIO + IAU1980 + other + topo
+
+dynamic = {}
+"""For dynamically created Frames, such as ground stations
+"""
 
 
 class _MetaFrame(type, Node2):
@@ -58,7 +66,10 @@ class _Frame(metaclass=_MetaFrame):
         orbit[:6] = self.orbit
         for _from, _to in steps:
             # print(_from, "=>", _to)
-            matrix = getattr(_from(self.date, orbit), "_to_{}".format(_to))()
+            try:
+                matrix = getattr(_from(self.date, orbit), "_to_{}".format(_to))()
+            except AttributeError:
+                matrix = getattr(_to(self.date, orbit), "_to_{}".format(_from))().T
             orbit = matrix @ orbit
 
         return orbit[:6]
@@ -95,6 +106,7 @@ class PEF(_Frame):
     def _to_ITRF(self):
         m = iau1980.pole_motion(self.date)
         return self._convert(m.T, m.T)
+
 
 class TOD(_Frame):
     """True (Equator) Of Date"""
@@ -164,18 +176,49 @@ class GCRF(_Frame):
     pass
 
 
-class TopocentricFrame(_Frame):
+def Station(name, latlonalt, parent_frame):
 
-    def __new__(cls, name, coordinates, parent_frame):
+    def _geodetic_to_xyz(lat, lon, alt):
 
-        obj = super().__new__(name, coordinates, parent_frame)
-        self.name = name
-        self.coordinates = coordinates
-        parent_frame + self
+        C = r_e / np.sqrt(1 - (e_e * np.sin(lat)) ** 2)
+        S = r_e * (1 - e_e ** 2) / np.sqrt(1 - (e_e * np.sin(lat)) ** 2)
+        r_d = (C + alt) * np.cos(lat)
+        r_k = (S + alt) * np.sin(lat)
+
+        norm = np.sqrt(r_d ** 2 + r_k ** 2)
+        return norm * np.array([
+            np.cos(lat) * np.cos(lon),
+            np.cos(lat) * np.sin(lon),
+            np.sin(lat)
+        ])
+
+    latlonalt = list(latlonalt)
+    latlonalt[:2] = np.radians(latlonalt[:2])
+    coordinates = _geodetic_to_xyz(*latlonalt)
+
+    def _convert(self):
+        lat, lon, _ = latlonalt
+        m = rot2(np.pi / 2. - lat) @ rot3(lon)
+        offset = np.identity(7)
+        offset[0:3, -1] = - coordinates
+        return (self._convert(m, m) @ offset).T
+
+    mtd = '_to_%s' % parent_frame.__name__
+    dct = {
+        mtd: _convert,
+        'latlonalt': latlonalt,
+        'coordinates': coordinates
+    }
+    cls = _MetaFrame(name, (_Frame,), dct)
+    cls + parent_frame
+    dynamic[name] = cls
+
+    return cls
 
 
 ITRF + PEF + TOD + MOD + EME2000
 TOD + MODbis + GCRF
 TOD + TEME
 EME2000 + GCRF
+# ITRF + TopocentricFrame
 #ITRF + TIRF + CIRF + GCRF

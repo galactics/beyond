@@ -20,7 +20,7 @@ ref_cart = np.array([
 ref_date = Date(2015, 9, 21, 12)
 ref_form = FormTransform.KEPL_M
 ref_frame = "EME2000"
-ref_propagator = None
+ref_propagator = 'Sgp4'
 
 
 @fixture

@@ -6,7 +6,6 @@ from numpy import cos, sqrt, sin, arctan2
 from datetime import datetime, timedelta
 
 from space.utils.date import Date
-from space.orbits.orbit import Orbit
 from space.orbits.forms import FormTransform
 
 __all__ = ['Sgp4']
@@ -46,9 +45,6 @@ class Init:
 class Sgp4:
 
     def __init__(self, orbit, gravity=WGS72):
-
-        if not isinstance(orbit, Orbit):
-            raise TypeError("Not Orbit")
 
         if orbit.form != FormTransform.TLE:
             raise TypeError("Not TLE")
@@ -221,4 +217,4 @@ class Sgp4:
         vR = rk * vU * r_e
         vRdot = (rdotk * vU + rfdotk * vV) * (r_e * k_e / 60.)
 
-        return Orbit(date, np.concatenate((vR, vRdot)) * 1000, 'cartesian', 'TEME', self.__class__)
+        return self.tle.__class__(date, np.concatenate((vR, vRdot)) * 1000, 'cartesian', 'TEME', self.__class__)

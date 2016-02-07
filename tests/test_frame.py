@@ -125,3 +125,25 @@ def test_change_tle():
                    -2233.346698, -4110.136822, -3157.394202]
 
     assert_vector(eme2000_ref, tle)
+
+
+def test_station():
+
+    # lines = """ISS (ZARYA)
+    #            1 25544U 98067A   16038.20499631  .00009950  00000-0  15531-3 0  9993
+    #            2 25544  51.6445 351.2284 0006997  89.9621  48.8570 15.54478078984606"""
+    # orb = Tle(lines).orbit()
+    # orb = orb.propagate()
+
+    aus = Station('AUS', (43.428889, 1.497778, 178.0), ITRF)
+
+    orb = Orbit(Date(2016, 2, 7, 16, 55),
+        [4225679.11976, 2789527.13836, 4497182.71156,
+         -5887.93077439, 3748.50929999, 3194.45322378],
+        'cartesian', 'TEME', 'Sgp4'
+    )
+    orb.change_frame('AUS')
+    orb.change_form('spherical')
+    assert np.degrees(np.pi - orb.theta) == 159.07589369672922  # azimuth
+    assert np.degrees(orb.phi) == 60.153110310757754     # elevation
+    assert orb.r == 461216.64539049496      # range
