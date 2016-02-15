@@ -3,6 +3,7 @@
 
 import numpy as np
 from abc import abstractmethod
+from datetime import timedelta
 
 from space.constants import e_e, r_e
 from space.utils.matrix import rot2, rot3
@@ -176,6 +177,84 @@ class GCRF(_Frame):
     pass
 
 
+class TopocentricFrame(_Frame):
+
+    @classmethod
+    def visibility(cls, orb, start, stop, step, events=False):
+
+        if type(stop) is timedelta:
+            stop = start + stop
+
+        date = start
+        visibility, __max = False, False
+        previous = cls._vis(orb, date)
+        while date < stop:
+            cursor = cls._vis(orb, date)
+            if cursor.phi >= 0:
+
+                if events and not visibility:
+                    aos = cls._bisect(orb, date - step, date)
+                    aos.info = "AOS"
+                    yield aos
+                    visibility = True
+
+                if events and cursor.r_dot >= 0 and not __max:
+                    _max = cls._bisect(orb, date - step, date, 'max')
+                    _max.info = "MAX"
+                    yield _max
+                    __max = True
+
+                cursor.info = ""
+                yield cursor
+            elif events and visibility:
+                los = cls._bisect(orb, date - step, date)
+                los.info = "LOS"
+                yield los
+                visibility, __max = False, False
+            previous = cursor
+            date += step
+
+    @classmethod
+    def _vis(cls, orb, date):
+        cursor = orb.propagate(date)
+        cursor.change_frame(cls.__name__)
+        cursor.change_form('spherical')
+        return cursor
+
+    @classmethod
+    def _bisect(cls, orb, start, stop, event='zero'):
+
+        MAX = 50
+        n = 0
+
+        if event == 'zero':
+            get = lambda x: getattr(x, 'phi')
+            eps = 1e-4
+        else:
+            get = lambda x: getattr(x, 'r_dot')
+            eps = 1e-3
+
+        step = (stop - start) / 2
+        prev_value = cls._vis(orb, start)
+        date = start
+        while n <= MAX and date <= stop:
+            date = start + step
+            value = cls._vis(orb, date)
+            if -eps < get(value) <= eps:
+                return value
+            elif np.sign(get(value)) == np.sign(get(prev_value)):
+                prev_value = value
+                start = date
+            else:
+                step /= 2
+            n += 1
+        else:
+            if n > MAX:
+                raise RuntimeError('Too much iterations : %d' % n)
+            else:
+                raise RuntimeError('Limit exceeded : {:%H:%M:%S:%f} >= {:%H:%M:%S}'.format(date, stop))
+
+
 def Station(name, latlonalt, parent_frame):
 
     def _geodetic_to_xyz(lat, lon, alt):
@@ -197,19 +276,20 @@ def Station(name, latlonalt, parent_frame):
     coordinates = _geodetic_to_xyz(*latlonalt)
 
     def _convert(self):
-        lat, lon, _ = latlonalt
+        lat, lon, _ = self.latlonalt
         m = rot2(np.pi / 2. - lat) @ rot3(lon)
         offset = np.identity(7)
-        offset[0:3, -1] = - coordinates
+        offset[0:3, -1] = - self.coordinates
         return (self._convert(m, m) @ offset).T
 
     mtd = '_to_%s' % parent_frame.__name__
     dct = {
         mtd: _convert,
         'latlonalt': latlonalt,
-        'coordinates': coordinates
+        'coordinates': coordinates,
+        'parent_frame': parent_frame,
     }
-    cls = _MetaFrame(name, (_Frame,), dct)
+    cls = _MetaFrame(name, (TopocentricFrame,), dct)
     cls + parent_frame
     dynamic[name] = cls
 
