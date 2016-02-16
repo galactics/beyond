@@ -101,7 +101,7 @@ def test_change_scale():
     assert str(t3) == "2015-12-06T00:00:17 GPS"
 
     t4 = t.change_scale('UT1')
-    assert str(t4) == "2015-12-06T00:00:00.124247 UT1"
+    assert str(t4) == "2015-12-06T00:00:00.124256 UT1"
 
     with raises(ValueError) as e:
         t5 = t.change_scale('unknown')
