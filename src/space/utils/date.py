@@ -2,7 +2,7 @@
 
 import datetime as _datetime
 
-from space.frames.poleandtimes import TimeScales
+from space.env.poleandtimes import TimeScales
 from .node import Node
 
 

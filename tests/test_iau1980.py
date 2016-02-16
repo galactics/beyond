@@ -7,7 +7,7 @@ from unittest.mock import patch
 from numpy.testing import assert_almost_equal
 
 from space.utils.date import Date
-from space.frames.poleandtimes import ScalesDiff
+from space.env.poleandtimes import ScalesDiff
 from space.frames.iau1980 import _pole_motion, _precesion, _nutation, _sideral, rate
 
 
@@ -18,14 +18,14 @@ def date():
 
 @yield_fixture
 def time():
-    with patch('space.frames.poleandtimes.TimeScales.get') as mock_ts:
+    with patch('space.env.poleandtimes.TimeScales.get') as mock_ts:
         mock_ts.return_value = ScalesDiff(-32.4399519, -0.4399619, 32)
         yield
 
 
 @yield_fixture()
 def pole_position(time):
-    with patch('space.frames.poleandtimes.PolePosition.get') as mock_pole:
+    with patch('space.env.poleandtimes.PolePosition.get') as mock_pole:
         mock_pole.return_value = {
             'X': -0.140682,
             'Y': 0.333309,

@@ -3,10 +3,10 @@
 import numpy as np
 from pathlib import Path
 
-from space.utils.date import Date
+from space.utils import Date
 from space.utils.matrix import rot1, rot2, rot3
 from space.utils.memoize import memoize
-from .poleandtimes import PolePosition
+from space.env.poleandtimes import PolePosition
 
 def _tab(max_i=None):
     """File reader as a generator

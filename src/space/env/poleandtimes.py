@@ -5,11 +5,31 @@ import math
 from pathlib import Path
 from collections import namedtuple
 
-import space.utils.interpol as interpol
-
 # __all__ = ['PolePosition', 'TimeScales']
 
 ScalesDiff = namedtuple('ScalesDiff', ('ut1_tai', 'ut1_utc', 'tai_utc'))
+
+
+def linear(x, x_list, y_list):
+    """Linear interpolation
+
+    Args:
+        x (float): Coordinate of the interpolated value
+        x_list (tuple): x-coordinates of data
+        y_list (tuple): y-coordinates of data
+    Return:
+        float
+
+    Example:
+        >>> x_list = [1, 2]
+        >>> y_list = [12, 4]
+        >>> linear(1.75, x_list, y_list)
+        6.0
+
+    """
+    x0, x1 = x_list
+    y0, y1 = y_list
+    return y0 + (y1 - y0) * (x - x0) / (x1 - x0)
 
 
 def _day_boundaries(d):
@@ -43,8 +63,8 @@ class TimeScales:
             stop = cls._get(dates[1])
 
             result = ScalesDiff(
-                interpol.linear(date, dates, (start[0], stop[0])),
-                interpol.linear(date, dates, (start[1], stop[1])),
+                linear(date, dates, (start[0], stop[0])),
+                linear(date, dates, (start[1], stop[1])),
                 start[-1]
             )
             return result
@@ -88,7 +108,7 @@ class PolePosition:
 
             result = {}
             for k in start.keys():
-                result[k] = interpol.linear(date, dates, (start[k], stop[k]))
+                result[k] = linear(date, dates, (start[k], stop[k]))
 
             return result
 
