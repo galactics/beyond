@@ -5,6 +5,7 @@ __pycache__
 *.swp
 htmlcov/
 dist/
+build/
 .cache/
 *.pyc
 doc/build/
