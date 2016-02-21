@@ -1,8 +1,8 @@
-space.propagators
-=================
+Propagators
+===========
 
-space.propagators.sgp4
-----------------------
+sgp4
+----
 
 .. automodule:: space.propagators.sgp4
     :members:

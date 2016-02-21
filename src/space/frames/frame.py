@@ -12,7 +12,7 @@ from space.frames import iau1980
 
 CIO = ['ITRF', 'TIRF', 'CIRF', 'GCRF']
 IAU1980 = ['TOD', 'MOD']
-other = ['EME2000', 'TEME', 'WGS84', 'PEF', 'MODbis']
+other = ['EME2000', 'TEME', 'WGS84', 'PEF']
 topo = ['Station', 'dynamic']
 
 __all__ = CIO + IAU1980 + other + topo
@@ -32,6 +32,8 @@ class _MetaFrame(type, Node2):
 
 
 class _Frame(metaclass=_MetaFrame):
+    """Frame base class
+    """
 
     def __init__(self, date, orbit):
         self.date = date
@@ -92,7 +94,9 @@ class GTOD(_Frame):
 
 class WGS84(_Frame):
     """World Geodetic System 1984"""
-    pass
+
+    def _to_ITRF(self):
+        return np.identity(7)
 
 
 class PEF(_Frame):
@@ -139,14 +143,6 @@ class MOD(_Frame):
         return self._convert(m, m).T
 
 
-class MODbis(_Frame):
-    """Mean (Equator) Of Date"""
-
-    def _to_GCRF(self):
-        m = iau1980.precesion(self.date)
-        return self._convert(m, m)
-
-
 class EME2000(_Frame):
 
     def _to_MOD(self):
@@ -160,6 +156,9 @@ class ITRF(_Frame):
     def _to_PEF(self):
         m = iau1980.pole_motion(self.date)
         return self._convert(m, m)
+
+    def _to_WGS84(self):
+        return np.identity(7)
 
 
 class TIRF(_Frame):
@@ -255,10 +254,29 @@ class TopocentricFrame(_Frame):
                 raise RuntimeError('Limit exceeded : {:%H:%M:%S:%f} >= {:%H:%M:%S}'.format(date, stop))
 
 
-def Station(name, latlonalt, parent_frame):
+def Station(name, latlonalt, parent_frame=WGS84):
+    """Create a ground station instance
+
+    Args:
+        name (str): Name of the station
+        latlonalt (tuple of float): coordinates of the station
+        parent_frame (_Frame): Planetocentric rotating frame of reference of coordinates.
+    Return:
+        TopocentricFrame
+    """
 
     def _geodetic_to_xyz(lat, lon, alt):
+        """Conversion from latitude, longitue and altitude coordinates to
+        cartesian
 
+        Args:
+            lat (float): Latitude in radians
+            lon (float): longitue in radians
+            alt (float): Altitude to sea level in meters
+
+        Return:
+            numpy.array: 3D element (in meters)
+        """
         C = r_e / np.sqrt(1 - (e_e * np.sin(lat)) ** 2)
         S = r_e * (1 - e_e ** 2) / np.sqrt(1 - (e_e * np.sin(lat)) ** 2)
         r_d = (C + alt) * np.cos(lat)
@@ -296,9 +314,7 @@ def Station(name, latlonalt, parent_frame):
     return cls
 
 
-ITRF + PEF + TOD + MOD + EME2000
-TOD + MODbis + GCRF
+WGS84 + ITRF + PEF + TOD + MOD + EME2000
 TOD + TEME
 EME2000 + GCRF
-# ITRF + TopocentricFrame
 #ITRF + TIRF + CIRF + GCRF

@@ -1,16 +1,16 @@
-space.orbits
-============
+Orbits
+======
 
-space.orbits.orbit
-------------------
+orbit
+-----
 
 .. automodule:: space.orbits.orbit
     :members:
     :undoc-members:
     :show-inheritance:
 
-space.orbits.tle
-----------------
+TLE
+---
 
 .. automodule:: space.orbits.tle
     :members:

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""This module helps to find the shortest path between two element of a
-hierarchy
+"""This module helps to find the shortest path between two element in a
+hierarchy or in a graph.
 """
 
 
 class Node:
-    """Class representing a child in the tree
+    """Class representing a child in a tree
     """
 
     _case = True

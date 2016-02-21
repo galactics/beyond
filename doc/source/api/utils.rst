@@ -1,32 +1,24 @@
-space.utils
-===========
+Utils
+=====
 
-space.utils.date
------------------
+Date
+----
 
 .. automodule:: space.utils.date
     :members:
     :undoc-members:
     :show-inheritance:
 
-space.utils.interpol
---------------------
-
-.. automodule:: space.utils.interpol
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-space.utils.matrix
-------------------
+Matrix
+------
 
 .. automodule:: space.utils.matrix
     :members:
     :undoc-members:
     :show-inheritance:
 
-space.utils.node
-----------------
+Node
+----
 
 .. automodule:: space.utils.node
     :members:

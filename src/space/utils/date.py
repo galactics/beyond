@@ -14,7 +14,7 @@ class Date:
     """Date object
 
     All computations and in-memory saving are made in
-    <MJD `https://en.wikipedia.org/wiki/Julian_day`>.
+    `MJD <https://en.wikipedia.org/wiki/Julian_day>`__.
 
     In the current implementation, the Date object does not handle the
     leap second.
@@ -157,10 +157,18 @@ class Date:
 
     @classmethod
     def strptime(cls, data, format, scale='UTC'):
+        """Convert a string representation of a date to a Date object
+        """
         return Date(_datetime.datetime.strptime(data, format), scale=scale)
 
     @classmethod
     def now(cls, scale="UTC"):
+        """
+        Arg:
+            scale (str)
+        Return:
+            Date: Current time in the choosen scale
+        """
         return cls(_datetime.datetime.utcnow()).change_scale(scale)
 
     def _scale_ut1_minus_utc(self):
@@ -180,6 +188,11 @@ class Date:
     def change_scale(self, new_scale):
         """Create an object representing the same time as ``self`` but in a
         different scale
+
+        Args:
+            new_scale (str)
+        Return:
+            Date
         """
 
         delta = 0
@@ -204,6 +217,12 @@ class Date:
 
     @property
     def julian_century(self):
+        """Compute the julian_century of the Date object relatively to its
+        scale
+
+        Return:
+            float
+        """
         return (self.jd - 2451545.0) / 36525.
 
     @property
@@ -218,4 +237,9 @@ class Date:
 
     @property
     def mjd(self):
+        """Date in terms of MJD
+
+        Return:
+            float
+        """
         return self.d + self.s / 86400.
