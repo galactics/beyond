@@ -180,12 +180,14 @@ class TopocentricFrame(_Frame):
 
     @classmethod
     def visibility(cls, orb, start, stop, step, events=False):
+        """Visibility from a topocentric frame
+        """
 
         if type(stop) is timedelta:
             stop = start + stop
 
         date = start
-        visibility, __max = False, False
+        visibility, max_found = False, False
         previous = cls._vis(orb, date)
         while date < stop:
             cursor = cls._vis(orb, date)
@@ -197,11 +199,11 @@ class TopocentricFrame(_Frame):
                     yield aos
                     visibility = True
 
-                if events and cursor.r_dot >= 0 and not __max:
+                if events and cursor.r_dot >= 0 and not max_found:
                     _max = cls._bisect(orb, date - step, date, 'max')
                     _max.info = "MAX"
                     yield _max
-                    __max = True
+                    max_found = True
 
                 cursor.info = ""
                 yield cursor
@@ -209,17 +211,17 @@ class TopocentricFrame(_Frame):
                 los = cls._bisect(orb, date - step, date)
                 los.info = "LOS"
                 yield los
-                visibility, __max = False, False
+                visibility, max_found = False, False
             previous = cursor
             date += step
 
     @classmethod
     def _vis(cls, orb, date):
-        cursor = orb.propagate(date)
-        cursor.change_frame(cls.__name__)
-        cursor.change_form('spherical')
-        return cursor
+        orb = orb.propagate(date)
+        orb.change_frame(cls.__name__)
+        orb.change_form('spherical')
 
+        return orb
     @classmethod
     def _bisect(cls, orb, start, stop, event='zero'):
 
@@ -251,7 +253,7 @@ class TopocentricFrame(_Frame):
             if n > MAX:
                 raise RuntimeError('Too much iterations : %d' % n)
             else:
-                raise RuntimeError('Limit exceeded : {:%H:%M:%S:%f} >= {:%H:%M:%S}'.format(date, stop))
+                raise RuntimeError('Time limit exceeded : {:%H:%M:%S:%f} >= {:%H:%M:%S}'.format(date, stop))
 
 
 def Station(name, latlonalt, parent_frame=WGS84):
@@ -271,7 +273,7 @@ def Station(name, latlonalt, parent_frame=WGS84):
 
         Args:
             lat (float): Latitude in radians
-            lon (float): longitue in radians
+            lon (float): Longitue in radians
             alt (float): Altitude to sea level in meters
 
         Return:
@@ -294,6 +296,8 @@ def Station(name, latlonalt, parent_frame=WGS84):
     coordinates = _geodetic_to_xyz(*latlonalt)
 
     def _convert(self):
+        """Conversion from Topocentric Frame to parent frame
+        """
         lat, lon, _ = self.latlonalt
         m = rot2(np.pi / 2. - lat) @ rot3(lon)
         offset = np.identity(7)

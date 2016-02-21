@@ -189,6 +189,10 @@ class FormTransform:
 
     @classmethod
     def _cartesian_to_spherical(cls, coord):
+        """Cartesin to Spherical conversion
+
+        .. warning:: The spherical form is equatorial, not zenithal
+        """
         x, y, z, vx, vy, vz = coord
         r = np.linalg.norm(coord[:3])
         lat = arcsin(z / r)
