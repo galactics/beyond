@@ -8,12 +8,15 @@ from space.utils.matrix import rot1, rot2, rot3
 from space.utils.memoize import memoize
 from space.env.poleandtimes import PolePosition
 
+
+@memoize
 def _tab(max_i=None):
-    """File reader as a generator
+    """Extraction and caching of IAU1980 nutation coefficients
     """
 
     filepath = Path(__file__).parent / "data" / "tab5.1.txt"
 
+    result = []
     with filepath.open() as f:
         i = 0
         for line in f.read().splitlines():
@@ -21,11 +24,13 @@ def _tab(max_i=None):
                 continue
 
             fields = line.split()
-            yield map(int, fields[:5]), map(float, fields[6:])
+            result.append(([int(x) for x in fields[:5]], [float(x) for x in fields[6:]]))
 
             i += 1
             if max_i and i >= max_i:
                 break
+
+    return result
 
 
 def rate(date):
