@@ -25,10 +25,7 @@ class Orbit(np.ndarray):
             raise ValueError("Unknown form '{}'".format(form))
 
         if type(frame) is str:
-            try:
-                frame = eval(frame)
-            except NameError:
-                frame = dynamic[frame]
+            frame = get_frame(frame)
 
         if type(propagator) is str:
             propagator = eval(propagator)
@@ -128,9 +125,13 @@ class Orbit(np.ndarray):
             new_frame (str or Frame)
         """
         old_form = self.form
+
+        if type(new_frame) is str:
+            new_frame = get_frame(new_frame)
+
         try:
             self.change_form('cartesian')
-            new_coord = self.frame(self.date, self).transform(new_frame)
+            new_coord = self.frame(self.date, self).transform(new_frame.name)
             self.base.setfield(new_coord, dtype=float)
             self.frame = new_frame
         finally:

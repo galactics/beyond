@@ -15,11 +15,19 @@ IAU1980 = ['TOD', 'MOD']
 other = ['EME2000', 'TEME', 'WGS84', 'PEF']
 topo = ['Station', 'dynamic']
 
-__all__ = CIO + IAU1980 + other + topo
+__all__ = CIO + IAU1980 + other + topo + ['get_frame']
 
 dynamic = {}
 """For dynamically created Frames, such as ground stations
 """
+
+def get_frame(frame):
+    if frame in __all__:
+        return eval(frame)
+    elif frame in dynamic.keys():
+        return dynamic[frame]
+    else:
+        raise ValueError("Unknown Frame : '{}'".format(frame))
 
 
 class _MetaFrame(type, Node2):
@@ -43,7 +51,7 @@ class _Frame(metaclass=_MetaFrame):
         return self.name
 
     def __repr__(self):
-        return "<Frame '{}'>".format(self.__class__.__name__)
+        return "<Frame obj '{}'>".format(self.__class__.__name__)
 
     @classmethod
     def _convert(cls, x=None, y=None):
@@ -200,7 +208,7 @@ class TopocentricFrame(_Frame):
                     visibility = True
 
                 if events and cursor.r_dot >= 0 and not max_found:
-                    _max = cls._bisect(orb, date - step, date, 'max')
+                    _max = cls._bisect(orb, date - step, date, 'r_dot')
                     _max.info = "MAX"
                     yield _max
                     max_found = True
@@ -223,17 +231,13 @@ class TopocentricFrame(_Frame):
 
         return orb
     @classmethod
-    def _bisect(cls, orb, start, stop, event='zero'):
+    def _bisect(cls, orb, start, stop, element='phi'):
 
         MAX = 50
         n = 0
 
-        if event == 'zero':
-            get = lambda x: getattr(x, 'phi')
-            eps = 1e-4
-        else:
-            get = lambda x: getattr(x, 'r_dot')
-            eps = 1e-3
+        get = lambda x: getattr(x, element)
+        eps = 1e-4 if element == 'phi' else 1e-3
 
         step = (stop - start) / 2
         prev_value = cls._vis(orb, start)
