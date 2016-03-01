@@ -21,6 +21,7 @@ dynamic = {}
 """For dynamically created Frames, such as ground stations
 """
 
+
 def get_frame(frame):
     if frame in __all__:
         return eval(frame)
@@ -78,10 +79,12 @@ class _Frame(metaclass=_MetaFrame):
         for _from, _to in steps:
             # print(_from, "=>", _to)
             try:
-                matrix = getattr(_from(self.date, orbit), "_to_{}".format(_to))()
+                rotation, offset = getattr(_from(self.date, orbit), "_to_{}".format(_to))()
             except AttributeError:
-                matrix = getattr(_to(self.date, orbit), "_to_{}".format(_from))().T
-            orbit = matrix @ orbit
+                rotation, offset = getattr(_to(self.date, orbit), "_to_{}".format(_from))()
+                rotation = rotation.T
+                offset[:6, -1] = - offset[:6, -1]
+            orbit = rotation @ offset @ orbit
 
         return orbit[:6]
 
@@ -92,7 +95,7 @@ class TEME(_Frame):
     def _to_TOD(self):
         equin = iau1980.equinox(self.date, eop_correction=False, terms=4, kinematic=False)
         m = rot3(-np.deg2rad(equin))
-        return self._convert(m, m)
+        return self._convert(m, m), np.identity(7)
 
 
 class GTOD(_Frame):
@@ -104,7 +107,7 @@ class WGS84(_Frame):
     """World Geodetic System 1984"""
 
     def _to_ITRF(self):
-        return np.identity(7)
+        return np.identity(7), np.identity(7)
 
 
 class PEF(_Frame):
@@ -114,29 +117,15 @@ class PEF(_Frame):
         m = iau1980.sideral(self.date, model='apparent', eop_correction=False)
         offset = np.identity(7)
         offset[3:6, -1] = np.cross(iau1980.rate(self.date), self.orbit[:3])
-        return self._convert(m, m) @ offset
-
-    def _to_ITRF(self):
-        m = iau1980.pole_motion(self.date)
-        return self._convert(m.T, m.T)
+        return self._convert(m, m), offset
 
 
 class TOD(_Frame):
     """True (Equator) Of Date"""
 
-    def _to_MODbis(self):
-        m = iau1980.nutation(self.date)
-        return self._convert(m, m)
-
     def _to_MOD(self):
         m = iau1980.nutation(self.date, eop_correction=False)
-        return self._convert(m, m)
-
-    def _to_PEF(self):
-        m = iau1980.sideral(self.date, model='apparent', eop_correction=False)
-        offset = np.identity(7)
-        offset[3:6, -1] = - np.cross(iau1980.rate(self.date), self.orbit[:3])
-        return self._convert(m, m).T @ offset
+        return self._convert(m, m), np.identity(7)
 
 
 class MOD(_Frame):
@@ -144,18 +133,11 @@ class MOD(_Frame):
 
     def _to_EME2000(self):
         m = iau1980.precesion(self.date)
-        return self._convert(m, m)
-
-    def _to_TOD(self):
-        m = iau1980.nutation(self.date, eop_correction=False)
-        return self._convert(m, m).T
+        return self._convert(m, m), np.identity(7)
 
 
 class EME2000(_Frame):
-
-    def _to_MOD(self):
-        m = iau1980.precesion(self.date)
-        return self._convert(m, m).T
+    pass
 
 
 class ITRF(_Frame):
@@ -163,10 +145,7 @@ class ITRF(_Frame):
 
     def _to_PEF(self):
         m = iau1980.pole_motion(self.date)
-        return self._convert(m, m)
-
-    def _to_WGS84(self):
-        return np.identity(7)
+        return self._convert(m, m), np.identity(7)
 
 
 class TIRF(_Frame):
@@ -305,8 +284,8 @@ def Station(name, latlonalt, parent_frame=WGS84):
         lat, lon, _ = self.latlonalt
         m = rot2(np.pi / 2. - lat) @ rot3(lon)
         offset = np.identity(7)
-        offset[0:3, -1] = - self.coordinates
-        return (self._convert(m, m) @ offset).T
+        offset[0:3, -1] = self.coordinates
+        return self._convert(m, m).T, offset
 
     mtd = '_to_%s' % parent_frame.__name__
     dct = {
