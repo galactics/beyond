@@ -135,8 +135,40 @@ class Route:
 
 
 class Node2:
+    """Class representing a node in a graph, relations may be circular.
+
+    .. code-block:: python
+
+        A = Node2('A')
+        B = Node2('B')
+        C = Node2('C')
+        D = Node2('D')
+        E = Node2('E')
+
+        A + B + C + D + E + F + A
+        F + C
+
+        #   A
+        #  / \
+        # B   F
+        # |   |
+        # C   E
+        #  \ /
+        #   D
+
+        A.path('E')
+        # [A, F, E]
+        A.steps('E')
+        # [(A, F), (F, E)]
+        E.path('B')
+        # [E, F, A, B] or [E, D, C, B]
+    """
 
     def __init__(self, name):
+        """
+        Args:
+            name (str): Name of the node. Will be used for graph searching
+        """
         self.name = name
         self.neighbors = set()
         self.routes = {}
@@ -174,6 +206,13 @@ class Node2:
                 node._update(already_updated)
 
     def path(self, goal):
+        """Get the shortest way between two nodes of the graph
+
+        Args:
+            goal (str): Name of the targeted node
+        Return:
+            list of Node2
+        """
         if goal == self.name:
             return [self]
 
@@ -190,6 +229,13 @@ class Node2:
         return path
 
     def steps(self, goal):
+        """Get the list of individual relations leading to the targeted node
+        Args:
+            goal (str): Name of the targeted node
+        Return:
+            list of tuple of Node2
+        """
+
         path = self.path(goal)
         for i in range(len(path) - 1):
             yield path[i], path[i + 1]

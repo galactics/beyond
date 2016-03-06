@@ -1,5 +1,5 @@
-Envirnment data
-===============
+Environment data
+================
 
 Environment handling. Solar Activity, pole motions, etc.
 

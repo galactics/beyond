@@ -1,9 +1,6 @@
 space
 =====
 
-Subpackages
------------
-
 .. toctree::
     :maxdepth: 2
 

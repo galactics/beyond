@@ -164,7 +164,7 @@ class Date:
     @classmethod
     def now(cls, scale="UTC"):
         """
-        Arg:
+        Args:
             scale (str)
         Return:
             Date: Current time in the choosen scale

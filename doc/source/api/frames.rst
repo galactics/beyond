@@ -8,6 +8,8 @@ Frames
 .. autoclass:: space.frames.frame._Frame
     :members:
 
+.. image:: /_static/frames.png
+
 CIO Based Frames
 ----------------
 

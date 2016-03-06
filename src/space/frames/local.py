@@ -20,7 +20,7 @@ def inertial_to_tnw(state_vector):
     >>> v = [505.8479685, 942.7809215, 7435.922231]
     >>> pv = p + v
     >>> mat = inertial_to_tnw(pv).T
-    >>> delta_inert = np.dot(mat, delta_tnw)
+    >>> delta_inert = mat @ delta_tnw
     >>> all(delta_inert == v / norm(v))
     True
     """
@@ -47,7 +47,7 @@ def inertial_to_qsw(state_vector):
     >>> v = [505.8479685, 942.7809215, 7435.922231]
     >>> pv = p + v
     >>> mat = inertial_to_qsw(pv).T
-    >>> delta_inert = np.dot(mat, delta_qsw)
+    >>> delta_inert = mat @ delta_qsw
     >>> all(delta_inert == p / norm(p))
     True
     """

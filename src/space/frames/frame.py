@@ -1,6 +1,37 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""This module define the Frames available for computation and their relations
+to each other.
+
+The relations may be circular, thanks to the use of the Node2 class.
+
+.. code-block:: text
+
+    The dotted relations are not implemented yet.
+
+       ,-------.
+       |EME2000|
+       `-------'
+       /      :
+      /       :
+    ,---.   ,----.
+    |MOD|   |GCRF|
+    `---'   `----'
+      |       :
+    ,---.   ,----.
+    |TOD|   |CIRF|
+    `---'   `----'
+      |       :
+    ,---.   ,----.   ,-----.
+    |PEF|   |TIRF|   |WGS84|
+    `--- \  `----'  /`-----'
+      |   \   :    /
+    ,----. \,----./
+    |TEME|  |ITRF|
+    `----'  `----'
+"""
+
 import numpy as np
 from abc import abstractmethod
 from datetime import timedelta
@@ -23,6 +54,13 @@ dynamic = {}
 
 
 def get_frame(frame):
+    """Frame factory
+
+    Args:
+        frame (str): name of the desired frame
+    Return:
+        ~space.frames.frame._Frame
+    """
     if frame in __all__:
         return eval(frame)
     elif frame in dynamic.keys():
@@ -32,6 +70,8 @@ def get_frame(frame):
 
 
 class _MetaFrame(type, Node2):
+    """This MetaClass is here to join the behaviours of ``type`` and ``Node2``
+    """
     def __init__(self, name, bases, dct):
         super(_MetaFrame, self).__init__(name, bases, dct)
         super(type, self).__init__(name)
@@ -45,6 +85,11 @@ class _Frame(metaclass=_MetaFrame):
     """
 
     def __init__(self, date, orbit):
+        """
+        Args:
+            date (~space.utils.Date)
+            orbit (numpy.ndarray)
+        """
         self.date = date
         self.orbit = orbit
 
@@ -65,7 +110,7 @@ class _Frame(metaclass=_MetaFrame):
         return m
 
     def transform(self, new_frame):
-        """Change the frame of the given orbit
+        """Change the frame of the orbit
 
         Args:
             new_frame (str)
@@ -252,7 +297,7 @@ def Station(name, latlonalt, parent_frame=WGS84):
 
     def _geodetic_to_xyz(lat, lon, alt):
         """Conversion from latitude, longitue and altitude coordinates to
-        cartesian
+        cartesian with respect to an ellipsoid
 
         Args:
             lat (float): Latitude in radians
@@ -303,5 +348,5 @@ def Station(name, latlonalt, parent_frame=WGS84):
 
 WGS84 + ITRF + PEF + TOD + MOD + EME2000
 TOD + TEME
-EME2000 + GCRF
+# EME2000 + GCRF
 #ITRF + TIRF + CIRF + GCRF
