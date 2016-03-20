@@ -69,7 +69,7 @@ class Tle:
 
         self.name = ""
         if len(text) == 3:
-            self.name = text.pop(0)
+            self.name = text.pop(0).strip()
 
         self._check_validity(text)
 
