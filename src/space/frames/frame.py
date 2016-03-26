@@ -327,10 +327,10 @@ def Station(name, latlonalt, parent_frame=WGS84):
         """Conversion from Topocentric Frame to parent frame
         """
         lat, lon, _ = self.latlonalt
-        m = rot2(np.pi / 2. - lat) @ rot3(lon)
+        m = rot3(-lon) @ rot2(lat - np.pi / 2.)
         offset = np.identity(7)
         offset[0:3, -1] = self.coordinates
-        return self._convert(m, m).T, offset
+        return self._convert(m, m), offset
 
     mtd = '_to_%s' % parent_frame.__name__
     dct = {
