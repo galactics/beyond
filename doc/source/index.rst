@@ -13,6 +13,7 @@ Contents:
 
    api/index
    structure
+   examples
 
 
 Indices and tables

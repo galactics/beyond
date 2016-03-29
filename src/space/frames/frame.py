@@ -44,7 +44,7 @@ from space.frames import iau1980
 CIO = ['ITRF', 'TIRF', 'CIRF', 'GCRF']
 IAU1980 = ['TOD', 'MOD']
 other = ['EME2000', 'TEME', 'WGS84', 'PEF']
-topo = ['Station', 'dynamic']
+topo = ['create_station', 'dynamic']
 
 __all__ = CIO + IAU1980 + other + topo + ['get_frame']
 
@@ -212,10 +212,25 @@ class GCRF(_Frame):
 
 
 class TopocentricFrame(_Frame):
+    """Base class for ground station
+    """
 
     @classmethod
     def visibility(cls, orb, start, stop, step, events=False):
         """Visibility from a topocentric frame
+
+        Args:
+            orb (Orbit): Orbit to compute visibility from the station with
+            start (Date): starting date of the visibility search
+            stop (Date or datetime.timedelta) end of the visibility search
+            step (timedelta): step of the computation
+            events (bool): If True, compute AOS, LOS and MAX elevation for
+                each pass
+
+        Yield:
+            Orbit: In-visibility point of the orbit.
+                This Orbit is already in the frame of the station and in
+                spherical form.
         """
 
         if type(stop) is timedelta:
@@ -252,13 +267,27 @@ class TopocentricFrame(_Frame):
 
     @classmethod
     def _vis(cls, orb, date):
+        """shortcut to onvert orb to topocentric frame in spherical form at a
+        given date
+        """
         orb = orb.propagate(date)
         orb.change_frame(cls.__name__)
         orb.change_form('spherical')
 
         return orb
+
     @classmethod
     def _bisect(cls, orb, start, stop, element='phi'):
+        """Find, between two dates, the zero-crossing of an orbit parameter
+
+        Args:
+            orb (Orbit)
+            start (Date)
+            stop (Date)
+            element (str)
+        Return:
+            Orbit
+        """
 
         MAX = 50
         n = 0
@@ -287,13 +316,20 @@ class TopocentricFrame(_Frame):
                 raise RuntimeError('Time limit exceeded : {:%H:%M:%S:%f} >= {:%H:%M:%S}'.format(date, stop))
 
 
-def Station(name, latlonalt, parent_frame=WGS84):
+def create_station(name, latlonalt, parent_frame=WGS84):
     """Create a ground station instance
 
     Args:
         name (str): Name of the station
-        latlonalt (tuple of float): coordinates of the station
-        parent_frame (_Frame): Planetocentric rotating frame of reference of coordinates.
+
+        latlonalt (tuple of float): coordinates of the station, as follow:
+
+            * Latitude in radians
+            * Longitude in radians
+            * Altitude to sea level in meters
+
+        parent_frame (_Frame): Planetocentric rotating frame of reference of
+            coordinates.
     Return:
         TopocentricFrame
     """

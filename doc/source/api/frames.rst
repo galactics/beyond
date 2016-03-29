@@ -5,10 +5,10 @@ Frames and Pole motions
 Frames
 ======
 
+.. image:: /_static/frames.png
+
 .. autoclass:: space.frames.frame._Frame
     :members:
-
-.. image:: /_static/frames.png
 
 CIO Based Frames
 ----------------
@@ -43,13 +43,24 @@ IAU1980 based Frames
 .. autoclass:: space.frames.frame.TEME
     :members:
 
-Local orbital Frames
---------------------
+Ground Station
+--------------
 
-.. automodule:: space.frames.local
+Ground Station may be created using the :py:func:`~space.frames.frame.create_station` function. This
+will ensure correct frames conversions.
+
+.. autofunction:: space.frames.frame.create_station
+
+.. autoclass:: space.frames.frame.TopocentricFrame
     :members:
-    :undoc-members:
-    :show-inheritance:
+
+.. Local orbital Frames
+    --------------------
+
+    .. automodule:: space.frames.local
+        :members:
+        :undoc-members:
+        :show-inheritance:
 
 Pole motion models
 ==================
