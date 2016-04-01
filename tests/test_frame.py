@@ -133,17 +133,25 @@ def test_station():
     #            1 25544U 98067A   16038.20499631  .00009950  00000-0  15531-3 0  9993
     #            2 25544  51.6445 351.2284 0006997  89.9621  48.8570 15.54478078984606"""
     # orb = Tle(lines).orbit()
-    # orb = orb.propagate()
+    # orb = orb.propagate(Date(2016, 2, 7, 16, 55))
 
-    aus = Station('AUS', (43.428889, 1.497778, 178.0), ITRF)
 
     orb = Orbit(Date(2016, 2, 7, 16, 55),
         [4225679.11976, 2789527.13836, 4497182.71156,
          -5887.93077439, 3748.50929999, 3194.45322378],
         'cartesian', 'TEME', 'Sgp4'
     )
-    orb.change_frame('AUS')
+    archive = orb.copy()
+
+    tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
+
+    orb.change_frame('Toulouse')
     orb.change_form('spherical')
-    assert np.degrees(np.pi - orb.theta) == 159.07634449694345  # azimuth
-    assert np.degrees(orb.phi) == 60.1532194724604     # elevation
-    assert orb.r == 461216.18004271947      # range
+
+    assert np.degrees(np.pi - orb.theta) == 159.75001561831203  # azimuth
+    assert np.degrees(orb.phi) == 57.894234537351593     # elevation
+    assert orb.r == 471467.6615039421      # range
+
+    orb.change_frame(archive.frame)
+    orb.change_form(archive.form)
+    assert_vector(archive, orb)

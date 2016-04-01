@@ -122,14 +122,17 @@ class _Frame(metaclass=_MetaFrame):
         orbit = np.ones(7)
         orbit[:6] = self.orbit
         for _from, _to in steps:
-            # print(_from, "=>", _to)
+
             try:
                 rotation, offset = getattr(_from(self.date, orbit), "_to_{}".format(_to))()
             except AttributeError:
                 rotation, offset = getattr(_to(self.date, orbit), "_to_{}".format(_from))()
                 rotation = rotation.T
                 offset[:6, -1] = - offset[:6, -1]
-            orbit = rotation @ offset @ orbit
+            if issubclass(_from, TopocentricFrame):
+                orbit = offset @ rotation @ orbit
+            else:
+                orbit = rotation @ offset @ orbit
 
         return orbit[:6]
 
