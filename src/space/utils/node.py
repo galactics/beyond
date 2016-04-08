@@ -21,7 +21,7 @@ class Node:
         self.name = name
         self.subtree = subtree
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return "<{} '{}'>".format(self.__class__.__name__, self.name)
 
     def __getitem__(self, item):
@@ -130,7 +130,7 @@ class Route:
         self.direction = direction
         self.steps = steps
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return "<d={0}, s={1}>".format(self.direction, self.steps)
 
 
@@ -240,8 +240,8 @@ class Node2:
         for i in range(len(path) - 1):
             yield path[i], path[i + 1]
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return self.name
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return "<{} '{}'>".format(self.__class__.__name__, self.name)

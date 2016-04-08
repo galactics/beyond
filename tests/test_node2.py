@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from pytest import raises
+
 from space.utils.node import Node2
 
 A = Node2('A')
@@ -37,6 +39,7 @@ def test_path():
     D + J + K + H
     E + L + M
 
+    assert A.path('A') == [A]
     assert A.path('B') == [A, B]
     assert A.path('C') == [A, B, C]
     assert A.path('D') == [A, D]
@@ -49,6 +52,9 @@ def test_path():
     assert A.path('K') == [A, D, J, K]
     assert A.path('L') == [A, E, L]
     assert A.path('M') == [A, E, L, M]
+
+    with raises(ValueError):
+        A.path('Z')
 
 
 def test_steps():

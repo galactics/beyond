@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pytest import fixture, yield_fixture
+from pytest import fixture, yield_fixture, raises
 from unittest.mock import patch
 
 import numpy as np
@@ -155,3 +155,9 @@ def test_station():
     orb.change_frame(archive.frame)
     orb.change_form(archive.form)
     assert_vector(archive, orb)
+
+
+def test_errors(ref_orbit):
+
+    with raises(ValueError):
+        ref_orbit.change_frame('Inexistant')

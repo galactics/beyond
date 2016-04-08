@@ -76,7 +76,7 @@ class _MetaFrame(type, Node2):
         super(_MetaFrame, self).__init__(name, bases, dct)
         super(type, self).__init__(name)
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return "<Frame '{}'>".format(self.name)
 
 
@@ -93,10 +93,10 @@ class _Frame(metaclass=_MetaFrame):
         self.date = date
         self.orbit = orbit
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return self.name
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return "<Frame obj '{}'>".format(self.__class__.__name__)
 
     @classmethod
@@ -309,10 +309,13 @@ class TopocentricFrame(_Frame):
             else:
                 step /= 2
             n += 1
-        else:
+        else:  # pragma: no cover
+            # Hopefully this part is never executed
             if n > MAX:
                 raise RuntimeError('Too much iterations : %d' % n)
             else:
+                # If you arrive her it's certainly because there was no zero
+                # crossing between the two dates
                 raise RuntimeError('Time limit exceeded : {:%H:%M:%S:%f} >= {:%H:%M:%S}'.format(date, stop))
 
 
