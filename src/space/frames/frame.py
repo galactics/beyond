@@ -32,6 +32,7 @@ The relations may be circular, thanks to the use of the Node2 class.
     `----'  `----'
 """
 
+import warnings
 import numpy as np
 from abc import abstractmethod
 from datetime import timedelta
@@ -44,7 +45,7 @@ from space.frames import iau1980
 CIO = ['ITRF', 'TIRF', 'CIRF', 'GCRF']
 IAU1980 = ['TOD', 'MOD']
 other = ['EME2000', 'TEME', 'WGS84', 'PEF']
-topo = ['create_station', 'dynamic']
+topo = ['create_station']
 
 __all__ = CIO + IAU1980 + other + topo + ['get_frame']
 
@@ -61,9 +62,7 @@ def get_frame(frame):
     Return:
         ~space.frames.frame._Frame
     """
-    if frame in __all__:
-        return eval(frame)
-    elif frame in dynamic.keys():
+    if frame in dynamic.keys():
         return dynamic[frame]
     else:
         raise ValueError("Unknown Frame : '{}'".format(frame))
@@ -72,9 +71,16 @@ def get_frame(frame):
 class _MetaFrame(type, Node2):
     """This MetaClass is here to join the behaviours of ``type`` and ``Node2``
     """
+
     def __init__(self, name, bases, dct):
         super(_MetaFrame, self).__init__(name, bases, dct)
         super(type, self).__init__(name)
+
+        if self.__name__ in dynamic:
+            warnings.warn("A frame with the name '%s' is already registered. Overriding" % self.__name__)
+
+        # Making the frame available to the get_frame function
+        dynamic[self.__name__] = self
 
     def __repr__(self):  # pragma: no cover
         return "<Frame '{}'>".format(self.name)
@@ -383,7 +389,6 @@ def create_station(name, latlonalt, parent_frame=WGS84):
     }
     cls = _MetaFrame(name, (TopocentricFrame,), dct)
     cls + parent_frame
-    dynamic[name] = cls
 
     return cls
 
