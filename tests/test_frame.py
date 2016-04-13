@@ -157,6 +157,24 @@ def test_station():
     assert_vector(archive, orb)
 
 
+def test_station_visibility():
+
+    lines = """ISS (ZARYA)
+               1 25544U 98067A   16038.20499631  .00009950  00000-0  15531-3 0  9993
+               2 25544  51.6445 351.2284 0006997  89.9621  48.8570 15.54478078984606"""
+    orb = Tle(lines).orbit()
+
+    tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
+    points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16), timedelta(hours=2), timedelta(seconds=30))]
+    points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16), Date(2016, 2, 7, 18), timedelta(seconds=30))]
+    assert len(points) == 21
+
+    points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16), timedelta(hours=2), timedelta(seconds=30), events=True)]
+
+    assert points[0].info == 'AOS'
+    assert points[-1].info == 'LOS'
+
+
 def test_errors(ref_orbit):
 
     with raises(ValueError):
