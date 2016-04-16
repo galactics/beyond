@@ -8,6 +8,7 @@ orbit
     :members:
     :undoc-members:
     :show-inheritance:
+    :exclude-members: copy
 
 TLE
 ---

@@ -8,7 +8,8 @@ from collections import namedtuple
 
 from ..config import config
 
-# __all__ = ['PolePosition', 'TimeScales']
+__all__ = ['PolePosition', 'TimeScales']
+
 
 ScalesDiff = namedtuple('ScalesDiff', ('ut1_tai', 'ut1_utc', 'tai_utc'))
 
@@ -58,6 +59,13 @@ class TimeScales:
 
     @classmethod
     def get(cls, date):
+        """
+        Args:
+            date (float): Date in MJD
+        Return:
+            tuple: 3-element (UT1-UTC, TAI-UTC, UT1-TAI)
+        """
+
         if date == int(date):
             return cls._get(date)
         else:

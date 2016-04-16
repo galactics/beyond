@@ -40,6 +40,9 @@ class Orbit(np.ndarray):
         return obj
 
     def copy(self):
+        """Override :py:meth:`numpy.ndarray.copy()` to include additional
+        fields
+        """
         new_obj = self.__class__(
             self.date, self.base.copy(), self.form,
             self.frame, self.propagator, **self.complements)
@@ -47,6 +50,8 @@ class Orbit(np.ndarray):
 
     @property
     def names(self):
+        """Gives the names of the fields
+        """
         return self.form.param_names
 
     def __getattr__(self, name):

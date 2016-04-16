@@ -12,5 +12,8 @@ Space API only requires Python 3.5 and numpy. To install it use pip
 
     pip install space-api
 
-Usage
------
+Reference
+---------
+
+A lot of the formulas and flight dynamic algorithm are based on Vallado's
+_Fundamentals of Astrodynamic and Applications_ 4th ed.
