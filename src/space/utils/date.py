@@ -87,11 +87,7 @@ class Date:
         raise TypeError("Can not modify attributes of immutable object")
 
     def __add__(self, other):
-        if type(other) in (int, float):
-            # number of days
-            days = int(other)
-            sec = (other - days) * 86400.
-        elif type(other) is _datetime.timedelta:
+        if type(other) is _datetime.timedelta:
             days, sec = divmod(other.total_seconds() + self.s, 86400)
         else:
             raise TypeError("Unknown operation with {} type".format(type(other)))
@@ -105,33 +101,35 @@ class Date:
             return self.datetime - other
         elif type(other) is self.__class__:
             return self.datetime - other.datetime
+        else:
+            raise TypeError("Unknown operation with {} type".format(type(other)))
 
         return self.__add__(other)
 
-    def __gt__(self, other):
+    def __gt__(self, other):  # pragma: no cover
         return self.mjd > other.mjd
 
-    def __ge__(self, other):
+    def __ge__(self, other):  # pragma: no cover
         return self.mjd >= other.mjd
 
-    def __lt__(self, other):
+    def __lt__(self, other):  # pragma: no cover
         return self.mjd < other.mjd
 
-    def __le__(self, other):
+    def __le__(self, other):  # pragma: no cover
         return self.mjd <= other.mjd
 
-    def __eq__(self, other):
+    def __eq__(self, other):  # pragma: no cover
         return self.d == other.d and self.s == other.s and self.scale == other.scale
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return "<{} '{}'>".format(self.__class__.__name__, self)
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         if 'str' not in self._cache.keys():
             self._cache['str'] = "{} {}".format(self.datetime.isoformat(), self.scale)
         return self._cache['str']
 
-    def __format__(self, fmt):
+    def __format__(self, fmt):  # pragma: no cover
         if fmt:
             return self.datetime.__format__(fmt)
         else:
@@ -156,7 +154,7 @@ class Date:
         return self._cache['dt']
 
     @classmethod
-    def strptime(cls, data, format, scale='UTC'):
+    def strptime(cls, data, format, scale='UTC'):  # pragma: no cover
         """Convert a string representation of a date to a Date object
         """
         return Date(_datetime.datetime.strptime(data, format), scale=scale)

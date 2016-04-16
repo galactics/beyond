@@ -73,21 +73,28 @@ def test_creation():
 
 def test_operations():
     t1 = Date(2015, 12, 6)
-    t2 = t1 + 1.5
-    assert t2.d == t1.d + 1
-    assert t2.s == 43200.
 
-    t3 = t1 + 1
-    assert t3.d == t1.d + 1
-    assert t3.s == t1.s
-
-    t4 = t1 + datetime.timedelta(hours=2)
-    assert t4.d == t1.d
-    assert t4.s == t1.s + 2 * 3600
+    t2 = t1 + datetime.timedelta(hours=2)
+    assert t2.d == t1.d
+    assert t2.s == t1.s + 2 * 3600
 
     with raises(TypeError):
-        t5 = t1 + [1]
+        t2 = t1 + 1
 
+    t2 = t1 - datetime.timedelta(hours=12)
+    assert t2.d == t1.d - 1
+    assert t2.s == 43200.
+
+    t2 = t1 - datetime.datetime(2015, 12, 4)
+    assert type(t2) is datetime.timedelta
+    assert t2.days == 2
+
+    t2 = t1 - Date(2015, 12, 4)
+    assert type(t2) is datetime.timedelta
+    assert t2.days == 2
+
+    with raises(TypeError):
+        t2 = t1 - 2.5
 
 def test_change_scale():
 
