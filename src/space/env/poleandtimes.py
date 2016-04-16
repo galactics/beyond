@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import math
+
 from pathlib import Path
 from collections import namedtuple
+
+from ..config import config
 
 # __all__ = ['PolePosition', 'TimeScales']
 
@@ -114,8 +117,12 @@ class PolePosition:
 
 
 class TaiUtc():
+    """File listing all leap seconds throught history
 
-    path = Path(__file__).parent / "data" / "tai-utc.txt"
+    This file can be retrieved at http://maia.usno.navy.mil/ser7/tai-utc.dat
+    """
+
+    path = Path(config.envdir) / "pole" / "tai-utc.dat"
     _data = []
 
     @classmethod
@@ -126,31 +133,31 @@ class TaiUtc():
                 lines = f.read().splitlines()
 
             for line in lines:
-                if line.startswith("#") or not line:
+                if not line:
                     continue
 
-                start, stop, value, *_ = line.split()
-                value = int(value)
+                line = line.split()
+                mjd = float(line[4]) - 2400000.5
+                value = float(line[6])
                 cls._data.append(
-                    (int(start), int(stop), value)
+                    (mjd, value)
                 )
 
     @classmethod
     def get(cls, date):
         cls._initialise()
-        tmp = cls()._data[0][2]
-        for start, stop, value in cls()._data:
-            if start <= date < stop:
-                tmp = value
-        return tmp
+        for mjd, value in reversed(cls()._data):
+            if mjd <= date:
+                return value
 
 
 class Finals2000A():
+    """History of pole motion correction for IAU2000 model
+
+    This file can be retrived at http://maia.usno.navy.mil/ser7/finals2000A.all
     """
 
-    """
-
-    path = Path(__file__).parent / "data" / "finals2000A.all"
+    path = Path(config.envdir) / "pole" / "finals2000A.all"
     _instance = None
     _deltas = ('dX', 'dY')
 
@@ -204,7 +211,11 @@ class Finals2000A():
 
 
 class Finals(Finals2000A):
+    """History of pole motion correction for IAU1980 model
 
-    path = Path(__file__).parent / "data" / "finals.all"
+    This file can be retrived at http://maia.usno.navy.mil/ser7/finals.all
+    """
+
+    path = Path(config.envdir) / "pole" / "finals.all"
     _instance = None
     _deltas = ('dpsi', 'deps')
