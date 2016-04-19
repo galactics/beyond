@@ -91,12 +91,15 @@ class Orbit(np.ndarray):
         coord_str = '\n'.join(
             [" " * 4 + "%s = %s" % (name, arg) for name, arg in zip(self.names, self)]
         )
+
+        propagator = self.propagator.__name__ if self.propagator is not None else self.propagator
+
         fmt = "Orbit =\n  date = {date}\n  form = {form}\n  frame = {frame}\n  propag = {propag}\n  coord =\n{coord}".format(
             date=self.date,
             coord=coord_str,
             form=self.form,
             frame=self.frame,
-            propag=self.propagator.__name__
+            propag=propagator
         )
         return fmt
 
