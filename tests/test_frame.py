@@ -148,9 +148,9 @@ def test_station():
     orb.change_frame('Toulouse')
     orb.change_form('spherical')
 
-    assert np.degrees(np.pi - orb.theta) == 159.75001561831203  # azimuth
-    assert np.degrees(orb.phi) == 57.894234537351593     # elevation
-    assert orb.r == 471467.6615039421      # range
+    assert -np.degrees(orb.theta) == 159.75001561831206  # azimuth
+    assert np.degrees(orb.phi) == 57.894234537351593    # elevation
+    assert orb.r == 471467.6615039421                   # range
 
     orb.change_frame(archive.frame)
     orb.change_form(archive.form)

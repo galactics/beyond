@@ -325,7 +325,7 @@ class TopocentricFrame(_Frame):
                 raise RuntimeError('Time limit exceeded : {:%H:%M:%S:%f} >= {:%H:%M:%S}'.format(date, stop))
 
 
-def create_station(name, latlonalt, parent_frame=WGS84):
+def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
     """Create a ground station instance
 
     Args:
@@ -339,6 +339,9 @@ def create_station(name, latlonalt, parent_frame=WGS84):
 
         parent_frame (_Frame): Planetocentric rotating frame of reference of
             coordinates.
+        orientation (str or float): Heading of the station
+            Acceptables values are 'N', 'S', 'E', 'W' or any angle in radians
+
     Return:
         TopocentricFrame
     """
@@ -367,6 +370,10 @@ def create_station(name, latlonalt, parent_frame=WGS84):
             np.sin(lat)
         ])
 
+    if type(orientation) is str:
+        orient = {'N': np.pi, 'S': 0., 'E': np.pi / 2., 'W': 3 * np.pi / 2.}
+        orientation = orient[orientation]
+
     latlonalt = list(latlonalt)
     latlonalt[:2] = np.radians(latlonalt[:2])
     coordinates = _geodetic_to_xyz(*latlonalt)
@@ -375,7 +382,7 @@ def create_station(name, latlonalt, parent_frame=WGS84):
         """Conversion from Topocentric Frame to parent frame
         """
         lat, lon, _ = self.latlonalt
-        m = rot3(-lon) @ rot2(lat - np.pi / 2.)
+        m = rot3(-lon) @ rot2(lat - np.pi / 2.) @ rot3(self.orientation)
         offset = np.identity(7)
         offset[0:3, -1] = self.coordinates
         return self._convert(m, m), offset
@@ -386,6 +393,7 @@ def create_station(name, latlonalt, parent_frame=WGS84):
         'latlonalt': latlonalt,
         'coordinates': coordinates,
         'parent_frame': parent_frame,
+        'orientation': orientation
     }
     cls = _MetaFrame(name, (TopocentricFrame,), dct)
     cls + parent_frame

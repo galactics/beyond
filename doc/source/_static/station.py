@@ -20,8 +20,9 @@ print("    Time      Azim    Elev    Distance   Radial Velocity")
 print("=========================================================")
 
 for orb in station.visibility(tle, start=Date.now(), stop=timedelta(hours=24), step=timedelta(seconds=30), events=True):
-    azim = np.degrees(np.pi - orb[2])
     elev = np.degrees(orb[1])
+    # Radians are counterclockwise and azimuth is clockwise
+    azim = np.degrees(-orb[2])
 
     # Archive for plotting
     azims.append(azim)
