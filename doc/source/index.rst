@@ -3,16 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to space's documentation!
-=================================
+Space API
+=========
 
-Contents:
+Space API is a library allowing developpers to handle orbits and space
+observations with ease.
 
 .. toctree::
    :maxdepth: 2
 
    api/index
-   structure
    examples
 
 

@@ -149,7 +149,7 @@ class Node2:
         F + C
 
         #   A
-        #  / \
+        #  / \\
         # B   F
         # |   |
         # C   E

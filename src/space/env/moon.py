@@ -67,9 +67,13 @@ def moon_vector(date):
 
 
 class MoonPropagator:
+    """Dummy propagator for moon position
+    """
 
     def __init__(self, *args, **kwargs):
         pass
 
     def propagate(self, date):
+        """Direct call to :py:func:`~space.env.moon.moon_vector`
+        """
         return moon_vector(date)

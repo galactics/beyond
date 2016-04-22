@@ -53,9 +53,13 @@ def sun_vector(date):
 
 
 class SunPropagator:
+    """Dummy propagator for Sun position
+    """
 
     def __init__(self, *args, **kwargs):
         pass
 
     def propagate(self, date):
+        """Direct call to :py:func:`~space.env.sun.sun_vector`
+        """
         return sun_vector(date)
