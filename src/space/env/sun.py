@@ -21,7 +21,7 @@ def sun_vector(date):
           date = 2006-04-02T00:00:00 UTC
           form = Cartesian
           frame = MOD
-          propag = None
+          propag = SunPropagator
           coord =
             x = 146186235644.0
             y = 28789144480.5

@@ -24,7 +24,7 @@ def moon_vector(date):
           date = 1994-04-28T00:00:00 UTC
           form = Cartesian
           frame = EME2000
-          propag = None
+          propag = MoonPropagator
           coord =
             x = -134181157.317
             y = -311598171.54
