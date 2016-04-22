@@ -130,7 +130,7 @@ class TaiUtc():
     This file can be retrieved at http://maia.usno.navy.mil/ser7/tai-utc.dat
     """
 
-    path = Path(config.envdir) / "pole" / "tai-utc.dat"
+    path = config.folder / "env" / "tai-utc.dat"
     _data = []
 
     @classmethod
@@ -165,7 +165,7 @@ class Finals2000A():
     This file can be retrived at http://maia.usno.navy.mil/ser7/finals2000A.all
     """
 
-    path = Path(config.envdir) / "pole" / "finals2000A.all"
+    path = config.folder / "env" / ("finals2000A." + config['env']['pole_motion_source'])
     _instance = None
     _deltas = ('dX', 'dY')
 
@@ -224,6 +224,6 @@ class Finals(Finals2000A):
     This file can be retrived at http://maia.usno.navy.mil/ser7/finals.all
     """
 
-    path = Path(config.envdir) / "pole" / "finals.all"
+    path = config.folder / "env" / ("finals." + config['env']['pole_motion_source'])
     _instance = None
     _deltas = ('dpsi', 'deps')

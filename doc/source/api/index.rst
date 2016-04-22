@@ -4,6 +4,7 @@ space
 .. toctree::
     :maxdepth: 2
 
+    config
     env
     frames
     orbits
