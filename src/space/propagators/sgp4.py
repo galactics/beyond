@@ -43,6 +43,11 @@ class Init:
 
 
 class Sgp4:
+    """This class is a simplistic implementation of SGP4 model. It doesn't
+    implement SDP4 model at the moment.
+
+    It is highly under-optimised, and serves only the purpose of testing.
+    """
 
     def __init__(self, orbit, gravity=WGS72):
 
@@ -117,6 +122,13 @@ class Sgp4:
         self._init.Ωdot = (- 3 * self._init.k2 * self._init.θ / (self._init.a0 ** 2 * self._init.β_0 ** 4) + 3 * self._init.k2 ** 2 * (4 * self._init.θ - 19 * self._init.θ ** 3) / (2 * self._init.a0 ** 4 * self._init.β_0 ** 8) + 5 * k4 * self._init.θ * (3 - 7 * self._init.θ ** 2) / (2 * self._init.a0 ** 4 * self._init.β_0 ** 8))
 
     def propagate(self, date):
+        """Compute state of orbit at a given date, past or future
+
+        Args:
+            date (Date)
+        Return:
+            Orbit:
+        """
 
         i0, Ω0, e0, ω0, M0, n0 = self.tle
         n0 *= 60  # conversion to min⁻¹

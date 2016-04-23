@@ -90,6 +90,13 @@ class Node:
         return x + list(reversed(y))
 
     def walk(self, goal):
+        """Get the shortest path between ``self`` and ``goal``
+
+        Args:
+            goal (str): Name of the node you want to reach
+        Return:
+            list: List of nodes
+        """
         # This method is only here to insert the top node in the loop
         name = self.name
         if not self._case:
@@ -119,12 +126,23 @@ class Node:
         return final
 
     def steps(self, start, stop):
+        """Same as :py:meth:`path` but gives a list of couple
+
+        Args:
+            start (str): Name of the source node
+            stop (str): Name of node you want to reach
+        Returns:
+            list: List of nodes names
+        """
         path = self.path(start, stop)
         for i in range(len(path) - 1):
             yield path[i], path[i + 1]
 
 
 class Route:
+    """Class used by :py:class:`Node2` to describe where to find
+    another node.
+    """
 
     def __init__(self, direction, steps):
         self.direction = direction
