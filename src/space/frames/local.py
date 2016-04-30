@@ -14,7 +14,6 @@ def inertial_to_tnw(state_vector):
     Returns:
         numpy.ndarray: matrix to convert from inertial frame to TNW.
 
-    >>> import numpy as np
     >>> delta_tnw = [1, 0, 0]
     >>> p = [-6142438.668, 3492467.560, -25767.25680]
     >>> v = [505.8479685, 942.7809215, 7435.922231]
@@ -41,7 +40,6 @@ def inertial_to_qsw(state_vector):
     Returns:
         numpy.ndarray: matrix to convert from inertial frame to QSW
 
-    >>> import numpy as np
     >>> delta_qsw = [1, 0, 0]
     >>> p = [-6142438.668, 3492467.560, -25767.25680]
     >>> v = [505.8479685, 942.7809215, 7435.922231]

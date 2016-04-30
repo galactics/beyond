@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from numpy import cos, arccos, sin, arcsin, arctan, arctan2, sqrt, arccosh, sinh
+from numpy import cos, arccos, sin, arcsin, arctan2, sqrt, arccosh, sinh
 
 from space.utils.node import Node
 from space.constants import µ_e

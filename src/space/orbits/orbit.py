@@ -6,7 +6,7 @@ import numpy as np
 from datetime import timedelta
 
 from .forms import FormTransform
-from space.frames.frame import *
+from space.frames.frame import get_frame
 from space.propagators import *
 
 

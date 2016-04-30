@@ -4,6 +4,7 @@
 from pathlib import Path
 from configparser import ConfigParser
 
+
 class Config:
     """Configuration class
 

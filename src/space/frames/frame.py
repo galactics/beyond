@@ -34,7 +34,6 @@ The relations may be circular, thanks to the use of the Node2 class.
 
 import warnings
 import numpy as np
-from abc import abstractmethod
 from datetime import timedelta
 
 from space.constants import e_e, r_e
@@ -244,7 +243,6 @@ class TopocentricFrame(_Frame):
 
         date = start
         visibility, max_found = False, False
-        previous = cls._vis(orb, date)
         while date < stop:
             cursor = cls._vis(orb, date)
             if cursor.phi >= 0:
@@ -268,7 +266,6 @@ class TopocentricFrame(_Frame):
                 los.info = "LOS"
                 yield los
                 visibility, max_found = False, False
-            previous = cursor
             date += step
 
     @classmethod
@@ -404,4 +401,4 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
 WGS84 + ITRF + PEF + TOD + MOD + EME2000
 TOD + TEME
 # EME2000 + GCRF
-#ITRF + TIRF + CIRF + GCRF
+# ITRF + TIRF + CIRF + GCRF

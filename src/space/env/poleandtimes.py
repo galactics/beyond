@@ -3,7 +3,6 @@
 
 import math
 
-from pathlib import Path
 from collections import namedtuple
 
 from ..config import config
@@ -206,14 +205,18 @@ class Finals2000A():
                         cls._instance.data[mjd]['pole'][cls._deltas[0]] = float(line[97:106])
                         cls._instance.data[mjd]['pole'][cls._deltas[1]] = float(line[116:125])
                     except ValueError:
-                        # dX and dY are not available for this date, so we take the last value available
-                        cls._instance.data[mjd]['pole'][cls._deltas[0]] = cls._instance.data[mjd - 1]['pole'][cls._deltas[0]]
-                        cls._instance.data[mjd]['pole'][cls._deltas[1]] = cls._instance.data[mjd - 1]['pole'][cls._deltas[1]]
+                        # dX and dY are not available for this date, so we take
+                        # the last value available
+                        cls._instance.data[mjd]['pole'][cls._deltas[0]] = \
+                            cls._instance.data[mjd - 1]['pole'][cls._deltas[0]]
+                        cls._instance.data[mjd]['pole'][cls._deltas[1]] = \
+                            cls._instance.data[mjd - 1]['pole'][cls._deltas[1]]
                     try:
                         cls._instance.data[mjd]['pole']['LOD'] = float(line[79:86])
                     except ValueError:
                         # LOD is not available for this date so we take the last value available
-                        cls._instance.data[mjd]['pole']['LOD'] = cls._instance.data[mjd - 1]['pole']['LOD']
+                        cls._instance.data[mjd]['pole']['LOD'] = \
+                            cls._instance.data[mjd - 1]['pole']['LOD']
 
         return cls._instance
 

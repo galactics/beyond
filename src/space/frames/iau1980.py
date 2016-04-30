@@ -3,7 +3,6 @@
 import numpy as np
 from pathlib import Path
 
-from space.utils import Date
 from space.utils.matrix import rot1, rot2, rot3
 from space.utils.memoize import memoize
 from space.env.poleandtimes import PolePosition
@@ -143,7 +142,6 @@ def _nutation(date, eop_correction=True, terms=106):
         delta_eps += pole['deps'] / 3600000.
         delta_psi += pole['dpsi'] / 3600000.
 
-    # print("eps_bar = {}\ndelta_psi = {}\ndelta_eps = {}\n".format(epsilon_bar, delta_psi, delta_eps))
     return epsilon_bar, delta_psi, delta_eps
 
 
@@ -209,6 +207,7 @@ def _sideral(date, longitude=0., model='mean', eop_correction=True, terms=106):
     theta %= 360.
 
     return theta
+
 
 def sideral(date, longitude=0., model='mean', eop_correction=True, terms=106):  # pragma: no cover
     """Sideral time as a rotation matrix

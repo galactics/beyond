@@ -5,7 +5,8 @@ import functools
 
 
 def memoize(obj):
-    """Memoize decorator, as seen on `here <https://wiki.python.org/moin/PythonDecoratorLibrary#Memoize>`_
+    """Memoize decorator, as seen on
+    `here <https://wiki.python.org/moin/PythonDecoratorLibrary#Memoize>`_
     """
     cache = obj._cache = {}
 

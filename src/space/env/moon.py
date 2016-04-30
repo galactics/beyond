@@ -2,7 +2,6 @@
 import numpy as np
 
 from space.constants import r_e
-from space.utils.date import Date
 from space.orbits import Orbit
 
 

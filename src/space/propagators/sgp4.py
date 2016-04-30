@@ -3,7 +3,7 @@
 
 import numpy as np
 from numpy import cos, sqrt, sin, arctan2
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from space.utils.date import Date
 from space.orbits.forms import FormTransform
@@ -69,7 +69,6 @@ class Sgp4:
         j2 = self.gravity.j2
         j3 = self.gravity.j3
         j4 = self.gravity.j4
-        µ = self.gravity.µ_e
         r_e = self.gravity.r_e
         k_e = self.gravity.k_e
 
