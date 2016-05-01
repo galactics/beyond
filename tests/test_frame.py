@@ -298,16 +298,16 @@ def test_orbit2frame():
     iss.register_as_frame('iss_unknown', 'unknow')
 
     s1 = soyouz.copy(frame='iss_inert')
-    assert_almost_equal(s1[:3], [70.616031724028289, 73.651090503670275, -62.527891733683646])
-    assert_almost_equal(s1[3:], [0.052151684838463552, 0.099888696147900191, -0.042362396145563253])
+    assert_almost_equal(s1[:3], [70.5889585, 73.6584008, -62.5406308])
+    assert_almost_equal(s1[3:], [0.0521557, 0.0998631, -0.0423856])
 
     s2 = soyouz.copy(frame="iss_qsw")
-    assert_almost_equal(s2[:3], [4.5450426777824759, -18.729738359805197, -118.10750304395333])
-    assert_almost_equal(s2[3:], [0.039432618629234639, -0.0046244694185588742, -0.1136477186164484])
+    assert_almost_equal(s2[:3], [4.5450528, -18.6989377, -118.107503])
+    assert_almost_equal(s2[3:], [0.0393978, -0.0046244, -0.1136478])
 
     s3 = soyouz.copy(frame="iss_tnw")
-    assert_almost_equal(s3[:3], [-18.728253549197689, -4.5511609734967351, -118.10750304395333])
-    assert_almost_equal(s3[3:], [-0.0046115872564769234, -0.039434125179468538, -0.1136477186164484])
+    assert_almost_equal(s3[:3], [-18.6974528, -4.5511611, -118.107503])
+    assert_almost_equal(s3[3:], [-0.0046116, -0.0393993, -0.1136478])
 
     # Whatever the local reference frame, the W vector is the same
     assert s2[2] == s3[2]

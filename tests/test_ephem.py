@@ -37,13 +37,13 @@ def test_interpolate(ephem):
 
     orb = ephem.interpolate(ephem.start + timedelta(hours=0.5), method="linear")
 
-    assert list(orb[:3]) == [-1345306.8788385859, 5181620.4607680216, -4088075.611075501]
-    assert list(orb[3:]) == [-5080.8194130861202, -4325.1407145624016, -3821.7458439122233]
+    assert list(orb[:3]) == [-1345306.8763218378, 5181620.4629104454, -4088075.609182423]
+    assert list(orb[3:]) == [-5080.8194139542002, -4325.1407112188917, -3821.7458465578138]
 
     orb = ephem.interpolate(ephem.start + timedelta(hours=0.5), method="lagrange")
 
-    assert list(orb[:3]) == [-1345304.9541785978, 5181617.05590453, -4088071.6593303955]
-    assert list(orb[3:]) == [-5080.8211218599981, -4325.1688590092863, -3821.7340028755452]
+    assert list(orb[:3]) == [-1345307.6633055285, 5181606.501893268, -4088069.6677857935]
+    assert list(orb[3:]) == [-5080.8129709429313, -4325.1691323453406, -3821.7243475924397]
 
     with raises(ValueError):
         # We ask for a value clearly out of range

@@ -43,7 +43,6 @@ import numpy as np
 
 from .orbit import Orbit
 from ..utils.date import Date
-from ..propagators.sgp4 import Sgp4
 
 
 def _float(text):
@@ -108,8 +107,6 @@ class Tle:
             text (str):
         """
 
-        self.text = text
-
         if isinstance(text, str):
             text = text.splitlines()
 
@@ -122,6 +119,8 @@ class Tle:
         self._check_validity(text)
 
         first, second = text[0].split(), text[1].split()
+
+        self.text = "\n".join((text[0].strip(), text[1].strip()))
 
         self.norad_id = int(first[1][:-1])
         self.classification = first[1][-1]
@@ -185,8 +184,13 @@ class Tle:
         Return:
             ~space.orbits.orbit.Orbit:
         """
-        data = {'bstar': self.bstar, 'ndot': self.ndot, 'ndotdot': self.ndotdot}
-        return Orbit(self.epoch, self.to_list(), "TLE", "TEME", Sgp4, **data)
+        data = {
+            'bstar': self.bstar,
+            'ndot': self.ndot,
+            'ndotdot': self.ndotdot,
+            'tle': self.text
+        }
+        return Orbit(self.epoch, self.to_list(), "TLE", "TEME", 'Sgp4', **data)
 
     @classmethod
     def from_orbit(cls, orbit, name=None, norad_id=None, cospar_id=None):

@@ -3,7 +3,7 @@
 
 from datetime import timedelta
 
-from space.propagators.sgp4 import Sgp4
+from space.propagators.sgp4beta import Sgp4Beta
 from space.orbits.tle import Tle
 
 
@@ -31,7 +31,7 @@ def test_one():
     for lines, expected in test_cases.items():
         tle = Tle(lines).orbit()
 
-        sgp4 = Sgp4(tle)
+        sgp4 = Sgp4Beta(tle)
         pv = sgp4.propagate(tle.date + timedelta(days=1))
         r, v = pv[:3], pv[3:]
 

@@ -1,8 +1,6 @@
 """This module defines the propagators availables
 """
 
-from .sgp4 import Sgp4
-
 
 def get_propagator(name):
     """Retrieve a named propagator
@@ -12,6 +10,10 @@ def get_propagator(name):
     Return:
         Propagator class
     """
+
+    from .sgp4 import Sgp4
+    from .sgp4beta import Sgp4Beta
+
     scope = locals().copy()
     scope.update(globals())
     try:

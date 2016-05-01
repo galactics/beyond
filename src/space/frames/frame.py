@@ -349,7 +349,7 @@ class TopocentricFrame(_Frame):
 
         prev_step = (stop - start)
         step = prev_step / 2
-        eps = 1e-4
+        eps = 1e-3
 
         start_attr = getattr(cls._vis(orb, start), element)
         prev = start_attr
@@ -360,7 +360,6 @@ class TopocentricFrame(_Frame):
         for i in range(MAX_ITER):
             orb_cursor = cls._vis(orb, date_cursor)
             attr = getattr(orb_cursor, element)
-            # print("{:<2} {: 15.8f} {: 7.5f} {}".format(i, attr, step.total_seconds(), element))
 
             if abs(attr) <= eps:
                 # We have a winner !

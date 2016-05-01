@@ -38,9 +38,6 @@ class Orbit(np.ndarray):
         if isinstance(frame, str):
             frame = get_frame(frame)
 
-        if isinstance(propagator, str):
-            propagator = get_propagator(propagator)
-
         obj = np.ndarray.__new__(cls, (6,), buffer=np.array(coord), dtype=float)
         obj.date = date
         obj._form = form
@@ -57,7 +54,7 @@ class Orbit(np.ndarray):
         self.date = obj.date
         self._form = obj._form
         self._frame = obj._frame
-        self.propagator = obj.propagator
+        self._propagator = obj._propagator
         self.complements = obj.complements
 
     def __reduce__(self):
@@ -72,7 +69,7 @@ class Orbit(np.ndarray):
             'date': self.date,
             '_form': self._form,
             '_frame': self._frame,
-            'propagator': self.propagator,
+            '_propagator': self._propagator,
             'complements': self.complements,
         }
 
@@ -87,7 +84,7 @@ class Orbit(np.ndarray):
         self.date = state['date']
         self._form = state['_form']
         self._frame = state['_frame']
-        self.propagator = state['propagator']
+        self._propagator = state['_propagator']
         self.complements = state['complements']
 
     def copy(self, *, frame=None, form=None):
@@ -218,6 +215,18 @@ class Orbit(np.ndarray):
                 self._frame = new_frame
             finally:
                 self.form = old_form
+
+    @property
+    def propagator(self):
+        return self._propagator
+
+    @propagator.setter
+    def propagator(self, new_propagator):
+
+        if isinstance(new_propagator, str):
+            new_propagator = get_propagator(new_propagator)
+
+        self._propagator = new_propagator
 
     def propagate(self, date):
         """Propagate the orbit to a new date

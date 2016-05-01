@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-install_requires = ['numpy']
+install_requires = ['numpy', 'sgp4']
 version = "0.1"
 
 setup(
