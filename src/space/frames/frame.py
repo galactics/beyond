@@ -243,29 +243,47 @@ class TopocentricFrame(_Frame):
 
         date = start
         visibility, max_found = False, False
+
         while date < stop:
+
+            # Propagate orbit at the current date, and convert it to the station
+            # frame and spherical form
             cursor = cls._vis(orb, date)
+
+            # If the elevation is positive we have the satellite in visibility
             if cursor.phi >= 0:
 
-                if events and not visibility:
+                if events and not visibility and date != start:
+                    # The date condition is there to discard the computation
+                    # of AOS if the computation starts during a pass
                     aos = cls._bisect(orb, date - step, date)
                     aos.info = "AOS"
                     yield aos
-                    visibility = True
+
+                visibility = True
 
                 if events and cursor.r_dot >= 0 and not max_found:
-                    _max = cls._bisect(orb, date - step, date, 'r_dot')
-                    _max.info = "MAX"
-                    yield _max
+                    if date != start:
+                        # If we start to compute after the MAX elevation, the
+                        # current _bisect algorithm can't detect it and will
+                        # raise an exception, so we discard this case
+                        _max = cls._bisect(orb, date - step, date, 'r_dot')
+                        _max.info = "MAX"
+                        yield _max
                     max_found = True
 
                 cursor.info = ""
                 yield cursor
             elif events and visibility:
+                # If a visibility has started, and the satellite is below the
+                # horizon, we can compute the LOS
                 los = cls._bisect(orb, date - step, date)
                 los.info = "LOS"
                 yield los
+
+                # Re-initialization of pass variables
                 visibility, max_found = False, False
+
             date += step
 
     @classmethod
