@@ -5,6 +5,8 @@ import datetime as _datetime
 from space.env.poleandtimes import TimeScales
 from .node import Node
 
+__all__ = ['Date']
+
 
 class _Scale(Node):
     pass

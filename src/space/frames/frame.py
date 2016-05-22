@@ -228,14 +228,13 @@ class TopocentricFrame(_Frame):
             orb (Orbit): Orbit to compute visibility from the station with
             start (Date): starting date of the visibility search
             stop (Date or datetime.timedelta) end of the visibility search
-            step (timedelta): step of the computation
+            step (datetime.timedelta): step of the computation
             events (bool): If True, compute AOS, LOS and MAX elevation for
                 each pass
 
         Yield:
-            Orbit: In-visibility point of the orbit.
-                This Orbit is already in the frame of the station and in
-                spherical form.
+            Orbit: In-visibility point of the orbit. This Orbit is already
+            in the frame of the station and in spherical form.
         """
 
         if type(stop) is timedelta:

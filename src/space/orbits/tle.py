@@ -46,6 +46,9 @@ from space.propagators.sgp4 import Sgp4
 
 
 def _float(text):
+    """Fonction to convert the 'decimal point assumed' format of TLE to actual
+    float
+    """
     if text.startswith("-"):
         text = "-.%s" % text[1:]
     else:
@@ -61,8 +64,14 @@ def _float(text):
 
 
 class Tle:
+    """TLE parsing
+    """
 
     def __init__(self, text):
+        """
+        Args:
+            text (str):
+        """
 
         if type(text) is str:
             text = text.splitlines()
@@ -108,10 +117,10 @@ class Tle:
         return [self.i, self.Ω, self.e, self.ω, self.M, self.n]
 
     def orbit(self):
-        """Convert TLE to :py:class:`~space.orbits.orbit.Orbit`
+        """Convert TLE to Orbit object, in order to make computations on it
 
         Return:
-            space.orbits.orbit.Orbit
+            ~space.orbits.orbit.Orbit:
         """
         data = {'bstar': self.bstar, 'ndot': self.ndot, 'ndotdot': self.ndotdot}
         return Orbit(self.epoch, self.to_list(), "TLE", "TEME", Sgp4, **data)

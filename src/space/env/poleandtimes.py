@@ -44,6 +44,8 @@ def _day_boundaries(d):
 
 
 class TimeScales:
+    """Get the various time-scale differences from environment data
+    """
 
     @classmethod
     def _get(cls, date):
@@ -81,6 +83,8 @@ class TimeScales:
 
 
 class PolePosition:
+    """Get the pole-motion informations from environment data
+    """
 
     @classmethod
     def _get(cls, date):
@@ -100,9 +104,8 @@ class PolePosition:
         Return:
             dict
 
-        X and Y in arcsecond
-        dpsi, deps, dX and dY in milli-arcsecond
-        LOD in millisecond
+        X and Y in arcsecond, dpsi, deps, dX and dY in milli-arcsecond and LOD
+        in millisecond.
         """
 
         if date == int(date):
