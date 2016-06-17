@@ -8,8 +8,6 @@ The relations may be circular, thanks to the use of the Node2 class.
 
 .. code-block:: text
 
-    The dotted relations are not implemented yet.
-
        ,-------.
        |EME2000|
        `-------'
@@ -18,15 +16,15 @@ The relations may be circular, thanks to the use of the Node2 class.
     ,---.   ,----.
     |MOD|   |GCRF|
     `---'   `----'
-      |       :
+      |       |
     ,---.   ,----.
     |TOD|   |CIRF|
     `---'   `----'
-      |       :
+      |       |
     ,---.   ,----.   ,-----.
     |PEF|   |TIRF|   |WGS84|
     `--- \  `----'  /`-----'
-      |   \   :    /
+      |   \   |    /
     ,----. \,----./
     |TEME|  |ITRF|
     `----'  `----'
@@ -39,7 +37,7 @@ from datetime import timedelta
 from space.constants import e_e, r_e
 from space.utils.matrix import rot2, rot3
 from space.utils.node import Node2
-from space.frames import iau1980
+from space.frames import iau1980, iau2010
 
 CIO = ['ITRF', 'TIRF', 'CIRF', 'GCRF']
 IAU1980 = ['TOD', 'MOD']
@@ -131,9 +129,13 @@ class _Frame(metaclass=_MetaFrame):
             try:
                 rotation, offset = getattr(_from(self.date, orbit), "_to_{}".format(_to))()
             except AttributeError:
-                rotation, offset = getattr(_to(self.date, orbit), "_to_{}".format(_from))()
-                rotation = rotation.T
-                offset[:6, -1] = - offset[:6, -1]
+                try:
+                    rotation, offset = getattr(_to(self.date, orbit), "_to_{}".format(_from))()
+                    rotation = rotation.T
+                    offset[:6, -1] = - offset[:6, -1]
+                except AttributeError:
+                    raise NotImplementedError("Unknown transformation {} to {}".format(_from, _to))
+
             if issubclass(_from, TopocentricFrame):
                 orbit = offset @ rotation @ orbit
             else:
@@ -201,15 +203,27 @@ class ITRF(_Frame):
         m = iau1980.pole_motion(self.date)
         return self._convert(m, m), np.identity(7)
 
+    def _to_TIRF(self):
+        m = iau2010.pole_motion(self.date)
+        return self._convert(m, m), np.identity(7)
+
 
 class TIRF(_Frame):
     """Terrestrial Intermediate Reference Frame"""
-    pass
+
+    def _to_CIRF(self):
+        m = iau2010.sideral(self.date)
+        offset = np.identity(7)
+        offset[3:6, -1] = np.cross(iau2010.rate(self.date), self.orbit[:3])
+        return self._convert(m, m), offset
 
 
 class CIRF(_Frame):
     """Celestial Intermediate Reference Frame"""
-    pass
+
+    def _to_GCRF(self):
+        m = iau2010.precesion_nutation(self.date)
+        return self._convert(m, m), np.identity(7)
 
 
 class GCRF(_Frame):
@@ -419,4 +433,4 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
 WGS84 + ITRF + PEF + TOD + MOD + EME2000
 TOD + TEME
 # EME2000 + GCRF
-# ITRF + TIRF + CIRF + GCRF
+ITRF + TIRF + CIRF + GCRF

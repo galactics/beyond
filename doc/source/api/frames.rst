@@ -65,7 +65,14 @@ will ensure correct frames conversions.
 Pole motion models
 ==================
 
+IAU1980
+-------
+
 .. automodule:: space.frames.iau1980
     :members:
-    :undoc-members:
-    :show-inheritance:
+
+IAU2000
+-------
+
+.. automodule:: space.frames.iau2010
+    :members:

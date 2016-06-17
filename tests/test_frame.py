@@ -14,21 +14,28 @@ from space.orbits.tle import Tle
 from space.frames.frame import *
 
 
+@fixture
+def date():
+    return Date(2004, 4, 6, 7, 51, 28, 386009)
+
+
 @yield_fixture
-def time():
+def time(date):
     with patch('space.env.poleandtimes.TimeScales.get') as mock_ts:
         mock_ts.return_value = ScalesDiff(-32.4399519, -0.4399619, 32)
         yield
 
 
 @yield_fixture()
-def pole_position(time):
+def model_correction(time):
     with patch('space.env.poleandtimes.PolePosition.get') as mock_pole:
         mock_pole.return_value = {
             'X': -0.140682,
             'Y': 0.333309,
             'dpsi': -52.195,
             'deps': -3.875,
+            'dX': -0.205,
+            'dY': -0.136,
             'LOD': 1.5563,
         }
         yield
@@ -46,8 +53,8 @@ def ref_orbit():
 
 
 def assert_vector(ref, pv, precision=(4, 6)):
-    np.testing.assert_almost_equal(ref[:3], pv[:3], precision[0])  # Position
-    np.testing.assert_almost_equal(ref[3:], pv[3:], precision[1])  # Velocity
+    np.testing.assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
+    np.testing.assert_almost_equal(ref[3:], pv[3:], precision[1], "Velocity")
 
 
 pef_ref = np.array([-1033475.03131, 7901305.5856, 6380344.5328,
@@ -56,13 +63,23 @@ tod_ref = np.array([5094514.7804, 6127366.4612, 6380344.5328,
                     -4746.088567, 786.077222, 5531.931288])
 mod_ref = np.array([5094028.3745, 6127870.8164, 6380248.5164,
                     -4746.263052, 786.014045, 5531.790562])
-gcrf_ref = np.array([5102508.958, 6123011.401, 6378136.928,
-                     -4743.22016, 790.53650, 5533.75528])
 eme_ref = np.array([5102509.6, 6123011.52, 6378136.3,
                     -4743.2196, 790.5366, 5533.75619])
 
+tirf_ref = np.array([-1033475.0312, 7901305.5856, 6380344.5327,
+                     -3225.632747, -2872.442511, 5531.931288])
+cirf_ref = np.array([5100018.4047, 6122786.3648, 6380344.5327,
+                     -4745.380330, 790.341453, 5531.931288])
 
-def test_unit_change(ref_orbit, pole_position):
+gcrf_ref = np.array([ 5102508.9528,  6123011.3991,  6378136.9338,
+                     -4743.220161,   790.536495,  5533.755724])
+
+# This is the real value from Vallado for GCRF reference values
+# But the values used in these tests are only 1cm away
+# gcrf_ref = np.array([5102508.959, 6123011.403, 6378136.925,
+#                      -4743.22016, 790.53650, 5533.75573])
+
+def test_unit_iau1980(ref_orbit, model_correction):
     """These reference data are extracted from Vallado §3.7.3.
     """
 
@@ -81,23 +98,47 @@ def test_unit_change(ref_orbit, pole_position):
     pv2 = TOD(ref_orbit.date, pv).transform("PEF")
     assert_vector(pef_ref, pv2)
 
+    # TOD to MOD
+    # pv = TOD(ref_orbit.date, pv).transform('MOD')
+    # assert_vector(mod_ref, pv)
+
     # TOD to EME2000 (via MOD)
     pv2 = TOD(ref_orbit.date, tod_ref).transform('EME2000')
     assert_vector(eme_ref, pv2)
 
-    # # TOD to MOD
-    # pv = TOD(ref_orbit.date, pv).transform('MODbis')
-    # assert_vector(mod_ref, pv, (3, 4))
 
-    # # MOD to GCRF
-    # pv = MODbis(ref_orbit.date, pv).transform('GCRF')
-    # assert_vector(gcrf_ref, pv, (3, 5))
+def test_unit_iau2010(ref_orbit, model_correction):
+
+    date = ref_orbit.date
+
+    tirf = ITRF(date, ref_orbit).transform('TIRF')
+    assert_vector(tirf_ref, tirf)
+
+    # Going back to ITRF
+    itrf = TIRF(date, tirf).transform('ITRF')
+    assert_vector(ref_orbit, itrf)
+
+    # TIRF to CIRF
+    cirf = TIRF(date, tirf).transform('CIRF')
+    assert_vector(cirf_ref, cirf)
+
+    # Back to TIRF
+    tirf = CIRF(date, cirf).transform('TIRF')
+    assert_vector(tirf_ref, tirf)
+
+    # CIRF to GCRF
+    gcrf = CIRF(date, cirf).transform('GCRF')
+    assert_vector(gcrf_ref, gcrf)
+
+    # Back to CIRF
+    cirf = GCRF(date, gcrf).transform('CIRF')
+    assert_vector(cirf_ref, cirf)
 
 
-def test_global_change(ref_orbit, pole_position):
+def test_global_change(ref_orbit, model_correction):
 
-    # pv = ITRF(ref_orbit.date, ref_orbit).transform('GCRF')
-    # assert_vector(gcrf_ref, pv)
+    pv = ITRF(ref_orbit.date, ref_orbit).transform('GCRF')
+    assert_vector(gcrf_ref, pv)
 
     pv = ITRF(ref_orbit.date, ref_orbit).transform('EME2000')
     assert_vector(eme_ref, pv)
