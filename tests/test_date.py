@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from pytest import raises
+from unittest.mock import patch
+
 import datetime
 
+from space.env.poleandtimes import TimeScales, ScalesDiff
 from space.utils.date import Date
 
 
@@ -98,23 +101,30 @@ def test_operations():
 
 def test_change_scale():
 
-    t = Date(2015, 12, 6)  # UTC object
-    assert t.scale == "UTC"
+    with patch('space.env.poleandtimes.TimeScales.get') as m:
+        m.return_value = ScalesDiff(-35.8757442, 0.1242558, 36.0)
 
-    t2 = t.change_scale('TT')
-    assert str(t2) == "2015-12-06T00:01:08.184000 TT"
+        t = Date(2015, 12, 6)  # UTC object
+        assert t.scale == "UTC"
 
-    t3 = t.change_scale('GPS')
-    assert str(t3) == "2015-12-06T00:00:17 GPS"
+        t2 = t.change_scale('TT')
+        assert str(t2) == "2015-12-06T00:01:08.184000 TT"
 
-    t4 = t.change_scale('UT1')
-    assert str(t4) == "2015-12-06T00:00:00.124256 UT1"
+        t3 = t.change_scale('GPS')
+        assert str(t3) == "2015-12-06T00:00:17 GPS"
 
-    with raises(ValueError) as e:
-        t5 = t.change_scale('unknown')
+        t4 = t.change_scale('UT1')
+        assert str(t4) == "2015-12-06T00:00:00.124256 UT1"
+
+        with raises(ValueError) as e:
+            t5 = t.change_scale('unknown')
 
 
 def test_julian():
-    t = Date(2015, 12, 18, 22, 25)
-    assert t.jd == 2457375.434027778
-    assert t.change_scale('TT').julian_century == 0.1596286055289367
+
+    with patch('space.env.poleandtimes.TimeScales.get') as m:
+        m.return_value = ScalesDiff(-35.896370420138894, 0.10362957986110499, 36.0)
+
+        t = Date(2015, 12, 18, 22, 25)
+        assert t.jd == 2457375.434027778
+        assert t.change_scale('TT').julian_century == 0.1596286055289367

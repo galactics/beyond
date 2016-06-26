@@ -17,20 +17,23 @@ def moon_vector(date):
         Replace `TT` time scale by `TDB`
 
     Example:
-        >>> from space.utils.date import Date
-        >>> moon_vector(Date(1994, 4, 28))
-        Orbit =
-          date = 1994-04-28T00:00:00 UTC
-          form = Cartesian
-          frame = EME2000
-          propag = MoonPropagator
-          coord =
-            x = -134181157.317
-            y = -311598171.54
-            z = -126699062.437
-            vx = 0.0
-            vy = 0.0
-            vz = 0.0
+
+        .. code-block:: python
+
+            from space.utils.date import Date
+            moon_vector(Date(1994, 4, 28))
+            # Orbit =
+            #   date = 1994-04-28T00:00:00 UTC
+            #   form = Cartesian
+            #   frame = EME2000
+            #   propag = MoonPropagator
+            #   coord =
+            #     x = -134181157.317
+            #     y = -311598171.54
+            #     z = -126699062.437
+            #     vx = 0.0
+            #     vy = 0.0
+            #     vz = 0.0
     """
 
     # This model should use the TDB time scale, but it's not implemented yet

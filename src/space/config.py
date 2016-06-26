@@ -1,64 +1,65 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from warnings import warn
 from pathlib import Path
 from configparser import ConfigParser
 
 
 class Config:
-    """Configuration class
-
-    The class has no real interest in itself. You should use the ``config``
-    instance variable.
-
-    Example:
-
-    .. code-block:: python
-
-        from space.config import config
-        config.load("/home/user/project-X/data")
-
-        print(config['env']['pole_motion_source'])  # 'all'
-    """
 
     _instance = None
-    folder = None
 
-    def __new__(cls, *args, **kwargs):
-
+    def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
 
         return cls._instance
 
-    def __init__(self, folder=None):
-        if folder is not None:
-            self.load(folder)
+    def __init__(self):
+        self._values = {}
 
-    def load(self, folder):
-        """Set a folder as configuration source.
+    def __setitem__(self, name, value):
+        self._values[name] = value
 
-        Args:
-            folder (:py:class:`pathlib.Path` or :py:class:`str`)
-        """
-        folder = Path(folder)
+    def __getitem__(self, name):
+        if name not in self._values:
+            raise ConfigError("Unknown configuration variable '%s'" % name)
 
-        if not folder.exists():
-            raise FileNotFoundError(folder)
+        return self._values[name]
 
-        self.folder = folder
+    @classmethod
+    def load(cls, path):
 
-        confpath = self.folder / "space.conf"
+        path = Path(path)
 
-        self._conf = ConfigParser()
-        self._conf.read(str(confpath))
+        if not path.exists():
+            raise FileNotFoundError(path)
 
-    def __getitem__(self, item):
-        return dict(self._conf[item])
+        confpath = path / "space.conf"
+
+        if not confpath.exists():
+            raise FileNotFoundError(confpath)
+
+        confparser = ConfigParser()
+        confparser.read(str(confpath))
+
+        for section in confparser.sections():
+            config[section] = dict(confparser[section])
+
+        config['folder'] = path
+
+
+class ConfigError(RuntimeError):
+    pass
+
+
+config = Config()
+
 
 try:
     # Load the '~/.space' folder
-    config = Config(Path.home() / ".space")
+    config.load(Path.home() / ".space")
 except FileNotFoundError:
-    # If it doesn't exist, use an empty config instance
-    config = Config()
+    # If it doesn't exist, use an empty config dict
+    pass

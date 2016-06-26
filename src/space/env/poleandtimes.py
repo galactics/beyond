@@ -5,7 +5,7 @@ import math
 
 from collections import namedtuple
 
-from ..config import config
+from ..config import config, ConfigError
 
 __all__ = ['PolePosition', 'TimeScales']
 
@@ -53,8 +53,13 @@ class TimeScales:
         Args:
             date (float)
         """
-        ut1_utc = Finals2000A().data[date]['time']['UT1-UTC']
-        tai_utc = TaiUtc.get(date)
+        try:
+            ut1_utc = Finals2000A().data[date]['time']['UT1-UTC']
+            tai_utc = TaiUtc.get(date)
+        except ConfigError:
+            ut1_utc = 0
+            tai_utc = 0
+
         ut1_tai = ut1_utc - tai_utc
         return ScalesDiff(ut1_tai, ut1_utc, tai_utc)
 
@@ -92,8 +97,19 @@ class PolePosition:
         Args:
             date (int): Date in MJD
         """
-        values = Finals2000A().data[date]['pole'].copy()
-        values.update(Finals().data[date]['pole'])
+        try:
+            values = Finals2000A().data[date]['pole'].copy()
+            values.update(Finals().data[date]['pole'])
+        except ConfigError:
+            values = {
+                'X': 0.,
+                'Y': 0.,
+                'dX': 0.,
+                'dY': 0.,
+                'dpsi': 0.,
+                'deps': 0.,
+                'LOD': 0.,
+            }
         return values
 
     @classmethod
@@ -132,13 +148,14 @@ class TaiUtc():
     This file can be retrieved at http://maia.usno.navy.mil/ser7/tai-utc.dat
     """
 
-    path = config.folder / "env" / "tai-utc.dat"
     _data = []
 
     @classmethod
-    def _initialise(cls):
+    def _load(cls):
         if not cls._data:
 
+            cls.path = config['folder'] / "env" / "tai-utc.dat"
+            
             with cls.path.open() as f:
                 lines = f.read().splitlines()
 
@@ -155,7 +172,7 @@ class TaiUtc():
 
     @classmethod
     def get(cls, date):
-        cls._initialise()
+        cls._load()
         for mjd, value in reversed(cls()._data):
             if mjd <= date:
                 return value
@@ -167,18 +184,21 @@ class Finals2000A():
     This file can be retrived at http://maia.usno.navy.mil/ser7/finals2000A.all
     """
 
-    path = config.folder / "env" / ("finals2000A." + config['env']['pole_motion_source'])
+    filename = 'finals2000A'
     _instance = None
     _deltas = ('dX', 'dY')
 
     def __new__(cls):
         if cls._instance is None:
+            path = config['folder'] / "env" / (cls.filename + "." + config['env']['pole_motion_source'])
+            
             cls._instance = super().__new__(cls)
-            cls._instance.data = {}
+            cls._instance.path = path
 
             with cls._instance.path.open() as f:
                 lines = f.read().splitlines()
 
+            cls._instance.data = {}
             for line in lines:
                 line = line.rstrip()
                 mjd = int(float(line[7:15]))
@@ -230,6 +250,6 @@ class Finals(Finals2000A):
     This file can be retrived at http://maia.usno.navy.mil/ser7/finals.all
     """
 
-    path = config.folder / "env" / ("finals." + config['env']['pole_motion_source'])
+    filename = "finals"
     _instance = None
     _deltas = ('dpsi', 'deps')

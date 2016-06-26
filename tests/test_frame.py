@@ -113,18 +113,39 @@ def test_change_tle():
     # tle = Tle(lines).orbit()
     # tle = tle.propagate(timedelta(days=3))
 
-    tle = Orbit(
-        Date(2000, 6, 30, 18, 50, 19, 733568),
-        [-9060473.7357, 4658709.52502, 813686.731536,
-         -2232.83278274, -4110.45348994, -3157.34543346],
-        "cartesian", "TEME", None
-    )
-    tle.change_frame('EME2000')
+    # from space.env.poleandtimes import TimeScales, PolePosition
+    # t = Date(2000, 6, 30, 18, 50, 19, 733568).mjd
 
-    eme2000_ref = [-9059942.6552, 4659694.9162, 813957.7525,
-                   -2233.346698, -4110.136822, -3157.394202]
+    # print(TimeScales.get(t))
+    # print(PolePosition.get(t))
+    # assert False
+    
+    with patch('space.env.poleandtimes.PolePosition.get') as m:
+        m.return_value = {
+            'X': 0.11019218256776,
+            'Y': 0.28053771387248,
+            'dX': -0.06607524689999991,
+            'dY': -0.05407524689999991,
+            'dpsi': -54.91309785252,
+            'deps': -6.363882395480003,
+            'LOD': 0.06999515274799778,
+        }
 
-    assert_vector(eme2000_ref, tle)
+        with patch('space.env.poleandtimes.TimeScales.get') as m2:
+            m2.return_value = ScalesDiff(-31.795840958507682, 0.20415904149231798, 32.0)
+
+            tle = Orbit(
+                Date(2000, 6, 30, 18, 50, 19, 733568),
+                [-9060473.7357, 4658709.52502, 813686.731536,
+                 -2232.83278274, -4110.45348994, -3157.34543346],
+                "cartesian", "TEME", None
+            )
+            tle.change_frame('EME2000')
+
+            eme2000_ref = [-9059942.6552, 4659694.9162, 813957.7525,
+                           -2233.346698, -4110.136822, -3157.394202]
+
+            assert_vector(eme2000_ref, tle)
 
 
 def test_station():
@@ -135,26 +156,46 @@ def test_station():
     # orb = Tle(lines).orbit()
     # orb = orb.propagate(Date(2016, 2, 7, 16, 55))
 
+    # from space.env.poleandtimes import PolePosition
 
-    orb = Orbit(Date(2016, 2, 7, 16, 55),
-        [4225679.11976, 2789527.13836, 4497182.71156,
-         -5887.93077439, 3748.50929999, 3194.45322378],
-        'cartesian', 'TEME', 'Sgp4'
-    )
-    archive = orb.copy()
+    # print(PolePosition.get(Date(2016, 2, 7, 16, 55).mjd))
+    # assert False
 
-    tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
+    with patch('space.env.poleandtimes.PolePosition.get') as m:
+        m.return_value = {
+            'X': -0.00951054166666622,
+            'Y': 0.31093590624999734,
+            'dpsi': -94.19544791666682,
+            'deps': -10.295645833333051,
+            'dY': -0.10067361111115315,
+            'dX': -0.06829513888889051,
+            'LOD': 1.6242802083331438,
+        }
 
-    orb.change_frame('Toulouse')
-    orb.change_form('spherical')
+        with patch('space.env.poleandtimes.TimeScales.get') as m2:
+            m2.return_value = ScalesDiff(-35.98243981527777, 0.01756018472222477, 36.0)
 
-    assert -np.degrees(orb.theta) == 159.75001561831206  # azimuth
-    assert np.degrees(orb.phi) == 57.894234537351593    # elevation
-    assert orb.r == 471467.6615039421                   # range
 
-    orb.change_frame(archive.frame)
-    orb.change_form(archive.form)
-    assert_vector(archive, orb)
+
+            orb = Orbit(Date(2016, 2, 7, 16, 55),
+                [4225679.11976, 2789527.13836, 4497182.71156,
+                 -5887.93077439, 3748.50929999, 3194.45322378],
+                'cartesian', 'TEME', 'Sgp4'
+            )
+            archive = orb.copy()
+
+            tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
+
+            orb.change_frame('Toulouse')
+            orb.change_form('spherical')
+
+            assert -np.degrees(orb.theta) == 159.75001561831206  # azimuth
+            assert np.degrees(orb.phi) == 57.894234537351593    # elevation
+            assert orb.r == 471467.6615039421                   # range
+
+            orb.change_frame(archive.frame)
+            orb.change_form(archive.form)
+            assert_vector(archive, orb)
 
 
 def test_station_visibility():

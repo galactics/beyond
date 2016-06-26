@@ -190,6 +190,7 @@ class MOD(_Frame):
 
 
 class EME2000(_Frame):
+    """EME2000 inertial frame (also known as J2000)"""
     pass
 
 

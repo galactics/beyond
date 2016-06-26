@@ -15,20 +15,23 @@ def sun_vector(date):
         ~space.orbits.orbit.Orbit: Position of the sun in MOD frame
 
     Example:
-        >>> from space.utils.date import Date
-        >>> sun_vector(Date(2006, 4, 2))
-        Orbit =
-          date = 2006-04-02T00:00:00 UTC
-          form = Cartesian
-          frame = MOD
-          propag = SunPropagator
-          coord =
-            x = 146186235644.0
-            y = 28789144480.5
-            z = 12481136552.3
-            vx = 0.0
-            vy = 0.0
-            vz = 0.0
+
+        .. code-block:: python
+
+            from space.utils.date import Date
+            sun_vector(Date(2006, 4, 2))
+            # Orbit =
+            #   date = 2006-04-02T00:00:00 UTC
+            #   form = Cartesian
+            #   frame = MOD
+            #   propag = SunPropagator
+            #   coord =
+            #     x = 146186235644.0
+            #     y = 28789144480.5
+            #     z = 12481136552.3
+            #     vx = 0.0
+            #     vy = 0.0
+            #     vz = 0.0
     """
 
     t_ut1 = date.change_scale('UT1').julian_century
