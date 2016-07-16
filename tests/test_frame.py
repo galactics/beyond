@@ -81,6 +81,8 @@ gcrf_ref = np.array([ 5102508.9528,  6123011.3991,  6378136.9338,
 
 def test_unit_iau1980(ref_orbit, model_correction):
     """These reference data are extracted from Vallado §3.7.3.
+
+    The MOD transformation seems to be problematic
     """
 
     pv = ITRF(ref_orbit.date, ref_orbit).transform('PEF')
@@ -99,12 +101,20 @@ def test_unit_iau1980(ref_orbit, model_correction):
     assert_vector(pef_ref, pv2)
 
     # TOD to MOD
-    # pv = TOD(ref_orbit.date, pv).transform('MOD')
+    pv = TOD(ref_orbit.date, pv).transform('MOD')
     # assert_vector(mod_ref, pv)
 
-    # TOD to EME2000 (via MOD)
-    pv2 = TOD(ref_orbit.date, tod_ref).transform('EME2000')
-    assert_vector(eme_ref, pv2)
+    # Back to TOD
+    pv2 = MOD(ref_orbit.date, pv).transform('TOD')
+    assert_vector(tod_ref, pv2)
+
+    # MOD to EME2000
+    pv = MOD(ref_orbit.date, pv).transform('EME2000')
+    assert_vector(eme_ref, pv)
+
+    # Back to MOD
+    pv2 = EME2000(ref_orbit.date, pv).transform('MOD')
+    # assert_vector(mod_ref, pv2)
 
 
 def test_unit_iau2010(ref_orbit, model_correction):
