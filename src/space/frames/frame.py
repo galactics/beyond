@@ -354,6 +354,31 @@ class TopocentricFrame(_Frame):
                 raise RuntimeError('Time limit exceeded : {:%H:%M:%S:%f} >= {:%H:%M:%S}'.format(date, stop))
 
 
+def _geodetic_to_cartesian(lat, lon, alt):
+    """Conversion from latitude, longitue and altitude coordinates to
+    cartesian with respect to an ellipsoid
+
+    Args:
+        lat (float): Latitude in radians
+        lon (float): Longitue in radians
+        alt (float): Altitude to sea level in meters
+
+    Return:
+        numpy.array: 3D element (in meters)
+    """
+    C = r_e / np.sqrt(1 - (e_e * np.sin(lat)) ** 2)
+    S = r_e * (1 - e_e ** 2) / np.sqrt(1 - (e_e * np.sin(lat)) ** 2)
+    r_d = (C + alt) * np.cos(lat)
+    r_k = (S + alt) * np.sin(lat)
+
+    norm = np.sqrt(r_d ** 2 + r_k ** 2)
+    return norm * np.array([
+        np.cos(lat) * np.cos(lon),
+        np.cos(lat) * np.sin(lon),
+        np.sin(lat)
+    ])
+
+
 def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
     """Create a ground station instance
 
@@ -375,37 +400,13 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
         TopocentricFrame
     """
 
-    def _geodetic_to_xyz(lat, lon, alt):
-        """Conversion from latitude, longitue and altitude coordinates to
-        cartesian with respect to an ellipsoid
-
-        Args:
-            lat (float): Latitude in radians
-            lon (float): Longitue in radians
-            alt (float): Altitude to sea level in meters
-
-        Return:
-            numpy.array: 3D element (in meters)
-        """
-        C = r_e / np.sqrt(1 - (e_e * np.sin(lat)) ** 2)
-        S = r_e * (1 - e_e ** 2) / np.sqrt(1 - (e_e * np.sin(lat)) ** 2)
-        r_d = (C + alt) * np.cos(lat)
-        r_k = (S + alt) * np.sin(lat)
-
-        norm = np.sqrt(r_d ** 2 + r_k ** 2)
-        return norm * np.array([
-            np.cos(lat) * np.cos(lon),
-            np.cos(lat) * np.sin(lon),
-            np.sin(lat)
-        ])
-
     if type(orientation) is str:
         orient = {'N': np.pi, 'S': 0., 'E': np.pi / 2., 'W': 3 * np.pi / 2.}
         orientation = orient[orientation]
 
     latlonalt = list(latlonalt)
     latlonalt[:2] = np.radians(latlonalt[:2])
-    coordinates = _geodetic_to_xyz(*latlonalt)
+    coordinates = _geodetic_to_cartesian(*latlonalt)
 
     def _convert(self):
         """Conversion from Topocentric Frame to parent frame
