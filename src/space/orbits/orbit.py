@@ -15,6 +15,14 @@ class Orbit(np.ndarray):
     """
 
     def __new__(cls, date, coord, form, frame, propagator, **kwargs):
+        """
+        Args:
+            date (Date): Date associated with the state vector
+            coord (list): 6-length state vector
+            form (str): Name of the form of the state vector
+            frame (str): Name of the frame of reference of the state vector
+            propagator (str): Name of the propagator to be used to extrapolate
+        """
 
         if len(coord) != 6:
             raise ValueError("Should be 6 in length")
