@@ -21,7 +21,7 @@ def _tab(element):
     }
 
     if element.lower() not in elements.keys():
-        raise ValueError('Unknown element \'%s\'' % s)
+        raise ValueError('Unknown element \'%s\'' % element)
 
     filepath = Path(__file__).parent / "data" / elements[element.lower()]
 
@@ -54,12 +54,12 @@ def _pole_motion(date):
     """
 
     ttt = date.change_scale('TT').julian_century
-    a_a = 0.12
-    a_c = 0.26
-
-    p = PolePosition.get(date.mjd)
+    # a_a = 0.12
+    # a_c = 0.26
     # s_prime = -0.0015 * (a_c ** 2 / 1.2 + a_a ** 2) * ttt
     s_prime = - 0.000047 * ttt
+
+    p = PolePosition.get(date.mjd)
     return p['X'] / 3600., p['Y'] / 3600., s_prime / 3600
 
 

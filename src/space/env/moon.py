@@ -40,8 +40,11 @@ def moon_vector(date):
     # and TT is a good approximation
     t_tdb = date.change_scale('TT').julian_century
 
-    cos = lambda x: np.cos(np.radians(x))
-    sin = lambda x: np.sin(np.radians(x))
+    def cos(x):
+        return np.cos(np.radians(x))
+
+    def sin(x):
+        return np.sin(np.radians(x))
 
     lambda_el = 218.32 + 481267.8813 * t_tdb + 6.29 * sin(134.9 + 477198.85 * t_tdb) \
         - 1.27 * sin(259.2 - 413335.38 * t_tdb) + 0.66 * sin(235.7 + 890534.23 * t_tdb) \

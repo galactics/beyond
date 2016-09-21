@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from warnings import warn
 from pathlib import Path
 from configparser import ConfigParser
 

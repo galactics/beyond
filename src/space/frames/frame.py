@@ -327,7 +327,9 @@ class TopocentricFrame(_Frame):
         MAX = 50
         n = 0
 
-        get = lambda x: getattr(x, element)
+        def get(x):
+            return getattr(x, element)
+
         eps = 1e-4 if element == 'phi' else 1e-3
 
         step = (stop - start) / 2

@@ -155,7 +155,7 @@ class TaiUtc():
         if not cls._data:
 
             cls.path = config['folder'] / "env" / "tai-utc.dat"
-            
+
             with cls.path.open() as f:
                 lines = f.read().splitlines()
 
@@ -191,7 +191,7 @@ class Finals2000A():
     def __new__(cls):
         if cls._instance is None:
             path = config['folder'] / "env" / (cls.filename + "." + config['env']['pole_motion_source'])
-            
+
             cls._instance = super().__new__(cls)
             cls._instance.path = path
 
