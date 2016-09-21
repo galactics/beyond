@@ -16,13 +16,13 @@ In order to use them into the Space-API library, you should place them into
 the following file tree::
 
     data/
-     |_ space.ini
+     |_ space.conf
      |_ env/
          |_ finals.all
          |_ finals2000A.all
          |_ tai-tuc.dat
 
-The ``space.ini`` file contains a few fields usefull for default library
+The ``space.conf`` file contains a few fields usefull for default library
 behaviour. A description of the fields is provided :ref:`here <spaceini>`.
 
 .. code-block:: ini
@@ -45,7 +45,7 @@ tree as above.
     /home/
      |_ user/
          |_ .space/
-             |_ space.ini
+             |_ space.conf
              |_ env/
                  |_ finals.all
                  |_ finals2000A.all
@@ -59,8 +59,8 @@ Config
 
 .. _spaceini:
 
-space.ini
----------
+space.conf
+----------
 
 pole_motion_source
     Either ``all`` or ``daily`` depending on the files you use for pole motion
