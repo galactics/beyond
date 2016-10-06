@@ -6,6 +6,7 @@ import numpy as np
 from datetime import timedelta
 
 from .forms import FormTransform
+from .ephem import Ephem
 from space.frames.frame import get_frame
 from space.propagators import *
 
@@ -182,6 +183,9 @@ class Orbit(np.ndarray):
         while cursor < stop:
             yield self.propagate(cursor)
             cursor += step
+
+    def ephem(self, *args):
+        return Ephem(self.ephemeris(*args))
 
     # @property
     # def apoapsis(self):
