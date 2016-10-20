@@ -7,7 +7,7 @@ import numpy as np
 from space.utils.date import Date
 from space.orbits.tle import Tle
 
-ref = """ISS (ZARYA)
+ref = """0 ISS (ZARYA)
 1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927
 2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537"""
 
@@ -53,3 +53,18 @@ def test_convert_to_orbit():
     assert orb['ω'] == np.deg2rad(130.5360)
     assert orb['M'] == np.deg2rad(325.0288)
     assert orb['n'] == 15.72125391 * 2 * np.pi / 86400.
+
+
+def test_to_and_from():
+
+    tle = Tle(ref)
+    orb = tle.orbit()
+
+    tle2 = Tle.from_orbit(orb, name=tle.name, norad_id=tle.norad_id, cospar_id=tle.cospar_id)
+
+    tle, tle2 = tle.text.splitlines(), tle2.text.splitlines()
+    for i in range(2):
+        # We don't test the last two fields of the TLE because when we reconstruct one from scracth
+        # we can't have any information about the element set number. And because of that, the
+        # checksum is also different
+        assert tle[i][:63] == tle2[i][:63]

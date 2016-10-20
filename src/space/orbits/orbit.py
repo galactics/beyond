@@ -146,13 +146,14 @@ class Orbit(np.ndarray):
         if type(new_frame) is str:
             new_frame = get_frame(new_frame)
 
-        try:
-            self.change_form('cartesian')
-            new_coord = self.frame(self.date, self).transform(new_frame.name)
-            self.base.setfield(new_coord, dtype=float)
-            self.frame = new_frame
-        finally:
-            self.change_form(old_form)
+        if new_frame != self.frame:
+            try:
+                self.change_form('cartesian')
+                new_coord = self.frame(self.date, self).transform(new_frame.name)
+                self.base.setfield(new_coord, dtype=float)
+                self.frame = new_frame
+            finally:
+                self.change_form(old_form)
 
     def propagate(self, date):
         """Propagate the orbit to a new date
