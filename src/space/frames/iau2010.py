@@ -4,7 +4,7 @@ from pathlib import Path
 
 from space.utils.matrix import rot1, rot2, rot3
 from space.utils.memoize import memoize
-from space.env.poleandtimes import PolePosition
+from space.env.poleandtimes import get_pole
 
 __all__ = ['sideral', 'precesion_nutation', 'pole_motion', 'rate']
 
@@ -59,7 +59,7 @@ def _pole_motion(date):
     # s_prime = -0.0015 * (a_c ** 2 / 1.2 + a_a ** 2) * ttt
     s_prime = - 0.000047 * ttt
 
-    p = PolePosition.get(date.mjd)
+    p = get_pole(date.mjd)
     return p['X'] / 3600., p['Y'] / 3600., s_prime / 3600
 
 
@@ -87,7 +87,7 @@ def sideral(date):
 def rate(date):
     """Return the rotation rate vector of the earth for a given date
     """
-    lod = PolePosition.get(date.mjd)['LOD'] / 1000.
+    lod = get_pole(date.mjd)['LOD'] / 1000.
     return np.array([0, 0, 7.292115146706979e-5 * (1 - lod / 86400.)])
 
 
@@ -196,7 +196,7 @@ def _xys(date):
 
     X, Y, s_xy2 = _xysxy2(date)
 
-    p = PolePosition.get(date.mjd)
+    p = get_pole(date.mjd)
     # convert milli-arcsecond to arcsecond
     dX, dY = p['dX'] / 1000., p['dY'] / 1000.
 

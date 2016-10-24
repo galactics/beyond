@@ -21,15 +21,15 @@ def date():
 
 @yield_fixture
 def time(date):
-    with patch('space.env.poleandtimes.TimeScales.get') as mock_ts:
+    with patch('space.utils.date.get_timescales') as mock_ts:
         mock_ts.return_value = ScalesDiff(-32.4399519, -0.4399619, 32)
         yield
 
 
 @yield_fixture()
 def model_correction(time):
-    with patch('space.env.poleandtimes.PolePosition.get') as mock_pole:
-        mock_pole.return_value = {
+    with patch('space.frames.iau1980.get_pole') as mock_pole1, patch('space.frames.iau2010.get_pole') as mock_pole2:
+        mock_pole1.return_value = {
             'X': -0.140682,
             'Y': 0.333309,
             'dpsi': -52.195,
@@ -38,6 +38,7 @@ def model_correction(time):
             'dY': -0.136,
             'LOD': 1.5563,
         }
+        mock_pole2.return_value = mock_pole1.return_value
         yield
 
 
@@ -78,6 +79,7 @@ gcrf_ref = np.array([ 5102508.9528,  6123011.3991,  6378136.9338,
 # But the values used in these tests are only 1cm away
 # gcrf_ref = np.array([5102508.959, 6123011.403, 6378136.925,
 #                      -4743.22016, 790.53650, 5533.75573])
+
 
 def test_unit_iau1980(ref_orbit, model_correction):
     """These reference data are extracted from Vallado §3.7.3.
@@ -164,14 +166,14 @@ def test_change_tle():
     # tle = Tle(lines).orbit()
     # tle = tle.propagate(timedelta(days=3))
 
-    # from space.env.poleandtimes import TimeScales, PolePosition
+    # from space.env.poleandtimes import get_pole
     # t = Date(2000, 6, 30, 18, 50, 19, 733568).mjd
 
-    # print(TimeScales.get(t))
-    # print(PolePosition.get(t))
+    # print(get_timescales(t))
+    # print(get_pole(t))
     # assert False
-    
-    with patch('space.env.poleandtimes.PolePosition.get') as m:
+
+    with patch('space.frames.iau1980.get_pole') as m:
         m.return_value = {
             'X': 0.11019218256776,
             'Y': 0.28053771387248,
@@ -182,7 +184,7 @@ def test_change_tle():
             'LOD': 0.06999515274799778,
         }
 
-        with patch('space.env.poleandtimes.TimeScales.get') as m2:
+        with patch('space.utils.date.get_timescales') as m2:
             m2.return_value = ScalesDiff(-31.795840958507682, 0.20415904149231798, 32.0)
 
             tle = Orbit(
@@ -207,12 +209,12 @@ def test_station():
     # orb = Tle(lines).orbit()
     # orb = orb.propagate(Date(2016, 2, 7, 16, 55))
 
-    # from space.env.poleandtimes import PolePosition
+    # from space.env.poleandtimes import get_pole
 
-    # print(PolePosition.get(Date(2016, 2, 7, 16, 55).mjd))
+    # print(get_pole(Date(2016, 2, 7, 16, 55).mjd))
     # assert False
 
-    with patch('space.env.poleandtimes.PolePosition.get') as m:
+    with patch('space.frames.iau1980.get_pole') as m, patch('space.utils.date.get_timescales') as m2:
         m.return_value = {
             'X': -0.00951054166666622,
             'Y': 0.31093590624999734,
@@ -223,30 +225,28 @@ def test_station():
             'LOD': 1.6242802083331438,
         }
 
-        with patch('space.env.poleandtimes.TimeScales.get') as m2:
-            m2.return_value = ScalesDiff(-35.98243981527777, 0.01756018472222477, 36.0)
+        m2.return_value = ScalesDiff(-35.98243981527777, 0.01756018472222477, 36.0)
 
+        orb = Orbit(
+            Date(2016, 2, 7, 16, 55),
+            [4225679.11976, 2789527.13836, 4497182.71156,
+             -5887.93077439, 3748.50929999, 3194.45322378],
+            'cartesian', 'TEME', 'Sgp4'
+        )
+        archive = orb.copy()
 
+        tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
 
-            orb = Orbit(Date(2016, 2, 7, 16, 55),
-                [4225679.11976, 2789527.13836, 4497182.71156,
-                 -5887.93077439, 3748.50929999, 3194.45322378],
-                'cartesian', 'TEME', 'Sgp4'
-            )
-            archive = orb.copy()
+        orb.change_frame('Toulouse')
+        orb.change_form('spherical')
 
-            tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
+        assert -np.degrees(orb.theta) == 159.75001561831206  # azimuth
+        assert np.degrees(orb.phi) == 57.894234537351593    # elevation
+        assert orb.r == 471467.6615039421                   # range
 
-            orb.change_frame('Toulouse')
-            orb.change_form('spherical')
-
-            assert -np.degrees(orb.theta) == 159.75001561831206  # azimuth
-            assert np.degrees(orb.phi) == 57.894234537351593    # elevation
-            assert orb.r == 471467.6615039421                   # range
-
-            orb.change_frame(archive.frame)
-            orb.change_form(archive.form)
-            assert_vector(archive, orb)
+        orb.change_frame(archive.frame)
+        orb.change_form(archive.form)
+        assert_vector(archive, orb)
 
 
 def test_station_visibility():

@@ -4,12 +4,13 @@ from unittest.mock import patch
 import numpy as np
 
 from space.utils.date import Date
-from space.env.poleandtimes import TimeScales, ScalesDiff
+from space.env.poleandtimes import ScalesDiff
 from space.env.moon import moon_vector
 from space.env.sun import sun_vector
 
+
 def test_moon():
-    with patch('space.env.poleandtimes.TimeScales.get') as mock_ts:
+    with patch('space.utils.date.get_timescales') as mock_ts:
         mock_ts.return_value = ScalesDiff(-28.0889898, -0.0889898, 28.0)
         moon = moon_vector(Date(1994, 4, 28))
 
@@ -27,11 +28,11 @@ def test_moon():
 
 def test_sun():
 
-    with patch('space.env.poleandtimes.TimeScales.get') as mock_ts:
+    with patch('space.utils.date.get_timescales') as mock_ts:
         mock_ts.return_value = ScalesDiff(-32.7346297, 0.2653703, 33.0)
 
         sun = sun_vector(Date(2006, 4, 2))
-        
+
         assert sun.date == Date(2006, 4, 2)
         assert str(sun.form) == 'Cartesian'
         assert str(sun.frame) == 'MOD'

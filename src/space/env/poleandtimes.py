@@ -1,19 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Retrieve and interpolate data for pole position and timescales conversions
+"""
+
 import math
 
 from collections import namedtuple
 
 from ..config import config, ConfigError
 
-__all__ = ['PolePosition', 'TimeScales']
+__all__ = ['get_timescales', 'get_pole']
 
 
 ScalesDiff = namedtuple('ScalesDiff', ('ut1_tai', 'ut1_utc', 'tai_utc'))
 
 
-def linear(x, x_list, y_list):
+def linear(x: float, x_list: tuple, y_list: tuple):
     """Linear interpolation
 
     Args:
@@ -35,111 +38,99 @@ def linear(x, x_list, y_list):
     return y0 + (y1 - y0) * (x - x0) / (x1 - x0)
 
 
-def _day_boundaries(d):
+def _day_boundaries(day: float) -> tuple:
     """
     Args:
-        d (Date): Date as a MJD
+        day: Date as a MJD
     """
-    return int(math.floor(d)), int(math.ceil(d))
+    return int(math.floor(day)), int(math.ceil(day))
 
 
-class TimeScales:
+def _get_timescales(date: int):
+    """Retrieve raw timescale data from different file classes
+    """
+    try:
+        ut1_utc = Finals2000A()[date]['time']['UT1-UTC']
+        tai_utc = TaiUtc()[date]
+    except ConfigError:
+        ut1_utc = 0
+        tai_utc = 0
+
+    ut1_tai = ut1_utc - tai_utc
+    return ScalesDiff(ut1_tai, ut1_utc, tai_utc)
+
+
+def get_timescales(date: float):
     """Get the various time-scale differences from environment data
+
+    Args:
+        date (float): Date in MJD
+    Return:
+        tuple: 3-element (UT1-UTC, TAI-UTC, UT1-TAI)
     """
 
-    @classmethod
-    def _get(cls, date):
-        """
-        Args:
-            date (float)
-        """
-        try:
-            ut1_utc = Finals2000A().data[date]['time']['UT1-UTC']
-            tai_utc = TaiUtc.get(date)
-        except ConfigError:
-            ut1_utc = 0
-            tai_utc = 0
+    if date == int(date):
+        return _get_timescales(int(date))
+    else:
+        dates = _day_boundaries(date)
+        start = _get_timescales(dates[0])
+        stop = _get_timescales(dates[1])
 
-        ut1_tai = ut1_utc - tai_utc
-        return ScalesDiff(ut1_tai, ut1_utc, tai_utc)
-
-    @classmethod
-    def get(cls, date):
-        """
-        Args:
-            date (float): Date in MJD
-        Return:
-            tuple: 3-element (UT1-UTC, TAI-UTC, UT1-TAI)
-        """
-
-        if date == int(date):
-            return cls._get(date)
-        else:
-            dates = _day_boundaries(date)
-            start = cls._get(dates[0])
-            stop = cls._get(dates[1])
-
-            result = ScalesDiff(
-                linear(date, dates, (start[0], stop[0])),
-                linear(date, dates, (start[1], stop[1])),
-                start[-1]
-            )
-            return result
+        result = ScalesDiff(
+            linear(date, dates, (start[0], stop[0])),
+            linear(date, dates, (start[1], stop[1])),
+            start[-1]
+        )
+        return result
 
 
-class PolePosition:
+def _get_pole(date: int):
+    """
+    Args:
+        date (int): Date in MJD
+    """
+    try:
+        values = Finals2000A()[date]['pole'].copy()
+        values.update(Finals()[date]['pole'])
+    except ConfigError:
+        values = {
+            'X': 0.,
+            'Y': 0.,
+            'dX': 0.,
+            'dY': 0.,
+            'dpsi': 0.,
+            'deps': 0.,
+            'LOD': 0.,
+        }
+    return values
+
+
+def get_pole(date: float):
     """Get the pole-motion informations from environment data
+
+    Args:
+        date (float): Date in MJD
+    Return:
+        dict
+
+    X and Y in arcsecond, dpsi, deps, dX and dY in milli-arcsecond and LOD
+    in millisecond.
     """
 
-    @classmethod
-    def _get(cls, date):
-        """
-        Args:
-            date (int): Date in MJD
-        """
-        try:
-            values = Finals2000A().data[date]['pole'].copy()
-            values.update(Finals().data[date]['pole'])
-        except ConfigError:
-            values = {
-                'X': 0.,
-                'Y': 0.,
-                'dX': 0.,
-                'dY': 0.,
-                'dpsi': 0.,
-                'deps': 0.,
-                'LOD': 0.,
-            }
-        return values
+    if date == int(date):
+        # no need for interpolation
+        return _get_pole(int(date))
+    else:
+        # linear interpolation
+        dates = _day_boundaries(date)
+        start = _get_pole(dates[0])
+        stop = _get_pole(dates[1])
 
-    @classmethod
-    def get(cls, date):
-        """
-        Args:
-            date (float): Date in MJD
-        Return:
-            dict
+        result = {}
+        for k in start.keys():
+            result[k] = linear(date, dates, (start[k], stop[k]))
 
-        X and Y in arcsecond, dpsi, deps, dX and dY in milli-arcsecond and LOD
-        in millisecond.
-        """
-
-        if date == int(date):
-            # no need for interpolation
-            return cls._get(date)
-        else:
-            # linear interpolation
-
-            dates = _day_boundaries(date)
-
-            start = cls._get(dates[0])
-            stop = cls._get(dates[1])
-
-            result = {}
-            for k in start.keys():
-                result[k] = linear(date, dates, (start[k], stop[k]))
-
-            return result
+        return result
 
 
 class TaiUtc():
@@ -148,15 +139,17 @@ class TaiUtc():
     This file can be retrieved at http://maia.usno.navy.mil/ser7/tai-utc.dat
     """
 
-    _data = []
+    _instance = None
 
-    @classmethod
-    def _load(cls):
-        if not cls._data:
+    def __new__(cls):
+        if cls._instance is None:
 
-            cls.path = config['folder'] / "env" / "tai-utc.dat"
+            cls._instance = super().__new__(cls)
 
-            with cls.path.open() as f:
+            cls._instance.path = config['folder'] / "env" / "tai-utc.dat"
+            cls._instance._data = []
+
+            with cls._instance.path.open() as f:
                 lines = f.read().splitlines()
 
             for line in lines:
@@ -166,14 +159,14 @@ class TaiUtc():
                 line = line.split()
                 mjd = float(line[4]) - 2400000.5
                 value = float(line[6])
-                cls._data.append(
+                cls._instance._data.append(
                     (mjd, value)
                 )
 
-    @classmethod
-    def get(cls, date):
-        cls._load()
-        for mjd, value in reversed(cls()._data):
+        return cls._instance
+
+    def __getitem__(self, date):
+        for mjd, value in reversed(self._data):
             if mjd <= date:
                 return value
 
@@ -242,6 +235,9 @@ class Finals2000A():
                             cls._instance.data[mjd - 1]['pole']['LOD']
 
         return cls._instance
+
+    def __getitem__(self, key):
+        return self.data[key]
 
 
 class Finals(Finals2000A):

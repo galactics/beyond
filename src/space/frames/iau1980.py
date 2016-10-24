@@ -5,7 +5,7 @@ from pathlib import Path
 
 from space.utils.matrix import rot1, rot2, rot3
 from space.utils.memoize import memoize
-from space.env.poleandtimes import PolePosition
+from space.env.poleandtimes import get_pole
 
 
 @memoize
@@ -35,14 +35,14 @@ def _tab(max_i=None):
 def rate(date):
     """Return the rotation rate vector of the earth for a given date
     """
-    lod = PolePosition.get(date.mjd)['LOD'] / 1000.
+    lod = get_pole(date.mjd)['LOD'] / 1000.
     return np.array([0, 0, 7.292115146706979e-5 * (1 - lod / 86400.)])
 
 
 def _pole_motion(date):
     """Pole motion in degrees
     """
-    p = PolePosition.get(date.mjd)
+    p = get_pole(date.mjd)
     return p['X'] / 3600., p['Y'] / 3600.
 
 
@@ -138,7 +138,7 @@ def _nutation(date, eop_correction=True, terms=106):
         delta_eps += (C + D * ttt) * np.cos(np.deg2rad(a_p))
 
     if eop_correction:
-        pole = PolePosition.get(date.mjd)
+        pole = get_pole(date.mjd)
         delta_eps += pole['deps'] / 3600000.
         delta_psi += pole['dpsi'] / 3600000.
 

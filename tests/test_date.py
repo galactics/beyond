@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import datetime
 
-from space.env.poleandtimes import TimeScales, ScalesDiff
+from space.env.poleandtimes import ScalesDiff
 from space.utils.date import Date
 
 
@@ -58,7 +58,7 @@ def test_creation():
 
     with raises(ValueError):
         t = Date(2015, 12, 6, 16, 52, 37, 2156, 'utc')
-    
+
     # Scale
     t = Date(2015, 12, 6, 16, 52, 37, 2156, scale='TAI')
 
@@ -99,9 +99,10 @@ def test_operations():
     with raises(TypeError):
         t2 = t1 - 2.5
 
+
 def test_change_scale():
 
-    with patch('space.env.poleandtimes.TimeScales.get') as m:
+    with patch('space.utils.date.get_timescales') as m:
         m.return_value = ScalesDiff(-35.8757442, 0.1242558, 36.0)
 
         t = Date(2015, 12, 6)  # UTC object
@@ -116,13 +117,13 @@ def test_change_scale():
         t4 = t.change_scale('UT1')
         assert str(t4) == "2015-12-06T00:00:00.124256 UT1"
 
-        with raises(ValueError) as e:
-            t5 = t.change_scale('unknown')
+        with raises(ValueError):
+            t.change_scale('unknown')
 
 
 def test_julian():
 
-    with patch('space.env.poleandtimes.TimeScales.get') as m:
+    with patch('space.utils.date.get_timescales') as m:
         m.return_value = ScalesDiff(-35.896370420138894, 0.10362957986110499, 36.0)
 
         t = Date(2015, 12, 18, 22, 25)

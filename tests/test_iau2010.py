@@ -18,14 +18,14 @@ def date():
 
 @yield_fixture
 def time(date):
-    with patch('space.env.poleandtimes.TimeScales.get') as mock_ts:
+    with patch('space.utils.date.get_timescales') as mock_ts:
         mock_ts.return_value = ScalesDiff(-32.4399519, -0.4399619, 32)
         yield
 
 
 @yield_fixture()
 def model_correction(time):
-    with patch('space.env.poleandtimes.PolePosition.get') as mock_pole:
+    with patch('space.frames.iau2010.get_pole') as mock_pole:
         mock_pole.return_value = {
             'X': -0.140682,
             'Y': 0.333309,
