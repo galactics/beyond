@@ -1,4 +1,7 @@
 
+"""Compute the position of the sun
+"""
+
 import numpy as np
 
 from space.orbits import Orbit

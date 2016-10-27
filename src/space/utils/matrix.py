@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Some matrix basic operations
+"""
+
 import numpy as np
 
 

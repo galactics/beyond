@@ -1,5 +1,5 @@
 
-"""
+"""Module for handling TLE reading and writing
 
 .. code-block:: text
 
@@ -36,13 +36,14 @@
     10  69–69   Checksum (modulo 10)                                7
 """
 
-import numpy as np
 from string import ascii_uppercase
 from datetime import datetime, timedelta
 
-from space.utils.date import Date
-from space.orbits.orbit import Orbit
-from space.propagators.sgp4 import Sgp4
+import numpy as np
+
+from ..utils.date import Date
+from .orbit import Orbit
+from ..propagators.sgp4 import Sgp4
 
 
 def _float(text):
@@ -109,7 +110,7 @@ class Tle:
 
         self.text = text
 
-        if type(text) is str:
+        if isinstance(text, str):
             text = text.splitlines()
 
         self.name = ""
@@ -168,11 +169,14 @@ class Tle:
         Return:
             int: Checksum (modulo 10)
         """
-        tr_table = str.maketrans({c: None for c in (ascii_uppercase + "+ .")})
+        tr_table = str.maketrans({c: None for c in ascii_uppercase + "+ ."})
         no_letters = line[:68].translate(tr_table).replace("-", "1")
         return sum([int(l) for l in no_letters]) % 10
 
     def to_list(self):
+        """Convert the tle to a list representation, with the order as it can be found in the TLE
+        representation.
+        """
         return [self.i, self.Ω, self.e, self.ω, self.M, self.n]
 
     def orbit(self):

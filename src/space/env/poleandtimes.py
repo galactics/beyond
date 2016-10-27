@@ -42,6 +42,10 @@ def _day_boundaries(day: float) -> tuple:
     """
     Args:
         day: Date as a MJD
+
+    Example:
+        >>> _day_boundaries(57687.71847184054)
+        (57687, 57688)
     """
     return int(math.floor(day)), int(math.ceil(day))
 
@@ -60,7 +64,7 @@ def _get_timescales(date: int):
     return ScalesDiff(ut1_tai, ut1_utc, tai_utc)
 
 
-def get_timescales(date: float):
+def get_timescales(date: float) -> tuple:
     """Get the various time-scale differences from environment data
 
     Args:
@@ -147,10 +151,10 @@ class TaiUtc():
             cls._instance = super().__new__(cls)
 
             cls._instance.path = config['folder'] / "env" / "tai-utc.dat"
-            cls._instance._data = []
+            cls._instance.data = []
 
-            with cls._instance.path.open() as f:
-                lines = f.read().splitlines()
+            with cls._instance.path.open() as fhandler:
+                lines = fhandler.read().splitlines()
 
             for line in lines:
                 if not line:
@@ -159,14 +163,14 @@ class TaiUtc():
                 line = line.split()
                 mjd = float(line[4]) - 2400000.5
                 value = float(line[6])
-                cls._instance._data.append(
+                cls._instance.data.append(
                     (mjd, value)
                 )
 
         return cls._instance
 
     def __getitem__(self, date):
-        for mjd, value in reversed(self._data):
+        for mjd, value in reversed(self.data):
             if mjd <= date:
                 return value
 
@@ -183,13 +187,14 @@ class Finals2000A():
 
     def __new__(cls):
         if cls._instance is None:
-            path = config['folder'] / "env" / (cls.filename + "." + config['env']['pole_motion_source'])
+            filename = cls.filename + "." + config['env']['pole_motion_source']
+            path = config['folder'] / "env" / filename
 
             cls._instance = super().__new__(cls)
             cls._instance.path = path
 
-            with cls._instance.path.open() as f:
-                lines = f.read().splitlines()
+            with cls._instance.path.open() as fhandler:
+                lines = fhandler.read().splitlines()
 
             cls._instance.data = {}
             for line in lines:

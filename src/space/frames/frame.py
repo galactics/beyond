@@ -32,6 +32,7 @@ The relations may be circular, thanks to the use of the Node2 class.
 
 import warnings
 import numpy as np
+
 from datetime import timedelta
 
 from space.constants import e_e, r_e
@@ -41,13 +42,14 @@ from space.frames import iau1980, iau2010
 
 CIO = ['ITRF', 'TIRF', 'CIRF', 'GCRF']
 IAU1980 = ['TOD', 'MOD']
-other = ['EME2000', 'TEME', 'WGS84', 'PEF']
-topo = ['create_station']
+OTHER = ['EME2000', 'TEME', 'WGS84', 'PEF']
+TOPO = ['create_station']
 
-__all__ = CIO + IAU1980 + other + topo + ['get_frame']
+__all__ = CIO + IAU1980 + OTHER + TOPO + ['get_frame']
 
 dynamic = {}
-"""For dynamically created Frames, such as ground stations
+"""This dictionnary contains all the frames. Those defined here, and those created on the fly
+by the developper.
 """
 
 
@@ -69,18 +71,18 @@ class _MetaFrame(type, Node2):
     """This MetaClass is here to join the behaviours of ``type`` and ``Node2``
     """
 
-    def __init__(self, name, bases, dct):
-        super(_MetaFrame, self).__init__(name, bases, dct)
-        super(type, self).__init__(name)
+    def __init__(cls, name, bases, dct):
+        super(_MetaFrame, cls).__init__(name, bases, dct)
+        super(type, cls).__init__(name)
 
-        if self.__name__ in dynamic:
-            warnings.warn("A frame with the name '%s' is already registered. Overriding" % self.__name__)
+        if cls.__name__ in dynamic:
+            warnings.warn("A frame with the name '%s' is already registered. Overriding" % cls.__name__)
 
         # Making the frame available to the get_frame function
-        dynamic[self.__name__] = self
+        dynamic[cls.__name__] = cls
 
-    def __repr__(self):  # pragma: no cover
-        return "<Frame '{}'>".format(self.name)
+    def __repr__(cls):  # pragma: no cover
+        return "<Frame '{}'>".format(cls.name)
 
 
 class _Frame(metaclass=_MetaFrame):
@@ -137,6 +139,7 @@ class _Frame(metaclass=_MetaFrame):
                     raise NotImplementedError("Unknown transformation {} to {}".format(_from, _to))
 
             if issubclass(_from, TopocentricFrame):
+                # In case of topocentric frame, the rotation is done before the translation
                 orbit = offset @ rotation @ orbit
             else:
                 orbit = rotation @ offset @ orbit
@@ -252,7 +255,7 @@ class TopocentricFrame(_Frame):
             in the frame of the station and in spherical form.
         """
 
-        if type(stop) is timedelta:
+        if isinstance(stop, timedelta):
             stop = start + stop
 
         date = start
@@ -339,7 +342,7 @@ class TopocentricFrame(_Frame):
             date = start + step
             value = cls._vis(orb, date)
             if -eps < get(value) <= eps:
-                return value
+                break
             elif np.sign(get(value)) == np.sign(get(prev_value)):
                 prev_value = value
                 start = date
@@ -354,6 +357,8 @@ class TopocentricFrame(_Frame):
                 # If you arrive her it's certainly because there was no zero
                 # crossing between the two dates
                 raise RuntimeError('Time limit exceeded : {:%H:%M:%S:%f} >= {:%H:%M:%S}'.format(date, stop))
+
+        return value
 
 
 def _geodetic_to_cartesian(lat, lon, alt):
@@ -402,7 +407,7 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
         TopocentricFrame
     """
 
-    if type(orientation) is str:
+    if isinstance(orientation, str):
         orient = {'N': np.pi, 'S': 0., 'E': np.pi / 2., 'W': 3 * np.pi / 2.}
         orientation = orient[orientation]
 

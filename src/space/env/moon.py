@@ -1,4 +1,7 @@
 
+"""Moon position computing
+"""
+
 import numpy as np
 
 from space.constants import r_e
@@ -40,11 +43,13 @@ def moon_vector(date):
     # and TT is a good approximation
     t_tdb = date.change_scale('TT').julian_century
 
-    def cos(x):
-        return np.cos(np.radians(x))
+    def cos(angle):
+        """cosine in degrees"""
+        return np.cos(np.radians(angle))
 
-    def sin(x):
-        return np.sin(np.radians(x))
+    def sin(angle):
+        """sine in degrees"""
+        return np.sin(np.radians(angle))
 
     lambda_el = 218.32 + 481267.8813 * t_tdb + 6.29 * sin(134.9 + 477198.85 * t_tdb) \
         - 1.27 * sin(259.2 - 413335.38 * t_tdb) + 0.66 * sin(235.7 + 890534.23 * t_tdb) \
@@ -61,14 +66,14 @@ def moon_vector(date):
 
     r_moon = r_e / sin(p)
 
-    pv = r_moon * np.array([
+    state_vector = r_moon * np.array([
         cos(phi_el) * cos(lambda_el),
         cos(e_bar) * cos(phi_el) * sin(lambda_el) - sin(e_bar) * sin(phi_el),
         sin(e_bar) * cos(phi_el) * sin(lambda_el) + cos(e_bar) * sin(phi_el),
         0, 0, 0
     ])
 
-    return Orbit(date, pv, 'cartesian', 'EME2000', MoonPropagator)
+    return Orbit(date, state_vector, 'cartesian', 'EME2000', MoonPropagator)
 
 
 class MoonPropagator:

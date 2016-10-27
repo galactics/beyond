@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+"""Date module
+"""
+
 import datetime as _datetime
 
 from ..env.poleandtimes import get_timescales
@@ -48,17 +51,17 @@ class Date:
 
         if len(args) == 1:
             arg = args[0]
-            if type(arg) is _datetime.datetime:
+            if isinstance(arg, _datetime.datetime):
                 # Python datetime.datetime object
                 d, s = self._convert_dt(arg)
-            elif type(arg) is self.__class__:
-                # Date object
+            elif isinstance(arg, self.__class__):
+                # Date object²
                 d = arg.d
                 s = arg.s
                 scale = arg.scale
-            elif type(arg) in (float, int):
+            elif isinstance(arg, (float, int)):
                 # Julian Day
-                if type(arg) is int:
+                if isinstance(arg, int):
                     d = arg
                     s = 0.
                 else:
@@ -66,7 +69,7 @@ class Date:
                     s = (arg - d) * 86400
             else:
                 raise TypeError("Unknown argument")
-        elif len(args) == 2 and (type(args[0]) == int and type(args[1]) in (int, float)):
+        elif len(args) == 2 and (isinstance(args[0], int) and isinstance(args[1], (int, float))):
             # Julian day and seconds in the day
             d, s = args
         elif len(args) in range(3, 8) and list(map(type, args)) == [int] * len(args):
@@ -77,6 +80,8 @@ class Date:
         else:
             raise ValueError("Unknown arguments")
 
+        # As Date acts like an immutable object, we can't set its attributes normally
+        # like when we do ``self.d = d``
         super().__setattr__('d', d)
         super().__setattr__('s', s)
         super().__setattr__('scale', scale)
@@ -89,7 +94,7 @@ class Date:
         raise TypeError("Can not modify attributes of immutable object")
 
     def __add__(self, other):
-        if type(other) is _datetime.timedelta:
+        if isinstance(other, _datetime.timedelta):
             days, sec = divmod(other.total_seconds() + self.s, 86400)
         else:
             raise TypeError("Unknown operation with {} type".format(type(other)))
@@ -97,11 +102,11 @@ class Date:
         return self.__class__(self.d + int(days), sec, scale=self.scale)
 
     def __sub__(self, other):
-        if type(other) is _datetime.timedelta:
+        if isinstance(other, _datetime.timedelta):
             other = _datetime.timedelta(seconds=-other.total_seconds())
-        elif type(other) is _datetime.datetime:
+        elif isinstance(other, _datetime.datetime):
             return self.datetime - other
-        elif type(other) is self.__class__:
+        elif isinstance(other, self.__class__):
             return self.datetime - other.datetime
         else:
             raise TypeError("Unknown operation with {} type".format(type(other)))
@@ -210,8 +215,7 @@ class Date:
             else:  # pragma: no cover
                 raise ValueError("Unknown convertion {} => {}".format(one, two))
 
-        delta = _datetime.timedelta(seconds=delta)
-        result = self + delta
+        result = self + _datetime.timedelta(seconds=delta)
 
         return Date(result.d, result.s, scale=new_scale)
 

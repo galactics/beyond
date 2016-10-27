@@ -1,6 +1,10 @@
 
-import numpy as np
+"""Implementation of the IAU 2010 nutation-precession model
+"""
+
 from pathlib import Path
+
+import numpy as np
 
 from space.utils.matrix import rot1, rot2, rot3
 from space.utils.memoize import memoize
@@ -26,9 +30,9 @@ def _tab(element):
     filepath = Path(__file__).parent / "data" / elements[element.lower()]
 
     total = []
-    with filepath.open() as f:
+    with filepath.open() as fhd:
 
-        for line in f.read().splitlines():
+        for line in fhd.read().splitlines():
 
             line = line.strip()
 
@@ -132,8 +136,7 @@ def _planets(date):
 
 
 def _xysxy2(date):
-    """
-    Here we deviate from what has been done everywhere else. Instead of taking the formulas
+    """Here we deviate from what has been done everywhere else. Instead of taking the formulas
     available in the Vallado, we take those described in the files tab5.2{a,b,d}.txt.
 
     The result should be equivalent, but they are the last iteration of the IAU2000A
@@ -222,14 +225,3 @@ def precesion_nutation(date):
         [-a * X * Y, 1 - a * Y ** 2, Y],
         [-X, -Y, 1 - a * (X**2 + Y**2)]
     ]) @ rot3(s)
-
-
-if __name__ == '__main__':
-
-    from space.utils import Date
-    from pprint import pprint
-
-    date = Date(2004, 4, 6, 7, 51, 28, 386009)
-    # a = _planets(date)
-    a = _xys(date)
-    pprint(a)

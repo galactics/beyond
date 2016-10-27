@@ -6,6 +6,31 @@ hierarchy or in a graph.
 """
 
 
+def _merge(x, y):
+    """Remove commons ancestors and concatenate two passes
+
+    Args:
+        x (list)
+        y (list)
+    Returns:
+        list
+    """
+
+    shortest, longuest = sorted((x, y), key=len)
+    for _ in range(-len(shortest), 0):
+        if shortest[-1] == longuest[-1]:
+            try:
+                if longuest[-2] == shortest[-2]:
+                    longuest.pop(-1)
+                    shortest.pop(-1)
+                else:
+                    longuest.pop(-1)
+            except IndexError:
+                shortest.pop()
+
+    return x + list(reversed(y))
+
+
 class Node:
     """Class representing a child in a tree
     """
@@ -15,7 +40,7 @@ class Node:
 
     def __init__(self, name, subtree=None):
 
-        if type(subtree) not in (list, type(None)):
+        if not isinstance(subtree, (list, type(None))):
             raise TypeError("subtree should be list or None, %s given" % type(subtree))
 
         self.name = name
@@ -57,37 +82,15 @@ class Node:
             elif node.subtree:
                 try:
                     res = self._walk(goal, node.subtree)
-                except:
+                except ValueError:
                     # print("Not in %s" % node.name)
                     continue
                 else:
-                    return res + [node]
+                    break
         else:
             raise ValueError("'{}' unfindable".format(goal))
 
-    def _merge(self, x, y):
-        """Remove commons ancestors and concatenate two passes
-
-        Args:
-            x (list)
-            y (list)
-        Returns:
-            list
-        """
-
-        shortest, longuest = sorted((x, y), key=len)
-        for i in range(-len(shortest), 0):
-            if shortest[-1] == longuest[-1]:
-                try:
-                    if longuest[-2] == shortest[-2]:
-                        longuest.pop(-1)
-                        shortest.pop(-1)
-                    else:
-                        longuest.pop(-1)
-                except IndexError:
-                    shortest.pop()
-
-        return x + list(reversed(y))
+        return res + [node]
 
     def walk(self, goal):
         """Get the shortest path between ``self`` and ``goal``
@@ -115,13 +118,13 @@ class Node:
             list: List of nodes names
         """
 
-        start = start.name if type(start) is self.__class__ else start
-        stop = stop.name if type(stop) is self.__class__ else stop
+        start = start.name if isinstance(start, self.__class__) else start
+        stop = stop.name if isinstance(stop, self.__class__) else stop
 
         x = self.walk(start)
         y = self.walk(stop)
 
-        final = self._merge(x, y)
+        final = _merge(x, y)
 
         return final
 

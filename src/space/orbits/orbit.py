@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
+"""Orbit description
+"""
 
 from datetime import timedelta
 
+import numpy as np
+
 from .forms import FormTransform
 from .ephem import Ephem
-from space.frames.frame import get_frame
-from space.propagators import *
+from ..frames.frame import get_frame
+from ..propagators import *
 
 
 class Orbit(np.ndarray):
@@ -28,15 +31,15 @@ class Orbit(np.ndarray):
         if len(coord) != 6:
             raise ValueError("Should be 6 in length")
 
-        if type(form) is str:
+        if isinstance(form, str):
             form = FormTransform._tree[form]
         elif form.name not in FormTransform._tree:
             raise ValueError("Unknown form '{}'".format(form))
 
-        if type(frame) is str:
+        if isinstance(frame, str):
             frame = get_frame(frame)
 
-        if type(propagator) is str:
+        if isinstance(propagator, str):
             propagator = eval(propagator)
 
         obj = np.ndarray.__new__(cls, (6,), buffer=np.array(coord), dtype=float)
@@ -88,13 +91,13 @@ class Orbit(np.ndarray):
 
     def __getitem__(self, key):
 
-        if type(key) in (int, slice):
+        if isinstance(key, (int, slice)):
             return super().__getitem__(key)
         else:
             try:
                 return self.__getattr__(key)
-            except AttributeError as e:
-                raise KeyError(str(e))
+            except AttributeError as err:
+                raise KeyError(str(err))
 
     def __repr__(self):  # pragma: no cover
         coord_str = '\n'.join(
@@ -128,11 +131,11 @@ class Orbit(np.ndarray):
         Args:
             new_form (str or Form)
         """
-        if type(new_form) is str:
+        if isinstance(new_form, str):
             new_form = FormTransform._tree[new_form]
 
-        ft = FormTransform(self)
-        self.base.setfield(ft.transform(new_form), dtype=float)
+        fmt = FormTransform(self)
+        self.base.setfield(fmt.transform(new_form), dtype=float)
         self.form = new_form
 
     def change_frame(self, new_frame):
@@ -143,7 +146,7 @@ class Orbit(np.ndarray):
         """
         old_form = self.form
 
-        if type(new_frame) is str:
+        if isinstance(new_frame, str):
             new_frame = get_frame(new_frame)
 
         if new_frame != self.frame:
@@ -186,6 +189,14 @@ class Orbit(np.ndarray):
             cursor += step
 
     def ephem(self, *args):
+        """
+        Args:
+            start (Date)
+            stop (Date or timedelta)
+            step (timedelta)
+        Return:
+            Ephem:
+        """
         return Ephem(self.ephemeris(*args))
 
     # @property

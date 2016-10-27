@@ -1,4 +1,7 @@
 
+"""Definition of ephemeris
+"""
+
 import numpy as np
 
 
@@ -8,7 +11,6 @@ class Ephem:
     It provides several useful interfaces in order to compute throught them
 
     Example:
-
         ephem = orb.ephem(Date.now(), timedeltat(hours=6), timedelta(minutes=2))
         ephem.change_frame('ITRF')
         ephem.change_form('spherical')
@@ -30,9 +32,9 @@ class Ephem:
         return self._orbits[self._i]
 
     def __getitem__(self, index):
-        if type(index) in (slice, int):
+        if isinstance(index, (slice, int)):
             return self._orbits[index]
-        elif type(index) is tuple and len(index) == 2:
+        elif isinstance(index, tuple) and len(index) == 2:
             return np.array(self._orbits)[index]
         else:
             raise IndexError(index)
@@ -64,7 +66,7 @@ class Ephem:
         for orb in self:
             orb.change_form(form)
 
-    def spline(self, date):
+    def interpolate(self, date):
         """Interpolate data at a given date
 
         Args:

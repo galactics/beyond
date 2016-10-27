@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
-from numpy import cos, sqrt, sin, arctan2
+"""This module provides the SGP4 extrapolator and all its required constants and configurations
+"""
+
 from datetime import timedelta
+from numpy import cos, sqrt, sin, arctan2
+
+import numpy as np
 
 from space.utils.date import Date
 from space.orbits.forms import FormTransform
@@ -45,6 +49,8 @@ class WGS84:
 
 
 class Init:
+    """This class is used as a cache mechanism
+    """
     pass
 
 
@@ -62,10 +68,6 @@ class Sgp4:
 
         self.gravity = gravity
         self.tle = orbit
-        self._sgp4_init()
-
-    def _sgp4_init(self):
-
         self._init = Init()
 
         i0, Ω0, e0, ω0, M0, n0 = self.tle
@@ -100,7 +102,7 @@ class Sgp4:
         if rp_alt < 156:
             self._init.s = rp_alt - 78
             if rp_alt < 98:
-                self._init.s = 20
+                self._init.s = 20.
 
             self._init.s = self._init.s / r_e + 1
 
@@ -234,4 +236,6 @@ class Sgp4:
         vR = rk * vU * r_e
         vRdot = (rdotk * vU + rfdotk * vV) * (r_e * k_e / 60.)
 
-        return self.tle.__class__(date, np.concatenate((vR, vRdot)) * 1000, 'cartesian', 'TEME', self.__class__)
+        vector = np.concatenate((vR, vRdot)) * 1000  # conversion to meters
+
+        return self.tle.__class__(date, vector, 'cartesian', 'TEME', self.__class__)

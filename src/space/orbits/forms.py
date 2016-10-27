@@ -1,14 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
+"""This module declares the different meanings that the Orbit 6 components can take
+and their conversions
+"""
+
 from numpy import cos, arccos, sin, arcsin, arctan2, sqrt, arccosh, sinh
+
+import numpy as np
 
 from space.utils.node import Node
 from space.constants import µ_e
 
 
 class Form(Node):
+    """Base class for form classes
+    """
 
     _case = False
 
@@ -21,6 +28,8 @@ class Form(Node):
 
 
 class FormTransform:
+    """Class handling the conversions between the differents forms availables
+    """
 
     TLE = Form("TLE", ["i", "Ω", "e", "ω", "M", "n"])
     KEPL_M = Form("Keplerian_M", ["a", "e", "i", "Ω", "ω", "M"], [TLE])
@@ -117,7 +126,7 @@ class FormTransform:
 
     @classmethod
     def _m_to_e(cls, e, M):
-        """Conversion from Mean Anomaly to Excetric anomaly
+        """Conversion from Mean Anomaly to Excentric anomaly
         """
 
         k1 = 3 * np.pi + 2

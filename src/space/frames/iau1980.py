@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import numpy as np
+"""Implementation of the IAU 1980 precession-nutation model
+"""
+
 from pathlib import Path
 
-from space.utils.matrix import rot1, rot2, rot3
-from space.utils.memoize import memoize
-from space.env.poleandtimes import get_pole
+import numpy as np
+
+from ..utils.matrix import rot1, rot2, rot3
+from ..utils.memoize import memoize
+from ..env.poleandtimes import get_pole
 
 
 @memoize
@@ -16,9 +20,9 @@ def _tab(max_i=None):
     filepath = Path(__file__).parent / "data" / "tab5.1.txt"
 
     result = []
-    with filepath.open() as f:
+    with filepath.open() as fhd:
         i = 0
-        for line in f.read().splitlines():
+        for line in fhd.read().splitlines():
             if line.startswith("#") or not line.strip():
                 continue
 

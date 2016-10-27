@@ -1,5 +1,9 @@
-import numpy as np
+"""For local orbital frame definitions
+"""
+
 from numpy.linalg import norm as norm
+
+import numpy as np
 
 
 def _split_state_vector(state_vector):
