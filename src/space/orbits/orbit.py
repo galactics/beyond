@@ -11,7 +11,7 @@ import numpy as np
 from .forms import FormTransform
 from .ephem import Ephem
 from ..frames.frame import get_frame
-from ..propagators import *
+from ..propagators import get_propagator
 
 
 class Orbit(np.ndarray):
@@ -40,7 +40,7 @@ class Orbit(np.ndarray):
             frame = get_frame(frame)
 
         if isinstance(propagator, str):
-            propagator = eval(propagator)
+            propagator = get_propagator(propagator)
 
         obj = np.ndarray.__new__(cls, (6,), buffer=np.array(coord), dtype=float)
         obj.date = date
