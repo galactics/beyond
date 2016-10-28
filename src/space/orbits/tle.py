@@ -41,8 +41,8 @@ from datetime import datetime, timedelta
 
 import numpy as np
 
-from ..utils.date import Date
 from .orbit import Orbit
+from ..utils.date import Date
 from ..propagators.sgp4 import Sgp4
 
 

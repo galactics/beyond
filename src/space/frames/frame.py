@@ -35,10 +35,10 @@ import numpy as np
 
 from datetime import timedelta
 
-from space.constants import e_e, r_e
-from space.utils.matrix import rot2, rot3
-from space.utils.node import Node2
-from space.frames import iau1980, iau2010
+from ..constants import e_e, r_e
+from ..utils.matrix import rot2, rot3
+from ..utils.node import Node2
+from . import iau1980, iau2010
 
 CIO = ['ITRF', 'TIRF', 'CIRF', 'GCRF']
 IAU1980 = ['TOD', 'MOD']

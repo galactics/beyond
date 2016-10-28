@@ -4,8 +4,8 @@
 
 import numpy as np
 
-from space.orbits import Orbit
-from space.utils.units import AU
+from ..orbits import Orbit
+from ..utils.units import AU
 
 
 def sun_vector(date):

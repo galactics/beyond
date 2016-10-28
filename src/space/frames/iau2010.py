@@ -6,9 +6,9 @@ from pathlib import Path
 
 import numpy as np
 
-from space.utils.matrix import rot1, rot2, rot3
-from space.utils.memoize import memoize
-from space.env.poleandtimes import get_pole
+from ..utils.matrix import rot1, rot2, rot3
+from ..utils.memoize import memoize
+from ..env.poleandtimes import get_pole
 
 __all__ = ['sideral', 'precesion_nutation', 'pole_motion', 'rate']
 

@@ -9,8 +9,8 @@ from numpy import cos, sqrt, sin, arctan2
 
 import numpy as np
 
-from space.utils.date import Date
-from space.orbits.forms import FormTransform
+from ..utils.date import Date
+from ..orbits.forms import FormTransform
 
 __all__ = ['Sgp4']
 

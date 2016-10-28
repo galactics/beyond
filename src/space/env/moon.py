@@ -4,8 +4,8 @@
 
 import numpy as np
 
-from space.constants import r_e
-from space.orbits import Orbit
+from ..constants import r_e
+from ..orbits import Orbit
 
 
 def moon_vector(date):

@@ -9,8 +9,8 @@ from numpy import cos, arccos, sin, arcsin, arctan2, sqrt, arccosh, sinh
 
 import numpy as np
 
-from space.utils.node import Node
-from space.constants import µ_e
+from ..utils.node import Node
+from ..constants import µ_e
 
 
 class Form(Node):
