@@ -19,6 +19,13 @@ K = Node2('K')
 L = Node2('L')
 M = Node2('M')
 
+A + B + C + D + A
+D + E + F
+E + A
+C + G + H + I + B
+D + J + K + H
+E + L + M
+
 #  F---E---L---M
 #     / \
 #    D---A
@@ -32,20 +39,13 @@ M = Node2('M')
 
 def test_path():
 
-    A + B + C + D + A
-    D + E + F
-    E + A
-    C + G + H + I + B
-    D + J + K + H
-    E + L + M
-
     assert A.path('A') == [A]
     assert A.path('B') == [A, B]
-    assert A.path('C') == [A, B, C]
+    assert A.path('C') == [A, D, C]
     assert A.path('D') == [A, D]
     assert A.path('E') == [A, E]
     assert A.path('F') == [A, E, F]
-    assert A.path('G') == [A, B, C, G]
+    assert A.path('G') == [A, D, C, G]
     assert A.path('H') == [A, B, I, H]
     assert A.path('I') == [A, B, I]
     assert A.path('J') == [A, D, J]
@@ -59,11 +59,11 @@ def test_path():
 
 def test_steps():
     assert list(A.steps('B')) == [(A, B)]
-    assert list(A.steps('C')) == [(A, B), (B, C)]
+    assert list(A.steps('C')) == [(A, D), (D, C)]
     assert list(A.steps('D')) == [(A, D)]
     assert list(A.steps('E')) == [(A, E)]
     assert list(A.steps('F')) == [(A, E), (E, F)]
-    assert list(A.steps('G')) == [(A, B), (B, C), (C, G)]
+    assert list(A.steps('G')) == [(A, D), (D, C), (C, G)]
     assert list(A.steps('H')) == [(A, B), (B, I), (I, H)]
     assert list(A.steps('I')) == [(A, B), (B, I)]
     assert list(A.steps('J')) == [(A, D), (D, J)]
