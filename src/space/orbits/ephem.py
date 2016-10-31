@@ -76,7 +76,7 @@ class Ephem:
         """
 
         if not self.start <= date <= self.stop:
-            raise ValueError("Date not in range")
+            raise ValueError("Date '%s' not in range" % date)
 
         for i, orb in enumerate(reversed(self)):
             if orb.date < date:
