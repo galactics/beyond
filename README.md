@@ -1,6 +1,8 @@
 Space API
 =========
 
+![Tests](https://travis-ci.org/galactics/space-api.svg?branch=master)
+
 This library was started to better understand how Flight Dynamics works. It
 has no intent of efficiency nor performance at the moment, and the goal is
 mainly to develop a simple API for space observations.
