@@ -119,8 +119,30 @@ def test_change_scale():
         t4 = t.change_scale('UT1')
         assert str(t4) == "2015-12-06T00:00:00.124256 UT1"
 
+        t5 = t.change_scale('TDB')
+        assert str(t5) == "2015-12-06T00:01:08.183225 TDB"
+
+        assert str(t5.change_scale('UTC')) == "2015-12-06T00:00:00 UTC"
+
         with raises(ValueError):
             t.change_scale('unknown')
+
+
+def test_barycenter():
+    with patch('beyond.utils.date.get_timescales') as m:
+        m.return_value = ScalesDiff(-0.463326, 32.0)
+
+        t = Date(2004, 5, 14, 16, 43)  # UTC
+
+        t2 = t.change_scale('TT')
+        assert str(t2) == "2004-05-14T16:44:04.184000 TT"
+
+        t3 = t2.change_scale('TDB')
+        assert str(t3) == "2004-05-14T16:44:04.185254 TDB"
+
+        # This value is the one in the example of Vallado, but it implies
+        # implementing the complete analytical formula (100+ terms)
+        # assert str(t3) == "2004-05-14T16:44:04.185640 TDB"
 
 
 def test_julian():

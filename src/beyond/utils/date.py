@@ -4,6 +4,7 @@
 """
 
 from datetime import datetime, timedelta
+from numpy import sin, radians
 
 from ..env.poleandtimes import get_timescales
 from .node import Node
@@ -42,6 +43,13 @@ class _Scale(Node):
     def _scale_tai_minus_gps(self, mjd):
         return 19.
 
+    def _scale_tdb_minus_tt(self, mjd):
+        jd = mjd + Date.JD_MJD
+        jj = Date._julian_century(jd)
+        m = radians(357.5277233 + 35999.05034 * jj)
+        delta_lambda = radians(246.11 + 0.90251792 * (jd - 2451545.))
+        return 0.001657 * sin(m) + 0.000022 * sin(delta_lambda)
+
     def offset(self, mjd, new_scale):
         """Compute the offset necessary in order to convert from one time-scale to another
 
@@ -72,9 +80,10 @@ class _Scale(Node):
 
 UT1 = _Scale('UT1')
 GPS = _Scale('GPS')
+TDB = _Scale('TDB')
 UTC = _Scale('UTC', [UT1])
 TAI = _Scale('TAI', [UTC, GPS])
-TT = _Scale('TT', [TAI])
+TT = _Scale('TT', [TAI, TDB])
 _Scale.HEAD = TT
 
 
@@ -296,10 +305,20 @@ class Date:
         return cls(datetime.utcnow()).change_scale(scale)
 
     def change_scale(self, new_scale):
+        """
+        Args:
+            new_scale (str)
+        Return:
+            Date
+        """
         offset = self.scale.offset(self.mjd, new_scale)
         result = self.datetime + timedelta(seconds=offset)
 
         return Date(result, scale=new_scale)
+
+    @classmethod
+    def _julian_century(cls, jd):
+        return (jd - 2451545.0) / 36525.
 
     @property
     def julian_century(self):
@@ -309,7 +328,7 @@ class Date:
         Return:
             float
         """
-        return (self.jd - 2451545.0) / 36525.
+        return self._julian_century(self.jd)
 
     @property
     def jd(self):
