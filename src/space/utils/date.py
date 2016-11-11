@@ -28,6 +28,7 @@ class Date:
     __slots__ = ["d", "s", "scale", "_cache"]
 
     MJD_T0 = _datetime.datetime(1858, 11, 17)
+    JD_MJD = 2400000.5
 
     UT1 = _Scale('UT1')
     GPS = _Scale('GPS')
@@ -237,7 +238,7 @@ class Date:
         Return:
             float
         """
-        return self.d + 2400000.5 + self.s / 86400.
+        return self.d + self.JD_MJD + self.s / 86400.
 
     @property
     def mjd(self):
