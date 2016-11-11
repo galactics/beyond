@@ -1,7 +1,7 @@
 Orbits
 ======
 
-orbit
+Orbit
 -----
 
 .. automodule:: space.orbits.orbit
@@ -9,6 +9,13 @@ orbit
     :undoc-members:
     :show-inheritance:
     :exclude-members: copy
+
+Ephem
+-----
+
+.. automodule:: space.orbits.ephem
+    :members:
+
 
 .. _tle:
 

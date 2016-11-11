@@ -184,7 +184,7 @@ class Orbit(np.ndarray):
             stop = start + stop
 
         cursor = start
-        while cursor < stop:
+        while cursor <= stop:
             yield self.propagate(cursor)
             cursor += step
 
