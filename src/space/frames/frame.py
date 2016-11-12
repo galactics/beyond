@@ -438,6 +438,37 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
     return cls
 
 
+def orbit2frame(name, orbit):
+    """Create a frame based on a Orbit or Ephem object.
+
+    The new frame will keep the orientation of the reference frame of the Orbit and move along
+    with the orbit
+    """
+
+    def _convert(self):
+        """Conversion from orbit frame to parent frame
+        """
+        rotation = np.identity(7)
+        offset = np.identity(7)
+        offset[0:6, -1] = orbit.propagate(self.date).base
+        return rotation, offset
+
+    # define the name of the method of conversion
+    mtd = '_to_%s' % orbit.frame.__name__
+
+    # dictionnary which defines attributes of the created class
+    dct = {
+        mtd: _convert
+    }
+
+    # Creation of the class
+    cls = _MetaFrame(name, (_Frame,), dct)
+
+    # Link to the parent
+    cls + orbit.frame
+    return cls
+
+
 WGS84 + ITRF + PEF + TOD + MOD + EME2000
 TOD + TEME
 # EME2000 + GCRF

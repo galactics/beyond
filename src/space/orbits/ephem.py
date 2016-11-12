@@ -5,6 +5,8 @@
 import numpy as np
 from datetime import timedelta
 
+from ..frames.frame import orbit2frame
+
 
 class Ephem:
     """This class represents a range of orbits
@@ -166,3 +168,11 @@ class Ephem:
         """
 
         return self.__class__(self.ephemeris(**kwargs))
+
+    def register_as_frame(self, name):  # pragma: no cover
+        """Register the Ephem object as a frame
+
+        The new frame will keep the orientation of the reference frame of the Ephem and move along
+        with the orbit
+        """
+        orbit2frame(name, self)

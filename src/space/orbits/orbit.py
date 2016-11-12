@@ -10,7 +10,7 @@ import numpy as np
 
 from .forms import FormTransform
 from .ephem import Ephem
-from ..frames.frame import get_frame
+from ..frames.frame import get_frame, orbit2frame
 from ..propagators import get_propagator
 
 
@@ -198,6 +198,14 @@ class Orbit(np.ndarray):
             Ephem:
         """
         return Ephem(self.ephemeris(*args))
+
+    def register_as_frame(self, name):
+        """Register the orbit as frame.
+
+        The new frame will keep the orientation of the reference frame of the orbit
+        and move along with the orbit
+        """
+        orbit2frame(name, self)
 
     # @property
     # def apoapsis(self):
