@@ -106,7 +106,7 @@ def test_change_scale():
         m.return_value = ScalesDiff(0.1242558, 36.0)
 
         t = Date(2015, 12, 6)  # UTC object
-        assert t.scale == "UTC"
+        assert str(t.scale) == "UTC"
 
         t2 = t.change_scale('TT')
         assert str(t2) == "2015-12-06T00:01:08.184000 TT"

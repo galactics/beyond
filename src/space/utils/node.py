@@ -90,7 +90,7 @@ class Node:
                 else:
                     break
         else:
-            raise ValueError("'{}' unfindable".format(goal))
+            raise ValueError("'{}' not found".format(goal))
 
         return res + [node]
 

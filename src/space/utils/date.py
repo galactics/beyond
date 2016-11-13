@@ -12,7 +12,70 @@ __all__ = ['Date']
 
 
 class _Scale(Node):
-    pass
+
+    HEAD = None
+    """Define the top Node of the tree. This one will be used as reference to search for the path
+    linking two Nodes together
+    """
+
+    def __repr__(self):
+        return "<Scale '%s'>" % self.name
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get(cls, name):
+        return cls.HEAD[name]
+
+    def _scale_ut1_minus_utc(self, date):
+        ut1_utc, tai_utc = get_timescales(date.mjd)
+        return ut1_utc
+
+    def _scale_tai_minus_utc(self, date):
+        ut1_utc, tai_utc = get_timescales(date.mjd)
+        return tai_utc
+
+    def _scale_tt_minus_tai(self, date):
+        return 32.184
+
+    def _scale_tai_minus_gps(self, date):
+        return 19.
+
+    def offset(self, date, new_scale):
+        """Compute the offset necessary in order to convert from one time scale to another
+
+        Args:
+            date (Date):
+            new_scale (str): Name of the desired scale
+        Return:
+            datetime.timedelta: offset to apply
+        """
+
+        delta = 0
+        for one, two in self.HEAD.steps(self.name, new_scale):
+            one = one.name.lower()
+            two = two.name.lower()
+            # find the operation
+            oper = "_scale_{}_minus_{}".format(two, one)
+            # find the reverse operation
+            roper = "_scale_{}_minus_{}".format(one, two)
+            if hasattr(self, oper):
+                delta += getattr(self, oper)(date)
+            elif hasattr(self, roper):
+                delta -= getattr(self, roper)(date)
+            else:  # pragma: no cover
+                raise ValueError("Unknown convertion {} => {}".format(one, two))
+
+        return _datetime.timedelta(seconds=delta)
+
+
+UT1 = _Scale('UT1')
+GPS = _Scale('GPS')
+UTC = _Scale('UTC', [UT1])
+TAI = _Scale('TAI', [UTC, GPS])
+TT = _Scale('TT', [TAI])
+_Scale.HEAD = TT
 
 
 class Date:
@@ -30,25 +93,12 @@ class Date:
     MJD_T0 = _datetime.datetime(1858, 11, 17)
     JD_MJD = 2400000.5
 
-    UT1 = _Scale('UT1')
-    GPS = _Scale('GPS')
-    UTC = _Scale('UTC', [UT1])
-    TAI = _Scale('TAI', [UTC, GPS])
-    TT = _Scale('TT', [TAI])
-
-    # Used to find the relations between scales, also contains
-    # the list of all scales
-    SCALES = TT
-
     def __init__(self, *args, **kwargs):
 
-        if 'scale' in kwargs:
-            if kwargs['scale'].upper() in self.SCALES:
-                scale = kwargs['scale'].upper()
-            else:
-                raise ValueError("Scale {} unknown".format(kwargs['scale']))
-        else:
-            scale = 'UTC'
+        scale = kwargs.get('scale', 'UTC')
+
+        if type(scale) is str:
+            scale = _Scale.get(scale.upper())
 
         if len(args) == 1:
             arg = args[0]
@@ -177,46 +227,8 @@ class Date:
         """
         return cls(_datetime.datetime.utcnow()).change_scale(scale)
 
-    def _scale_ut1_minus_utc(self):
-        ut1_utc, tai_utc = get_timescales(self.mjd)
-        return ut1_utc
-
-    def _scale_tai_minus_utc(self):
-        ut1_utc, tai_utc = get_timescales(self.mjd)
-        return tai_utc
-
-    def _scale_tt_minus_tai(self):
-        return 32.184
-
-    def _scale_tai_minus_gps(self):
-        return 19.
-
     def change_scale(self, new_scale):
-        """Create an object representing the same time as ``self`` but in a
-        different scale
-
-        Args:
-            new_scale (str)
-        Return:
-            Date
-        """
-
-        delta = 0
-        for one, two in self.SCALES.steps(self.scale, new_scale):
-            one = one.name.lower()
-            two = two.name.lower()
-            # find the operation
-            oper = "_scale_{}_minus_{}".format(two, one)
-            # find the reverse operation
-            roper = "_scale_{}_minus_{}".format(one, two)
-            if hasattr(self, oper):
-                delta += getattr(self, oper)()
-            elif hasattr(self, roper):
-                delta -= getattr(self, roper)()
-            else:  # pragma: no cover
-                raise ValueError("Unknown convertion {} => {}".format(one, two))
-
-        result = self + _datetime.timedelta(seconds=delta)
+        result = self + self.scale.offset(self, new_scale)
 
         return Date(result.d, result.s, scale=new_scale)
 

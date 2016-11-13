@@ -16,8 +16,26 @@ C = Node("C", None)
 B = Node("B", [C, D])
 A = Node("A", [B, E, K])
 
-# Equivalent to
 
+# A
+# :.. B
+# :   :.. C
+# :   :.. D
+# :
+# :.. E
+# :   :.. F
+# :   :   :.. H
+# :   :   :   :.. J
+# :   :   :
+# :   :   :.. I
+# :   :
+# :   :.. G
+# :
+# :.. K
+#     :.. L
+#     :.. M
+
+# Equivalent to
 # A = Node("A", [
 #     Node("B", [
 #         Node("C", None),
