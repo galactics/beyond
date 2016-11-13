@@ -178,11 +178,11 @@ class Date:
         return cls(_datetime.datetime.utcnow()).change_scale(scale)
 
     def _scale_ut1_minus_utc(self):
-        ut1_tai, ut1_utc, tai_utc = get_timescales(self.mjd)
+        ut1_utc, tai_utc = get_timescales(self.mjd)
         return ut1_utc
 
     def _scale_tai_minus_utc(self):
-        ut1_tai, ut1_utc, tai_utc = get_timescales(self.mjd)
+        ut1_utc, tai_utc = get_timescales(self.mjd)
         return tai_utc
 
     def _scale_tt_minus_tai(self):

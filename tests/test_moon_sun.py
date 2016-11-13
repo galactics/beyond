@@ -11,7 +11,7 @@ from space.env.sun import sun_vector
 
 def test_moon():
     with patch('space.utils.date.get_timescales') as mock_ts:
-        mock_ts.return_value = ScalesDiff(-28.0889898, -0.0889898, 28.0)
+        mock_ts.return_value = ScalesDiff(-0.0889898, 28.0)
         moon = moon_vector(Date(1994, 4, 28))
 
     assert moon.date == Date(1994, 4, 28)
@@ -29,7 +29,7 @@ def test_moon():
 def test_sun():
 
     with patch('space.utils.date.get_timescales') as mock_ts:
-        mock_ts.return_value = ScalesDiff(-32.7346297, 0.2653703, 33.0)
+        mock_ts.return_value = ScalesDiff(0.2653703, 33.0)
 
         sun = sun_vector(Date(2006, 4, 2))
 

@@ -103,7 +103,7 @@ def test_operations():
 def test_change_scale():
 
     with patch('space.utils.date.get_timescales') as m:
-        m.return_value = ScalesDiff(-35.8757442, 0.1242558, 36.0)
+        m.return_value = ScalesDiff(0.1242558, 36.0)
 
         t = Date(2015, 12, 6)  # UTC object
         assert t.scale == "UTC"
@@ -124,7 +124,7 @@ def test_change_scale():
 def test_julian():
 
     with patch('space.utils.date.get_timescales') as m:
-        m.return_value = ScalesDiff(-35.896370420138894, 0.10362957986110499, 36.0)
+        m.return_value = ScalesDiff(0.10362957986110499, 36.0)
 
         t = Date(2015, 12, 18, 22, 25)
         assert t.jd == 2457375.434027778

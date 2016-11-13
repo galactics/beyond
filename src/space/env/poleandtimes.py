@@ -13,7 +13,7 @@ from ..config import config, ConfigError
 __all__ = ['get_timescales', 'get_pole']
 
 
-ScalesDiff = namedtuple('ScalesDiff', ('ut1_tai', 'ut1_utc', 'tai_utc'))
+ScalesDiff = namedtuple('ScalesDiff', ('ut1_utc', 'tai_utc'))
 
 
 def linear(x: float, x_list: tuple, y_list: tuple):
@@ -60,8 +60,7 @@ def _get_timescales(date: int):
         ut1_utc = 0
         tai_utc = 0
 
-    ut1_tai = ut1_utc - tai_utc
-    return ScalesDiff(ut1_tai, ut1_utc, tai_utc)
+    return ScalesDiff(ut1_utc, tai_utc)
 
 
 def get_timescales(date: float) -> tuple:
@@ -70,7 +69,7 @@ def get_timescales(date: float) -> tuple:
     Args:
         date (float): Date in MJD
     Return:
-        tuple: 3-element (UT1-UTC, TAI-UTC, UT1-TAI)
+        tuple: 2-element (UT1-UTC, TAI-UTC)
     """
 
     if date == int(date):
@@ -82,8 +81,7 @@ def get_timescales(date: float) -> tuple:
 
         result = ScalesDiff(
             linear(date, dates, (start[0], stop[0])),
-            linear(date, dates, (start[1], stop[1])),
-            start[-1]
+            start[1]
         )
         return result
 

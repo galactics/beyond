@@ -22,7 +22,7 @@ def date():
 @yield_fixture
 def time(date):
     with patch('space.utils.date.get_timescales') as mock_ts:
-        mock_ts.return_value = ScalesDiff(-32.4399519, -0.4399619, 32)
+        mock_ts.return_value = ScalesDiff(-0.4399619, 32)
         yield
 
 
@@ -185,7 +185,7 @@ def test_change_tle():
         }
 
         with patch('space.utils.date.get_timescales') as m2:
-            m2.return_value = ScalesDiff(-31.795840958507682, 0.20415904149231798, 32.0)
+            m2.return_value = ScalesDiff(0.20415904149231798, 32.0)
 
             tle = Orbit(
                 Date(2000, 6, 30, 18, 50, 19, 733568),
@@ -225,7 +225,7 @@ def test_station():
             'LOD': 1.6242802083331438,
         }
 
-        m2.return_value = ScalesDiff(-35.98243981527777, 0.01756018472222477, 36.0)
+        m2.return_value = ScalesDiff(0.01756018472222477, 36.0)
 
         orb = Orbit(
             Date(2016, 2, 7, 16, 55),

@@ -19,7 +19,7 @@ def date():
 @yield_fixture
 def time(date):
     with patch('space.utils.date.get_timescales') as mock_ts:
-        mock_ts.return_value = ScalesDiff(-32.4399519, -0.4399619, 32)
+        mock_ts.return_value = ScalesDiff(-0.4399619, 32)
         yield
 
 
