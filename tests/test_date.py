@@ -33,6 +33,11 @@ def test_creation():
     assert t.d == 57362
     assert t.s == 44400
 
+    tz = datetime.timezone(datetime.timedelta(hours=2))
+    t = Date(datetime.datetime(2015, 12, 6, 14, 20, tzinfo=tz))
+    assert t.d == 57362
+    assert t.s == 44400
+
     # Date object
     t2 = Date(t)
     assert t2.d == t.d

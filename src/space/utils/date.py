@@ -95,7 +95,7 @@ class Date:
 
     def __init__(self, *args, **kwargs):
 
-        scale = kwargs.get('scale', 'UTC')
+        scale = kwargs.pop('scale', 'UTC')
 
         if type(scale) is str:
             scale = _Scale.get(scale.upper())
@@ -125,8 +125,8 @@ class Date:
             d, s = args
         elif len(args) in range(3, 8) and list(map(type, args)) == [int] * len(args):
             # Same constructor as datetime.datetime
-            # (year, month, day[, hour[, minute[, second[, microsecond]]]])
-            dt = _datetime.datetime(*args)
+            # (year, month, day hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+            dt = _datetime.datetime(*args, **kwargs)
             d, s = self._convert_dt(dt)
         else:
             raise ValueError("Unknown arguments")
@@ -195,8 +195,12 @@ class Date:
 
     @classmethod
     def _convert_dt(cls, dt):
-        tz = _datetime.timedelta(0) if dt.tzinfo is None else dt.utcoffset
-        delta = dt - cls.MJD_T0 - tz
+        if dt.tzinfo is None:
+            delta = dt - cls.MJD_T0
+        else:
+            tz = dt.utcoffset()
+            delta = dt.replace(tzinfo=None) - cls.MJD_T0 - tz
+
         return delta.days, delta.seconds + delta.microseconds * 1e-6
 
     @property
