@@ -14,7 +14,6 @@ def test_moon():
         mock_ts.return_value = ScalesDiff(-0.0889898, 28.0)
         moon = moon_vector(Date(1994, 4, 28))
 
-    assert moon.date == Date(1994, 4, 28)
     assert str(moon.form) == 'Cartesian'
     assert str(moon.frame) == 'EME2000'
     assert moon.propagator.__name__ == 'MoonPropagator'

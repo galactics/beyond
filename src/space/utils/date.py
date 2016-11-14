@@ -164,20 +164,20 @@ class Date:
 
         return self.__add__(other)
 
-    def __gt__(self, other):  # pragma: no cover
-        return self.mjd > other.mjd
+    def __gt__(self, other):
+        return self.to_ref.mjd > other.to_ref.mjd
 
-    def __ge__(self, other):  # pragma: no cover
-        return self.mjd >= other.mjd
+    def __ge__(self, other):
+        return self.to_ref.mjd >= other.to_ref.mjd
 
-    def __lt__(self, other):  # pragma: no cover
-        return self.mjd < other.mjd
+    def __lt__(self, other):
+        return self.to_ref.mjd < other.to_ref.mjd
 
-    def __le__(self, other):  # pragma: no cover
-        return self.mjd <= other.mjd
+    def __le__(self, other):
+        return self.to_ref.mjd <= other.to_ref.mjd
 
-    def __eq__(self, other):  # pragma: no cover
-        return self.d == other.d and self.s == other.s and self.scale == other.scale
+    def __eq__(self, other):
+        return self.to_ref.mjd == other.to_ref.mjd
 
     def __repr__(self):  # pragma: no cover
         return "<{} '{}'>".format(self.__class__.__name__, self)
@@ -264,3 +264,12 @@ class Date:
             float
         """
         return self.d + self.s / 86400.
+
+    @property
+    def to_ref(self):
+        """Convert to the reference time-scale
+
+        Return:
+            Date:
+        """
+        return self.change_scale(self.REF_SCALE)
