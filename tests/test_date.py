@@ -156,3 +156,23 @@ def test_comparison():
         assert t1 == t2
         assert t1 >= t2
         assert t1 <= t2
+
+
+def test_leap_second():
+
+    with patch('space.utils.date.get_timescales') as m:
+        m.return_value = ScalesDiff(0., 36.0)
+
+        t1 = Date(2016, 12, 31, 23, 59, 59)
+
+    with patch('space.utils.date.get_timescales') as m:
+        m.return_value = ScalesDiff(0., 37.0)
+        t2 = Date(2017, 1, 1, 0, 0, 0)
+
+    t3 = Date(2017, 1, 1, 0, 0, 36, scale='TAI')
+
+    assert t1 == Date(2017, 1, 1, 0, 0, 35, scale='TAI')
+    assert t2 == Date(2017, 1, 1, 0, 0, 37, scale='TAI')
+
+    assert t2 - t1 == datetime.timedelta(seconds=2)
+    assert t3 - t1 == datetime.timedelta(seconds=1)

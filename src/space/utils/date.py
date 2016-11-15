@@ -18,7 +18,7 @@ class _Scale(Node):
     linking two Nodes together
     """
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return "<Scale '%s'>" % self.name
 
     def __str__(self):
@@ -28,28 +28,28 @@ class _Scale(Node):
     def get(cls, name):
         return cls.HEAD[name]
 
-    def _scale_ut1_minus_utc(self, date):
-        ut1_utc, tai_utc = get_timescales(date.mjd)
+    def _scale_ut1_minus_utc(self, mjd):
+        ut1_utc, tai_utc = get_timescales(mjd)
         return ut1_utc
 
-    def _scale_tai_minus_utc(self, date):
-        ut1_utc, tai_utc = get_timescales(date.mjd)
+    def _scale_tai_minus_utc(self, mjd):
+        ut1_utc, tai_utc = get_timescales(mjd)
         return tai_utc
 
-    def _scale_tt_minus_tai(self, date):
+    def _scale_tt_minus_tai(self, mjd):
         return 32.184
 
-    def _scale_tai_minus_gps(self, date):
+    def _scale_tai_minus_gps(self, mjd):
         return 19.
 
-    def offset(self, date, new_scale):
-        """Compute the offset necessary in order to convert from one time scale to another
+    def offset(self, mjd, new_scale):
+        """Compute the offset necessary in order to convert from one time-scale to another
 
         Args:
-            date (Date):
+            mjd (float):
             new_scale (str): Name of the desired scale
         Return:
-            datetime.timedelta: offset to apply
+            float: offset to apply in seconds
         """
 
         delta = 0
@@ -61,13 +61,13 @@ class _Scale(Node):
             # find the reverse operation
             roper = "_scale_{}_minus_{}".format(one, two)
             if hasattr(self, oper):
-                delta += getattr(self, oper)(date)
+                delta += getattr(self, oper)(mjd)
             elif hasattr(self, roper):
-                delta -= getattr(self, roper)(date)
+                delta -= getattr(self, roper)(mjd)
             else:  # pragma: no cover
                 raise ValueError("Unknown convertion {} => {}".format(one, two))
 
-        return _datetime.timedelta(seconds=delta)
+        return delta
 
 
 UT1 = _Scale('UT1')
@@ -88,10 +88,11 @@ class Date:
     leap second.
     """
 
-    __slots__ = ["d", "s", "scale", "_cache"]
+    __slots__ = ["_d", "_s", "_offset", "scale", "_cache"]
 
     MJD_T0 = _datetime.datetime(1858, 11, 17)
     JD_MJD = 2400000.5
+    REF_SCALE = 'TAI'
 
     def __init__(self, *args, **kwargs):
 
@@ -131,10 +132,18 @@ class Date:
         else:
             raise ValueError("Unknown arguments")
 
+        # Retrieve the offset for the current date
+        offset = scale.offset(d + s / 86400., self.REF_SCALE)
+
+        d += int((s + offset) // 86400)
+        s = (s + offset) % 86400.
+
         # As Date acts like an immutable object, we can't set its attributes normally
-        # like when we do ``self.d = d``
-        super().__setattr__('d', d)
-        super().__setattr__('s', s)
+        # like when we do ``self._d = _d``. Furthermore, those attribute represent the date with
+        # respect to REF_SCALE
+        super().__setattr__('_d', d)
+        super().__setattr__('_s', s)
+        super().__setattr__('_offset', offset)
         super().__setattr__('scale', scale)
         super().__setattr__('_cache', {})
 
@@ -158,26 +167,26 @@ class Date:
         elif isinstance(other, _datetime.datetime):
             return self.datetime - other
         elif isinstance(other, self.__class__):
-            return self.datetime - other.datetime
+            return self._to_ref.datetime - other._to_ref.datetime
         else:
             raise TypeError("Unknown operation with {} type".format(type(other)))
 
         return self.__add__(other)
 
     def __gt__(self, other):
-        return self.to_ref.mjd > other.to_ref.mjd
+        return self._mjd > other._mjd
 
     def __ge__(self, other):
-        return self.to_ref.mjd >= other.to_ref.mjd
+        return self._mjd >= other._mjd
 
     def __lt__(self, other):
-        return self.to_ref.mjd < other.to_ref.mjd
+        return self._mjd < other._mjd
 
     def __le__(self, other):
-        return self.to_ref.mjd <= other.to_ref.mjd
+        return self._mjd <= other._mjd
 
     def __eq__(self, other):
-        return self.to_ref.mjd == other.to_ref.mjd
+        return self._mjd == other._mjd
 
     def __repr__(self):  # pragma: no cover
         return "<{} '{}'>".format(self.__class__.__name__, self)
@@ -203,12 +212,29 @@ class Date:
 
         return delta.days, delta.seconds + delta.microseconds * 1e-6
 
+    def _convert_to_scale(self):
+        """Convert the inner value (defined with respect to REF_SCALE) into the given scale
+        of the object
+        """
+        d = self._d
+        s = (self._s - self._offset) % 86400.
+        d -= int((s + self._offset) // 86400)
+        return d, s
+
+    @property
+    def d(self):
+        return self._convert_to_scale()[0]
+
+    @property
+    def s(self):
+        return self._convert_to_scale()[1]
+
     @property
     def datetime(self):
         """Transform the Date object into a ``datetime.datetime`` object
 
         The resulting object is a timezone-naive instance with the same scale
-        as the originating object.
+        as the originating Date object.
         """
 
         if 'dt' not in self._cache.keys():
@@ -232,9 +258,10 @@ class Date:
         return cls(_datetime.datetime.utcnow()).change_scale(scale)
 
     def change_scale(self, new_scale):
-        result = self + self.scale.offset(self, new_scale)
+        offset = self.scale.offset(self.mjd, new_scale)
+        result = self.datetime + _datetime.timedelta(seconds=offset)
 
-        return Date(result.d, result.s, scale=new_scale)
+        return Date(result, scale=new_scale)
 
     @property
     def julian_century(self):
@@ -254,7 +281,15 @@ class Date:
         Return:
             float
         """
-        return self.d + self.JD_MJD + self.s / 86400.
+        return self.mjd + self.JD_MJD
+
+    @property
+    def _mjd(self):
+        """
+        Return:
+            float: Date in terms of MJD in the REF_SCALE timescale
+        """
+        return self._d + self._s / 86400.
 
     @property
     def mjd(self):
@@ -266,7 +301,7 @@ class Date:
         return self.d + self.s / 86400.
 
     @property
-    def to_ref(self):
+    def _to_ref(self):
         """Convert to the reference time-scale
 
         Return:
