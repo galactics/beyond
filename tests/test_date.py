@@ -174,5 +174,31 @@ def test_leap_second():
     assert t1 == Date(2017, 1, 1, 0, 0, 35, scale='TAI')
     assert t2 == Date(2017, 1, 1, 0, 0, 37, scale='TAI')
 
-    assert t2 - t1 == datetime.timedelta(seconds=2)
-    assert t3 - t1 == datetime.timedelta(seconds=1)
+    assert t2 - t1 == timedelta(seconds=2)
+    assert t3 - t1 == timedelta(seconds=1)
+
+
+def test_range():
+
+    start = Date(2016, 11, 16, 22, 38)
+    stop = timedelta(hours=1)
+    step = timedelta(seconds=30)
+
+    l1 = list(Date.range(start, stop, step))
+    assert len(l1) == stop // step
+
+    l2 = list(Date.range(start, stop, step, inclusive=True))
+    assert len(l2) == stop // step + 1
+
+    stop = Date(2016, 11, 16, 22, 40)
+    l3 = Date.range(start, stop, step)
+
+    start = Date(2016, 11, 16, 22, 40)
+    stop = - timedelta(minutes=2)
+    step = - timedelta(seconds=30)
+
+    l4 = list(Date.range(start, stop, step))
+    assert len(l4) == stop // step
+
+    with raises(ValueError):
+        list(Date.range(start, stop, timedelta(seconds=30)))

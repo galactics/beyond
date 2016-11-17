@@ -36,6 +36,7 @@ import numpy as np
 from datetime import timedelta
 
 from ..constants import e_e, r_e
+from ..utils.date import Date
 from ..utils.matrix import rot2, rot3
 from ..utils.node import Node2
 from . import iau1980, iau2010
@@ -255,13 +256,10 @@ class TopocentricFrame(_Frame):
             in the frame of the station and in spherical form.
         """
 
-        if isinstance(stop, timedelta):
-            stop = start + stop
-
         date = start
         visibility, max_found = False, False
 
-        while date < stop:
+        for date in Date.range(start, stop, step):
 
             # Propagate orbit at the current date, and convert it to the station
             # frame and spherical form
@@ -300,8 +298,6 @@ class TopocentricFrame(_Frame):
 
                 # Re-initialization of pass variables
                 visibility, max_found = False, False
-
-            date += step
 
     @classmethod
     def _vis(cls, orb, date):

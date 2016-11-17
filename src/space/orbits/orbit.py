@@ -4,12 +4,11 @@
 """Orbit description
 """
 
-from datetime import timedelta
-
 import numpy as np
 
 from .forms import FormTransform
 from .ephem import Ephem
+from ..utils import Date
 from ..frames.frame import get_frame, orbit2frame
 from ..propagators import get_propagator
 
@@ -180,13 +179,8 @@ class Orbit(np.ndarray):
             Orbit
         """
 
-        if isinstance(stop, timedelta):
-            stop = start + stop
-
-        cursor = start
-        while cursor <= stop:
-            yield self.propagate(cursor)
-            cursor += step
+        for date in Date.range(start, stop, step, inclusive=True):
+            yield self.propagate(date)
 
     def ephem(self, *args):
         """

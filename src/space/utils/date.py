@@ -93,6 +93,7 @@ class Date:
     MJD_T0 = _datetime.datetime(1858, 11, 17)
     JD_MJD = 2400000.5
     REF_SCALE = 'TAI'
+    """Scale used internlly"""
 
     def __init__(self, *args, **kwargs):
 
@@ -308,3 +309,41 @@ class Date:
             Date:
         """
         return self.change_scale(self.REF_SCALE)
+
+    @classmethod
+    def range(cls, start, stop, step, inclusive=False):
+        """Generator of a date range
+
+        Args:
+            start (Date):
+            stop (Date or datetime.timedelta)!
+            step (timedelta):
+        Keyword Args:
+            inclusive (bool): If ``False``, the stopping date is not included.
+                This is the same behaviour as the builtin :py:func:`range`.
+        Yield:
+            Date:
+        """
+
+        def sign(x):
+            return (-1, 1)[x >= 0]
+
+        if isinstance(stop, _datetime.timedelta):
+            stop = start + stop
+
+        if not step:
+            raise ValueError("Null step")
+
+        if sign((stop - start).total_seconds()) != sign(step.total_seconds()):
+            raise ValueError("start/stop order not coherent with step")
+
+        date = start
+
+        if step.total_seconds() > 0:
+            oper = "__le__" if inclusive else "__lt__"
+        else:
+            oper = "__ge__" if inclusive else "__gt__"
+
+        while getattr(date, oper)(stop):
+            yield date
+            date += step
