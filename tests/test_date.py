@@ -184,15 +184,19 @@ def test_range():
     stop = timedelta(hours=1)
     step = timedelta(seconds=30)
 
+    # classic range
     l1 = list(Date.range(start, stop, step))
     assert len(l1) == stop // step
 
+    # Inclusive range
     l2 = list(Date.range(start, stop, step, inclusive=True))
     assert len(l2) == stop // step + 1
 
+    # stop as a Date object
     stop = Date(2016, 11, 16, 22, 40)
     l3 = Date.range(start, stop, step)
 
+    # Inverse order
     start = Date(2016, 11, 16, 22, 40)
     stop = - timedelta(minutes=2)
     step = - timedelta(seconds=30)
@@ -200,5 +204,10 @@ def test_range():
     l4 = list(Date.range(start, stop, step))
     assert len(l4) == stop // step
 
+    # Error when the date range (start/stop) is not coherent with the step
     with raises(ValueError):
-        list(Date.range(start, stop, timedelta(seconds=30)))
+        list(Date.range(start, stop, -step))
+
+    # Error when the step is null.
+    with raises(ValueError):
+        list(Date.range(start, stop, timedelta(0)))

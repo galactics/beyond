@@ -86,12 +86,25 @@ class Date:
 
     In the current implementation, the Date object does not handle the
     leap second.
+
+    Examples:
+
+        .. code-block:: python
+
+            Date(2016, 11, 17, 19, 16, 40)
+            Date(2016, 11, 17, 19, 16, 40, scale="TAI")
+            Date(57709.804455)  # MJD
+            Date(57709, 69540.752649)
+            Date(datetime(2016, 11, 17, 19, 16, 40))  # builtin datetime object
+            Date.now()
     """
 
     __slots__ = ["_d", "_s", "_offset", "scale", "_cache"]
 
     MJD_T0 = _datetime.datetime(1858, 11, 17)
+    """Origin of MJD"""
     JD_MJD = 2400000.5
+    """Offset between JD and MJD"""
     REF_SCALE = 'TAI'
     """Scale used internlly"""
 
@@ -108,12 +121,12 @@ class Date:
                 # Python datetime.datetime object
                 d, s = self._convert_dt(arg)
             elif isinstance(arg, self.__class__):
-                # Date object²
+                # Date object
                 d = arg.d
                 s = arg.s
                 scale = arg.scale
             elif isinstance(arg, (float, int)):
-                # Julian Day
+                # Modified Julian Day
                 if isinstance(arg, int):
                     d = arg
                     s = 0.
@@ -326,13 +339,16 @@ class Date:
         """
 
         def sign(x):
+            """Inner function for determining the sign of a float
+            """
             return (-1, 1)[x >= 0]
-
-        if isinstance(stop, _datetime.timedelta):
-            stop = start + stop
 
         if not step:
             raise ValueError("Null step")
+
+        # Convert stop from timedelta to Date object
+        if isinstance(stop, _datetime.timedelta):
+            stop = start + stop
 
         if sign((stop - start).total_seconds()) != sign(step.total_seconds()):
             raise ValueError("start/stop order not coherent with step")
