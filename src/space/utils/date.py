@@ -3,7 +3,7 @@
 """Date module
 """
 
-import datetime as _datetime
+from datetime import datetime, timedelta
 
 from ..env.poleandtimes import get_timescales
 from .node import Node
@@ -101,7 +101,7 @@ class Date:
 
     __slots__ = ["_d", "_s", "_offset", "scale", "_cache"]
 
-    MJD_T0 = _datetime.datetime(1858, 11, 17)
+    MJD_T0 = datetime(1858, 11, 17)
     """Origin of MJD"""
     JD_MJD = 2400000.5
     """Offset between JD and MJD"""
@@ -117,7 +117,7 @@ class Date:
 
         if len(args) == 1:
             arg = args[0]
-            if isinstance(arg, _datetime.datetime):
+            if isinstance(arg, datetime):
                 # Python datetime.datetime object
                 d, s = self._convert_dt(arg)
             elif isinstance(arg, self.__class__):
@@ -141,7 +141,7 @@ class Date:
         elif len(args) in range(3, 8) and list(map(type, args)) == [int] * len(args):
             # Same constructor as datetime.datetime
             # (year, month, day hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
-            dt = _datetime.datetime(*args, **kwargs)
+            dt = datetime(*args, **kwargs)
             d, s = self._convert_dt(dt)
         else:
             raise ValueError("Unknown arguments")
@@ -168,7 +168,7 @@ class Date:
         raise TypeError("Can not modify attributes of immutable object")
 
     def __add__(self, other):
-        if isinstance(other, _datetime.timedelta):
+        if isinstance(other, timedelta):
             days, sec = divmod(other.total_seconds() + self.s, 86400)
         else:
             raise TypeError("Unknown operation with {} type".format(type(other)))
@@ -176,12 +176,12 @@ class Date:
         return self.__class__(self.d + int(days), sec, scale=self.scale)
 
     def __sub__(self, other):
-        if isinstance(other, _datetime.timedelta):
-            other = _datetime.timedelta(seconds=-other.total_seconds())
-        elif isinstance(other, _datetime.datetime):
+        if isinstance(other, timedelta):
+            other = timedelta(seconds=-other.total_seconds())
+        elif isinstance(other, datetime):
             return self.datetime - other
         elif isinstance(other, self.__class__):
-            return self._to_ref.datetime - other._to_ref.datetime
+            return self._datetime - other._datetime
         else:
             raise TypeError("Unknown operation with {} type".format(type(other)))
 
@@ -250,16 +250,25 @@ class Date:
         The resulting object is a timezone-naive instance with the same scale
         as the originating Date object.
         """
+        if 'dt_scale' not in self._cache.keys():
+            self._cache['dt_scale'] = self._datetime - timedelta(seconds=self._offset)
+        return self._cache['dt_scale']
 
+    @property
+    def _datetime(self):
+        """Transform the Date object into a :py:class:`datetime.datetime` object.
+
+        The resulting object is a timezone-naive instance in the REF_SCALE time-scale
+        """
         if 'dt' not in self._cache.keys():
-            self._cache['dt'] = self.MJD_T0 + _datetime.timedelta(days=self.d, seconds=self.s)
+            self._cache['dt'] = self.MJD_T0 + timedelta(days=self._d, seconds=self._s)
         return self._cache['dt']
 
     @classmethod
     def strptime(cls, data, format, scale='UTC'):  # pragma: no cover
         """Convert a string representation of a date to a Date object
         """
-        return Date(_datetime.datetime.strptime(data, format), scale=scale)
+        return Date(datetime.strptime(data, format), scale=scale)
 
     @classmethod
     def now(cls, scale="UTC"):
@@ -269,11 +278,11 @@ class Date:
         Return:
             Date: Current time in the choosen scale
         """
-        return cls(_datetime.datetime.utcnow()).change_scale(scale)
+        return cls(datetime.utcnow()).change_scale(scale)
 
     def change_scale(self, new_scale):
         offset = self.scale.offset(self.mjd, new_scale)
-        result = self.datetime + _datetime.timedelta(seconds=offset)
+        result = self.datetime + timedelta(seconds=offset)
 
         return Date(result, scale=new_scale)
 
@@ -347,7 +356,7 @@ class Date:
             raise ValueError("Null step")
 
         # Convert stop from timedelta to Date object
-        if isinstance(stop, _datetime.timedelta):
+        if isinstance(stop, timedelta):
             stop = start + stop
 
         if sign((stop - start).total_seconds()) != sign(step.total_seconds()):
