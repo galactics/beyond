@@ -5,6 +5,8 @@ from pytest import fixture, yield_fixture, raises
 from unittest.mock import patch
 
 import numpy as np
+from numpy.testing import assert_almost_equal
+from numpy.linalg import norm
 from space.env.poleandtimes import ScalesDiff
 from datetime import timedelta
 
@@ -54,8 +56,8 @@ def ref_orbit():
 
 
 def assert_vector(ref, pv, precision=(4, 6)):
-    np.testing.assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
-    np.testing.assert_almost_equal(ref[3:], pv[3:], precision[1], "Velocity")
+    assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
+    assert_almost_equal(ref[3:], pv[3:], precision[1], "Velocity")
 
 
 pef_ref = np.array([-1033475.03131, 7901305.5856, 6380344.5328,
@@ -72,8 +74,8 @@ tirf_ref = np.array([-1033475.0312, 7901305.5856, 6380344.5327,
 cirf_ref = np.array([5100018.4047, 6122786.3648, 6380344.5327,
                      -4745.380330, 790.341453, 5531.931288])
 
-gcrf_ref = np.array([ 5102508.9528,  6123011.3991,  6378136.9338,
-                     -4743.220161,   790.536495,  5533.755724])
+gcrf_ref = np.array([5102508.9528, 6123011.3991, 6378136.9338,
+                     -4743.220161, 790.536495, 5533.755724])
 
 # This is the real value from Vallado for GCRF reference values
 # But the values used in these tests are only 1cm away
@@ -271,3 +273,49 @@ def test_errors(ref_orbit):
 
     with raises(ValueError):
         ref_orbit.change_frame('Inexistant')
+
+
+def test_orbit2frame():
+
+    iss = Tle("""0 ISS (ZARYA)
+                 1 25544U 98067A   16333.80487076  .00003660  00000-0  63336-4 0  9996
+                 2 25544  51.6440 317.1570 0006082 266.5744 156.9779 15.53752683 30592""").orbit()
+    soyouz = Tle("""0 SOYUZ MS-03
+                    1 41864U 16070A   16332.46460811 +.00003583 +00000-0 +62193-4 0  9996
+                    2 41864 051.6436 323.8351 0006073 261.8114 220.0268 15.53741335030385""").orbit()
+
+    # This is done to convert the TLE format to cartesian coordinates
+    # as done during propagation
+    soyouz = soyouz.propagate(soyouz.date)
+
+    iss.register_as_frame('iss_inert')
+    iss.register_as_frame('iss_qsw', 'QSW')
+    iss.register_as_frame('iss_tnw', 'TNW')
+    iss.register_as_frame('iss_unknown', 'unknow')
+
+    s1 = soyouz.copy()
+    s1.change_frame('iss_inert')
+    assert_almost_equal(s1[:3], [70.616031724028289, 73.651090503670275, -62.527891733683646])
+    assert_almost_equal(s1[3:], [0.052151684838463552, 0.099888696147900191, -0.042362396145563253])
+
+    s2 = soyouz.copy()
+    s2.change_frame("iss_qsw")
+    assert_almost_equal(s2[:3], [4.5450426777824759, -18.729738359805197, -118.10750304395333])
+    assert_almost_equal(s2[3:], [0.039432618629234639, -0.0046244694185588742, -0.1136477186164484])
+
+    s3 = soyouz.copy()
+    s3.change_frame("iss_tnw")
+    assert_almost_equal(s3[:3], [-18.728253549197689, -4.5511609734967351, -118.10750304395333])
+    assert_almost_equal(s3[3:], [-0.0046115872564769234, -0.039434125179468538, -0.1136477186164484])
+
+    # Whatever the local reference frame, the W vector is the same
+    assert s2[2] == s3[2]
+
+    # The norm of the position vectors should the same, because it's always the
+    # same relative positions, but expressed in differents frames
+    assert_almost_equal(norm(s1[:3]), norm(s2[:3]), 4)
+    assert_almost_equal(norm(s2[:3]), norm(s3[:3]), 6)
+
+    s4 = soyouz.copy()
+    with raises(ValueError):
+        s4.change_frame('iss_unknown')

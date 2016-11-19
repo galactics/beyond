@@ -40,6 +40,8 @@ from ..utils.date import Date
 from ..utils.matrix import rot2, rot3
 from ..utils.node import Node2
 from . import iau1980, iau2010
+from .local import to_qsw, to_tnw
+
 
 CIO = ['ITRF', 'TIRF', 'CIRF', 'GCRF']
 IAU1980 = ['TOD', 'MOD']
@@ -434,19 +436,33 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
     return cls
 
 
-def orbit2frame(name, orbit):
+def orbit2frame(name, orbit, orientation=None):
     """Create a frame based on a Orbit or Ephem object.
 
-    The new frame will keep the orientation of the reference frame of the Orbit and move along
-    with the orbit
+    If orientation is ``None``, the new frame will keep the orientation of the
+    reference frame of the Orbit and move along with the orbit
     """
 
     def _convert(self):
         """Conversion from orbit frame to parent frame
         """
-        rotation = np.identity(7)
         offset = np.identity(7)
         offset[0:6, -1] = orbit.propagate(self.date).base
+
+        if orientation is None:
+            # The orientation is the same as the parent reference frame
+            rotation = np.identity(7)
+        elif orientation.upper() in ("QSW", "TNW"):
+            orb = orbit.propagate(self.date)
+
+            m = to_qsw(orb) if orientation.upper() == "QSW" else to_tnw(orb)
+
+            # we transpose the matrix because it represent the conversion
+            # from inertial to local frame, and we'd like the other way around
+            rotation = _Frame._convert(m, m).T
+        else:
+            raise ValueError("Unknown orientation '%s'" % orientation)
+
         return rotation, offset
 
     # define the name of the method of conversion

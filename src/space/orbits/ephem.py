@@ -169,10 +169,9 @@ class Ephem:
 
         return self.__class__(self.ephemeris(**kwargs))
 
-    def register_as_frame(self, name):  # pragma: no cover
+    def register_as_frame(self, name, orientation=None):  # pragma: no cover
         """Register the Ephem object as a frame
 
-        The new frame will keep the orientation of the reference frame of the Ephem and move along
-        with the orbit
+        see :py:func:`space.frames.frame.orbit2frame` for details of the arguments
         """
-        orbit2frame(name, self)
+        orbit2frame(name, self, orientation)

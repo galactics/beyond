@@ -149,8 +149,8 @@ class Orbit(np.ndarray):
             new_frame = get_frame(new_frame)
 
         if new_frame != self.frame:
+            self.change_form('cartesian')
             try:
-                self.change_form('cartesian')
                 new_coord = self.frame(self.date, self).transform(new_frame.name)
                 self.base.setfield(new_coord, dtype=float)
                 self.frame = new_frame
@@ -198,13 +198,12 @@ class Orbit(np.ndarray):
         """
         return Ephem(self.ephemeris(*args))
 
-    def register_as_frame(self, name):
+    def register_as_frame(self, name, orientation=None):  # pragma: no cover
         """Register the orbit as frame.
 
-        The new frame will keep the orientation of the reference frame of the orbit
-        and move along with the orbit
+        see :py:func:`space.frames.frame.orbit2frame` for details of the arguments
         """
-        orbit2frame(name, self)
+        orbit2frame(name, self, orientation)
 
     # @property
     # def apoapsis(self):

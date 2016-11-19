@@ -1,20 +1,19 @@
 """For local orbital frame definitions
 """
 
-from numpy.linalg import norm as norm
+from numpy.linalg import norm
 
 import numpy as np
 
 
-def _split_state_vector(state_vector):
-    state_vector = np.array(state_vector)
-    return state_vector[:3], state_vector[3:]
+def _split(orbit):
+    return orbit[:3], orbit[3:]
 
 
-def inertial_to_tnw(state_vector):
+def to_tnw(orbit):
     """
     Args:
-        state_vector (list): Array of length 6
+        orbit (list): Array of length 6
     Returns:
         numpy.ndarray: matrix to convert from inertial frame to TNW.
 
@@ -22,13 +21,13 @@ def inertial_to_tnw(state_vector):
     >>> p = [-6142438.668, 3492467.560, -25767.25680]
     >>> v = [505.8479685, 942.7809215, 7435.922231]
     >>> pv = p + v
-    >>> mat = inertial_to_tnw(pv).T
+    >>> mat = to_tnw(pv).T
     >>> delta_inert = mat @ delta_tnw
     >>> all(delta_inert == v / norm(v))
     True
     """
 
-    pos, vel = _split_state_vector(state_vector)
+    pos, vel = _split(orbit)
 
     t = vel / norm(vel)
     w = np.cross(pos, vel) / (norm(pos) * norm(vel))
@@ -37,10 +36,10 @@ def inertial_to_tnw(state_vector):
     return np.array([t, n, w])
 
 
-def inertial_to_qsw(state_vector):
+def to_qsw(orbit):
     """
     Args:
-        state_vector (list): Array of length 6
+        orbit (list): Array of length 6
     Returns:
         numpy.ndarray: matrix to convert from inertial frame to QSW
 
@@ -48,13 +47,13 @@ def inertial_to_qsw(state_vector):
     >>> p = [-6142438.668, 3492467.560, -25767.25680]
     >>> v = [505.8479685, 942.7809215, 7435.922231]
     >>> pv = p + v
-    >>> mat = inertial_to_qsw(pv).T
+    >>> mat = to_qsw(pv).T
     >>> delta_inert = mat @ delta_qsw
     >>> all(delta_inert == p / norm(p))
     True
     """
 
-    pos, vel = _split_state_vector(state_vector)
+    pos, vel = _split(orbit)
 
     q = pos / norm(pos)
     w = np.cross(pos, vel) / (norm(pos) * norm(vel))
