@@ -165,8 +165,13 @@ class Orbit(np.ndarray):
         Return:
             Orbit
         """
-        propag_obj = self.propagator(self)
-        return propag_obj.propagate(date)
+
+        if type(self.propagator) is type:
+            # Instanciation of the propagator, only the first time the propagator
+            # is called
+            self.propagator = self.propagator(self)
+
+        return self.propagator.propagate(date)
 
     def ephemeris(self, start, stop, step):
         """Generator giving the propagation of the orbit at different dates
