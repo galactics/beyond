@@ -204,23 +204,3 @@ class Orbit(np.ndarray):
         see :py:func:`space.frames.frame.orbit2frame` for details of the arguments
         """
         orbit2frame(name, self, orientation)
-
-    # @property
-    # def apoapsis(self):
-
-    #     coord = self.coord.copy()
-    #     if coord.form not in (Coord.KEPL, Coord.KEPL_M):
-    #         coord.transform(Coord.KEPL)
-
-    #     a, e = coord[:2]
-    #     return a * (1 + e)
-
-    # @property
-    # def periapsis(self):
-
-    #     coord = self.coord.copy()
-    #     if coord.form not in (Coord.KEPL, Coord.KEPL_M):
-    #         coord.transform(Coord.KEPL)
-
-    #     a, e = coord[:2]
-    #     return a * (1 - e)
