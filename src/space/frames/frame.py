@@ -131,14 +131,19 @@ class _Frame(metaclass=_MetaFrame):
         orbit[:6] = self.orbit
         for _from, _to in steps:
 
-            try:
-                rotation, offset = getattr(_from(self.date, orbit), "_to_{}".format(_to))()
-            except AttributeError:
-                try:
-                    rotation, offset = getattr(_to(self.date, orbit), "_to_{}".format(_from))()
+            from_obj = _from(self.date, orbit)
+            direct = "_to_%s" % _to
+
+            if hasattr(from_obj, direct):
+                rotation, offset = getattr(from_obj, direct)()
+            else:
+                to_obj = _to(self.date, orbit)
+                inverse = "_to_%s" % _from
+                if hasattr(to_obj, inverse):
+                    rotation, offset = getattr(to_obj, inverse)()
                     rotation = rotation.T
                     offset[:6, -1] = - offset[:6, -1]
-                except AttributeError:
+                else:
                     raise NotImplementedError("Unknown transformation {} to {}".format(_from, _to))
 
             if issubclass(_from, TopocentricFrame):
