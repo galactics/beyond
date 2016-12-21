@@ -33,8 +33,6 @@ The relations may be circular, thanks to the use of the Node2 class.
 import warnings
 import numpy as np
 
-from datetime import timedelta
-
 from ..constants import e_e, r_e
 from ..utils.date import Date
 from ..utils.matrix import rot2, rot3
