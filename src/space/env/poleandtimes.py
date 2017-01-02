@@ -172,6 +172,24 @@ class TaiUtc():
             if mjd <= date:
                 return value
 
+    def get_last_next(self, date):
+        """Provide the last and next leap-second events relative to a date
+
+        Args:
+            date (float): Date in MJD
+        Return:
+            tuple:
+        """
+        l, n = (None, None), (None, None)
+
+        for mjd, value in reversed(self.data):
+            if mjd <= date:
+                l = (mjd, value)
+                break
+            n = (mjd, value)
+
+        return l, n
+
 
 class Finals2000A():
     """History of pole motion correction for IAU2000 model
