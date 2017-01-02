@@ -12,11 +12,9 @@ class Config:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
+            cls._instance._values = {}
 
         return cls._instance
-
-    def __init__(self):
-        self._values = {}
 
     def __setitem__(self, name, value):
         self._values[name] = value
@@ -44,9 +42,9 @@ class Config:
         confparser.read(str(confpath))
 
         for section in confparser.sections():
-            config[section] = dict(confparser[section])
+            cls._instance[section] = dict(confparser[section])
 
-        config['folder'] = path
+        cls._instance['folder'] = path
 
 
 class ConfigError(RuntimeError):
