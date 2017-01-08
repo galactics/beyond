@@ -328,39 +328,39 @@ class TopocentricFrame(_Frame):
             Orbit
         """
 
-        MAX = 50
-        n = 0
+        prev_step = (stop - start)
+        step = prev_step / 2
+        eps = 1e-2
 
-        def get(x):
-            return getattr(x, element)
+        start_attr = getattr(cls._vis(orb, start), element)
+        prev = start_attr
+        date_cursor = start + step
 
-        eps = 1e-4 if element == 'phi' else 1e-3
+        MAX_ITER = 40
 
-        step = (stop - start) / 2
-        prev_value = cls._vis(orb, start)
-        date = start
-        while n <= MAX and date <= stop:
-            date = start + step
-            value = cls._vis(orb, date)
-            if -eps < get(value) <= eps:
+        for i in range(MAX_ITER):
+            orb_cursor = cls._vis(orb, date_cursor)
+            attr = getattr(orb_cursor, element)
+            # print("{:<2} {: 15.8f} {: 7.5f} {}".format(i, attr, step.total_seconds(), element))
+
+            if abs(attr) <= eps:
+                # We have a winner !
                 break
-            elif np.sign(get(value)) == np.sign(get(prev_value)):
-                prev_value = value
-                start = date
-            else:
-                step /= 2
-            n += 1
-        else:  # pragma: no cover
-            # Hopefully this part is never executed
-            if n > MAX:
-                raise RuntimeError('Too much iterations : %d' % n)
-            else:
-                # If you arrive her it's certainly because there was no zero
-                # crossing between the two dates
-                raise RuntimeError('Time limit exceeded : {:%H:%M:%S:%f} >= {:%H:%M:%S}'.format(date, stop))
 
-        return value
+            if np.sign(attr) != np.sign(prev):
+                # reverse direction
+                step *= -1
+                if prev_step == -step:
+                    # decrease the step if this direction was already searched through
+                    step /= 2
 
+            prev = attr
+            prev_step = step
+            date_cursor += step
+        else:
+            raise RuntimeError("Too many iterations", MAX_ITER)
+
+        return orb_cursor
 
 def _geodetic_to_cartesian(lat, lon, alt):
     """Conversion from latitude, longitue and altitude coordinates to
