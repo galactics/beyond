@@ -24,6 +24,9 @@ class Ephem:
         longitudes = ephem[:,2]
     """
 
+    LINEAR = "linear"
+    LAGRANGE = "lagrange"
+
     def __init__(self, orbits):
         self._orbits = list(sorted(orbits, key=lambda x: x.date))
 
@@ -72,6 +75,12 @@ class Ephem:
         """
         return self._orbits[0].frame
 
+    @property
+    def form(self):
+        """Get the form of the first point
+        """
+        return self._orbits[0].form
+
     def change_frame(self, frame):  # pragma: no cover
         """Change the frames of all points
         """
@@ -84,11 +93,13 @@ class Ephem:
         for orb in self:
             orb.change_form(form)
 
-    def interpolate(self, date):
+    def interpolate(self, date, method=LAGRANGE, order=8):
         """Interpolate data at a given date
 
         Args:
             date (Date):
+            method (str): Method of interpolation to use
+            order (int): In case of ``LAGRANGE`` method is used
         Return:
             Orbit:
         """
@@ -96,14 +107,47 @@ class Ephem:
         if not self.start <= date <= self.stop:
             raise ValueError("Date '%s' not in range" % date)
 
-        for i, orb in enumerate(reversed(self)):  # pragma: no branch
-            if orb.date <= date:
+        # reseach of the point just after the date we wish to interpolate to
+        for next_i, orb in enumerate(self):  # pragma: no branch
+            if orb.date > date:
                 break
 
-        y0 = orb
-        y1 = self[-i]
+        if method == self.LINEAR:
 
-        result = y0[:] + (y1[:] - y0[:]) * (date.mjd - y0.date.mjd) / (y1.date.mjd - y0.date.mjd)
+            y0 = self[next_i - 1]
+            y1 = self[next_i]
+
+            result = y0[:] + (y1[:] - y0[:]) * (date.mjd - y0.date.mjd) / (y1.date.mjd - y0.date.mjd)
+
+        elif method == self.LAGRANGE:
+
+            stop = next_i + order
+            start = next_i
+            if stop >= len(self):
+                start -= stop - len(self)
+
+            # selection of the subset of data, of length 'order' around the desired value
+            subset = self[start:stop]
+            date_subset = np.array([x.date.mjd for x in subset])
+
+            result = np.zeros(6)
+
+            # Everything is on wikipedia
+            #        k
+            # L(x) = Σ y_j * l_j(x)
+            #        j=0
+            #
+            # l_j(x) = Π (x - x_m) / (x_j - x_m)
+            #     0 <= m <= k
+            #        m != j
+            for j in range(order):
+                # This mask is here to enforce the m != j in the lagrange polynomials
+                mask = date_subset != date_subset[j]
+                l_j = (date.mjd - date_subset[mask]) / (date_subset[j] - date_subset[mask])
+                result = result + l_j.prod() * subset[j]
+
+        else:
+            raise ValueError("Unkown interpolation method", method)
 
         return orb.__class__(date, result, orb.form, orb.frame, orb.propagator)
 

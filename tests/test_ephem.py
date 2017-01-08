@@ -36,10 +36,15 @@ def test_create(ephem):
 
 def test_interpolate(ephem):
 
-    orb = ephem.propagate(ephem.start + timedelta(hours=0.5))
+    orb = ephem.interpolate(ephem.start + timedelta(hours=0.5), method="linear")
 
     assert list(orb[:3]) == [-1345306.8788385859, 5181620.4607680216, -4088075.611075501]
     assert list(orb[3:]) == [-5080.8194130861202, -4325.1407145624016, -3821.7458439122233]
+
+    orb = ephem.interpolate(ephem.start + timedelta(hours=0.5), method="lagrange")
+
+    assert list(orb[:3]) == [-1345304.9541785978, 5181617.05590453, -4088071.6593303955]
+    assert list(orb[3:]) == [-5080.8211218599981, -4325.1688590092863, -3821.7340028755452]
 
     with raises(ValueError):
         # We ask for a value clearly out of range
