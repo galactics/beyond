@@ -330,13 +330,13 @@ class TopocentricFrame(_Frame):
 
         prev_step = (stop - start)
         step = prev_step / 2
-        eps = 1e-2
+        eps = 1e-4
 
         start_attr = getattr(cls._vis(orb, start), element)
         prev = start_attr
         date_cursor = start + step
 
-        MAX_ITER = 40
+        MAX_ITER = 60
 
         for i in range(MAX_ITER):
             orb_cursor = cls._vis(orb, date_cursor)
