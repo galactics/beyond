@@ -215,9 +215,7 @@ class Tle:
             y, _, i = cospar_id.partition('-')
             cospar_id = y[2:] + i
 
-        orbit = orbit.copy()
-        orbit.change_frame('TEME')
-        orbit.change_form('TLE')
+        orbit = orbit.copy(form='TLE', frame='TEME')
 
         date = orbit.date.datetime
         i, Ω, e, ω, M, n = orbit

@@ -21,10 +21,10 @@ latitudes, longitudes = [], []
 for point in orb.ephemeris(Date.now(), timedelta(minutes=120), timedelta(minutes=1)):
 
     # Conversion to earth rotating frame
-    point.change_frame('ITRF')
+    point.frame = 'ITRF'
 
     # Conversion from cartesian to spherical coordinates (range, latitude, longitude)
-    point.change_form('spherical')
+    point.form = 'spherical'
 
     # Conversion from radians to degrees
     lat, lon = np.degrees(point[1:3])

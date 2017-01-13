@@ -43,20 +43,24 @@ class Orbit(np.ndarray):
 
         obj = np.ndarray.__new__(cls, (6,), buffer=np.array(coord), dtype=float)
         obj.date = date
-        obj.form = form
-        obj.frame = frame
+        obj._form = form
+        obj._frame = frame
         obj.propagator = propagator
         obj.complements = kwargs
 
         return obj
 
-    def copy(self):
+    def copy(self, *, frame=None, form=None):
         """Override :py:meth:`numpy.ndarray.copy()` to include additional
         fields
         """
         new_obj = self.__class__(
             self.date, self.base.copy(), self.form,
             self.frame, self.propagator, **self.complements)
+        if frame and frame != self.frame:
+            new_obj.frame = frame
+        if form and form != self.form:
+            new_obj.form = form
         return new_obj
 
     @property
@@ -115,16 +119,11 @@ class Orbit(np.ndarray):
         return fmt
 
     @property
-    def pv(self):
-        """Get the coordinates of the orbit in terms of position and velocity
+    def form(self):
+        return self._form
 
-        Returns:
-            Orbit: 2-length, first element is position, second is velocity.
-                The frame is unchanged
-        """
-        return self.change_form('Cartesian')
-
-    def change_form(self, new_form):
+    @form.setter
+    def form(self, new_form):
         """Changes the form of the coordinates in-place
 
         Args:
@@ -135,9 +134,14 @@ class Orbit(np.ndarray):
 
         fmt = FormTransform(self)
         self.base.setfield(fmt.transform(new_form), dtype=float)
-        self.form = new_form
+        self._form = new_form
 
-    def change_frame(self, new_frame):
+    @property
+    def frame(self):
+        return self._frame
+
+    @frame.setter
+    def frame(self, new_frame):
         """Convert the orbit to a new frame of reference
 
         Args:
@@ -149,13 +153,13 @@ class Orbit(np.ndarray):
             new_frame = get_frame(new_frame)
 
         if new_frame != self.frame:
-            self.change_form('cartesian')
+            self.form = 'cartesian'
             try:
                 new_coord = self.frame(self.date, self).transform(new_frame.name)
                 self.base.setfield(new_coord, dtype=float)
-                self.frame = new_frame
+                self._frame = new_frame
             finally:
-                self.change_form(old_form)
+                self.form = old_form
 
     def propagate(self, date):
         """Propagate the orbit to a new date

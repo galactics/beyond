@@ -84,10 +84,10 @@ def test_coord_global_transform(ref_orbit):
     backup = ref_orbit.copy()
 
     # Useless transformation, no effect
-    ref_orbit.change_form('keplerian_m')
+    ref_orbit.form = 'keplerian_m'
     assert all(ref_orbit == backup)
 
-    ref_orbit.change_form(FormTransform.CART)
+    ref_orbit.form = FormTransform.CART
     assert np.allclose(ref_orbit, ref_cart)
 
 
@@ -109,13 +109,13 @@ def test_coord_attributes_access(ref_orbit):
     with raises(KeyError):
         ref_orbit["ν"]
 
-    ref_orbit.change_form(FormTransform.KEPL)
+    ref_orbit.form = FormTransform.KEPL
     assert ref_orbit.ν == ref_orbit[5]
 
 
 def test_orbit_change_form(ref_orbit):
 
-    ref_orbit.change_form(FormTransform.CART.name)
+    ref_orbit.form = FormTransform.CART.name
     assert ref_orbit.form == FormTransform.CART
     assert np.allclose(ref_orbit, ref_cart)
 
@@ -129,7 +129,7 @@ def test_orbit_change_form(ref_orbit):
 #     assert ref_orbit.periapsis == ref_periapsis
 #     assert ref_orbit.apoapsis > ref_orbit.periapsis
 
-#     ref_orbit.change_form("Cartesian")
+#     ref_orbit.form = "Cartesian"
 #     assert np.allclose(ref_orbit.apoapsis, ref_apoapsis)
 #     assert np.allclose(ref_orbit.periapsis, ref_periapsis)
 #     assert ref_orbit.apoapsis > ref_orbit.periapsis

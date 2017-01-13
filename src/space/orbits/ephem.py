@@ -18,8 +18,8 @@ class Ephem:
     .. code-block:: python
 
         ephem = orb.ephem(Date.now(), timedeltat(hours=6), timedelta(minutes=2))
-        ephem.change_frame('ITRF')
-        ephem.change_form('spherical')
+        ephem.frame = 'ITRF'
+        ephem.form = 'spherical'
         latitudes = ephem[:,1]
         longitudes = ephem[:,2]
     """
@@ -75,23 +75,25 @@ class Ephem:
         """
         return self._orbits[0].frame
 
+    @frame.setter
+    def frame(self, frame):
+        """Change the frames of all points
+        """
+        for orb in self:
+            orb.frame = frame
+
     @property
     def form(self):
         """Get the form of the first point
         """
         return self._orbits[0].form
 
-    def change_frame(self, frame):  # pragma: no cover
-        """Change the frames of all points
-        """
-        for orb in self:
-            orb.change_frame(frame)
-
-    def change_form(self, form):  # pragma: no cover
+    @form.setter
+    def form(self, form):
         """Change the form of all points
         """
         for orb in self:
-            orb.change_form(form)
+            orb.form = form
 
     def interpolate(self, date, method=LAGRANGE, order=8):
         """Interpolate data at a given date

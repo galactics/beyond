@@ -195,7 +195,7 @@ def test_change_tle():
                  -2232.83278274, -4110.45348994, -3157.34543346],
                 "cartesian", "TEME", None
             )
-            tle.change_frame('EME2000')
+            tle.frame = 'EME2000'
 
             eme2000_ref = [-9059942.6552, 4659694.9162, 813957.7525,
                            -2233.346698, -4110.136822, -3157.394202]
@@ -239,15 +239,15 @@ def test_station():
 
         tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
 
-        orb.change_frame('Toulouse')
-        orb.change_form('spherical')
+        orb.frame = 'Toulouse'
+        orb.form = 'spherical'
 
         assert -np.degrees(orb.theta) == 159.75001561831206  # azimuth
         assert np.degrees(orb.phi) == 57.894234537351593    # elevation
         assert orb.r == 471467.6615039421                   # range
 
-        orb.change_frame(archive.frame)
-        orb.change_form(archive.form)
+        orb.frame = archive.frame
+        orb.form = archive.form
         assert_vector(archive, orb)
 
 
@@ -272,7 +272,7 @@ def test_station_visibility():
 def test_errors(ref_orbit):
 
     with raises(ValueError):
-        ref_orbit.change_frame('Inexistant')
+        ref_orbit.frame = 'Inexistant'
 
 
 def test_orbit2frame():
@@ -293,18 +293,15 @@ def test_orbit2frame():
     iss.register_as_frame('iss_tnw', 'TNW')
     iss.register_as_frame('iss_unknown', 'unknow')
 
-    s1 = soyouz.copy()
-    s1.change_frame('iss_inert')
+    s1 = soyouz.copy(frame='iss_inert')
     assert_almost_equal(s1[:3], [70.616031724028289, 73.651090503670275, -62.527891733683646])
     assert_almost_equal(s1[3:], [0.052151684838463552, 0.099888696147900191, -0.042362396145563253])
 
-    s2 = soyouz.copy()
-    s2.change_frame("iss_qsw")
+    s2 = soyouz.copy(frame="iss_qsw")
     assert_almost_equal(s2[:3], [4.5450426777824759, -18.729738359805197, -118.10750304395333])
     assert_almost_equal(s2[3:], [0.039432618629234639, -0.0046244694185588742, -0.1136477186164484])
 
-    s3 = soyouz.copy()
-    s3.change_frame("iss_tnw")
+    s3 = soyouz.copy(frame="iss_tnw")
     assert_almost_equal(s3[:3], [-18.728253549197689, -4.5511609734967351, -118.10750304395333])
     assert_almost_equal(s3[3:], [-0.0046115872564769234, -0.039434125179468538, -0.1136477186164484])
 
@@ -316,6 +313,5 @@ def test_orbit2frame():
     assert_almost_equal(norm(s1[:3]), norm(s2[:3]), 4)
     assert_almost_equal(norm(s2[:3]), norm(s3[:3]), 6)
 
-    s4 = soyouz.copy()
     with raises(ValueError):
-        s4.change_frame('iss_unknown')
+        soyouz.copy(frame='iss_unknown')

@@ -310,8 +310,8 @@ class TopocentricFrame(_Frame):
         given date
         """
         orb = orb.propagate(date)
-        orb.change_frame(cls.__name__)
-        orb.change_form('spherical')
+        orb.frame = cls.__name__
+        orb.form = 'spherical'
 
         return orb
 
