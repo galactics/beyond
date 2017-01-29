@@ -8,7 +8,6 @@ Orbit
     :members:
     :undoc-members:
     :show-inheritance:
-    :exclude-members: copy
 
 Ephem
 -----

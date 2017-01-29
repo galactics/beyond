@@ -51,7 +51,15 @@ class Orbit(np.ndarray):
         return obj
 
     def copy(self, *, frame=None, form=None):
-        """Override :py:meth:`numpy.ndarray.copy()` to include additional
+        """Provide a new instance of the same point in space-time
+
+        Keyword Args:
+            frame (str or Frame): Frame to convert the new instance into
+            form (str or Form): Form to convert the new instance into
+        Return:
+            Orbit:
+
+        Override :py:meth:`numpy.ndarray.copy()` to include additional
         fields
         """
         new_obj = self.__class__(
@@ -120,6 +128,11 @@ class Orbit(np.ndarray):
 
     @property
     def form(self):
+        """Form of the coordinates of the orbit
+
+        Return:
+            Form:
+        """
         return self._form
 
     @form.setter
@@ -138,6 +151,11 @@ class Orbit(np.ndarray):
 
     @property
     def frame(self):
+        """Frame of reference of the coordinates
+
+        Return:
+            Frame:
+        """
         return self._frame
 
     @frame.setter
@@ -192,7 +210,8 @@ class Orbit(np.ndarray):
             yield self.propagate(date)
 
     def ephem(self, *args):
-        """
+        """Tabulation of Orbit at a given step and on a given date range
+
         Args:
             start (Date)
             stop (Date or timedelta)
