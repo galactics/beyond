@@ -4,6 +4,7 @@
 from pytest import fixture, yield_fixture, raises
 from unittest.mock import patch
 
+from sys import float_info
 import numpy as np
 from numpy.testing import assert_almost_equal
 from numpy.linalg import norm
@@ -242,9 +243,12 @@ def test_station():
         orb.frame = 'Toulouse'
         orb.form = 'spherical'
 
-        assert -np.degrees(orb.theta) == 159.75001561831206  # azimuth
-        assert np.degrees(orb.phi) == 57.894234537351593    # elevation
-        assert orb.r == 471467.6615039421                   # range
+        # azimuth
+        assert -np.degrees(orb.theta) - 159.75001561831206 <= float_info.epsilon
+        # elevation
+        assert np.degrees(orb.phi) - 57.894234537351593 <= float_info.epsilon
+        # range
+        assert orb.r - 471467.6615039421 <= float_info.epsilon
 
         orb.frame = archive.frame
         orb.form = archive.form
