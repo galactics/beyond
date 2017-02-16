@@ -27,8 +27,10 @@ class Ephem:
     LINEAR = "linear"
     LAGRANGE = "lagrange"
 
-    def __init__(self, orbits):
+    def __init__(self, orbits, method=LAGRANGE, order=8):
         self._orbits = list(sorted(orbits, key=lambda x: x.date))
+        self.method = method
+        self.order = order
 
     def __iter__(self):
         self._i = -1
@@ -95,7 +97,7 @@ class Ephem:
         for orb in self:
             orb.form = form
 
-    def interpolate(self, date, method=LAGRANGE, order=8):
+    def interpolate(self, date, method=None, order=None):
         """Interpolate data at a given date
 
         Args:
@@ -113,6 +115,9 @@ class Ephem:
         for next_i, orb in enumerate(self):  # pragma: no branch
             if orb.date > date:
                 break
+
+        method = method if method is not None else self.method
+        order = order if order is not None else self.order
 
         if method == self.LINEAR:
 

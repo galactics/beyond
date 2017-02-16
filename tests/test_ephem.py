@@ -1,5 +1,4 @@
 
-import numpy as np
 from datetime import timedelta
 
 from space.utils import Date
