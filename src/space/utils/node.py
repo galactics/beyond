@@ -167,6 +167,7 @@ class Node2:
         C = Node2('C')
         D = Node2('D')
         E = Node2('E')
+        F = Node2('F')
 
         A + B + C + D + E + F + A
         F + C
@@ -174,7 +175,7 @@ class Node2:
         #   A
         #  / \\
         # B   F
-        # |   |
+        # | / |
         # C   E
         #  \ /
         #   D

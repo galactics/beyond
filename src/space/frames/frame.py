@@ -395,8 +395,8 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
 
         latlonalt (tuple of float): coordinates of the station, as follow:
 
-            * Latitude in radians
-            * Longitude in radians
+            * Latitude in degrees
+            * Longitude in degrees
             * Altitude to sea level in meters
 
         parent_frame (_Frame): Planetocentric rotating frame of reference of
