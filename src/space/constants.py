@@ -29,3 +29,6 @@ f_e = 1 / 298.257
 
 e_e = 0.081819221456
 """Eccentricity of Earth surface"""
+
+r_sun = 695700000
+"""Sun radius in m"""
