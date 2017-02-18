@@ -50,6 +50,46 @@ class Orbit(np.ndarray):
 
         return obj
 
+    def __array_finalize__(self, obj):
+        if obj is None:
+            return
+
+        self.date = obj.date
+        self._form = obj._form
+        self._frame = obj._frame
+        self.propagator = obj.propagator
+        self.complements = obj.complements
+
+    def __reduce__(self):
+        """For pickling
+
+        see http://stackoverflow.com/questions/26598109
+        """
+        reconstruct, clsinfo, state = super().__reduce__()
+
+        new_state = {
+            'basestate': state,
+            'date': self.date,
+            '_form': self._form,
+            '_frame': self._frame,
+            'propagator': self.propagator,
+            'complements': self.complements,
+        }
+
+        return reconstruct, clsinfo, new_state
+
+    def __setstate__(self, state):
+        """For pickling
+
+        see http://stackoverflow.com/questions/26598109
+        """
+        super().__setstate__(state['basestate'])
+        self.date = state['date']
+        self._form = state['_form']
+        self._frame = state['_frame']
+        self.propagator = state['propagator']
+        self.complements = state['complements']
+
     def copy(self, *, frame=None, form=None):
         """Provide a new instance of the same point in space-time
 

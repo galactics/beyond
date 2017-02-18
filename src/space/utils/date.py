@@ -161,6 +161,21 @@ class Date:
         super().__setattr__('scale', scale)
         super().__setattr__('_cache', {})
 
+    def __getstate__(self):
+        return {
+            'd': self._d,
+            's': self._s,
+            'offset': self._offset,
+            'scale': self.scale,
+        }
+
+    def __setstate__(self, state):
+        super().__setattr__('_d', state['d'])
+        super().__setattr__('_s', state['s'])
+        super().__setattr__('_offset', state['offset'])
+        super().__setattr__('scale', state['scale'])
+        super().__setattr__('_cache', {})
+
     def __setattr__(self, *args):  # pragma: no cover
         raise TypeError("Can not modify attributes of immutable object")
 

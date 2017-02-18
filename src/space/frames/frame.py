@@ -30,6 +30,7 @@ The relations may be circular, thanks to the use of the Node2 class.
     `-----'         `----'
 """
 
+import sys
 import warnings
 import numpy as np
 
@@ -48,10 +49,26 @@ TOPO = ['create_station']
 
 __all__ = CIO + IAU1980 + OTHER + TOPO + ['get_frame']
 
-dynamic = {}
+
+class _FrameCache(dict):
+    """This class is here to emulate module behaviour for dynamically
+    created frames.
+
+    It's useful when pickle is involved (e.g. multiprocessing)
+    """
+    def __getattr__(self, name):
+        if name not in self:
+            raise AttributeError(name)
+        return self[name]
+
+
+dynamic = _FrameCache()
 """This dictionnary contains all the frames. Those defined here, and those created on the fly
 by the developper.
 """
+
+sys.modules[__name__ + ".dynamic"] = dynamic
+
 
 
 def get_frame(frame):
@@ -78,6 +95,8 @@ class _MetaFrame(type, Node2):
 
         if cls.__name__ in dynamic:
             warnings.warn("A frame with the name '%s' is already registered. Overriding" % cls.__name__)
+
+        cls.__module__ = __name__ + ".dynamic"
 
         # Making the frame available to the get_frame function
         dynamic[cls.__name__] = cls
