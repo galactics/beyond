@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 install_requires = ['numpy', 'sgp4']
-version = "0.1"
+version = "0.2"
 
 setup(
     name='space-api',
@@ -20,7 +20,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha"
+        "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Programming Language :: Python :: 3.5",
