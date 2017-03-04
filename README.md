@@ -1,7 +1,9 @@
 Space API
 =========
 
-![Tests](https://travis-ci.org/galactics/space-api.svg?branch=master)
+[![Documentation Status](http://readthedocs.org/projects/space-api/badge/?version=latest)](http://space-api.readthedocs.io/en/latest/?badge=latest)
+[![Tests](https://travis-ci.org/galactics/space-api.svg?branch=master)](https://travis-ci.org/galactics/space-api)
+[![Coverage Status](https://coveralls.io/repos/github/galactics/space-api/badge.svg?branch=master)](https://coveralls.io/github/galactics/space-api?branch=master)
 
 This library was started to better understand how Flight Dynamics works. It
 has no intent of efficiency nor performance at the moment, and the goal is
@@ -12,7 +14,7 @@ The sources of this library can be found at [github](https://github.com/galactic
 Installation
 ------------
 
-Space API only requires Python 3.5 and numpy. To install it use pip
+Space API only requires Python 3.5+ and numpy. To install it use pip
 
     pip install space-api
 
