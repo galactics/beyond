@@ -7,27 +7,35 @@ to each other.
 The relations may be circular, thanks to the use of the Node2 class.
 
 .. code-block:: text
-
-              ,-------.
-              |EME2000|
-              `-------'
-               |      :
-               |      :
-             ,---.  ,----.
-             |MOD|  |GCRF|
-             `---'  `----'
-               |      |
-    ,----.   ,---.  ,----.
-    |TEME|---|TOD|  |CIRF|
-    `----'   `---'  `----'
-               |      |
-             ,---.  ,----.
-             |PEF|  |TIRF|
-             `---   `----'
-                  \   |
-    ,-----.        \,----.
-    |WGS84|---------|ITRF|
-    `-----'         `----'
+    
+                   ,-------.        ,----.
+                   |EME2000|..bias..|GCRF|
+                   `-------'        `----'
+                       |              |
+                   precesion          |
+                       |              |
+                     ,---.        prececion
+                     |MOD|            +
+                     `---'         nutation
+                       |              |
+                    nutation          |
+                       |              |
+    ,----.           ,---.         ,----.
+    |TEME|--equinox--|TOD|         |CIRF|
+    `----'           `---'         `----'
+                       |              |
+                    sideral        sideral
+                       |              |
+                     ,---.         ,----.
+                     |PEF|         |TIRF|
+                     `---'         `----'
+                        \            /
+           model corrections      model corrections
+                     IAU1980      IAU2010
+                           \      /
+         ,-----.            ,----.
+         |WGS84|--identity--|ITRF|
+         `-----'            `----'
 """
 
 import sys
