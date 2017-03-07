@@ -483,6 +483,8 @@ def orbit2frame(name, ref_orbit, orientation=None):
             rotation = np.identity(7)
         elif orientation.upper() in ("QSW", "TNW"):
 
+            # propagation of the reference orbit to the date of the
+            # converted orbit
             orb = ref_orbit.propagate(self.date)
 
             m = to_qsw(orb) if orientation.upper() == "QSW" else to_tnw(orb)

@@ -152,7 +152,15 @@ class Orbit(np.ndarray):
             [" " * 4 + "%s = %s" % (name, arg) for name, arg in zip(self.names, self)]
         )
 
-        propagator = self.propagator.__name__ if self.propagator is not None else self.propagator
+        if self.propagator is None:
+            # No propagator defined
+            propagator = self.propagator
+        elif isinstance(self.propagator, type):
+            # Propagator defined but not used yet
+            propagator = self.propagator.__name__
+        else:
+            # Propagator instanciated
+            propagator = "%s (initialised)" % self.propagator.__class__.__name__
 
         fmt = "Orbit =\n  date = {date}\n  form = {form}\n  frame = {frame}\n  propag = {propag}\n  coord =\n{coord}".format(
             date=self.date,
