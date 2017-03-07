@@ -5,46 +5,63 @@ from pathlib import Path
 from configparser import ConfigParser
 
 
-class Config:
+class Config(dict):
+    """Configuration
+
+    Example:
+        .. code-block:: python
+
+            from space.config import config
+            print(config['env']['pole_motion_source'])
+    """
 
     _instance = None
 
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance._values = {}
 
         return cls._instance
 
-    def __setitem__(self, name, value):
-        self._values[name] = value
-
     def __getitem__(self, name):
-        if name not in self._values:
+        if name not in self:
             raise ConfigError("Unknown configuration variable '%s'" % name)
 
-        return self._values[name]
+        return super().__getitem__(name)
 
     @classmethod
     def load(cls, path):
+        """
+        Args:
+            path (pathlib.Path or str):
+        """
 
         path = Path(path)
 
         if not path.exists():
             raise FileNotFoundError(path)
 
-        confpath = path / "space.conf"
+        if path.is_file():
+            # if the path provided is a conf file
+            folder_path = path.parent
+            conf_path = path
+        else:
+            folder_path = path
+            conf_path = path / "space.conf"
 
-        if not confpath.exists():
-            raise FileNotFoundError(confpath)
+        if not conf_path.exists():
+            raise FileNotFoundError(conf_path)
 
+        # reading of the conf file
         confparser = ConfigParser()
-        confparser.read(str(confpath))
+        confparser.read(str(conf_path))
+
+        obj = cls()
 
         for section in confparser.sections():
-            cls._instance[section] = dict(confparser[section])
+            obj[section] = dict(confparser[section])
 
-        cls._instance['folder'] = path
+        obj['folder'] = folder_path
 
 
 class ConfigError(RuntimeError):
