@@ -3,7 +3,7 @@
 
 from pytest import raises
 
-from space.utils.node import Node2
+from beyond.utils.node import Node2
 
 A = Node2('A')
 B = Node2('B')

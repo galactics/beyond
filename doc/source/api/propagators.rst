@@ -23,19 +23,19 @@ of the C++ SGP4 reference implementation. As the reference, it implements both S
 and SDP4 models in one interface. For these reasons, this module is to be prefered
 over the rewrite.
 
-.. automodule:: space.propagators.sgp4
+.. automodule:: beyond.propagators.sgp4
     :members:
 
 
 Rewrite
 ^^^^^^^
 
-.. automodule:: space.propagators.sgp4beta
+.. automodule:: beyond.propagators.sgp4beta
     :members:
 
 Folloing are gravitional constants used in the SGP4 propagator, the default
 beeing WGS72.
 
-.. autoclass:: space.propagators.sgp4beta.WGS72Old
-.. autoclass:: space.propagators.sgp4beta.WGS72
-.. autoclass:: space.propagators.sgp4beta.WGS84
+.. autoclass:: beyond.propagators.sgp4beta.WGS72Old
+.. autoclass:: beyond.propagators.sgp4beta.WGS72
+.. autoclass:: beyond.propagators.sgp4beta.WGS84

@@ -1,8 +1,8 @@
 
 from datetime import timedelta
 
-from space.utils import Date
-from space.orbits import Tle
+from beyond.utils import Date
+from beyond.orbits import Tle
 
 from pytest import raises, fixture
 

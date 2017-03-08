@@ -12,16 +12,16 @@ def sun_vector(date):
     """Compute the position of the sun at a given date
 
     Args:
-        date (~space.utils.date.Date)
+        date (~beyond.utils.date.Date)
 
     Return:
-        ~space.orbits.orbit.Orbit: Position of the sun in MOD frame
+        ~beyond.orbits.orbit.Orbit: Position of the sun in MOD frame
 
     Example:
 
         .. code-block:: python
 
-            from space.utils.date import Date
+            from beyond.utils.date import Date
             sun_vector(Date(2006, 4, 2))
             # Orbit =
             #   date = 2006-04-02T00:00:00 UTC
@@ -66,6 +66,6 @@ class SunPropagator:
         pass
 
     def propagate(self, date):
-        """Direct call to :py:func:`~space.env.sun.sun_vector`
+        """Direct call to :py:func:`~beyond.env.sun.sun_vector`
         """
         return sun_vector(date)

@@ -4,9 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import timedelta
 
-from space.utils import Date
-from space.orbits import Tle
-from space.frames import create_station
+from beyond.utils import Date
+from beyond.orbits import Tle
+from beyond.frames import create_station
 
 tle = Tle("""ISS (ZARYA)
 1 25544U 98067A   16086.49419020  .00003976  00000-0  66962-4 0  9998

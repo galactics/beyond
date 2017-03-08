@@ -182,7 +182,7 @@ class Tle:
         """Convert TLE to Orbit object, in order to make computations on it
 
         Return:
-            ~space.orbits.orbit.Orbit:
+            ~beyond.orbits.orbit.Orbit:
         """
         data = {
             'bstar': self.bstar,

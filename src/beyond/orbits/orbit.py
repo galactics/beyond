@@ -281,6 +281,6 @@ class Orbit(np.ndarray):
     def register_as_frame(self, name, orientation=None):  # pragma: no cover
         """Register the orbit as frame.
 
-        see :py:func:`space.frames.frame.orbit2frame` for details of the arguments
+        see :py:func:`beyond.frames.frame.orbit2frame` for details of the arguments
         """
         orbit2frame(name, self, orientation)

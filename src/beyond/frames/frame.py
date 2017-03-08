@@ -85,7 +85,7 @@ def get_frame(frame):
     Args:
         frame (str): name of the desired frame
     Return:
-        ~space.frames.frame._Frame
+        ~beyond.frames.frame._Frame
     """
     if frame in dynamic.keys():
         return dynamic[frame]
@@ -120,7 +120,7 @@ class _Frame(metaclass=_MetaFrame):
     def __init__(self, date, orbit):
         """
         Args:
-            date (~space.utils.Date)
+            date (~beyond.utils.Date)
             orbit (numpy.ndarray)
         """
         self.date = date

@@ -1,34 +1,34 @@
 Space API
 =========
 
-[![Documentation Status](http://readthedocs.org/projects/space-api/badge/?version=latest)](http://space-api.readthedocs.io/en/latest/?badge=latest)
-[![Tests](https://travis-ci.org/galactics/space-api.svg?branch=master)](https://travis-ci.org/galactics/space-api)
-[![Coverage Status](https://coveralls.io/repos/github/galactics/space-api/badge.svg?branch=master)](https://coveralls.io/github/galactics/space-api?branch=master)
-[![PyPi version](https://img.shields.io/pypi/v/space-api.svg)](https://pypi.python.org/pypi/space-api)
-[![Python versions](https://img.shields.io/pypi/pyversions/space-api.svg)](https://pypi.python.org/pypi/space-api)
+[![Documentation Status](http://readthedocs.org/projects/beyond/badge/?version=latest)](http://beyond.readthedocs.io/en/latest/?badge=latest)
+[![Tests](https://travis-ci.org/galactics/beyond.svg?branch=master)](https://travis-ci.org/galactics/beyond)
+[![Coverage Status](https://coveralls.io/repos/github/galactics/beyond/badge.svg?branch=master)](https://coveralls.io/github/galactics/beyond?branch=master)
+[![PyPi version](https://img.shields.io/pypi/v/beyond.svg)](https://pypi.python.org/pypi/beyond)
+[![Python versions](https://img.shields.io/pypi/pyversions/beyond.svg)](https://pypi.python.org/pypi/beyond)
 
 This library was started to better understand how Flight Dynamics works. It
 has no intent of efficiency nor performance at the moment, and the goal is
 mainly to develop a simple API for space observations.
 
-The sources of this library can be found at [github](https://github.com/galactics/space-api)
+The sources of this library can be found at [github](https://github.com/galactics/beyond)
 
 Installation
 ------------
 
 Space API only requires Python 3.5+, numpy and [sgp4](https://github.com/brandon-rhodes/python-sgp4). To install it use pip
 
-    pip install space-api
+    pip install beyond
 
 Documentation
 -------------
 
-The documentation of the library can be found [here](http://space-api.readthedocs.io/en/latest/).
+The documentation of the library can be found [here](http://beyond.readthedocs.io/en/latest/).
 
 Usage
 -----
 
-You can find some usage in the official documentation at [this page](http://space-api.readthedocs.io/en/latest//examples.html).
+You can find some usage in the official documentation at [this page](http://beyond.readthedocs.io/en/latest//examples.html).
 
 Commons usages are:
 

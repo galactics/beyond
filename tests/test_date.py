@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 from datetime import datetime, timedelta, timezone
 
-from space.env.poleandtimes import ScalesDiff
-from space.utils.date import Date
+from beyond.env.poleandtimes import ScalesDiff
+from beyond.utils.date import Date
 
 
 def test_creation():
@@ -104,7 +104,7 @@ def test_operations():
 
 def test_change_scale():
 
-    with patch('space.utils.date.get_timescales') as m:
+    with patch('beyond.utils.date.get_timescales') as m:
         m.return_value = ScalesDiff(0.1242558, 36.0)
 
         t = Date(2015, 12, 6)  # UTC object
@@ -125,7 +125,7 @@ def test_change_scale():
 
 def test_julian():
 
-    with patch('space.utils.date.get_timescales') as m:
+    with patch('beyond.utils.date.get_timescales') as m:
         m.return_value = ScalesDiff(0.10362957986110499, 36.0)
 
         t = Date(2015, 12, 18, 22, 25)
@@ -136,7 +136,7 @@ def test_julian():
 
 def test_comparison():
 
-    with patch('space.utils.date.get_timescales') as m:
+    with patch('beyond.utils.date.get_timescales') as m:
         m.return_value = ScalesDiff(0.10362957986110499, 36.0)
 
         # Same scale
@@ -160,12 +160,12 @@ def test_comparison():
 
 def test_leap_second():
 
-    with patch('space.utils.date.get_timescales') as m:
+    with patch('beyond.utils.date.get_timescales') as m:
         m.return_value = ScalesDiff(0., 36.0)
 
         t1 = Date(2016, 12, 31, 23, 59, 59)
 
-    with patch('space.utils.date.get_timescales') as m:
+    with patch('beyond.utils.date.get_timescales') as m:
         m.return_value = ScalesDiff(0., 37.0)
         t2 = Date(2017, 1, 1, 0, 0, 0)
 

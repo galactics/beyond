@@ -1,3 +1,2 @@
 include *.md
-include src/space/frames/data/*
-include src/space/env/data/*
+include src/beyond/frames/data/*

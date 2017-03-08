@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import timedelta
 
-from space.orbits import Tle
-from space.utils import Date
+from beyond.orbits import Tle
+from beyond.utils import Date
 
 
 # Parsing of TLE

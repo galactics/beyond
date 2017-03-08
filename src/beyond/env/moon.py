@@ -12,9 +12,9 @@ def moon_vector(date):
     """Compute the Moon position at a given date
 
     Args:
-        date (~space.utils.date.Date)
+        date (~beyond.utils.date.Date)
     Return:
-        ~space.orbits.orbit.Orbit: Position of the Moon in EME2000 frame
+        ~beyond.orbits.orbit.Orbit: Position of the Moon in EME2000 frame
 
     Todo:
         Replace `TT` time scale by `TDB`
@@ -23,7 +23,7 @@ def moon_vector(date):
 
         .. code-block:: python
 
-            from space.utils.date import Date
+            from beyond.utils.date import Date
             moon_vector(Date(1994, 4, 28))
             # Orbit =
             #   date = 1994-04-28T00:00:00 UTC
@@ -84,6 +84,6 @@ class MoonPropagator:
         pass
 
     def propagate(self, date):
-        """Direct call to :py:func:`~space.env.moon.moon_vector`
+        """Direct call to :py:func:`~beyond.env.moon.moon_vector`
         """
         return moon_vector(date)

@@ -8,13 +8,13 @@ from sys import float_info
 import numpy as np
 from numpy.testing import assert_almost_equal
 from numpy.linalg import norm
-from space.env.poleandtimes import ScalesDiff
+from beyond.env.poleandtimes import ScalesDiff
 from datetime import timedelta
 
-from space.utils.date import Date
-from space.orbits.orbit import Orbit
-from space.orbits.tle import Tle
-from space.frames.frame import *
+from beyond.utils.date import Date
+from beyond.orbits.orbit import Orbit
+from beyond.orbits.tle import Tle
+from beyond.frames.frame import *
 
 
 @fixture
@@ -24,14 +24,14 @@ def date():
 
 @yield_fixture
 def time(date):
-    with patch('space.utils.date.get_timescales') as mock_ts:
+    with patch('beyond.utils.date.get_timescales') as mock_ts:
         mock_ts.return_value = ScalesDiff(-0.4399619, 32)
         yield
 
 
 @yield_fixture()
 def model_correction(time):
-    with patch('space.frames.iau1980.get_pole') as mock_pole1, patch('space.frames.iau2010.get_pole') as mock_pole2:
+    with patch('beyond.frames.iau1980.get_pole') as mock_pole1, patch('beyond.frames.iau2010.get_pole') as mock_pole2:
         mock_pole1.return_value = {
             'X': -0.140682,
             'Y': 0.333309,
@@ -169,14 +169,14 @@ def test_change_tle():
     # tle = Tle(lines).orbit()
     # tle = tle.propagate(timedelta(days=3))
 
-    # from space.env.poleandtimes import get_pole
+    # from beyond.env.poleandtimes import get_pole
     # t = Date(2000, 6, 30, 18, 50, 19, 733568).mjd
 
     # print(get_timescales(t))
     # print(get_pole(t))
     # assert False
 
-    with patch('space.frames.iau1980.get_pole') as m:
+    with patch('beyond.frames.iau1980.get_pole') as m:
         m.return_value = {
             'X': 0.11019218256776,
             'Y': 0.28053771387248,
@@ -187,7 +187,7 @@ def test_change_tle():
             'LOD': 0.06999515274799778,
         }
 
-        with patch('space.utils.date.get_timescales') as m2:
+        with patch('beyond.utils.date.get_timescales') as m2:
             m2.return_value = ScalesDiff(0.20415904149231798, 32.0)
 
             tle = Orbit(
@@ -212,12 +212,12 @@ def test_station():
     # orb = Tle(lines).orbit()
     # orb = orb.propagate(Date(2016, 2, 7, 16, 55))
 
-    # from space.env.poleandtimes import get_pole
+    # from beyond.env.poleandtimes import get_pole
 
     # print(get_pole(Date(2016, 2, 7, 16, 55).mjd))
     # assert False
 
-    with patch('space.frames.iau1980.get_pole') as m, patch('space.utils.date.get_timescales') as m2:
+    with patch('beyond.frames.iau1980.get_pole') as m, patch('beyond.utils.date.get_timescales') as m2:
         m.return_value = {
             'X': -0.00951054166666622,
             'Y': 0.31093590624999734,

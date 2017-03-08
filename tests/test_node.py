@@ -1,6 +1,6 @@
 from pytest import raises
 
-from space.utils.node import Node
+from beyond.utils.node import Node
 
 M = Node("M", None)
 L = Node("L", None)

@@ -1,12 +1,12 @@
-.. space documentation master file, created by
+.. beyond documentation master file, created by
    sphinx-quickstart on Sat Dec  5 18:19:20 2015.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Space API
-=========
+Beyond
+======
 
-Space API is a library allowing developpers to handle orbits and space
+Beyond is a library allowing developpers to handle orbits and space
 observations with ease.
 
 .. toctree::

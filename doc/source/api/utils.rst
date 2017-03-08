@@ -4,20 +4,20 @@ Utils
 Date
 ----
 
-.. automodule:: space.utils.date
+.. automodule:: beyond.utils.date
     :members:
     :show-inheritance:
 
 Matrix
 ------
 
-.. automodule:: space.utils.matrix
+.. automodule:: beyond.utils.matrix
     :members:
     :show-inheritance:
 
 Node
 ----
 
-.. automodule:: space.utils.node
+.. automodule:: beyond.utils.node
     :members:
     :show-inheritance:

@@ -47,7 +47,7 @@ class Config(dict):
             conf_path = path
         else:
             folder_path = path
-            conf_path = path / "space.conf"
+            conf_path = path / "beyond.conf"
 
         if not conf_path.exists():
             raise FileNotFoundError(conf_path)
@@ -72,8 +72,8 @@ config = Config()
 
 
 try:
-    # Load the '~/.space' folder
-    config.load(Path.home() / ".space")
+    # Load the '~/.beyond' folder
+    config.load(Path.home() / ".beyond")
 except FileNotFoundError:
     # If it doesn't exist, use an empty config dict
     pass

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# space documentation build configuration file, created by
+# beyond documentation build configuration file, created by
 # sphinx-quickstart on Sat Dec  5 18:19:20 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -55,7 +55,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'space'
+project = 'beyond'
 copyright = '2015, Jules DAVID'
 author = 'Jules DAVID'
 
@@ -211,7 +211,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'spacedoc'
+htmlhelp_basename = 'beyonddoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -233,7 +233,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'space.tex', 'space Documentation',
+  (master_doc, 'beyond.tex', 'beyond Documentation',
    'Jules DAVID', 'manual'),
 ]
 
@@ -263,7 +263,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'space', 'space Documentation',
+    (master_doc, 'beyond', 'beyond Documentation',
      [author], 1)
 ]
 
@@ -277,8 +277,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'space', 'space Documentation',
-   author, 'space', 'One line description of project.',
+  (master_doc, 'beyond', 'beyond Documentation',
+   author, 'beyond', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -307,9 +307,9 @@ epub_copyright = copyright
 #epub_basename = project
 
 # The HTML theme for the epub output. Since the default themes are not optimized
-# for small screen space, using the same theme for HTML and epub output is
+# for small screen beyond, using the same theme for HTML and epub output is
 # usually not wise. This defaults to 'epub', a theme designed to save visual
-# space.
+# beyond.
 #epub_theme = 'epub'
 
 # The language of the text. It defaults to the language option

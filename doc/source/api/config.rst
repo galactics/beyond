@@ -6,37 +6,37 @@ Configuration
 .. note:: Setting up a configuration, althought it will degrade the precision
     of the library, is presently optional. This may change in a future version.
 
-The ``space.conf`` file contains a few fields usefull for the library
-behaviour. A description of the fields is provided :ref:`here <spaceconf>`.
+The ``beyond.conf`` file contains a few fields usefull for the library
+behaviour. A description of the fields is provided :ref:`here <beyondconf>`.
 
 .. code-block:: ini
 
     [env]
     pole_motion_source = all
 
-You can either create a directory containing the space.conf file and load it by hand
+You can either create a directory containing the beyond.conf file and load it by hand
 
 .. code-block:: python
 
-    from space.config import config
+    from beyond.config import config
     config.load('/home/user/project-X/data/')
     # or
-    config.load('/home/user/project-X/data/space.conf')
+    config.load('/home/user/project-X/data/beyond.conf')
 
-or create a ``.space`` directory directly in your home, containing the :ref:`spaceconf`
+or create a ``.beyond`` directory directly in your home, containing the :ref:`beyondconf`
 file, which will be automatically loaded.
 
 .. code-block:: text
 
     /home/
      |_ user/
-         |_ .space/
-             |_ space.conf
+         |_ .beyond/
+             |_ beyond.conf
 
-.. _spaceconf:
+.. _beyondconf:
 
-space.conf
-----------
+beyond.conf
+-----------
 
 env
 ^^^
@@ -60,7 +60,7 @@ pole_motion_source
     the following file tree::
 
         data/
-         |_ space.conf
+         |_ beyond.conf
          |_ env/
              |_ finals.all
              |_ finals2000A.all
@@ -69,5 +69,5 @@ pole_motion_source
 API
 ---
 
-.. automodule:: space.config
+.. automodule:: beyond.config
     :members:

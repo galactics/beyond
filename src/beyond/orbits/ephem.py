@@ -169,8 +169,8 @@ class Ephem:
         If an argument is set to ``None`` it will keep the same property as its parent
 
         Keyword Arguments:
-            start (:py:class:`~space.utils.date.Date` or None): Date of the first point
-            stop (:py:class:`~space.utils.date.Date`, :py:class:`~datetime.timedelta` or None): Date
+            start (:py:class:`~beyond.utils.date.Date` or None): Date of the first point
+            stop (:py:class:`~beyond.utils.date.Date`, :py:class:`~datetime.timedelta` or None): Date
                 of the last point
             step (:py:class:`~datetime.timedelta` or None): Step to use during the computation
         Yield:
@@ -223,6 +223,6 @@ class Ephem:
     def register_as_frame(self, name, orientation=None):  # pragma: no cover
         """Register the Ephem object as a frame
 
-        see :py:func:`space.frames.frame.orbit2frame` for details of the arguments
+        see :py:func:`beyond.frames.frame.orbit2frame` for details of the arguments
         """
         orbit2frame(name, self, orientation)

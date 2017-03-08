@@ -3,8 +3,8 @@
 
 from datetime import timedelta
 
-from space.propagators.sgp4beta import Sgp4Beta
-from space.orbits.tle import Tle
+from beyond.propagators.sgp4beta import Sgp4Beta
+from beyond.orbits.tle import Tle
 
 
 def test_one():

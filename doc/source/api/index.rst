@@ -1,5 +1,5 @@
-Space API modules
-=================
+Beyond modules
+==============
 
 .. toctree::
     :maxdepth: 2

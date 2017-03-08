@@ -83,7 +83,7 @@ def _nutation(date, eop_correction=True, terms=106):
     """Model 1980 of nutation as described in Vallado p. 224
 
     Args:
-        date (space.utils.date.Date)
+        date (beyond.utils.date.Date)
         eop_correction (bool): set to ``True`` to include model correction
             from 'finals' files.
         terms (int)

@@ -6,9 +6,9 @@ from pytest import fixture, yield_fixture
 from unittest.mock import patch
 from numpy.testing import assert_almost_equal
 
-from space.utils.date import Date
-from space.env.poleandtimes import ScalesDiff
-from space.frames.iau2010 import _pole_motion, _sideral, _planets, _xys, _xysxy2
+from beyond.utils.date import Date
+from beyond.env.poleandtimes import ScalesDiff
+from beyond.frames.iau2010 import _pole_motion, _sideral, _planets, _xys, _xysxy2
 
 
 @fixture
@@ -18,14 +18,14 @@ def date():
 
 @yield_fixture
 def time(date):
-    with patch('space.utils.date.get_timescales') as mock_ts:
+    with patch('beyond.utils.date.get_timescales') as mock_ts:
         mock_ts.return_value = ScalesDiff(-0.4399619, 32)
         yield
 
 
 @yield_fixture()
 def model_correction(time):
-    with patch('space.frames.iau2010.get_pole') as mock_pole:
+    with patch('beyond.frames.iau2010.get_pole') as mock_pole:
         mock_pole.return_value = {
             'X': -0.140682,
             'Y': 0.333309,

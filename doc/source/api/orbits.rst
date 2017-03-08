@@ -4,7 +4,7 @@ Orbits
 Orbit
 -----
 
-.. automodule:: space.orbits.orbit
+.. automodule:: beyond.orbits.orbit
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ Orbit
 Ephem
 -----
 
-.. automodule:: space.orbits.ephem
+.. automodule:: beyond.orbits.ephem
     :members:
 
 
@@ -24,7 +24,7 @@ TLE
 The `TLE <https://en.wikipedia.org/wiki/Two-line_element_set>`__ representation
 is a de-facto standard for orbit description.
 
-.. automodule:: space.orbits.tle
+.. automodule:: beyond.orbits.tle
     :members:
     :undoc-members:
     :show-inheritance:

@@ -6,7 +6,7 @@ install_requires = ['numpy', 'sgp4']
 version = "0.2"
 
 setup(
-    name='space-api',
+    name='beyond',
     version=version,
     description="Flight Dynamic Library",
     platforms=["any"],
@@ -16,7 +16,7 @@ setup(
     license='GPLv3',
     packages=find_packages('src'),
     package_dir={'': 'src'},
-    namespace_packages=['space'],
+    namespace_packages=['beyond'],
     include_package_data=True,
     zip_safe=False,
     classifiers=[

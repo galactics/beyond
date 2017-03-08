@@ -5,9 +5,9 @@ from pytest import raises, fixture
 
 import numpy as np
 
-from space.utils.date import Date
-from space.orbits.orbit import Orbit
-from space.orbits.forms import FormTransform, Form
+from beyond.utils.date import Date
+from beyond.orbits.orbit import Orbit
+from beyond.orbits.forms import FormTransform, Form
 
 ref_coord = [
     7192631.11295, 0.00218439, np.deg2rad(98.50639978),

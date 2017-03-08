@@ -4,8 +4,8 @@
 from pytest import raises
 import numpy as np
 
-from space.utils.date import Date
-from space.orbits.tle import Tle
+from beyond.utils.date import Date
+from beyond.orbits.tle import Tle
 
 ref = """0 ISS (ZARYA)
 1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927

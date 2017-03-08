@@ -6,15 +6,15 @@ Environment handling. Solar Activity, pole motions, etc.
 Pole motion and Time Scales
 ---------------------------
 
-.. automodule:: space.env.poleandtimes
+.. automodule:: beyond.env.poleandtimes
     :members:
     :undoc-members:
 
 Position of the Sun and the Moon
 --------------------------------
 
-.. automodule:: space.env.sun
+.. automodule:: beyond.env.sun
     :members:
 
-.. automodule:: space.env.moon
+.. automodule:: beyond.env.moon
     :members:
