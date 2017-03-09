@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 install_requires = ['numpy', 'sgp4']
-version = "0.2"
+version = "0.2.1"
 
 setup(
     name='beyond',
@@ -14,6 +14,7 @@ setup(
     author='Jules David',
     author_email='jules@onada.fr',
     license='GPLv3',
+    url="https://github.com/galactics/beyond",
     packages=find_packages('src'),
     package_dir={'': 'src'},
     namespace_packages=['beyond'],
