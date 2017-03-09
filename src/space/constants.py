@@ -24,7 +24,7 @@ m_e = 5.9736e24
 r_e = 6378136.3
 """Earth Radius in m"""
 
-f_e = 1 / 298.257
+f_e = 1 / 298.257223563
 """Flattening of the earth"""
 
 e_e = 0.081819221456
