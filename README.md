@@ -1,5 +1,5 @@
-Space API
-=========
+Beyond
+======
 
 [![Documentation Status](http://readthedocs.org/projects/beyond/badge/?version=latest)](http://beyond.readthedocs.io/en/latest/?badge=latest)
 [![Tests](https://travis-ci.org/galactics/beyond.svg?branch=master)](https://travis-ci.org/galactics/beyond)
@@ -16,7 +16,7 @@ The sources of this library can be found at [github](https://github.com/galactic
 Installation
 ------------
 
-Space API only requires Python 3.5+, numpy and [sgp4](https://github.com/brandon-rhodes/python-sgp4). To install it use pip
+Beyond requires Python 3.5+, numpy and [sgp4](https://github.com/brandon-rhodes/python-sgp4). To install it use pip
 
     pip install beyond
 
