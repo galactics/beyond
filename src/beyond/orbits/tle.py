@@ -154,6 +154,9 @@ class Tle:
             ValueError
         """
 
+        if not text[0].lstrip().startswith('1 ') and not text[1].lstrip().startswith('2 '):
+            raise ValueError("Line number check failed")
+
         for line in text:
             line = line.strip()
             if str(cls._checksum(line)) != line[-1]:
@@ -247,3 +250,36 @@ class Tle:
         line2 += str(cls._checksum(line2))
 
         return cls("%s%s\n%s" % (name, line1, line2))
+
+    @classmethod
+    def from_string(cls, text, comments="#"):
+        """Generator of TLEs from a string
+
+        Args:
+            text (str): A text containing many TLEs
+            comments (str): If a line starts with this character, it is ignored
+        Yields:
+            Tle:
+        """
+
+        cache = []
+        for line in text.splitlines():
+
+            # If the line is empty or begins with a comment mark, we skip it.
+            if not line.strip() or line.startswith(comments):
+                continue
+
+            # The startswith conditions include a blank space in order to not take into account
+            # lines containing only a COSPAR ID, which happens when an object is detected but the
+            # JSpOc doesn't know what is the source yet.
+            if line.startswith('1 '):
+                cache.append(line)
+            elif line.startswith('2 '):
+                cache.append(line)
+                yield cls("\n".join(cache))
+                cache = []
+            else:
+                # In the 3LE format, the first line (numbered 0, or unumbered) contains the name
+                # of the satellite
+                # In the TLE format, this line doesn't exists.
+                cache = [line]
