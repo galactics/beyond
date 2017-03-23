@@ -65,6 +65,17 @@ class FormTransform:
 
     @classmethod
     def _cartesian_to_keplerian(cls, coord):
+        """Convertion from cartesian (position and velocity) to keplerian
+
+        The keplerian form is
+
+            a : semi-major axis
+            e : excentricity
+            i : inclination
+            Ω : right-ascencion of ascending node
+            ω : Arguement of perigee
+            ν : True anomaly
+        """
 
         r_, v_ = coord[:3], coord[3:]
         h_ = np.cross(r_, v_)                     # angular momentum vector
@@ -104,6 +115,11 @@ class FormTransform:
 
     @classmethod
     def _keplerian_to_keplerian_m(cls, coord):
+        """Conversion from Keplerian to Mean Keplerian
+
+        The difference is the use of Mean anomaly instead of True anomaly
+        """
+
         a, e, i, Ω, ω, ν = coord
         if e < 1:
             # Elliptic case
@@ -118,6 +134,8 @@ class FormTransform:
 
     @classmethod
     def _keplerian_m_to_keplerian(cls, coord):
+        """Conversion from Mean Keplerian to True Keplerian
+        """
         a, e, i, Ω, ω, M = coord
         E = cls._m_to_e(e, M)
         ν = arccos((cos(E) - e) / (1 - e * cos(E)))
@@ -127,6 +145,9 @@ class FormTransform:
     @classmethod
     def _m_to_e(cls, e, M):
         """Conversion from Mean Anomaly to Excentric anomaly
+
+        Procedures for solving Kepler's Equation, A. W. Odell and  R. H. Gooding,
+        Celestial Mechanics 38 (1986) 307-334
         """
 
         k1 = 3 * np.pi + 2
@@ -184,6 +205,10 @@ class FormTransform:
 
     @classmethod
     def _tle_to_keplerian_m(cls, coord):
+        """Convertion from the TLE standard format to the Mean Keplerian
+
+        see :py:class:`Tle` for more information.
+        """
         i, Ω, e, ω, M, n = coord
         a = (µ_e / n ** 2) ** (1 / 3)
 
@@ -191,6 +216,8 @@ class FormTransform:
 
     @classmethod
     def _keplerian_m_to_tle(cls, coord):
+        """Mean Keplerian to TLE format conversion
+        """
         a, e, i, Ω, ω, M = coord
         n = sqrt(µ_e / a ** 3)
 
@@ -198,7 +225,7 @@ class FormTransform:
 
     @classmethod
     def _cartesian_to_spherical(cls, coord):
-        """Cartesin to Spherical conversion
+        """Cartesian to Spherical conversion
 
         .. warning:: The spherical form is equatorial, not zenithal
         """
@@ -216,6 +243,8 @@ class FormTransform:
 
     @classmethod
     def _spherical_to_cartesian(cls, coord):
+        """Spherical to cartesian conversion
+        """
         r, lat, lon, r_dot, lat_dot, lon_dot = coord
         x = r * cos(lat) * cos(lon)
         y = r * cos(lat) * sin(lon)
