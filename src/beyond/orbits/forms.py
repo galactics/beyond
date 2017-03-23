@@ -77,22 +77,22 @@ class FormTransform:
             ν : True anomaly
         """
 
-        r_, v_ = coord[:3], coord[3:]
-        h_ = np.cross(r_, v_)                     # angular momentum vector
-        h = np.linalg.norm(h_)
-        r = np.linalg.norm(r_)
-        v = np.linalg.norm(v_)
+        r, v = coord[:3], coord[3:]
+        h = np.cross(r, v)                      # angular momentum vector
+        h_norm = np.linalg.norm(h)
+        r_norm = np.linalg.norm(r)
+        v_norm = np.linalg.norm(v)
 
-        K = v ** 2 / 2 - µ_e / r                  # specific energy
-        a = - µ_e / (2 * K)                       # semi-major axis
-        e = sqrt(1 - h ** 2 / (a * µ_e))          # eccentricity
+        K = v_norm ** 2 / 2 - µ_e / r_norm      # specific energy
+        a = - µ_e / (2 * K)                     # semi-major axis
+        e = sqrt(1 - h_norm ** 2 / (a * µ_e))   # eccentricity
         p = a * (1 - e ** 2)
-        i = arccos(h_[2] / h)                     # inclination
-        Ω = arctan2(h_[0], -h_[1]) % (2 * np.pi)  # right ascencion of the ascending node
+        i = arccos(h[2] / h_norm)               # inclination
+        Ω = arctan2(h[0], -h[1]) % (2 * np.pi)  # right ascencion of the ascending node
 
-        ω_ν = arctan2(r_[2] / sin(i), r_[0] * cos(Ω) + r_[1] * sin(Ω))
-        ν = arctan2(sqrt(p / µ_e) * np.dot(v_, r_), p - r)
-        ω = (ω_ν - ν) % (2 * np.pi)               # argument of the perigee
+        ω_ν = arctan2(r[2] / sin(i), r[0] * cos(Ω) + r[1] * sin(Ω))
+        ν = arctan2(sqrt(p / µ_e) * np.dot(v, r), p - r_norm)
+        ω = (ω_ν - ν) % (2 * np.pi)             # argument of the perigee
 
         return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
@@ -231,28 +231,28 @@ class FormTransform:
         """
         x, y, z, vx, vy, vz = coord
         r = np.linalg.norm(coord[:3])
-        lat = arcsin(z / r)
-        lon = arctan2(y, x)
+        phi = arcsin(z / r)
+        theta = arctan2(y, x)
 
         # Not very sure about this
         r_dot = (x * vx + y * vy + z * vz) / r
-        lat_dot = (z * (x * vx + y * vy) - vz * (x ** 2 + y ** 2)) / (r ** 2 * sqrt(x ** 2 + y ** 2))
-        lon_dot = (y * vx - x * vy) / (x ** 2 + y ** 2)
+        phi_dot = (z * (x * vx + y * vy) - vz * (x ** 2 + y ** 2)) / (r ** 2 * sqrt(x ** 2 + y ** 2))
+        theta_dot = (y * vx - x * vy) / (x ** 2 + y ** 2)
 
-        return np.array([r, lat, lon, r_dot, lat_dot, lon_dot], dtype=float)
+        return np.array([r, phi, theta, r_dot, phi_dot, theta_dot], dtype=float)
 
     @classmethod
     def _spherical_to_cartesian(cls, coord):
         """Spherical to cartesian conversion
         """
-        r, lat, lon, r_dot, lat_dot, lon_dot = coord
-        x = r * cos(lat) * cos(lon)
-        y = r * cos(lat) * sin(lon)
-        z = r * sin(lat)
+        r, phi, theta, r_dot, phi_dot, theta_dot = coord
+        x = r * cos(phi) * cos(theta)
+        y = r * cos(phi) * sin(theta)
+        z = r * sin(phi)
 
         # Not very sure about that either
-        vx = r_dot * x / r + y * lon_dot + z * lat_dot * cos(lon)
-        vy = r_dot * y / r - x * lon_dot + z * lat_dot * sin(lon)
-        vz = r_dot * z / r - r * lat_dot * cos(lat)
+        vx = r_dot * x / r + y * theta_dot + z * phi_dot * cos(theta)
+        vy = r_dot * y / r - x * theta_dot + z * phi_dot * sin(theta)
+        vz = r_dot * z / r - r * phi_dot * cos(phi)
 
         return np.array([x, y, z, vx, vy, vz], dtype=float)
