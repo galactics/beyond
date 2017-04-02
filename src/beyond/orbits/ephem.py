@@ -225,4 +225,4 @@ class Ephem:
 
         see :py:func:`beyond.frames.frame.orbit2frame` for details of the arguments
         """
-        orbit2frame(name, self, orientation)
+        return orbit2frame(name, self, orientation)
