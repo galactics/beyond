@@ -236,8 +236,8 @@ class FormTransform:
 
         # Not very sure about this
         r_dot = (x * vx + y * vy + z * vz) / r
-        phi_dot = (z * (x * vx + y * vy) - vz * (x ** 2 + y ** 2)) / (r ** 2 * sqrt(x ** 2 + y ** 2))
-        theta_dot = (y * vx - x * vy) / (x ** 2 + y ** 2)
+        phi_dot = (vz * (x ** 2 + y ** 2) - z * (x * vx + y * vy)) / (r ** 2 * sqrt(x ** 2 + y ** 2))
+        theta_dot = (x * vy - y * vx) / (x ** 2 + y ** 2)
 
         return np.array([r, phi, theta, r_dot, phi_dot, theta_dot], dtype=float)
 
@@ -251,8 +251,8 @@ class FormTransform:
         z = r * sin(phi)
 
         # Not very sure about that either
-        vx = r_dot * x / r + y * theta_dot + z * phi_dot * cos(theta)
-        vy = r_dot * y / r - x * theta_dot + z * phi_dot * sin(theta)
-        vz = r_dot * z / r - r * phi_dot * cos(phi)
+        vx = r_dot * x / r - y * theta_dot - z * phi_dot * cos(theta)
+        vy = r_dot * y / r + x * theta_dot - z * phi_dot * sin(theta)
+        vz = r_dot * z / r + r * phi_dot * cos(phi)
 
         return np.array([x, y, z, vx, vy, vz], dtype=float)
