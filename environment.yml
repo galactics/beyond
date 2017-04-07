@@ -4,3 +4,4 @@ dependencies:
 - python=3.5.1=0
 - pip:
   - sgp4
+  - jplephem

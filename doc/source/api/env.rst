@@ -18,3 +18,9 @@ Position of the Sun and the Moon
 
 .. automodule:: beyond.env.moon
     :members:
+
+Position of objects of the Solar System
+---------------------------------------
+
+.. automodule:: beyond.env.jpl
+    :members:
