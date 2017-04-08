@@ -70,3 +70,20 @@ def test_steps():
     assert list(A.steps('K')) == [(A, D), (D, J), (J, K)]
     assert list(A.steps('L')) == [(A, E), (E, L)]
     assert list(A.steps('M')) == [(A, E), (E, L), (L, M)]
+
+
+def test_list():
+
+    assert A in A.list
+    assert B in A.list
+    assert C in A.list
+    assert D in A.list
+    assert E in A.list
+    assert F in A.list
+    assert G in A.list
+    assert H in A.list
+    assert I in A.list
+    assert J in A.list
+    assert K in A.list
+    assert L in A.list
+    assert M in A.list

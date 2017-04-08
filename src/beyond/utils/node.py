@@ -213,6 +213,10 @@ class Node2:
         self._update()
         return other
 
+    @property
+    def list(self):
+        return [self.path(node_name)[-1] for node_name in self.routes.keys()] + [self]
+
     def _update(self, already_updated=None):
 
         self.routes = {}
@@ -266,7 +270,7 @@ class Node2:
         while True:
             obj = obj.routes[goal].direction
             path.append(obj)
-            if obj.name is goal:
+            if obj.name == goal:
                 break
         return path
 
