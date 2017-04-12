@@ -66,6 +66,20 @@ pole_motion_source
              |_ finals2000A.all
              |_ tai-tuc.dat
 
+planets_source
+    This variable is optional and is only needed if you wish to track planets or other
+    solar system bodies.
+
+    It defines a list of file in which to look solar system bodies (planets, moons, comets, etc.).
+    Those files should be placed in the same `env` folder as above.
+
+    This variable may take on a coma-separated list of files::
+
+        [env]
+        platets_source = de430.bsp, mar097.bsp, jup310.bsp, sat360xl.bsp
+
+    More information in the :py:mod:`beyond.env.jpl` module.
+
 API
 ---
 

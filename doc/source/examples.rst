@@ -17,8 +17,6 @@ Station pointings
 .. literalinclude:: /_static/station.py
     :language: python
 
-which gives
-
 .. code-block:: text
 
         Time      Azim    Elev    Distance   Radial Velocity
@@ -49,3 +47,11 @@ which gives
     LOS 02:12:05  118.97    0.01    2323.42    6912.59
 
 .. image:: _static/station.png
+
+Jupiter and its moons
+---------------------
+
+.. literalinclude:: /_static/jupiter.py
+    :language: python
+
+.. image:: _static/jupiter.png

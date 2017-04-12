@@ -28,12 +28,11 @@ The documentation of the library can be found [here](http://beyond.readthedocs.i
 Usage
 -----
 
-You can find some usage in the official documentation at [this page](http://beyond.readthedocs.io/en/latest//examples.html).
-
 Commons usages are:
 
-*   Predicting of satellite visibility
-*   Computing satellite ground track
+*   [Predicting of satellite visibility](http://beyond.readthedocs.io/en/latest//examples.html#station-pointings)
+*   [Computing satellite ground track](http://beyond.readthedocs.io/en/latest//examples.html#ground-track)
+*   [Computing planets visibility](http://beyond.readthedocs.io/en/latest//examples.html#jupiter-and-its-moons)
 
 References
 ----------
