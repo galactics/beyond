@@ -245,7 +245,7 @@ class Orbit(np.ndarray):
             Orbit
         """
 
-        if type(self.propagator) is type:
+        if not hasattr(self.propagator, 'orbit'):
             # Instanciation of the propagator, only the first time the propagator
             # is called
             self.propagator = self.propagator(self)

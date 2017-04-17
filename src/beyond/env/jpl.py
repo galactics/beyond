@@ -52,8 +52,8 @@ class GenericBspPropagator:
 
     EARTH_BASE = "EME2000"
 
-    def __init__(self, *args, **kwargs):
-        pass
+    def __init__(self, orb, *args, **kwargs):
+        self.orbit = orb
 
     @classmethod
     def vector(cls, date):
@@ -72,6 +72,17 @@ class GenericBspPropagator:
 
     def propagate(self, date):
         return self.vector(date)
+
+
+class EarthPropagator:
+
+    def __init__(self, orb, *args, **kwargs):
+        self.orbit = orb
+
+    def propagate(self, date):
+        orb = self.orbit.copy()
+        orb.date = date
+        return orb
 
 
 class Bsp:
@@ -178,7 +189,7 @@ def get_body(name, date):
             [0] * 6,
             form="cartesian",
             frame=GenericBspPropagator.EARTH_BASE,
-            propagator=None
+            propagator=EarthPropagator
         )
 
     # On-demand Propagator and Frame generation

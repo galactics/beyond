@@ -63,7 +63,7 @@ class SunPropagator:
     """
 
     def __init__(self, *args, **kwargs):
-        pass
+        self.orbit = None
 
     def propagate(self, date):
         """Direct call to :py:func:`~beyond.env.sun.sun_vector`
