@@ -3,6 +3,7 @@ from numpy import sqrt, zeros
 from datetime import timedelta
 from collections import namedtuple
 
+from .base import NumericalPropagator
 from ..utils import Date
 from ..env.jpl import get_body
 
@@ -10,7 +11,7 @@ from ..env.jpl import get_body
 Obj = namedtuple("Obj", ('orbit', 'mass'))
 
 
-class Kepler:
+class Kepler(NumericalPropagator):
 
     G = 6.67408e-11  # in m³.s⁻².kg⁻¹
 
@@ -75,8 +76,8 @@ class Kepler:
 
         return y_n_1
 
-    def propagate(self, date):
-        orb = self.orb
+    def _generator(self, date, step=None):
+        orb = self.orbit
 
         if step is None:
             step = self.step
@@ -86,6 +87,11 @@ class Kepler:
             step = - step
 
         for date in Date.range(self.orbit.date, date, self.step):
+
+            if date <= Date(2017, 4, 20) < date + self.step:
+                print('man')
+                orb[3] = 12000.
+
             method = getattr(self, self.method)
             orb = method(orb, self.step)
             yield orb.copy()
