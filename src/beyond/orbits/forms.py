@@ -34,7 +34,7 @@ class FormTransform:
     TLE = Form("TLE", ["i", "Ω", "e", "ω", "M", "n"])
     KEPL_M = Form("Keplerian_M", ["a", "e", "i", "Ω", "ω", "M"], [TLE])
     KEPL = Form("Keplerian", ["a", "e", "i", "Ω", "ω", "ν"], [KEPL_M])
-    SPHE = Form("Spherical", ["r", "φ", "θ", "r_dot", "φ_dot", "θ_dot"])
+    SPHE = Form("Spherical", ["r", "θ", "φ", "r_dot", "θ_dot", "φ_dot"])
     CART = Form("Cartesian", ["x", "y", "z", "vx", "vy", "vz"], [KEPL, SPHE])
 
     _tree = CART
@@ -239,13 +239,13 @@ class FormTransform:
         phi_dot = (vz * (x ** 2 + y ** 2) - z * (x * vx + y * vy)) / (r ** 2 * sqrt(x ** 2 + y ** 2))
         theta_dot = (x * vy - y * vx) / (x ** 2 + y ** 2)
 
-        return np.array([r, phi, theta, r_dot, phi_dot, theta_dot], dtype=float)
+        return np.array([r, theta, phi, r_dot, theta_dot, phi_dot], dtype=float)
 
     @classmethod
     def _spherical_to_cartesian(cls, coord):
         """Spherical to cartesian conversion
         """
-        r, phi, theta, r_dot, phi_dot, theta_dot = coord
+        r, theta, phi, r_dot, theta_dot, phi_dot = coord
         x = r * cos(phi) * cos(theta)
         y = r * cos(phi) * sin(theta)
         z = r * sin(phi)
