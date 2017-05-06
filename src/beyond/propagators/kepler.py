@@ -31,6 +31,14 @@ class Kepler(NumericalPropagator):
         self.bodies = [Obj(get_body(body, Date.now()), self.masses[body]) for body in bodies]
         self.step = step
 
+    @property
+    def orbit(self):
+        return self._orbit if hasattr(self, '_orbit') else None
+
+    @orbit.setter
+    def orbit(self, orbit):
+        self._orbit = orbit.copy(form="cartesian", frame="EME2000")
+
     def dgl(self, date, orb):
 
         new_body = orb.__class__(date, zeros(6), "cartesian", orb.frame, self.__class__)
