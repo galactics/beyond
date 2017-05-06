@@ -250,11 +250,11 @@ class Orbit(np.ndarray):
 
         return self.propagator.propagate(date)
 
-    def iter_propagate(self, *args):
+    def iter(self, *args, **kwargs):
         if self.propagator.orbit is not self:
             self.propagator.orbit = self
 
-        return self.propagator.iter(*args)
+        return self.propagator.iter(*args, **kwargs)
 
     def ephemeris(self, start, stop, step):
         """Generator giving the propagation of the orbit at different dates
@@ -267,8 +267,8 @@ class Orbit(np.ndarray):
             Orbit
         """
 
-        for date in Date.range(start, stop, step, inclusive=True):
-            yield self.propagate(date)
+        for orb in self.iter(start, stop, step, inclusive=True):
+            yield orb
 
     def ephem(self, *args):
         """Tabulation of Orbit at a given step and on a given date range

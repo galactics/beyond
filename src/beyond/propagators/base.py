@@ -10,7 +10,7 @@ class Propagator(metaclass=ABCMeta):
     orbit = None
 
     @abstractmethod
-    def _iter(self, star, stop, step):
+    def _iter(self, star, stop, step, **kwargs):
         pass
 
     # @abstractmethod
@@ -21,7 +21,7 @@ class Propagator(metaclass=ABCMeta):
     def propagate(self, start):
         pass
 
-    def iter(self, *args):
+    def iter(self, *args, **kwargs):
         """
         Examples:
 
@@ -47,13 +47,13 @@ class Propagator(metaclass=ABCMeta):
         if start > stop and step > 0:
             step = -step
 
-        return self._iter(start, stop, step)
+        return self._iter(start, stop, step, **kwargs)
 
 
 class AnalyticalPropagator(Propagator):
 
-    def _iter(self, start, stop, step):
-        for date in Date.range(start, stop, step):
+    def _iter(self, start, stop, step, **kwargs):
+        for date in Date.range(start, stop, step, kwargs.get('inclusive')):
             yield self.propagate(date)
 
 

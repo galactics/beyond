@@ -73,6 +73,7 @@ class Kepler(NumericalPropagator):
     def _iter(self, start, stop, step):
         orb = self.orbit
 
+        yield orb.copy()
         for date in Date.range(start, stop, step):
             method = getattr(self, self.method)
             orb = method(orb, self.step)
