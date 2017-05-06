@@ -1,24 +1,30 @@
 
-import numpy as np
 from datetime import timedelta
+
+from .base import AnalyticalPropagator
 
 from sgp4.earth_gravity import wgs72
 from sgp4.io import twoline2rv
 
 
-class Sgp4:
+class Sgp4(AnalyticalPropagator):
     """Interface to the `sgp4 <https://github.com/brandon-rhodes/python-sgp4/>`__
     library
     """
 
-    def __init__(self, orbit):
+    @property
+    def orbit(self):
+        return self._orbit if hasattr(self, '_orbit') else None
+
+    @orbit.setter
+    def orbit(self, orbit):
         """Initialise the propagator
 
         Args:
             orbit (Orbit)
         """
 
-        self.orbit = orbit
+        self._orbit = orbit
         lines = orbit.complements['tle'].splitlines()
 
         if len(lines) == 3:
@@ -46,4 +52,12 @@ class Sgp4:
 
         # Convert from km to meters
         result = [x * 1000 for x in p + v]
-        return self.orbit.__class__(date, result, 'cartesian', 'TEME', self.__class__)
+
+        return self.orbit.__class__(
+            date,
+            result,
+            'cartesian',
+            'TEME',
+            self.__class__(),
+            **self.orbit.complements
+        )

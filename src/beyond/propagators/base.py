@@ -1,40 +1,67 @@
 
 from abc import ABCMeta, abstractmethod
+from datetime import timedelta
 
 from ..utils import Date
 
 
 class Propagator(metaclass=ABCMeta):
 
-    @abstractmethod
-    def _single(self, date):
-        pass
+    orbit = None
 
     @abstractmethod
-    def _generator(self, star, stop, step):
+    def _iter(self, star, stop, step):
         pass
 
-    def propagate(self, start, stop=None, step=None):
+    # @abstractmethod
+    # def _bisect(self, start, stop):
+    #     pass
 
-        if stop is None and step is None:
-            return self._single(start)
-        elif stop is None or step is None:
-            raise TypeError("stop and step should be defined")
+    @abstractmethod
+    def propagate(self, start):
+        pass
+
+    def iter(self, *args):
+        """
+        Examples:
+
+            propag.iter(stop)
+            propag.iter(stop, step)
+            propag.iter(start, stop, step)
+        """
+
+        if not 1 <= len(args) <= 3:
+            raise ValueError
+        elif len(args) == 1:
+            start = self.orbit.date
+            stop, = args
+            step = self.step
+        elif len(args) == 2:
+            start = self.orbit.date
+            stop, step = args
         else:
-            return self._generator(start, stop, step)
+            start, stop, step = args
+
+        if isinstance(stop, timedelta):
+            stop = start + stop
+        if start > stop and step > 0:
+            step = -step
+
+        return self._iter(start, stop, step)
 
 
 class AnalyticalPropagator(Propagator):
 
-    def _generator(self, start, stop, step):
+    def _iter(self, start, stop, step):
         for date in Date.range(start, stop, step):
-            yield self._single(date)
+            yield self.propagate(date)
 
 
 class NumericalPropagator(Propagator):
 
-    def _single(self, date):
-        for orb in self._generator(self.orb.date, date, self.step):
+    def propagate(self, date):
+        for orb in self.iter(self.orbit.date, date, self.step):
             continue
-        # Gives only the last iteration
-        return orb
+        else:
+            # Gives only the last iteration
+            return orb

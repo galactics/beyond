@@ -61,12 +61,19 @@ class Sgp4Beta:
     It is highly under-optimised, and serves only the purpose of testing.
     """
 
-    def __init__(self, orbit, gravity=WGS72):
+    MODEL = WGS72
+
+    @property
+    def orbit(self):
+        return self._orbit
+
+    @orbit.setter
+    def orbit(self, orbit):
 
         if orbit.form != FormTransform.TLE:
             raise TypeError("Not TLE")
 
-        self.gravity = gravity
+        self.gravity = self.MODEL
         self.tle = orbit
         self._init = Init()
 
@@ -238,4 +245,4 @@ class Sgp4Beta:
 
         vector = np.concatenate((vR, vRdot)) * 1000  # conversion to meters
 
-        return self.tle.__class__(date, vector, 'cartesian', 'TEME', self.__class__)
+        return self.tle.__class__(date, vector, 'cartesian', 'TEME', self.__class__(), **self.tle.complements)

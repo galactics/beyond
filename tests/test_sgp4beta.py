@@ -31,7 +31,8 @@ def test_one():
     for lines, expected in test_cases.items():
         tle = Tle(lines).orbit()
 
-        sgp4 = Sgp4Beta(tle)
+        sgp4 = Sgp4Beta()
+        sgp4.orbit = tle
         pv = sgp4.propagate(tle.date + timedelta(days=1))
         r, v = pv[:3], pv[3:]
 

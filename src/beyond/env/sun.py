@@ -6,6 +6,7 @@ import numpy as np
 
 from ..orbits import Orbit
 from ..utils.units import AU
+from ..propagators.base import AnalyticalPropagator
 
 
 def sun_vector(date):
@@ -55,15 +56,14 @@ def sun_vector(date):
         0
     ]) * AU
 
-    return Orbit(date, pv, 'cartesian', 'MOD', SunPropagator)
+    return Orbit(date, pv, 'cartesian', 'MOD', SunPropagator())
 
 
-class SunPropagator:
+class SunPropagator(AnalyticalPropagator):
     """Dummy propagator for Sun position
     """
 
-    def __init__(self, *args, **kwargs):
-        self.orbit = None
+    orbit = None
 
     def propagate(self, date):
         """Direct call to :py:func:`~beyond.env.sun.sun_vector`

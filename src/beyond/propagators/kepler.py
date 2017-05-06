@@ -26,16 +26,10 @@ class Kepler(NumericalPropagator):
         'Jupiter': 1.8986e27,
     }
 
-    def __init__(self, method=EULER, bodies=('Earth', 'Moon', 'Sun'), step=timedelta(minutes=3)):
+    def __init__(self, step, method=RK4, bodies=('Earth', 'Moon', 'Sun')):
         self.method = method
         self.bodies = [Obj(get_body(body, Date.now()), self.masses[body]) for body in bodies]
         self.step = step
-
-    def __call__(self, orb):
-        """Initialisation of the propagator
-        """
-        self.orbit = orb.copy()
-        return self
 
     def dgl(self, date, orb):
 
@@ -76,22 +70,10 @@ class Kepler(NumericalPropagator):
 
         return y_n_1
 
-    def _generator(self, date, step=None):
+    def _iter(self, start, stop, step):
         orb = self.orbit
 
-        if step is None:
-            step = self.step
-
-        if type(date) is timedelta and date.total_seconds() < 0 or \
-           type(date) is Date and date < self.orbit.date:
-            step = - step
-
-        for date in Date.range(self.orbit.date, date, self.step):
-
-            if date <= Date(2017, 4, 20) < date + self.step:
-                print('man')
-                orb[3] = 12000.
-
+        for date in Date.range(start, stop, step):
             method = getattr(self, self.method)
             orb = method(orb, self.step)
             yield orb.copy()

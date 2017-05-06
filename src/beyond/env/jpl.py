@@ -24,6 +24,7 @@ import numpy as np
 from ..config import config
 from ..orbits import Orbit
 from ..utils.node import Node2
+from ..propagators.base import AnalyticalPropagator
 
 from jplephem.spk import SPK
 from jplephem.names import target_names
@@ -46,43 +47,47 @@ class Target(Node2):
         return value in [x.index for x in self.list]
 
 
-class GenericBspPropagator:
+class EarthPropagator(AnalyticalPropagator):
+
+    FRAME = "EME2000"
+    ORIGIN = [0] * 6
+
+    @classmethod
+    def vector(cls, date):
+        orb = Orbit(
+            date,
+            cls.ORIGIN,
+            form='cartesian',
+            frame=cls.FRAME,
+            propagator=cls()
+        )
+        return orb
+
+    def propagate(self, date):
+        return self.vector(date)
+
+
+class GenericBspPropagator(AnalyticalPropagator):
     """Generic propagator
     """
-
-    EARTH_BASE = "EME2000"
-
-    def __init__(self, orb, *args, **kwargs):
-        self.orbit = orb
 
     @classmethod
     def vector(cls, date):
 
         frame_name = cls.src.name
         if frame_name == 'Earth':
-            frame_name = cls.EARTH_BASE
+            frame_name = EarthPropagator.FRAME
 
         return Orbit(
             date,
             Bsp().get(cls.src.index, cls.dst.index, date),
             form="cartesian",
             frame=frame_name,
-            propagator=cls
+            propagator=cls()
         )
 
     def propagate(self, date):
         return self.vector(date)
-
-
-class EarthPropagator:
-
-    def __init__(self, orb, *args, **kwargs):
-        self.orbit = orb
-
-    def propagate(self, date):
-        orb = self.orbit.copy()
-        orb.date = date
-        return orb
 
 
 class Bsp:
@@ -186,10 +191,10 @@ def get_body(name, date):
     if name == 'Earth':
         return Orbit(
             date,
-            [0] * 6,
+            EarthPropagator.ORIGIN,
             form="cartesian",
-            frame=GenericBspPropagator.EARTH_BASE,
-            propagator=EarthPropagator
+            frame=EarthPropagator.FRAME,
+            propagator=EarthPropagator()
         )
 
     # On-demand Propagator and Frame generation

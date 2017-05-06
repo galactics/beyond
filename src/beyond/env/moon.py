@@ -6,6 +6,7 @@ import numpy as np
 
 from ..constants import r_e
 from ..orbits import Orbit
+from ..propagators.base import AnalyticalPropagator
 
 
 def moon_vector(date):
@@ -73,15 +74,14 @@ def moon_vector(date):
         0, 0, 0
     ])
 
-    return Orbit(date, state_vector, 'cartesian', 'EME2000', MoonPropagator)
+    return Orbit(date, state_vector, 'cartesian', 'EME2000', MoonPropagator())
 
 
-class MoonPropagator:
+class MoonPropagator(AnalyticalPropagator):
     """Dummy propagator for moon position
     """
 
-    def __init__(self, *args, **kwargs):
-        self.orbit = None
+    orbit = None
 
     def propagate(self, date):
         """Direct call to :py:func:`~beyond.env.moon.moon_vector`

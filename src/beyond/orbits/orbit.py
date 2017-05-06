@@ -232,7 +232,7 @@ class Orbit(np.ndarray):
     def propagator(self, new_propagator):
 
         if isinstance(new_propagator, str):
-            new_propagator = get_propagator(new_propagator)
+            new_propagator = get_propagator(new_propagator)()
 
         self._propagator = new_propagator
 
@@ -245,12 +245,16 @@ class Orbit(np.ndarray):
             Orbit
         """
 
-        if not hasattr(self.propagator, 'orbit'):
-            # Instanciation of the propagator, only the first time the propagator
-            # is called
-            self.propagator = self.propagator(self)
+        if self.propagator.orbit is not self:
+            self.propagator.orbit = self
 
         return self.propagator.propagate(date)
+
+    def iter_propagate(self, *args):
+        if self.propagator.orbit is not self:
+            self.propagator.orbit = self
+
+        return self.propagator.iter(*args)
 
     def ephemeris(self, start, stop, step):
         """Generator giving the propagation of the orbit at different dates
