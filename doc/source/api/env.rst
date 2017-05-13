@@ -10,17 +10,17 @@ Pole motion and Time Scales
     :members:
     :undoc-members:
 
-Position of the Sun and the Moon
---------------------------------
-
-.. automodule:: beyond.env.sun
-    :members:
-
-.. automodule:: beyond.env.moon
-    :members:
-
 Position of objects of the Solar System
 ---------------------------------------
+
+Analytical
+^^^^^^^^^^
+
+.. automodule:: beyond.env.solarsystem
+    :members:
+
+JPL ephemeris
+^^^^^^^^^^^^^
 
 .. automodule:: beyond.env.jpl
     :members:

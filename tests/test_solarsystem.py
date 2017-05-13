@@ -5,18 +5,17 @@ import numpy as np
 
 from beyond.utils.date import Date
 from beyond.env.poleandtimes import ScalesDiff
-from beyond.env.moon import moon_vector
-from beyond.env.sun import sun_vector
+from beyond.env.solarsystem import get_body
 
 
 def test_moon():
     with patch('beyond.utils.date.get_timescales') as mock_ts:
         mock_ts.return_value = ScalesDiff(-0.0889898, 28.0)
-        moon = moon_vector(Date(1994, 4, 28))
+        moon = get_body('Moon', Date(1994, 4, 28))
 
     assert str(moon.form) == 'Cartesian'
     assert str(moon.frame) == 'EME2000'
-    assert moon.propagator.__name__ == 'MoonPropagator'
+    assert moon.propagator.__class__.__name__ == 'MoonPropagator'
     np.testing.assert_array_equal(
         moon,
         np.array([
@@ -30,12 +29,12 @@ def test_sun():
     with patch('beyond.utils.date.get_timescales') as mock_ts:
         mock_ts.return_value = ScalesDiff(0.2653703, 33.0)
 
-        sun = sun_vector(Date(2006, 4, 2))
+        sun = get_body('Sun', Date(2006, 4, 2))
 
         assert sun.date == Date(2006, 4, 2)
         assert str(sun.form) == 'Cartesian'
         assert str(sun.frame) == 'MOD'
-        assert sun.propagator.__name__ == 'SunPropagator'
+        assert sun.propagator.__class__.__name__ == 'SunPropagator'
 
         np.testing.assert_array_equal(
             sun,
