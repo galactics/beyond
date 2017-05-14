@@ -38,7 +38,7 @@ class Orbit(np.ndarray):
         if isinstance(frame, str):
             frame = get_frame(frame)
 
-        obj = np.ndarray.__new__(cls, (6,), buffer=np.array(coord), dtype=float)
+        obj = np.ndarray.__new__(cls, (6,), buffer=np.array([float(x) for x in coord]), dtype=float)
         obj.date = date
         obj._form = form
         obj._frame = frame
