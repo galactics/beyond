@@ -60,7 +60,7 @@ class AnalyticalPropagator(Propagator):
 class NumericalPropagator(Propagator):
 
     def propagate(self, date):
-        for orb in self.iter(self.orbit.date, date, self.step):
+        for orb in self.iter(self.orbit.date, date, self.step, inclusive=True):
             continue
         else:
             # Gives only the last iteration
