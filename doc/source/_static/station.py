@@ -20,9 +20,9 @@ print("    Time      Azim    Elev    Distance   Radial Velocity")
 print("=========================================================")
 
 for orb in station.visibility(tle, start=Date.now(), stop=timedelta(hours=24), step=timedelta(seconds=30), events=True):
-    elev = np.degrees(orb[1])
+    elev = np.degrees(orb.phi)
     # Radians are counterclockwise and azimuth is clockwise
-    azim = np.degrees(-orb[2])
+    azim = np.degrees(-orb.theta) % 360
 
     # Archive for plotting
     azims.append(azim)
@@ -31,11 +31,11 @@ for orb in station.visibility(tle, start=Date.now(), stop=timedelta(hours=24), s
     elevs.append(90 - elev)
 
     r = orb.r / 1000.
-    print("{orb.info:3} {orb.date:%H:%M:%S} {azim:7.2f} {elev:7.2f} {r:10.2f} {orb.r_dot:10.2f}".format(
+    print("{orb.info:7} {orb.date:%H:%M:%S} {azim:7.2f} {elev:7.2f} {r:10.2f} {orb.r_dot:10.2f}".format(
         orb=orb, r=r, azim=azim, elev=elev
     ))
 
-    if orb.info == "LOS":
+    if orb.info.startswith("LOS"):
         # We stop at the end of the first pass
         print()
         break

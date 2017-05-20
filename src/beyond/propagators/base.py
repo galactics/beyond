@@ -3,9 +3,10 @@ from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 
 from ..utils import Date
+from ..orbits.listeners import Speaker
 
 
-class Propagator(metaclass=ABCMeta):
+class Propagator(Speaker, metaclass=ABCMeta):
 
     orbit = None
 
@@ -24,7 +25,6 @@ class Propagator(metaclass=ABCMeta):
     def iter(self, *args, **kwargs):
         """
         Examples:
-
             propag.iter(stop)
             propag.iter(stop, step)
             propag.iter(start, stop, step)
@@ -47,7 +47,12 @@ class Propagator(metaclass=ABCMeta):
         if start > stop and step > 0:
             step = -step
 
-        return self._iter(start, stop, step, **kwargs)
+        listeners = kwargs.get('listeners', [])
+
+        for orb in self._iter(start, stop, step, **kwargs):
+            for listen_orb in self.listen(orb, listeners):
+                yield listen_orb
+            yield orb
 
 
 class AnalyticalPropagator(Propagator):

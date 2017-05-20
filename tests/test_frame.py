@@ -269,8 +269,8 @@ def test_station_visibility():
 
     points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16), timedelta(hours=2), timedelta(seconds=30), events=True)]
 
-    assert points[0].info == 'AOS'
-    assert points[-1].info == 'LOS'
+    assert points[0].info == 'AOS Toulouse'
+    assert points[-1].info == 'LOS Toulouse'
 
 
 def test_errors(ref_orbit):

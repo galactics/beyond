@@ -49,7 +49,6 @@ from ..utils.node import Node2
 from . import iau1980, iau2010
 from .local import to_qsw, to_tnw
 
-
 CIO = ['ITRF', 'TIRF', 'CIRF', 'GCRF']
 IAU1980 = ['TOD', 'MOD']
 OTHER = ['EME2000', 'TEME', 'WGS84', 'PEF']
@@ -290,105 +289,20 @@ class TopocentricFrame(_Frame):
             in the frame of the station and in spherical form.
         """
 
-        date = start
-        visibility, max_found = False, False
+        from ..orbits.listeners import stations_listeners
 
-        for date in Date.range(start, stop, step):
+        listeners = stations_listeners(cls) if events else []
 
-            # Propagate orbit at the current date, and convert it to the station
-            # frame and spherical form
-            cursor = cls._vis(orb, date)
+        for point in orb.iter(start, stop, step, listeners=listeners):
 
-            # If the elevation is positive we have the satellite in visibility
-            if cursor.phi >= 0:
+            point.frame = cls
+            point.form = 'spherical'
 
-                if events and not visibility and date != start:
-                    # The date condition is there to discard the computation
-                    # of AOS if the computation starts during a pass
-                    aos = cls._bisect(orb, date - step, date)
-                    aos.info = "AOS"
-                    yield aos
+            # Not very clean !
+            if point.phi < 0 and point.info == "":
+                continue
 
-                visibility = True
-
-                if events and cursor.r_dot >= 0 and not max_found:
-                    if date != start:
-                        # If we start to compute after the MAX elevation, the
-                        # current _bisect algorithm can't detect it and will
-                        # raise an exception, so we discard this case
-                        _max = cls._bisect(orb, date - step, date, 'r_dot')
-                        _max.info = "MAX"
-                        yield _max
-                    max_found = True
-
-                cursor.info = ""
-                yield cursor
-            elif events and visibility:
-                # If a visibility has started, and the satellite is below the
-                # horizon, we can compute the LOS
-                los = cls._bisect(orb, date - step, date)
-                los.info = "LOS"
-                yield los
-
-                # Re-initialization of pass variables
-                visibility, max_found = False, False
-
-    @classmethod
-    def _vis(cls, orb, date):
-        """shortcut to onvert orb to topocentric frame in spherical form at a
-        given date
-        """
-        orb = orb.propagate(date)
-        orb.frame = cls.__name__
-        orb.form = 'spherical'
-
-        return orb
-
-    @classmethod
-    def _bisect(cls, orb, start, stop, element='phi'):
-        """Find, between two dates, the zero-crossing of an orbit parameter
-
-        Args:
-            orb (Orbit)
-            start (Date)
-            stop (Date)
-            element (str)
-        Return:
-            Orbit
-        """
-
-        prev_step = (stop - start)
-        step = prev_step / 2
-        eps = 1e-3
-
-        start_attr = getattr(cls._vis(orb, start), element)
-        prev = start_attr
-        date_cursor = start + step
-
-        MAX_ITER = 60
-
-        for i in range(MAX_ITER):
-            orb_cursor = cls._vis(orb, date_cursor)
-            attr = getattr(orb_cursor, element)
-
-            if abs(attr) <= eps:
-                # We have a winner !
-                break
-
-            if np.sign(attr) != np.sign(prev):
-                # reverse direction
-                step *= -1
-                if prev_step == -step:
-                    # decrease the step if this direction was already searched through
-                    step /= 2
-
-            prev = attr
-            prev_step = step
-            date_cursor += step
-        else:
-            raise RuntimeError("Too many iterations", MAX_ITER)
-
-        return orb_cursor
+            yield point
 
 def _geodetic_to_cartesian(lat, lon, alt):
     """Conversion from latitude, longitue and altitude coordinates to

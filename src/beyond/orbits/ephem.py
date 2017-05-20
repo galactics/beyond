@@ -5,10 +5,11 @@
 import numpy as np
 from datetime import timedelta
 
+from .listeners import Speaker
 from ..frames.frame import orbit2frame
 
 
-class Ephem:
+class Ephem(Speaker):
     """This class represents a range of orbits
 
     It provides several useful interfaces in order to compute throught them
@@ -166,11 +167,11 @@ class Ephem:
     def ephemeris(self, **kwargs):
         """Ephemeris generator based on the data of this one, but with different dates
 
-        If an argument is set to ``None`` it will keep the same property as its parent
+        If an argument is set to ``None`` it will keep the same property as the generating ephemeris
 
         Keyword Arguments:
-            start (:py:class:`~beyond.utils.date.Date` or None): Date of the first point
-            stop (:py:class:`~beyond.utils.date.Date`, :py:class:`~datetime.timedelta` or None): Date
+            start (:py:class:`Date` or None): Date of the first point
+            stop (:py:class:`Date`, :py:class:`~datetime.timedelta` or None): Date
                 of the last point
             step (:py:class:`~datetime.timedelta` or None): Step to use during the computation
         Yield:
@@ -184,6 +185,7 @@ class Ephem:
         if isinstance(stop, timedelta):
             stop = start + stop
 
+        listeners = kwargs.get('listeners', [])
         if step is None:
 
             dates = [x.date for x in self]
@@ -193,20 +195,31 @@ class Ephem:
                 raise ValueError("If 'step' is not defined, 'stop' should be an existing point")
 
             # The step stays the same as the original ephemeris
-            for cursor in self:
+            for orb in self:
 
-                if cursor.date < start:
+                if orb.date < start:
                     continue
 
-                if cursor.date > stop:
+                if orb.date > stop:
                     break
 
-                yield cursor
+                # Listeners
+                for listen_orb in self.listen(orb, listeners):
+                    yield listen_orb
+
+                yield orb
         else:
             # create as ephemeris with a different step than the original
             date = start
             while date <= stop:
-                yield self.interpolate(date)
+
+                orb = self.propagate(date)
+
+                # Listeners
+                for listen_orb in self.listen(orb, listeners):
+                    yield listen_orb
+
+                yield orb
                 date += step
 
     def ephem(self, **kwargs):
