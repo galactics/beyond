@@ -5,6 +5,7 @@ from pytest import raises, fixture
 
 import numpy as np
 
+from beyond.constants import Earth
 from beyond.utils.date import Date
 from beyond.orbits.orbit import Orbit
 from beyond.orbits.forms import FormTransform, Form
@@ -55,13 +56,13 @@ def test_init_cart():
 
 def test_coord_unit_transform(ref_orbit):
 
-    kep = FormTransform._keplerian_m_to_keplerian(ref_orbit)
+    kep = FormTransform._keplerian_m_to_keplerian(ref_orbit, Earth)
     assert np.allclose(ref_orbit[:5], kep[:5])
 
-    new = FormTransform._keplerian_to_keplerian_m(kep)
+    new = FormTransform._keplerian_to_keplerian_m(kep, Earth)
     assert np.allclose(ref_orbit, new)
 
-    tle = FormTransform._keplerian_m_to_tle(ref_orbit)
+    tle = FormTransform._keplerian_m_to_tle(ref_orbit, Earth)
     tle_dict = dict(zip(FormTransform.TLE.param_names, tle))
     assert tle_dict['i'] == ref_orbit['i']
     assert tle_dict['Ω'] == ref_orbit['Ω']
@@ -69,13 +70,13 @@ def test_coord_unit_transform(ref_orbit):
     assert tle_dict['ω'] == ref_orbit['ω']
     assert tle_dict['M'] == ref_orbit['M']
 
-    new = FormTransform._tle_to_keplerian_m(tle)
+    new = FormTransform._tle_to_keplerian_m(tle, Earth)
     assert np.allclose(new, ref_orbit)
 
-    cart = FormTransform._keplerian_to_cartesian(kep)
+    cart = FormTransform._keplerian_to_cartesian(kep, Earth)
     assert np.allclose(cart, ref_cart)
 
-    new = FormTransform._cartesian_to_keplerian(cart)
+    new = FormTransform._cartesian_to_keplerian(cart, Earth)
     assert np.allclose(new, kep)
 
 

@@ -244,7 +244,7 @@ def test_station():
         orb.form = 'spherical'
 
         # azimuth
-        assert -np.degrees(orb.theta) - 159.75001561831206 <= float_info.epsilon
+        assert -np.degrees(orb.theta) - 159.75001561831209 <= float_info.epsilon
         # elevation
         assert np.degrees(orb.phi) - 57.894234537351593 <= float_info.epsilon
         # range

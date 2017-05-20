@@ -1,35 +1,30 @@
+"""Keplerian motion numerical propagator
+
+"""
 
 from numpy import sqrt, zeros
-from datetime import timedelta
-from collections import namedtuple
 
+from ..constants import G
 from .base import NumericalPropagator
 from ..utils import Date
-from ..env.jpl import get_body
-
-
-Obj = namedtuple("Obj", ('orbit', 'mass'))
 
 
 class Kepler(NumericalPropagator):
 
-    G = 6.67408e-11  # in m³.s⁻².kg⁻¹
-
     RK4 = 'rk4'
     EULER = 'euler'
 
-    masses = {
-        'Sun': 1.98855e30,
-        'Earth': 5.97237e24,
-        'Moon': 7.342e22,
-        'Mars': 6.4171e23,
-        'Jupiter': 1.8986e27,
-    }
+    def __init__(self, step, bodies, method=RK4):
+        """
+        Args:
+            step (datetime.timedelta): Step size of the propagator
+            bodies (tuple): List of bodies to take into account
+            method (str): Integration method (:py:attr:`RK4` or :py:attr:`EULER`)
+        """
 
-    def __init__(self, step, method=RK4, bodies=('Earth', 'Moon', 'Sun')):
-        self.method = method
-        self.bodies = [Obj(get_body(body, Date.now()), self.masses[body]) for body in bodies]
         self.step = step
+        self.bodies = bodies if isinstance(bodies, (list, tuple)) else [bodies]
+        self.method = method
 
     @property
     def orbit(self):
@@ -50,7 +45,7 @@ class Kepler(NumericalPropagator):
             orb_body.frame = orb.frame
             diff = orb_body[:3] - orb[:3]
             norm = sqrt(sum(diff ** 2)) ** 3
-            new_body[3:] += self.G * body.mass * diff / norm  # * step.total_seconds()
+            new_body[3:] += G * body.mass * diff / norm  # * step.total_seconds()
 
         return new_body
 

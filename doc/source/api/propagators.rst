@@ -39,3 +39,8 @@ beeing WGS72.
 .. autoclass:: beyond.propagators.sgp4beta.WGS72Old
 .. autoclass:: beyond.propagators.sgp4beta.WGS72
 .. autoclass:: beyond.propagators.sgp4beta.WGS84
+
+Kepler
+------
+
+Basic Keplerian propagator, computing the position of the next iteration by integrating

@@ -13,11 +13,11 @@ def test_moon():
         mock_ts.return_value = ScalesDiff(-0.0889898, 28.0)
         moon = get_body('Moon', Date(1994, 4, 28))
 
-    assert str(moon.form) == 'Cartesian'
-    assert str(moon.frame) == 'EME2000'
-    assert moon.propagator.__class__.__name__ == 'MoonPropagator'
+    assert str(moon.orbit.form) == 'Cartesian'
+    assert str(moon.orbit.frame) == 'EME2000'
+    assert moon.orbit.propagator.__class__.__name__ == 'MoonPropagator'
     np.testing.assert_array_equal(
-        moon,
+        moon.orbit,
         np.array([
             -134181157.31672296, -311598171.54027724, -126699062.43738127, 0.0, 0.0, 0.0
         ])
@@ -31,13 +31,12 @@ def test_sun():
 
         sun = get_body('Sun', Date(2006, 4, 2))
 
-        assert sun.date == Date(2006, 4, 2)
-        assert str(sun.form) == 'Cartesian'
-        assert str(sun.frame) == 'MOD'
-        assert sun.propagator.__class__.__name__ == 'SunPropagator'
+        assert str(sun.orbit.form) == 'Cartesian'
+        assert str(sun.orbit.frame) == 'MOD'
+        assert sun.orbit.propagator.__class__.__name__ == 'SunPropagator'
 
         np.testing.assert_array_equal(
-            sun,
+            sun.orbit,
             np.array([
                 146186235643.53641, 28789144480.499767, 12481136552.345926, 0.0, 0.0, 0.0
             ])

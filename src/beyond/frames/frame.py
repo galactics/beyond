@@ -42,7 +42,7 @@ import sys
 import warnings
 import numpy as np
 
-from ..constants import e_e, r_e
+from ..constants import Earth
 from ..utils.date import Date
 from ..utils.matrix import rot2, rot3
 from ..utils.node import Node2
@@ -116,6 +116,8 @@ class _MetaFrame(type, Node2):
 class _Frame(metaclass=_MetaFrame):
     """Frame base class
     """
+
+    center = Earth
 
     def __init__(self, date, orbit):
         """
@@ -400,8 +402,8 @@ def _geodetic_to_cartesian(lat, lon, alt):
     Return:
         numpy.array: 3D element (in meters)
     """
-    C = r_e / np.sqrt(1 - (e_e * np.sin(lat)) ** 2)
-    S = r_e * (1 - e_e ** 2) / np.sqrt(1 - (e_e * np.sin(lat)) ** 2)
+    C = Earth.r / np.sqrt(1 - (Earth.e * np.sin(lat)) ** 2)
+    S = Earth.r * (1 - Earth.e ** 2) / np.sqrt(1 - (Earth.e * np.sin(lat)) ** 2)
     r_d = (C + alt) * np.cos(lat)
     r_k = (S + alt) * np.sin(lat)
 

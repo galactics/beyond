@@ -10,7 +10,6 @@ from numpy import cos, arccos, sin, arcsin, arctan2, sqrt, arccosh, sinh
 import numpy as np
 
 from ..utils.node import Node
-from ..constants import µ_e
 
 
 class Form(Node):
@@ -59,12 +58,12 @@ class FormTransform:
             for a, b in self._tree.steps(self.orbit.form.name, new_form):
                 a = a.name.lower()
                 b = b.name.lower()
-                coord = getattr(self, "_{}_to_{}".format(a, b))(coord)
+                coord = getattr(self, "_{}_to_{}".format(a, b))(coord, self.orbit.frame.center)
 
         return coord
 
     @classmethod
-    def _cartesian_to_keplerian(cls, coord):
+    def _cartesian_to_keplerian(cls, coord, center):
         """Convertion from cartesian (position and velocity) to keplerian
 
         The keplerian form is
@@ -83,27 +82,27 @@ class FormTransform:
         r_norm = np.linalg.norm(r)
         v_norm = np.linalg.norm(v)
 
-        K = v_norm ** 2 / 2 - µ_e / r_norm      # specific energy
-        a = - µ_e / (2 * K)                     # semi-major axis
-        e = sqrt(1 - h_norm ** 2 / (a * µ_e))   # eccentricity
+        K = v_norm ** 2 / 2 - center.µ / r_norm      # specific energy
+        a = - center.µ / (2 * K)                     # semi-major axis
+        e = sqrt(1 - h_norm ** 2 / (a * center.µ))   # eccentricity
         p = a * (1 - e ** 2)
         i = arccos(h[2] / h_norm)               # inclination
         Ω = arctan2(h[0], -h[1]) % (2 * np.pi)  # right ascencion of the ascending node
 
         ω_ν = arctan2(r[2] / sin(i), r[0] * cos(Ω) + r[1] * sin(Ω))
-        ν = arctan2(sqrt(p / µ_e) * np.dot(v, r), p - r_norm)
+        ν = arctan2(sqrt(p / center.µ) * np.dot(v, r), p - r_norm)
         ω = (ω_ν - ν) % (2 * np.pi)             # argument of the perigee
 
         return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
     @classmethod
-    def _keplerian_to_cartesian(cls, coord):
+    def _keplerian_to_cartesian(cls, coord, center):
 
         a, e, i, Ω, ω, ν = coord
 
         p = a * (1 - e ** 2)
         r = p / (1 + e * cos(ν))
-        h = sqrt(µ_e * p)
+        h = sqrt(center.µ * p)
         x = r * (cos(Ω) * cos(ω + ν) - sin(Ω) * sin(ω + ν) * cos(i))
         y = r * (sin(Ω) * cos(ω + ν) + cos(Ω) * sin(ω + ν) * cos(i))
         z = r * sin(i) * sin(ω + ν)
@@ -114,7 +113,7 @@ class FormTransform:
         return np.array([x, y, z, vx, vy, vz], dtype=float)
 
     @classmethod
-    def _keplerian_to_keplerian_m(cls, coord):
+    def _keplerian_to_keplerian_m(cls, coord, center):
         """Conversion from Keplerian to Mean Keplerian
 
         The difference is the use of Mean anomaly instead of True anomaly
@@ -133,7 +132,7 @@ class FormTransform:
         return np.array([a, e, i, Ω, ω, M], dtype=float)
 
     @classmethod
-    def _keplerian_m_to_keplerian(cls, coord):
+    def _keplerian_m_to_keplerian(cls, coord, center):
         """Conversion from Mean Keplerian to True Keplerian
         """
         a, e, i, Ω, ω, M = coord
@@ -204,27 +203,27 @@ class FormTransform:
         return x
 
     @classmethod
-    def _tle_to_keplerian_m(cls, coord):
+    def _tle_to_keplerian_m(cls, coord, center):
         """Convertion from the TLE standard format to the Mean Keplerian
 
         see :py:class:`Tle` for more information.
         """
         i, Ω, e, ω, M, n = coord
-        a = (µ_e / n ** 2) ** (1 / 3)
+        a = (center.µ / n ** 2) ** (1 / 3)
 
         return np.array([a, e, i, Ω, ω, M], dtype=float)
 
     @classmethod
-    def _keplerian_m_to_tle(cls, coord):
+    def _keplerian_m_to_tle(cls, coord, center):
         """Mean Keplerian to TLE format conversion
         """
         a, e, i, Ω, ω, M = coord
-        n = sqrt(µ_e / a ** 3)
+        n = sqrt(center.µ / a ** 3)
 
         return np.array([i, Ω, e, ω, M, n], dtype=float)
 
     @classmethod
-    def _cartesian_to_spherical(cls, coord):
+    def _cartesian_to_spherical(cls, coord, center):
         """Cartesian to Spherical conversion
 
         .. warning:: The spherical form is equatorial, not zenithal
@@ -242,7 +241,7 @@ class FormTransform:
         return np.array([r, theta, phi, r_dot, theta_dot, phi_dot], dtype=float)
 
     @classmethod
-    def _spherical_to_cartesian(cls, coord):
+    def _spherical_to_cartesian(cls, coord, center):
         """Spherical to cartesian conversion
         """
         r, theta, phi, r_dot, theta_dot, phi_dot = coord

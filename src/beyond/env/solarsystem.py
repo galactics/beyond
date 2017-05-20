@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from ..constants import r_e
+from ..constants import Earth, Moon, Sun
 from ..orbits import Orbit
 from ..utils.units import AU
 from ..propagators.base import AnalyticalPropagator
@@ -12,12 +12,20 @@ from ..propagators.base import AnalyticalPropagator
 def get_body(body, date):
 
     bodies = {
-        'Moon': MoonPropagator,
-        'Sun': SunPropagator,
-        'Earth': EarthPropagator
+        'Moon': (Moon, MoonPropagator),
+        'Sun': (Sun, SunPropagator),
+        'Earth': (Earth, EarthPropagator)
     }
 
-    return bodies[body].propagate(date)
+    def _get(body, date):
+        body, propag = bodies[body]
+        body.orbit = propag.propagate(date)
+        return body
+
+    if isinstance(body, (tuple, list)):
+        return [_get(b, date) for b in body]
+    else:
+        return _get(body, date)
 
 
 class EarthPropagator(AnalyticalPropagator):
@@ -92,7 +100,7 @@ class MoonPropagator(AnalyticalPropagator):
 
         e_bar = 23.439291 - 0.0130042 * t_tdb - 1.64e-7 * t_tdb ** 2 + 5.04e-7 * t_tdb ** 3
 
-        r_moon = r_e / sin(p)
+        r_moon = Earth.r / sin(p)
 
         state_vector = r_moon * np.array([
             cos(phi_el) * cos(lambda_el),
