@@ -28,3 +28,13 @@ is a de-facto standard for orbit description.
     :members:
     :undoc-members:
     :show-inheritance:
+
+Listeners
+---------
+
+Listeners allow to watch for state transition during the propagation of an orbit.
+For example, the :abbr:`AOS (Acquisition Of Signal)` and :abbr:`LOS (Loss Of Signal)` of a satellite as
+seen from a station.
+
+.. automodule:: beyond.orbits.listeners
+    :members:

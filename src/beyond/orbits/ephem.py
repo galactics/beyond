@@ -173,11 +173,15 @@ class Ephem(Speaker):
             start (:py:class:`Date` or None): Date of the first point
             stop (:py:class:`Date`, :py:class:`~datetime.timedelta` or None): Date
                 of the last point
-            step (:py:class:`~datetime.timedelta` or None): Step to use during the computation
+            step (:py:class:`~datetime.timedelta` or None): Step to use during the computation. Use
+                the same step as `self` if `None`
         Yield:
             :py:class:`Orbit`:
 
         Example:
+
+        .. code-block:: python
+
             # In the examples below, we consider the 'ephem' object to be an ephemeris starting on
             # 2017-01-01 00:00:00 UTC and ending and 2017-01-02 00:00:00 UTC (included) with a fixed
             # step of 3 minutes.
@@ -191,6 +195,9 @@ class Ephem(Speaker):
             # 00:00, as 11:58 does not fall on date included in the 'ephem' object.
             ephem.iter(start=Date(2017, 1, 1, 11, 58))
             ephem.iter(start=Date(2017, 1, 1, 12))
+
+            # This call will generate an ephemeris, wich is a subpart of the initial one
+            ephem.iter(start=Date(2017, 1, 1, 8), stop=Date(2017, 1, 1, 16))
         """
 
         if start is None:

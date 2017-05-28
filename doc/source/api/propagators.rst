@@ -15,8 +15,8 @@ There is currently two implementation available:
     * a rewrite from scratch of the SGP4 model specifically done for this library
 
 
-Brando Rhodes'
-^^^^^^^^^^^^^^
+Brandon Rhodes'
+^^^^^^^^^^^^^^^
 
 This module provide a interface to the `sgp4` module, which is a direct adaptation
 of the C++ SGP4 reference implementation. As the reference, it implements both SGP4
@@ -44,3 +44,5 @@ Kepler
 ------
 
 Basic Keplerian propagator, computing the position of the next iteration by integrating
+of the acceleration components applied to the satellite by numerous bodies (Earth, Moon, Sun, etc.).
+This propagator is currently in development.

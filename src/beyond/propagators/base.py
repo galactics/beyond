@@ -7,16 +7,14 @@ from ..orbits.listeners import Speaker
 
 
 class Propagator(Speaker, metaclass=ABCMeta):
+    """Base class for propagators
+    """
 
     orbit = None
 
     @abstractmethod
     def _iter(self, star, stop, step, **kwargs):
         pass
-
-    # @abstractmethod
-    # def _bisect(self, start, stop):
-    #     pass
 
     @abstractmethod
     def propagate(self, start):
@@ -50,6 +48,8 @@ class Propagator(Speaker, metaclass=ABCMeta):
 
 
 class AnalyticalPropagator(Propagator):
+    """Base class for analytical propagators (RGP4, Eckstein-Heschler, etc.)
+    """
 
     def _iter(self, start, stop, step, **kwargs):
         for date in Date.range(start, stop, step, kwargs.get('inclusive')):
@@ -57,6 +57,8 @@ class AnalyticalPropagator(Propagator):
 
 
 class NumericalPropagator(Propagator):
+    """Base class for numerical propagators (i.e. Cowell)
+    """
 
     def propagate(self, date):
 

@@ -10,6 +10,14 @@ from ..propagators.base import AnalyticalPropagator
 
 
 def get_body(body, date):
+    """Retrieve a given body orbits and parameters
+
+    Args:
+        body (str or list): Object name(s)
+        date (Date): Date at which retrieve the orbital elements of the object
+    Return:
+        Body
+    """
 
     bodies = {
         'Moon': (Moon, MoonPropagator),

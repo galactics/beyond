@@ -56,6 +56,8 @@ class Speaker(metaclass=ABCMeta):
 
 
 class Listener(metaclass=ABCMeta):
+    """Base class for listeners
+    """
 
     prev = None
     binary = False
@@ -88,6 +90,8 @@ class Listener(metaclass=ABCMeta):
 
 
 class NodeListener(Listener):
+    """Listener for Ascending and Descending Node detection
+    """
 
     def info(self, orb):
         return "AscNode" if abs(self(orb)) < 0.1 else "DscNode"
@@ -98,6 +102,8 @@ class NodeListener(Listener):
 
 
 class ApsideListener(Listener):
+    """Listener for Periapside and Apoapside detection
+    """
 
     def info(self, orb):
         return "Perigee" if abs(self(orb)) < 0.1 else "Apogee"
@@ -108,6 +114,8 @@ class ApsideListener(Listener):
 
 
 class StationSignalListener(Listener):
+    """Listener for AOS and LOS of a given station
+    """
 
     def __init__(self, station):
         self.station = station
@@ -125,6 +133,8 @@ class StationSignalListener(Listener):
 
 
 class StationMaxListener(Listener):
+    """Listener for max elevation of a pass over a station
+    """
 
     def __init__(self, station):
         self.station = station
@@ -146,6 +156,13 @@ class StationMaxListener(Listener):
 
 
 def stations_listeners(stations):
+    """Function for creating listeners for a a list of station
+
+    Args:
+        stations (iterable): List of TopocentricFrame
+    Return:
+        list of Listener
+    """
     stations = stations if isinstance(stations, (list, tuple)) else [stations]
 
     listeners = []
