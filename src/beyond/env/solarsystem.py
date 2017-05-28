@@ -9,31 +9,30 @@ from ..utils.units import AU
 from ..propagators.base import AnalyticalPropagator
 
 
-def get_body(body, date):
+def get_body(*bodies):
     """Retrieve a given body orbits and parameters
 
     Args:
-        body (str or list): Object name(s)
-        date (Date): Date at which retrieve the orbital elements of the object
+        bodies (str or list): Object name(s)
     Return:
         Body
     """
 
-    bodies = {
-        'Moon': (Moon, MoonPropagator),
-        'Sun': (Sun, SunPropagator),
-        'Earth': (Earth, EarthPropagator)
+    _bodies = {
+        'moon': (Moon, MoonPropagator),
+        'sun': (Sun, SunPropagator),
+        'earth': (Earth, EarthPropagator)
     }
 
-    def _get(body, date):
-        body, propag = bodies[body]
-        body.orbit = propag.propagate(date)
-        return body
+    result = []
+    for name in bodies:
 
-    if isinstance(body, (tuple, list)):
-        return [_get(b, date) for b in body]
-    else:
-        return _get(body, date)
+        body, propag = _bodies[name.lower()]
+        # attach a propagator to the object
+        body.propagate = propag.propagate
+        result.append(body)
+
+    return result[0] if len(bodies) == 1 else result
 
 
 class EarthPropagator(AnalyticalPropagator):

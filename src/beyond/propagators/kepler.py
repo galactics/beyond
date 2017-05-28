@@ -41,7 +41,7 @@ class Kepler(NumericalPropagator):
         new_body[:3] = orb[3:]
 
         for body in self.bodies:
-            orb_body = body.orbit.propagate(date)
+            orb_body = body.propagate(date)
             orb_body.frame = orb.frame
             diff = orb_body[:3] - orb[:3]
             norm = sqrt(sum(diff ** 2)) ** 3
