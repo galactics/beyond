@@ -267,7 +267,7 @@ class Orbit(np.ndarray):
             Orbit
         """
 
-        for orb in self.iter(start, stop, step, inclusive=True):
+        for orb in self.iter(start=start, stop=stop, step=step, inclusive=True):
             yield orb
 
     def ephem(self, *args):

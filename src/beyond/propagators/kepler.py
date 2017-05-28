@@ -73,11 +73,10 @@ class Kepler(NumericalPropagator):
 
         return y_n_1
 
-    def _iter(self, start, stop, step):
+    def _iter(self, start, stop, step, **kwargs):
         orb = self.orbit
 
         yield orb.copy()
-        for date in Date.range(start, stop, step):
-            method = getattr(self, self.method)
-            orb = method(orb, self.step)
+        for date in Date.range(start, stop, step, inclusive=kwargs.get("inclusive", False)):
+            orb = getattr(self, self.method)(orb, self.step)
             yield orb.copy()

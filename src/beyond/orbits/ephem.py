@@ -164,7 +164,7 @@ class Ephem(Speaker):
         """
         return self.interpolate(date)
 
-    def ephemeris(self, **kwargs):
+    def iter(self, *, start=None, stop=None, step=None, **kwargs):
         """Ephemeris generator based on the data of this one, but with different dates
 
         If an argument is set to ``None`` it will keep the same property as the generating ephemeris
@@ -176,23 +176,39 @@ class Ephem(Speaker):
             step (:py:class:`~datetime.timedelta` or None): Step to use during the computation
         Yield:
             :py:class:`Orbit`:
+
+        Example:
+            # In the examples below, we consider the 'ephem' object to be an ephemeris starting on
+            # 2017-01-01 00:00:00 UTC and ending and 2017-01-02 00:00:00 UTC (included) with a fixed
+            # step of 3 minutes.
+
+            # These two calls will generate exactly the same points starting at 00:00 and ending at
+            # 12:00, as 12:02 does not fall on a date included in the original 'ephem' object.
+            ephem.iter(stop=Date(2017, 1, 1, 12))
+            ephem.iter(stop=Date(2017, 1, 1, 12, 2))
+
+            # Similarly, these calls will generate the same points starting at 12:00 and ending at
+            # 00:00, as 11:58 does not fall on date included in the 'ephem' object.
+            ephem.iter(start=Date(2017, 1, 1, 11, 58))
+            ephem.iter(start=Date(2017, 1, 1, 12))
         """
 
-        start = kwargs.get('start', self.start)
-        stop = kwargs.get('stop', self.stop)
-        step = kwargs.get('step', None)
+        if start is None:
+            start = self.start
+        elif start < self.start:
+            raise ValueError("Start date not in range")
 
-        if isinstance(stop, timedelta):
-            stop = start + stop
+        if stop is None:
+            stop = self.stop
+        else:
+            if isinstance(stop, timedelta):
+                stop = start + stop
+            if stop > self.stop:
+                raise ValueError("Stop date not in range")
 
         listeners = kwargs.get('listeners', [])
-        if step is None:
 
-            dates = [x.date for x in self]
-            if start not in dates:
-                raise ValueError("If 'step' is not defined, 'start' should be an existing point")
-            if stop not in dates:
-                raise ValueError("If 'step' is not defined, 'stop' should be an existing point")
+        if step is None:
 
             # The step stays the same as the original ephemeris
             for orb in self:
@@ -221,6 +237,9 @@ class Ephem(Speaker):
 
                 yield orb
                 date += step
+
+    def ephemeris(self, **kwargs):
+        return self.iter(**kwargs)
 
     def ephem(self, **kwargs):
         """Create an Ephem object which is a subset of this one

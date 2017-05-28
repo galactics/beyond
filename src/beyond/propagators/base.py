@@ -22,7 +22,7 @@ class Propagator(Speaker, metaclass=ABCMeta):
     def propagate(self, start):
         pass
 
-    def iter(self, *args, **kwargs):
+    def iter(self, *, start=None, stop=None, step=None, **kwargs):
         """
         Examples:
             propag.iter(stop)
@@ -30,24 +30,18 @@ class Propagator(Speaker, metaclass=ABCMeta):
             propag.iter(start, stop, step)
         """
 
-        if not 1 <= len(args) <= 3:
-            raise ValueError
-        elif len(args) == 1:
-            start = self.orbit.date
-            stop, = args
-            step = self.step
-        elif len(args) == 2:
-            start = self.orbit.date
-            stop, step = args
-        else:
-            start, stop, step = args
+        if stop is None:
+            raise ValueError("The end of the propagation should be defined")
+
+        start = self.orbit.date if start is None else start
+        step = self.step if step is None else step
 
         if isinstance(stop, timedelta):
             stop = start + stop
         if start > stop and step > 0:
             step = -step
 
-        listeners = kwargs.get('listeners', [])
+        listeners = kwargs.pop('listeners', [])
 
         for orb in self._iter(start, stop, step, **kwargs):
             for listen_orb in self.listen(orb, listeners):
@@ -65,7 +59,8 @@ class AnalyticalPropagator(Propagator):
 class NumericalPropagator(Propagator):
 
     def propagate(self, date):
-        for orb in self.iter(self.orbit.date, date, self.step, inclusive=True):
+
+        for orb in self.iter(stop=date, inclusive=True):
             continue
         else:
             # Gives only the last iteration

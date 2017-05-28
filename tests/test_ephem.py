@@ -69,21 +69,37 @@ def test_subephem(ref_orb, ephem):
     assert subephem.stop == ephem.stop
     assert len(subephem) == stop // timedelta(minutes=10) + 1
 
-    # change of the start date of the ephem
+    # Trying to generate ephemeris out of the range of the current one
     with raises(ValueError):
-        subephem = ephem.ephem(start=ephem.start + timedelta(minutes=10))
+        subephem = ephem.ephem(start=ephem.start - timedelta(minutes=10))
+    with raises(ValueError):
+        subephem = ephem.ephem(stop=ephem.stop + timedelta(minutes=10))
 
+    # Changing of the starting date but with concervation of the step
+    # (i.e. the start date provided is on already contained in the ephem object)
     subephem = ephem.ephem(start=ephem.start + timedelta(minutes=9))
     assert subephem.start == ephem.start + timedelta(minutes=9)
     assert subephem.stop == ephem.stop
     assert len(subephem) == (subephem.stop - subephem.start) // step + 1
 
-    with raises(ValueError):
-        subephem = ephem.ephem(stop=ephem.stop - timedelta(minutes=10))
+    # Changing of the starting date, with an arbitraty date
+    # (i.e. will take the next available point)
+    subephem = ephem.ephem(start=ephem.start + timedelta(minutes=10, seconds=12))
+    assert subephem.start == ephem.start + timedelta(minutes=12)
+    assert subephem.stop == ephem.stop
+    assert len(subephem) == (subephem.stop - subephem.start) // step + 1
 
+    # Creation of a shorter ephemeris, with the same start, and same step
     subephem = ephem.ephem(stop=timedelta(minutes=12))
     assert subephem.start == ephem.start
     assert subephem.stop == ephem.start + timedelta(minutes=12)
+    assert len(subephem) == (subephem.stop - subephem.start) // step + 1
+
+    # Same as above, but as the stop date doesn't match one of the original ephemeris points,
+    # the last point of the newly generated ephemeris will be on the previous point.
+    subephem = ephem.ephem(stop=timedelta(minutes=11))
+    assert subephem.start == ephem.start
+    assert subephem.stop == ephem.start + timedelta(minutes=9)
     assert len(subephem) == (subephem.stop - subephem.start) // step + 1
 
 

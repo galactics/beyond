@@ -293,7 +293,7 @@ class TopocentricFrame(_Frame):
 
         listeners = stations_listeners(cls) if events else []
 
-        for point in orb.iter(start, stop, step, listeners=listeners):
+        for point in orb.iter(start=start, stop=stop, step=step, listeners=listeners):
 
             point.frame = cls
             point.form = 'spherical'
