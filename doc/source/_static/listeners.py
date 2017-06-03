@@ -5,17 +5,24 @@ from datetime import timedelta
 from beyond.utils import Date
 from beyond.orbits import Tle
 from beyond.frames import create_station
-from beyond.orbits.listeners import stations_listeners, NodeListener, ApsideListener
+from beyond.orbits.listeners import stations_listeners, NodeListener, ApsideListener, LightListener
 
 tle = Tle("""ISS (ZARYA)
-1 25544U 98067A   16086.49419020  .00003976  00000-0  66962-4 0  9998
-2 25544  51.6423 110.4590 0001967   0.7896 153.8407 15.54256299992114""").orbit()
+1 25544U 98067A   17153.89608442  .00001425  00000-0  28940-4 0  9997
+2 25544  51.6419 109.5559 0004850 223.1783 180.8272 15.53969766 59532""").orbit()
 
 # Station definition
 station = create_station('TLS', (43.428889, 1.497778, 178.0))
-listeners = stations_listeners(station)
-listeners.append(NodeListener())
-listeners.append(ApsideListener())
 
-for orb in tle.iter(Date.now(), timedelta(minutes=100), timedelta(seconds=180), listeners=listeners):
-    print("{orb.info:8} {orb.date:%Y-%m-%d %H:%M:%S}".format(orb=orb))
+# Listeners declaration
+listeners = stations_listeners(station)  # AOS, LOS and MAX elevation
+listeners.append(NodeListener())         # Ascending and Descending Node
+listeners.append(ApsideListener())       # Apogee and Perigee
+listeners.append(LightListener())        # Illumination events
+
+start = Date.now()
+stop = timedelta(minutes=100)
+step = timedelta(seconds=180)
+
+for orb in tle.iter(start=start, stop=stop, step=step, listeners=listeners):
+    print("{orb.date:%Y-%m-%d %H:%M:%S} {orb.info}".format(orb=orb))
