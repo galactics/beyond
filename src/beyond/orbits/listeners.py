@@ -232,6 +232,32 @@ class StationMaxListener(Listener):
         return orb.phi_dot
 
 
+class ZeroDopplerListener(Listener):
+
+    def __init__(self, frame, sight=False):
+        """
+        Args:
+            frame (~beyond.frames.frame._Frame): Frame from which the computation is made
+            sight (bool): If the frame used is a station, it could be interesting to only compute
+                the Zero Doppler when the object is in sight
+        """
+        self.frame = frame
+        self.sight = sight
+
+    def info(self, orb):
+        return "Zero Doppler"
+
+    def check(self, orb):
+        # Override to disable the computation when the object is not in view of the station
+        if self.sight and orb.copy(frame=self.frame, form='spherical').phi <= 0:
+            return False
+        else:
+            return super().check(orb)
+
+    def __call__(self, orb):
+        return orb.copy(frame=self.frame, form='spherical').r_dot
+
+
 def stations_listeners(stations):
     """Function for creating listeners for a a list of station
 
