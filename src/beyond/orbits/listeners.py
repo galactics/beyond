@@ -17,17 +17,19 @@ class Speaker(metaclass=ABCMeta):
         Args:
             orb (Orbit): The current state of the orbit
             listeners (iterable): List of Listener objects
-        Yield:
-            Orbit
+        Return:
+            list of Orbit: Orbits corresponding to events, sorted by dates
         """
 
         orb.info = ""
+        results = []
         for listener in listeners:
             if listener.check(orb):
-                yield self._bisect(listener.prev, orb, listener)
+                results.append(self._bisect(listener.prev, orb, listener))
 
             # Saving of the current value for the next iteration
             listener.prev = orb
+        return sorted(results, key=lambda x: x.date)
 
     def _bisect(self, begin, end, listener):
         """This method search for the zero-crossing of the watched parameter
@@ -87,6 +89,81 @@ class Listener(metaclass=ABCMeta):
     @abstractmethod
     def __call__(self, orb):
         pass
+
+
+class LightListener(Listener):
+    """This class compute, for a given orbit, its illumination.
+    """
+
+    binary = True
+
+    UMBRA = "umbra"
+    PENUMBRA = "penumbra"
+    FRAME = "EME2000"
+
+    def __init__(self, event=UMBRA):
+        """
+        Args:
+            event (str): Choose which event to trigger between umbra or penumbra
+        """
+        self.event = event
+
+    def info(self, orb):
+        if self.event == self.UMBRA:
+            return "Umbra in" if self(orb) <= 0 else "Umbra out"
+        else:
+            return "Penumbra in" if self(orb) <= 0 else "Penumbra out"
+
+    def __call__(self, orb):
+        """
+        Args:
+            orb (Orbit)
+        Return:
+            int: Positive value if the satellite is illuminated
+        """
+
+        # This import is not at the top of the file to avoid circular imports
+        from ..env.solarsystem import get_body
+
+        orb = orb.copy(form="cartesian", frame=self.FRAME)
+
+        alpha_umb = np.radians(0.264121687)
+        alpha_pen = np.radians(0.269007205)
+
+        sun = get_body("Sun")
+
+        sun_orb = sun.propagate(orb.date)
+        sun_orb.frame = orb.frame
+        vec_r_sun = sun_orb[:3]
+        r_sun_norm = np.linalg.norm(vec_r_sun)
+
+        vec_r = orb[:3]
+        r_norm = np.linalg.norm(vec_r)
+
+        if vec_r_sun @ vec_r < 0:
+            zeta = np.arccos(-vec_r_sun @ vec_r / (r_sun_norm * r_norm))
+
+            sat_horiz = r_norm * np.cos(zeta)
+            sat_vert = r_norm * np.sin(zeta)
+
+            x = orb.frame.center.r / np.sin(alpha_pen)
+            pen_vert = np.tan(alpha_pen) * (x + sat_horiz)
+
+            if sat_vert <= pen_vert:
+
+                if self.event == self.PENUMBRA:
+                    # Penumbra
+                    return -1
+                else:
+
+                    y = orb.frame.center.r / np.sin(alpha_umb)
+                    umb_vert = np.tan(alpha_umb) * (y - sat_horiz)
+
+                    if sat_vert <= umb_vert:
+                        # Unmbra
+                        return -1
+
+        return 1
 
 
 class NodeListener(Listener):
