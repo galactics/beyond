@@ -194,8 +194,14 @@ class StationSignalListener(Listener):
     """Listener for AOS and LOS of a given station
     """
 
-    def __init__(self, station):
+    def __init__(self, station, elev=0):
+        """
+        Args:
+            station (TopocentricFrame): Station from which to listen to elevation events
+            elev (float): Elevation from which to trigger the listener (in radians)
+        """
         self.station = station
+        self.elevation = elev
 
     def info(self, orb):
         orb = orb.copy(frame=self.station, form='spherical')
@@ -206,7 +212,7 @@ class StationSignalListener(Listener):
 
     def __call__(self, orb):
         orb = orb.copy(form='spherical', frame=self.station)
-        return orb.phi
+        return orb.phi - self.elevation
 
 
 class StationMaxListener(Listener):
