@@ -31,7 +31,8 @@ class FormTransform:
     """
 
     TLE = Form("TLE", ["i", "Ω", "e", "ω", "M", "n"])
-    KEPL_M = Form("Keplerian_M", ["a", "e", "i", "Ω", "ω", "M"], [TLE])
+    KEPL_C = Form("Keplerian_Circular", ["a", "ex", "ey", "i", "Ω", "λ"])
+    KEPL_M = Form("Keplerian_Mean", ["a", "e", "i", "Ω", "ω", "M"], [TLE, KEPL_C])
     KEPL = Form("Keplerian", ["a", "e", "i", "Ω", "ω", "ν"], [KEPL_M])
     SPHE = Form("Spherical", ["r", "θ", "φ", "r_dot", "θ_dot", "φ_dot"])
     CART = Form("Cartesian", ["x", "y", "z", "vx", "vy", "vz"], [KEPL, SPHE])
@@ -113,7 +114,7 @@ class FormTransform:
         return np.array([x, y, z, vx, vy, vz], dtype=float)
 
     @classmethod
-    def _keplerian_to_keplerian_m(cls, coord, center):
+    def _keplerian_to_keplerian_mean(cls, coord, center):
         """Conversion from Keplerian to Mean Keplerian
 
         The difference is the use of Mean anomaly instead of True anomaly
@@ -132,7 +133,7 @@ class FormTransform:
         return np.array([a, e, i, Ω, ω, M], dtype=float)
 
     @classmethod
-    def _keplerian_m_to_keplerian(cls, coord, center):
+    def _keplerian_mean_to_keplerian(cls, coord, center):
         """Conversion from Mean Keplerian to True Keplerian
         """
         a, e, i, Ω, ω, M = coord
@@ -203,7 +204,31 @@ class FormTransform:
         return x
 
     @classmethod
-    def _tle_to_keplerian_m(cls, coord, center):
+    def _keplerian_circular_to_keplerian_mean(cls, coord, center):
+        """Conversion from Keplerian near-circular elements to Mean Keplerian
+        """
+        a, ex, ey, i, Ω, λ = coord
+
+        e = sqrt(ex ** 2 + ey ** 2)
+        ω = arccos(ex / e)
+        M = λ - ω
+
+        return np.array([a, e, i, Ω, ω, M], dtype=float)
+
+    @classmethod
+    def _keplerian_mean_to_keplerian_circular(cls, coord, center):
+        """Conversion from Mean Keplerian to Keplerian near-circular elements
+        """
+        a, e, i, Ω, ω, M = coord
+
+        ex = e * cos(ω)
+        ey = e * sin(ω)
+        λ = ω + M
+
+        return np.array([a, ex, ey, i, Ω, λ], dtype=float)
+
+    @classmethod
+    def _tle_to_keplerian_mean(cls, coord, center):
         """Convertion from the TLE standard format to the Mean Keplerian
 
         see :py:class:`Tle` for more information.
@@ -214,7 +239,7 @@ class FormTransform:
         return np.array([a, e, i, Ω, ω, M], dtype=float)
 
     @classmethod
-    def _keplerian_m_to_tle(cls, coord, center):
+    def _keplerian_mean_to_tle(cls, coord, center):
         """Mean Keplerian to TLE format conversion
         """
         a, e, i, Ω, ω, M = coord

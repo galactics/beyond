@@ -56,13 +56,13 @@ def test_init_cart():
 
 def test_coord_unit_transform(ref_orbit):
 
-    kep = FormTransform._keplerian_m_to_keplerian(ref_orbit, Earth)
+    kep = FormTransform._keplerian_mean_to_keplerian(ref_orbit, Earth)
     assert np.allclose(ref_orbit[:5], kep[:5])
 
-    new = FormTransform._keplerian_to_keplerian_m(kep, Earth)
+    new = FormTransform._keplerian_to_keplerian_mean(kep, Earth)
     assert np.allclose(ref_orbit, new)
 
-    tle = FormTransform._keplerian_m_to_tle(ref_orbit, Earth)
+    tle = FormTransform._keplerian_mean_to_tle(ref_orbit, Earth)
     tle_dict = dict(zip(FormTransform.TLE.param_names, tle))
     assert tle_dict['i'] == ref_orbit['i']
     assert tle_dict['Ω'] == ref_orbit['Ω']
@@ -70,7 +70,7 @@ def test_coord_unit_transform(ref_orbit):
     assert tle_dict['ω'] == ref_orbit['ω']
     assert tle_dict['M'] == ref_orbit['M']
 
-    new = FormTransform._tle_to_keplerian_m(tle, Earth)
+    new = FormTransform._tle_to_keplerian_mean(tle, Earth)
     assert np.allclose(new, ref_orbit)
 
     cart = FormTransform._keplerian_to_cartesian(kep, Earth)
@@ -85,7 +85,7 @@ def test_coord_global_transform(ref_orbit):
     backup = ref_orbit.copy()
 
     # Useless transformation, no effect
-    ref_orbit.form = 'keplerian_m'
+    ref_orbit.form = 'keplerian_mean'
     assert all(ref_orbit == backup)
 
     ref_orbit.form = FormTransform.CART

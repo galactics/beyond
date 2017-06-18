@@ -124,6 +124,7 @@ class Orbit(np.ndarray):
             'nu': "ν",
             'theta_dot': 'θ_dot',
             'phi_dot': 'φ_dot',
+            'lambda': 'λ',
         }
 
         # Conversion of variable name to utf-8
