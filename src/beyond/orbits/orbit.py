@@ -116,20 +116,9 @@ class Orbit(np.ndarray):
 
     def __getattr__(self, name):
 
-        convert = {
-            'theta': 'θ',
-            'phi': 'φ',
-            'Omega': "Ω",
-            'omega': 'ω',
-            'nu': "ν",
-            'theta_dot': 'θ_dot',
-            'phi_dot': 'φ_dot',
-            'lambda': 'λ',
-        }
-
         # Conversion of variable name to utf-8
-        if name in convert:
-            name = convert[name]
+        if name in FormTransform.alt:
+            name = FormTransform.alt[name]
 
         # Verification if the variable is available in the current form
         if name not in self.names:

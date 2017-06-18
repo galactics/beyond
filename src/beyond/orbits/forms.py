@@ -39,6 +39,17 @@ class FormTransform:
 
     _tree = CART
 
+    alt = {
+        'theta': 'θ',
+        'phi': 'φ',
+        'Omega': "Ω",
+        'omega': 'ω',
+        'nu': "ν",
+        'theta_dot': 'θ_dot',
+        'phi_dot': 'φ_dot',
+        'lambda': 'λ',
+    }
+
     def __init__(self, orbit):
         self.orbit = orbit
 
