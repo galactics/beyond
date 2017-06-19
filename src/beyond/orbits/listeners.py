@@ -170,24 +170,31 @@ class NodeListener(Listener):
     """Listener for Ascending and Descending Node detection
     """
 
+    def __init__(self, frame="EME2000"):
+        self.frame = frame
+
     def info(self, orb):
-        return "AscNode" if abs(self(orb)) < 0.1 else "DscNode"
+        orb = orb.copy(frame=self.frame, form="spherical")
+        return "Desc Node" if orb.phi_dot < 0 else "Asc Node"
 
     def __call__(self, orb):
-        orb = orb.copy(form='keplerian', frame="EME2000")
-        return ((orb.omega + orb.nu + np.pi) % (2 * np.pi)) - np.pi
+        orb = orb.copy(form='spherical', frame=self.frame)
+        return orb.phi
 
 
 class ApsideListener(Listener):
     """Listener for Periapside and Apoapside detection
     """
 
+    def __init__(self, frame="EME2000"):
+        self.frame = frame
+
     def info(self, orb):
-        return "Perigee" if abs(self(orb)) < 0.1 else "Apogee"
+        return "Periapsis" if self(orb) > self(self.prev) else "Apoapsis"
 
     def __call__(self, orb):
-        orb = orb.copy(form='keplerian', frame="EME2000")
-        return ((orb.nu + np.pi) % (2 * np.pi)) - np.pi
+        orb = orb.copy(form='spherical', frame=self.frame)
+        return orb.r_dot
 
 
 class StationSignalListener(Listener):
