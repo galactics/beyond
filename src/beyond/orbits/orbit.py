@@ -8,7 +8,6 @@ import numpy as np
 
 from .forms import FormTransform
 from .ephem import Ephem
-from ..utils import Date
 from ..frames.frame import get_frame, orbit2frame
 from ..propagators import get_propagator
 

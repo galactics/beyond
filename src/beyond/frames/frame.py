@@ -7,7 +7,7 @@ to each other.
 The relations may be circular, thanks to the use of the Node2 class.
 
 .. code-block:: text
-    
+
                    ,-------.        ,----.
                    |EME2000|..bias..|GCRF|
                    `-------'        `----'
@@ -43,7 +43,6 @@ import warnings
 import numpy as np
 
 from ..constants import Earth
-from ..utils.date import Date
 from ..utils.matrix import rot2, rot3
 from ..utils.node import Node2
 from . import iau1980, iau2010
@@ -75,7 +74,6 @@ by the developper.
 """
 
 sys.modules[__name__ + ".dynamic"] = dynamic
-
 
 
 def get_frame(frame):
@@ -303,6 +301,7 @@ class TopocentricFrame(_Frame):
                 continue
 
             yield point
+
 
 def _geodetic_to_cartesian(lat, lon, alt):
     """Conversion from latitude, longitue and altitude coordinates to
