@@ -28,9 +28,9 @@ class Ephem(Speaker):
     LINEAR = "linear"
     LAGRANGE = "lagrange"
 
-    def __init__(self, orbits, method=LAGRANGE, order=8):
+    def __init__(self, orbits, method=None, order=8):
         self._orbits = list(sorted(orbits, key=lambda x: x.date))
-        self.method = method
+        self.method = self.LAGRANGE if method is None else method
         self.order = order
 
     def __iter__(self):
