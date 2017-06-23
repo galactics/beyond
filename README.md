@@ -11,7 +11,8 @@ This library was started to better understand how Flight Dynamics works. It
 has no intent of efficiency nor performance at the moment, and the goal is
 mainly to develop a simple API for space observations.
 
-The sources of this library can be found at [github](https://github.com/galactics/beyond)
+The sources of this library can be found at [github](https://github.com/galactics/beyond) and
+are under the GPLv3.
 
 Installation
 ------------
