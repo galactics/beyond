@@ -9,6 +9,7 @@ setup(
     name='beyond',
     version=version,
     description="Flight Dynamic Library",
+    long_description=open('README.rst').read(),
     platforms=["any"],
     keywords=['flight dynamic', 'satellite', 'space'],
     author='Jules David',
