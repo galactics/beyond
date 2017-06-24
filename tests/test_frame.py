@@ -310,7 +310,8 @@ def test_orbit2frame():
     iss.register_as_frame('iss_inert')
     iss.register_as_frame('iss_qsw', 'QSW')
     iss.register_as_frame('iss_tnw', 'TNW')
-    iss.register_as_frame('iss_unknown', 'unknow')
+    with raises(ValueError):
+        iss.register_as_frame('iss_unknown', 'unknow')
 
     s1 = soyouz.copy(frame='iss_inert')
     assert_almost_equal(s1[:3], [70.5889585, 73.6584008, -62.5406308])
@@ -331,6 +332,3 @@ def test_orbit2frame():
     # same relative positions, but expressed in differents frames
     assert_almost_equal(norm(s1[:3]), norm(s2[:3]), 4)
     assert_almost_equal(norm(s2[:3]), norm(s3[:3]), 6)
-
-    with raises(ValueError):
-        soyouz.copy(frame='iss_unknown')

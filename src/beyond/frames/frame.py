@@ -387,6 +387,9 @@ def orbit2frame(name, ref_orbit, orientation=None):
     reference frame of the Orbit and move along with the orbit
     """
 
+    if orientation is not None and orientation.upper() not in ("QSW", "TNW"):
+        raise ValueError("Unknown orientation '%s'" % orientation)
+
     def _convert(self):
         """Conversion from orbit frame to parent frame
         """
