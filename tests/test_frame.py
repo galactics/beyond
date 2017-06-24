@@ -55,6 +55,23 @@ def ref_orbit():
     )
 
 
+@yield_fixture
+def station_env():
+    with patch('beyond.frames.iau1980.get_pole') as m, patch('beyond.utils.date.get_timescales') as m2:
+        m.return_value = {
+            'X': -0.00951054166666622,
+            'Y': 0.31093590624999734,
+            'dpsi': -94.19544791666682,
+            'deps': -10.295645833333051,
+            'dY': -0.10067361111115315,
+            'dX': -0.06829513888889051,
+            'LOD': 1.6242802083331438,
+        }
+        m2.return_value = ScalesDiff(0.01756018472222477, 36.0)
+
+        yield
+
+
 def assert_vector(ref, pv, precision=(4, 6)):
     assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
     assert_almost_equal(ref[3:], pv[3:], precision[1], "Velocity")
@@ -203,7 +220,7 @@ def test_change_tle():
             assert_vector(eme2000_ref, tle)
 
 
-def test_station():
+def test_station(station_env):
 
     # lines = """ISS (ZARYA)
     #            1 25544U 98067A   16038.20499631  .00009950  00000-0  15531-3 0  9993
@@ -216,45 +233,32 @@ def test_station():
     # print(get_pole(Date(2016, 2, 7, 16, 55).mjd))
     # assert False
 
-    with patch('beyond.frames.iau1980.get_pole') as m, patch('beyond.utils.date.get_timescales') as m2:
-        m.return_value = {
-            'X': -0.00951054166666622,
-            'Y': 0.31093590624999734,
-            'dpsi': -94.19544791666682,
-            'deps': -10.295645833333051,
-            'dY': -0.10067361111115315,
-            'dX': -0.06829513888889051,
-            'LOD': 1.6242802083331438,
-        }
+    orb = Orbit(
+        Date(2016, 2, 7, 16, 55),
+        [4225679.11976, 2789527.13836, 4497182.71156,
+         -5887.93077439, 3748.50929999, 3194.45322378],
+        'cartesian', 'TEME', 'Sgp4'
+    )
+    archive = orb.copy()
 
-        m2.return_value = ScalesDiff(0.01756018472222477, 36.0)
+    tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
 
-        orb = Orbit(
-            Date(2016, 2, 7, 16, 55),
-            [4225679.11976, 2789527.13836, 4497182.71156,
-             -5887.93077439, 3748.50929999, 3194.45322378],
-            'cartesian', 'TEME', 'Sgp4'
-        )
-        archive = orb.copy()
+    orb.frame = 'Toulouse'
+    orb.form = 'spherical'
 
-        tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
+    # azimuth
+    assert -np.degrees(orb.theta) - 159.75001561831209 <= 1e-9
+    # elevation
+    assert np.degrees(orb.phi) - 57.894234537351593 <= 1e-9
+    # range
+    assert orb.r - 471467.6615039421 <= 1e-9
 
-        orb.frame = 'Toulouse'
-        orb.form = 'spherical'
-
-        # azimuth
-        assert -np.degrees(orb.theta) - 159.75001561831209 <= 1e-9
-        # elevation
-        assert np.degrees(orb.phi) - 57.894234537351593 <= 1e-9
-        # range
-        assert orb.r - 471467.6615039421 <= 1e-9
-
-        orb.frame = archive.frame
-        orb.form = archive.form
-        assert_vector(archive, orb)
+    orb.frame = archive.frame
+    orb.form = archive.form
+    assert_vector(archive, orb)
 
 
-def test_station_visibility():
+def test_station_visibility(station_env):
 
     lines = """ISS (ZARYA)
                1 25544U 98067A   16038.20499631  .00009950  00000-0  15531-3 0  9993
@@ -262,14 +266,26 @@ def test_station_visibility():
     orb = Tle(lines).orbit()
 
     tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
-    points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16), timedelta(hours=2), timedelta(seconds=30))]
-    points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16), Date(2016, 2, 7, 18), timedelta(seconds=30))]
+
+    points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16, 45), timedelta(minutes=16), timedelta(seconds=30))]
+    assert len(points) == 21
+    points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16, 45), Date(2016, 2, 7, 17, 1), timedelta(seconds=30))]
     assert len(points) == 21
 
-    points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16), timedelta(hours=2), timedelta(seconds=30), events=True)]
+    # Events (AOS, MAX and LOS)
+    points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16, 45), timedelta(minutes=16), timedelta(seconds=30), events=True)]
+
+    # Three more points than precedently, due to the events computation
+    assert len(points) == 24
 
     assert points[0].info == 'AOS Toulouse'
+    assert points[0].date == Date(2016, 2, 7, 16, 49, 51, 266783)
+
+    assert points[12].info == "MAX Toulouse"
+    assert points[12].date == Date(2016, 2, 7, 16, 55, 9, 268318)
+
     assert points[-1].info == 'LOS Toulouse'
+    assert points[-1].date == Date(2016, 2, 7, 17, 0, 25, 271351)
 
 
 def test_errors(ref_orbit):
