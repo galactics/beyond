@@ -15,7 +15,7 @@ def get_body(*bodies):
     Args:
         bodies (str or list): Object name(s)
     Return:
-        Body
+        Body:
     """
 
     _bodies = {

@@ -5,6 +5,7 @@ Beyond modules
     :maxdepth: 2
 
     config
+    constants
     env
     frames
     orbits
