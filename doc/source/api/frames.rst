@@ -54,13 +54,19 @@ will ensure correct frames conversions.
 .. autoclass:: beyond.frames.frame.TopocentricFrame
     :members:
 
-.. Local orbital Frames
-    --------------------
+Local Orbital Reference Frame
+-----------------------------
 
-    .. automodule:: beyond.frames.local
-        :members:
-        :undoc-members:
-        :show-inheritance:
+It is possible to attach a frame to a moving object by calling the method
+:py:meth:`Orbit.register_as_frame() <beyond.orbits.orbit.Orbit.register_as_frame>` or
+:py:meth:`Ephem.register_as_frame() <beyond.orbits.ephem.Ephem.register_as_frame>`.
+Both are a simple shortcut to the :py:func:`~beyond.frames.frame.orbit2frame` function.
+
+.. autofunction:: beyond.frames.frame.orbit2frame
+
+.. automodule:: beyond.frames.local
+    :members:
+
 
 Pole motion models
 ==================

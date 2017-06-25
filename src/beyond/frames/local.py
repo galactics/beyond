@@ -1,4 +1,4 @@
-"""For local orbital frame definitions
+"""Local orbital reference frame
 """
 
 from numpy.linalg import norm
@@ -11,10 +11,12 @@ def _split(orbit):
 
 
 def to_tnw(orbit):
-    """
+    """In the TNW Local Orbital Reference Frame, x is oriented along the velocity vector,
+    z along the angular momentum, and y complete the frame.
+
     Args:
         orbit (list): Array of length 6
-    Returns:
+    Return:
         numpy.ndarray: matrix to convert from inertial frame to TNW.
 
     >>> delta_tnw = [1, 0, 0]
@@ -37,10 +39,12 @@ def to_tnw(orbit):
 
 
 def to_qsw(orbit):
-    """
+    """In the QSW Local Orbital Reference Frame, x is oriented along the position vector,
+    z along the angular momentum, and y complete the frame.
+
     Args:
         orbit (list): Array of length 6
-    Returns:
+    Return:
         numpy.ndarray: matrix to convert from inertial frame to QSW
 
     >>> delta_qsw = [1, 0, 0]
