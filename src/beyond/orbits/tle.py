@@ -124,8 +124,9 @@ class Tle:
 
         self.norad_id = int(first[1][:-1])
         self.classification = first[1][-1]
+
         year = int(first[2][:2])
-        year += 1900 if self.norad_id < 26052 else 2000
+        year += 1900 if year >= 57 else 2000  # This condition works until 2057
         self.cospar_id = "%d-%s" % (year, first[2][2:])
 
         epoch = datetime(2000 + int(first[3][:2]), 1, 1) + timedelta(days=float(first[3][2:]) - 1)
