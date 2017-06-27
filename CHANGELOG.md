@@ -3,7 +3,7 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
-## [Unreleased]
+## [v0.3] - 2017-06-27
 
 ### Added
 - Integration of JPL ephemeris by interfacing Brandon Rhodes' [jplephem](https://github.com/brandon-rhodes/python-jplephem) python library
