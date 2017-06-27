@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 install_requires = ['numpy', 'sgp4', 'jplephem']
-version = "0.2.1"
+version = "0.3"
 
 setup(
     name='beyond',
