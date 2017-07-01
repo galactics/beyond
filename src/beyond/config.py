@@ -5,7 +5,22 @@ from pathlib import Path
 from configparser import ConfigParser
 
 
-class Config(dict):
+class ConfigError(AttributeError, KeyError):
+    pass
+
+
+class ConfigDict(dict):
+
+    def __getitem__(self, name):
+        if name not in self:
+            raise ConfigError("Unknown configuration variable '%s'" % name)
+        return super().__getitem__(name)
+
+    def __getattr__(self, name):
+        return self[name]
+
+
+class Config(ConfigDict):
     """Configuration
 
     Example:
@@ -13,21 +28,15 @@ class Config(dict):
 
             from space.config import config
             print(config['env']['pole_motion_source'])
+            print(config.env.pole_motion_source)
     """
 
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         if cls._instance is None:
-            cls._instance = super().__new__(cls)
-
+            cls._instance = super().__new__(cls, *args, **kwargs)
         return cls._instance
-
-    def __getitem__(self, name):
-        if name not in self:
-            raise ConfigError("Unknown configuration variable '%s'" % name)
-
-        return super().__getitem__(name)
 
     @classmethod
     def load(cls, path):
@@ -59,21 +68,9 @@ class Config(dict):
         obj = cls()
 
         for section in confparser.sections():
-            obj[section] = dict(confparser[section])
+            obj[section] = ConfigDict(confparser[section])
 
         obj['folder'] = folder_path
 
 
-class ConfigError(RuntimeError):
-    pass
-
-
 config = Config()
-
-
-try:
-    # Load the '~/.beyond' folder
-    config.load(Path.home() / ".beyond")
-except FileNotFoundError:
-    # If it doesn't exist, use an empty config dict
-    pass

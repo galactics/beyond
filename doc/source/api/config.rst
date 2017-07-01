@@ -14,7 +14,7 @@ behaviour. A description of the fields is provided :ref:`here <beyondconf>`.
     [env]
     pole_motion_source = all
 
-You can either create a directory containing the beyond.conf file and load it by hand
+You can create a directory containing the beyond.conf file and load it
 
 .. code-block:: python
 
@@ -22,16 +22,6 @@ You can either create a directory containing the beyond.conf file and load it by
     config.load('/home/user/project-X/data/')
     # or
     config.load('/home/user/project-X/data/beyond.conf')
-
-or create a ``.beyond`` directory directly in your home, containing the :ref:`beyondconf`
-file, which will be automatically loaded.
-
-.. code-block:: text
-
-    /home/
-     |_ user/
-         |_ .beyond/
-             |_ beyond.conf
 
 .. _beyondconf:
 
