@@ -19,6 +19,21 @@ class ConfigDict(dict):
     def __getattr__(self, name):
         return self[name]
 
+    def _get(self, key, default):
+        return super().get(key, default)
+
+    def get(self, section, value, default):
+        """Retrieve a value in the config, if the value is not available
+        give the default value specified.
+        """
+
+        out = self._get(section, default)
+
+        if isinstance(out, ConfigDict):
+            return out._get(value, default)
+        else:
+            return out
+
 
 class Config(ConfigDict):
     """Configuration
