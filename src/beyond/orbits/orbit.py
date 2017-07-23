@@ -21,9 +21,9 @@ class Orbit(np.ndarray):
         Args:
             date (Date): Date associated with the state vector
             coord (list): 6-length state vector
-            form (str): Name of the form of the state vector
-            frame (str): Name of the frame of reference of the state vector
-            propagator (str): Name of the propagator to be used to extrapolate
+            form (str or Form): Name of the form of the state vector
+            frame (str or Frame): Name of the frame of reference of the state vector
+            propagator (str or Propagator): Name of the propagator to be used to extrapolate
         """
 
         if len(coord) != 6:
@@ -107,12 +107,6 @@ class Orbit(np.ndarray):
             new_obj.form = form
         return new_obj
 
-    @property
-    def names(self):
-        """Gives the names of the fields
-        """
-        return self.form.param_names
-
     def __getattr__(self, name):
 
         # Conversion of variable name to utf-8
@@ -120,10 +114,10 @@ class Orbit(np.ndarray):
             name = FormTransform.alt[name]
 
         # Verification if the variable is available in the current form
-        if name not in self.names:
+        if name not in self.form.param_names:
             raise AttributeError("'{}' object has no attribute {!r}".format(self.__class__, name))
 
-        i = self.names.index(name)
+        i = self.form.param_names.index(name)
         return self[i]
 
     def __getitem__(self, key):
@@ -138,7 +132,7 @@ class Orbit(np.ndarray):
 
     def __repr__(self):  # pragma: no cover
         coord_str = '\n'.join(
-            [" " * 4 + "%s = %s" % (name, arg) for name, arg in zip(self.names, self)]
+            [" " * 4 + "%s = %s" % (name, arg) for name, arg in zip(self.form.param_names, self)]
         )
 
         if self.propagator is None:
@@ -162,20 +156,22 @@ class Orbit(np.ndarray):
 
     @property
     def form(self):
-        """Form of the coordinates of the orbit
+        """:py:class:`~beyond.orbits.forms.Form`: Form of the coordinates of the orbit
 
-        Return:
-            Form:
+        If set as a string (e.g. ``"cartesian"``) will be automatically converted to the corresponding
+        Form object.
+
+        .. code-block:: python
+
+            orbit.form = "cartesian"
+            # is equivalent to
+            from beyond.orbits.forms import FormTransform
+            orbit.form = FormTransform.CART
         """
         return self._form
 
     @form.setter
     def form(self, new_form):
-        """Changes the form of the coordinates in-place
-
-        Args:
-            new_form (str or Form)
-        """
         if isinstance(new_form, str):
             new_form = FormTransform._tree[new_form]
 
@@ -185,20 +181,22 @@ class Orbit(np.ndarray):
 
     @property
     def frame(self):
-        """Frame of reference of the coordinates
+        """:py:class:`~beyond.frames.frame.Frame`: Reference frame of the orbit
 
-        Return:
-            Frame:
+        if set as a string (e.g. ``"EME2000"``) will be automatically converted to the corresponding
+        Frame class.
+
+        .. code-block:: python
+
+            orbit.frame = "EME2000"
+            # is equivalent to
+            from beyond.frames.frame import EME2000
+            orbit.frame = EME2000
         """
         return self._frame
 
     @frame.setter
     def frame(self, new_frame):
-        """Convert the orbit to a new frame of reference
-
-        Args:
-            new_frame (str or Frame)
-        """
         old_form = self.form
 
         if isinstance(new_frame, str):
@@ -215,6 +213,11 @@ class Orbit(np.ndarray):
 
     @property
     def propagator(self):
+        """:py:class:`~beyond.propagators.base.Propagator`: Propagator of the orbit.
+
+        if set as a string (e.g. ``"Sgp4"``) will be automatically converted to the corresponding
+        propagator class and instanciated without arguments.
+        """
         return self._propagator
 
     @propagator.setter
@@ -240,6 +243,8 @@ class Orbit(np.ndarray):
         return self.propagator.propagate(date)
 
     def iter(self, *args, **kwargs):
+        """see :py:meth:`Propagator.iter() <beyond.propagators.base.Propagator.iter>`
+        """
         if self.propagator.orbit is not self:
             self.propagator.orbit = self
 
@@ -259,7 +264,7 @@ class Orbit(np.ndarray):
         for orb in self.iter(start=start, stop=stop, step=step, inclusive=True):
             yield orb
 
-    def ephem(self, *args):
+    def ephem(self, start, stop, step):
         """Tabulation of Orbit at a given step and on a given date range
 
         Args:
@@ -269,7 +274,7 @@ class Orbit(np.ndarray):
         Return:
             Ephem:
         """
-        return Ephem(self.ephemeris(*args))
+        return Ephem(self.ephemeris(start, stop, step))
 
     def register_as_frame(self, name, orientation=None):  # pragma: no cover
         """Register the orbit as frame.

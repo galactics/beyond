@@ -56,7 +56,7 @@ TOPO = ['create_station']
 __all__ = CIO + IAU1980 + OTHER + TOPO + ['get_frame']
 
 
-class _FrameCache(dict):
+class FrameCache(dict):
     """This class is here to emulate module behaviour for dynamically
     created frames.
 
@@ -68,7 +68,7 @@ class _FrameCache(dict):
         return self[name]
 
 
-dynamic = _FrameCache()
+dynamic = FrameCache()
 """This dictionnary contains all the frames. Those defined here, and those created on the fly
 by the developper.
 """
@@ -82,7 +82,7 @@ def get_frame(frame):
     Args:
         frame (str): name of the desired frame
     Return:
-        ~beyond.frames.frame._Frame
+        ~beyond.frames.frame.Frame
     """
     if frame in dynamic.keys():
         return dynamic[frame]
@@ -110,7 +110,7 @@ class _MetaFrame(type, Node2):
         return "<Frame '{}'>".format(cls.name)
 
 
-class _Frame(metaclass=_MetaFrame):
+class Frame(metaclass=_MetaFrame):
     """Frame base class
     """
 
@@ -179,7 +179,7 @@ class _Frame(metaclass=_MetaFrame):
         return orbit[:6]
 
 
-class TEME(_Frame):
+class TEME(Frame):
     """True Equator Mean Equinox"""
 
     def _to_TOD(self):
@@ -188,19 +188,19 @@ class TEME(_Frame):
         return self._convert(m, m), np.identity(7)
 
 
-class GTOD(_Frame):
+class GTOD(Frame):
     """Greenwich True Of Date"""
     pass
 
 
-class WGS84(_Frame):
+class WGS84(Frame):
     """World Geodetic System 1984"""
 
     def _to_ITRF(self):
         return np.identity(7), np.identity(7)
 
 
-class PEF(_Frame):
+class PEF(Frame):
     """Pseudo Earth Fixed"""
 
     def _to_TOD(self):
@@ -210,7 +210,7 @@ class PEF(_Frame):
         return self._convert(m, m), offset
 
 
-class TOD(_Frame):
+class TOD(Frame):
     """True (Equator) Of Date"""
 
     def _to_MOD(self):
@@ -218,7 +218,7 @@ class TOD(_Frame):
         return self._convert(m, m), np.identity(7)
 
 
-class MOD(_Frame):
+class MOD(Frame):
     """Mean (Equator) Of Date"""
 
     def _to_EME2000(self):
@@ -226,12 +226,12 @@ class MOD(_Frame):
         return self._convert(m, m), np.identity(7)
 
 
-class EME2000(_Frame):
+class EME2000(Frame):
     """EME2000 inertial frame (also known as J2000)"""
     pass
 
 
-class ITRF(_Frame):
+class ITRF(Frame):
     """International Terrestrial Reference Frame"""
 
     def _to_PEF(self):
@@ -243,7 +243,7 @@ class ITRF(_Frame):
         return self._convert(m, m), np.identity(7)
 
 
-class TIRF(_Frame):
+class TIRF(Frame):
     """Terrestrial Intermediate Reference Frame"""
 
     def _to_CIRF(self):
@@ -253,7 +253,7 @@ class TIRF(_Frame):
         return self._convert(m, m), offset
 
 
-class CIRF(_Frame):
+class CIRF(Frame):
     """Celestial Intermediate Reference Frame"""
 
     def _to_GCRF(self):
@@ -261,12 +261,12 @@ class CIRF(_Frame):
         return self._convert(m, m), np.identity(7)
 
 
-class GCRF(_Frame):
+class GCRF(Frame):
     """Geocentric Celestial Reference Frame"""
     pass
 
 
-class TopocentricFrame(_Frame):
+class TopocentricFrame(Frame):
     """Base class for ground station
     """
 
@@ -340,7 +340,7 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
             * Longitude in degrees
             * Altitude to sea level in meters
 
-        parent_frame (_Frame): Planetocentric rotating frame of reference of
+        parent_frame (Frame): Planetocentric rotating frame of reference of
             coordinates.
         orientation (str or float): Heading of the station
             Acceptables values are 'N', 'S', 'E', 'W' or any angle in radians
@@ -388,7 +388,7 @@ def orbit2frame(name, ref_orbit, orientation=None):
         ref_orbit (Orbit or Ephem):
         orientation (str): Orientation of the created frame
     Return:
-        _Frame:
+        Frame:
 
     If orientation is ``None``, the new frame will keep the orientation of the
     reference frame of the Orbit and move along with the orbit.
@@ -419,7 +419,7 @@ def orbit2frame(name, ref_orbit, orientation=None):
 
             # we transpose the matrix because it represent the conversion
             # from inertial to local frame, and we'd like the other way around
-            rotation = _Frame._convert(m, m).T
+            rotation = Frame._convert(m, m).T
         else:
             raise ValueError("Unknown orientation '%s'" % orientation)
 
@@ -434,7 +434,7 @@ def orbit2frame(name, ref_orbit, orientation=None):
     }
 
     # Creation of the class
-    cls = _MetaFrame(name, (_Frame,), dct)
+    cls = _MetaFrame(name, (Frame,), dct)
 
     # Link to the parent
     cls + ref_orbit.frame

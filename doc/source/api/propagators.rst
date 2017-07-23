@@ -1,6 +1,11 @@
 Propagators
 ===========
 
+All propagators follow the :py:class:`Propagator` interface.
+
+.. autoclass:: beyond.propagators.base.Propagator
+    :members:
+
 SGP4
 ----
 

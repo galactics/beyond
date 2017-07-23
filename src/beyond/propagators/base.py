@@ -23,9 +23,12 @@ class Propagator(Speaker, metaclass=ABCMeta):
     def iter(self, *, start=None, stop=None, step=None, **kwargs):
         """
         Examples:
-            propag.iter(stop)
-            propag.iter(stop, step)
-            propag.iter(start, stop, step)
+
+        .. code-block:: python
+
+            propag.iter(stop=stop)
+            propag.iter(stop=stop, step=step)
+            propag.iter(start=start, stop=stop, step=step)
         """
 
         if stop is None:

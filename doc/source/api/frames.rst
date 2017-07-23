@@ -7,7 +7,7 @@ Frames
 
 .. image:: /_static/frames.png
 
-.. autoclass:: beyond.frames.frame._Frame
+.. autoclass:: beyond.frames.frame.Frame
     :members:
 
 CIO Based Frames

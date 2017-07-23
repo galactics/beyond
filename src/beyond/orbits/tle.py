@@ -1,4 +1,3 @@
-
 """Module for handling TLE reading and writing
 
 .. code-block:: text

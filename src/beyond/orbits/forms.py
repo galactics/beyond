@@ -13,7 +13,7 @@ from ..utils.node import Node
 
 
 class Form(Node):
-    """Base class for form classes
+    """Base class for orbital form definition
     """
 
     _case = False
@@ -31,11 +31,37 @@ class FormTransform:
     """
 
     TLE = Form("TLE", ["i", "Ω", "e", "ω", "M", "n"])
+    """TLE form"""
+
     KEPL_C = Form("Keplerian_Circular", ["a", "ex", "ey", "i", "Ω", "λ"])
+    """Keplerian near-circular form"""
+
     KEPL_M = Form("Keplerian_Mean", ["a", "e", "i", "Ω", "ω", "M"], [TLE, KEPL_C])
+    """Keplerian with Mean anomaly"""
+
     KEPL = Form("Keplerian", ["a", "e", "i", "Ω", "ω", "ν"], [KEPL_M])
+    """The keplerian form is
+
+        * a : semi-major axis
+        * e : excentricity
+        * i : inclination
+        * Ω : right-ascencion of ascending node
+        * ω : Arguement of perigee
+        * ν : True anomaly
+    """
+
     SPHE = Form("Spherical", ["r", "θ", "φ", "r_dot", "θ_dot", "φ_dot"])
+    """Spherical form
+        * r : radial distance
+        * θ : azimuth
+        * φ : elevation
+        * r_dot : first derivative of radial distance
+        * θ_dot : first derivative of azimuth
+        * φ_dot : first derivative of elevation
+    """
+
     CART = Form("Cartesian", ["x", "y", "z", "vx", "vy", "vz"], [KEPL, SPHE])
+    """Cartesian form"""
 
     _tree = CART
 
@@ -80,12 +106,12 @@ class FormTransform:
 
         The keplerian form is
 
-            a : semi-major axis
-            e : excentricity
-            i : inclination
-            Ω : right-ascencion of ascending node
-            ω : Arguement of perigee
-            ν : True anomaly
+            * a : semi-major axis
+            * e : excentricity
+            * i : inclination
+            * Ω : right-ascencion of ascending node
+            * ω : Arguement of perigee
+            * ν : True anomaly
         """
 
         r, v = coord[:3], coord[3:]
@@ -109,6 +135,8 @@ class FormTransform:
 
     @classmethod
     def _keplerian_to_cartesian(cls, coord, center):
+        """Conversion from Keplerian to Cartesian coordinates
+        """
 
         a, e, i, Ω, ω, ν = coord
 
@@ -126,7 +154,7 @@ class FormTransform:
 
     @classmethod
     def _keplerian_to_keplerian_mean(cls, coord, center):
-        """Conversion from Keplerian to Mean Keplerian
+        """Conversion from Keplerian to Keplerian Mean
 
         The difference is the use of Mean anomaly instead of True anomaly
         """

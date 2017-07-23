@@ -171,15 +171,14 @@ class Ephem(Speaker):
         If an argument is set to ``None`` it will keep the same property as the generating ephemeris
 
         Keyword Arguments:
-            start (:py:class:`Date` or None): Date of the first point
-            stop (:py:class:`Date`, :py:class:`~datetime.timedelta` or None): Date
-                of the last point
-            step (:py:class:`~datetime.timedelta` or None): Step to use during the computation. Use
-                the same step as `self` if `None`
+            start (Date or None): Date of the first point
+            stop (Date, timedelta or None): Date of the last point
+            step (timedelta or None): Step to use during the computation. Use the same step as
+                `self` if `None`
         Yield:
             :py:class:`Orbit`:
 
-        Example:
+        Examples:
 
         .. code-block:: python
 
