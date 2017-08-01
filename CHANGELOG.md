@@ -3,6 +3,15 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [Unreleased]
+
+### Added
+- Config get() method to implement default behaviour in case of missing parameter
+- Documentation of orbital forms (cartesian, keplerian, etc.)
+
+### Removed
+- automatic loading of `~/.beyond` folder
+
 ## [v0.3] - 2017-06-27
 
 ### Added
