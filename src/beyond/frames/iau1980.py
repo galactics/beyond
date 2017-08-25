@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Implementation of the IAU 1980 precession-nutation model
+"""Implementation of the IAU 1980 Earth orientation model
 """
 
 from pathlib import Path
@@ -43,17 +43,17 @@ def rate(date):
     return np.array([0, 0, 7.292115146706979e-5 * (1 - lod / 86400.)])
 
 
-def _pole_motion(date):
-    """Pole motion in degrees
+def _earth_orientation(date):
+    """Earth Orientation Parameters in degrees
     """
     p = get_pole(date.mjd)
     return p['X'] / 3600., p['Y'] / 3600.
 
 
-def pole_motion(date):  # pragma: no cover
-    """Pole motion as a rotation matrix
+def earth_orientation(date):  # pragma: no cover
+    """Earth Orientation as a rotation matrix
     """
-    x_p, y_p = np.deg2rad(_pole_motion(date))
+    x_p, y_p = np.deg2rad(_earth_orientation(date))
     return rot1(y_p) @ rot2(x_p)
 
 

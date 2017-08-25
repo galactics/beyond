@@ -235,11 +235,11 @@ class ITRF(Frame):
     """International Terrestrial Reference Frame"""
 
     def _to_PEF(self):
-        m = iau1980.pole_motion(self.date)
+        m = iau1980.earth_orientation(self.date)
         return self._convert(m, m), np.identity(7)
 
     def _to_TIRF(self):
-        m = iau2010.pole_motion(self.date)
+        m = iau2010.earth_orientation(self.date)
         return self._convert(m, m), np.identity(7)
 
 

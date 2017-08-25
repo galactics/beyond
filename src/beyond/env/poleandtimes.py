@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Retrieve and interpolate data for pole position and timescales conversions
+"""Retrieve and interpolate data for Earth orientation and timescales conversions
 """
 
 import math
@@ -192,7 +192,7 @@ class TaiUtc():
 
 
 class Finals2000A():
-    """History of pole motion correction for IAU2000 model
+    """History of Earth orientation correction for IAU2000 model
 
     This file can be retrived at http://maia.usno.navy.mil/ser7/finals2000A.all
     """
@@ -203,7 +203,7 @@ class Finals2000A():
 
     def __new__(cls):
         if cls._instance is None:
-            filename = cls.filename + "." + config['env']['pole_motion_source']
+            filename = cls.filename + "." + config['env']['eop_source']
             path = config['folder'] / "env" / filename
 
             cls._instance = super().__new__(cls)
@@ -262,7 +262,7 @@ class Finals2000A():
 
 
 class Finals(Finals2000A):
-    """History of pole motion correction for IAU1980 model
+    """History of Earth orientation correction for IAU1980 model
 
     This file can be retrived at http://maia.usno.navy.mil/ser7/finals.all
     """

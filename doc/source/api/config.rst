@@ -12,7 +12,7 @@ behaviour. A description of the fields is provided :ref:`here <beyondconf>`.
 .. code-block:: ini
 
     [env]
-    pole_motion_source = all
+    eop_source = all
 
 You can create a directory containing the beyond.conf file and load it
 
@@ -31,9 +31,9 @@ beyond.conf
 env
 ^^^
 
-pole_motion_source
-    Either ``all`` or ``daily`` depending on the files you want to use for pole motion
-    model correction.
+eop_source
+    Either ``all`` or ``daily`` depending on the files you want to use for Earth Orientation
+    Parameters.
 
     These are necessary for precision of frame transformations and date handling
 
@@ -46,7 +46,7 @@ pole_motion_source
     The differences between the ``.daily`` and ``.all`` files, explained `here <http://maia.usno.navy.mil/ser7/readme>`__, are mainly about freshness and timespan.
     They are available on the `US Naval Observatory <http://maia.usno.navy.mil/ser7/>`__
     web server. 
-    In order to use them into the Space-API library, you should place them into
+    In order to use them into the Beyond library, you should place them into
     the following file tree::
 
         data/

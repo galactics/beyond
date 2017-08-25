@@ -68,8 +68,8 @@ Both are a simple shortcut to the :py:func:`~beyond.frames.frame.orbit2frame` fu
     :members:
 
 
-Pole motion models
-==================
+Earth Orientation Parameters
+============================
 
 IAU1980
 -------

@@ -1,5 +1,4 @@
-
-"""Implementation of the IAU 2010 nutation-precession model
+"""Implementation of the IAU 2010 Earth orientation model
 """
 
 from pathlib import Path
@@ -10,7 +9,7 @@ from ..utils.matrix import rot1, rot2, rot3
 from ..utils.memoize import memoize
 from ..env.poleandtimes import get_pole
 
-__all__ = ['sideral', 'precesion_nutation', 'pole_motion', 'rate']
+__all__ = ['sideral', 'precesion_nutation', 'earth_orientation', 'rate']
 
 
 @memoize
@@ -53,8 +52,8 @@ def _tab(element):
     return total
 
 
-def _pole_motion(date):
-    """Pole motion in degrees
+def _earth_orientation(date):
+    """Earth orientation parameters in degrees
     """
 
     ttt = date.change_scale('TT').julian_century
@@ -67,11 +66,11 @@ def _pole_motion(date):
     return p['X'] / 3600., p['Y'] / 3600., s_prime / 3600
 
 
-def pole_motion(date):
-    """Pole motion as a rotating matrix
+def earth_orientation(date):
+    """Earth orientation as a rotating matrix
     """
 
-    x_p, y_p, s_prime = np.deg2rad(_pole_motion(date))
+    x_p, y_p, s_prime = np.deg2rad(_earth_orientation(date))
     return rot3(-s_prime) @ rot2(x_p) @ rot1(y_p)
 
 
@@ -139,7 +138,7 @@ def _xysxy2(date):
     """Here we deviate from what has been done everywhere else. Instead of taking the formulas
     available in the Vallado, we take those described in the files tab5.2{a,b,d}.txt.
 
-    The result should be equivalent, but they are the last iteration of the IAU2000A
+    The result should be equivalent, but they are the last iteration of the IAU2000A as of June 2016
 
     Args:
         date (Date)

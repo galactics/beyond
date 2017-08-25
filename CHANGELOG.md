@@ -12,6 +12,10 @@ Each release is linked to a git commit.
 ### Removed
 - automatic loading of `~/.beyond` folder
 
+### Changed
+- replacement of incorrect 'pole_motion' functions and variables names for
+  'earth_orientation'
+
 ## [v0.3] - 2017-06-27
 
 ### Added

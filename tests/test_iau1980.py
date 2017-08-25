@@ -8,7 +8,7 @@ from numpy.testing import assert_almost_equal
 
 from beyond.utils.date import Date
 from beyond.env.poleandtimes import ScalesDiff
-from beyond.frames.iau1980 import _pole_motion, _precesion, _nutation, _sideral, rate
+from beyond.frames.iau1980 import _earth_orientation, _precesion, _nutation, _sideral, rate
 
 
 @fixture
@@ -38,8 +38,8 @@ def model_correction(time):
         yield
 
 
-def test_pole_motion(date, model_correction):
-    x, y = _pole_motion(date)
+def test_earth_orientation(date, model_correction):
+    x, y = _earth_orientation(date)
     assert x == -3.9078333333333335e-05
     assert y == 9.258583333333334e-05
 
