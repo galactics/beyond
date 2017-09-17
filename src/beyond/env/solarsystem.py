@@ -58,16 +58,12 @@ class MoonPropagator(AnalyticalPropagator):
             date (~beyond.utils.date.Date)
         Return:
             ~beyond.orbits.orbit.Orbit: Position of the Moon in EME2000 frame
-
-        Todo:
-            Replace `TT` time scale by `TDB`
-
         Example:
 
             .. code-block:: python
 
                 from beyond.utils.date import Date
-                MoonPropagator.vector(Date(1994, 4, 28))
+                MoonPropagator.propagate(Date(1994, 4, 28))
                 # Orbit =
                 #   date = 1994-04-28T00:00:00 UTC
                 #   form = Cartesian
@@ -82,9 +78,7 @@ class MoonPropagator(AnalyticalPropagator):
                 #     vz = 0.0
         """
 
-        # This model should use the TDB time scale, but it's not implemented yet
-        # and TT is a good approximation
-        t_tdb = date.change_scale('TT').julian_century
+        t_tdb = date.change_scale('TDB').julian_century
 
         def cos(angle):
             """cosine in degrees"""
@@ -140,7 +134,7 @@ class SunPropagator(AnalyticalPropagator):
             .. code-block:: python
 
                 from beyond.utils.date import Date
-                SunPropagator.vector(Date(2006, 4, 2))
+                SunPropagator.propagate(Date(2006, 4, 2))
                 # Orbit =
                 #   date = 2006-04-02T00:00:00 UTC
                 #   form = Cartesian
