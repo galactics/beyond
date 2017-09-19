@@ -132,9 +132,12 @@ class Date:
     REF_SCALE = 'TAI'
     """Scale used internally"""
 
+    DEFAULT_SCALE = "UTC"
+    """Default scale"""
+
     def __init__(self, *args, **kwargs):
 
-        scale = kwargs.pop('scale', 'UTC')
+        scale = kwargs.pop('scale', self.DEFAULT_SCALE)
 
         if type(scale) is str:
             scale = _Scale.get(scale.upper())
@@ -304,13 +307,13 @@ class Date:
         return self._cache['dt']
 
     @classmethod
-    def strptime(cls, data, format, scale='UTC'):  # pragma: no cover
+    def strptime(cls, data, format, scale=DEFAULT_SCALE):  # pragma: no cover
         """Convert a string representation of a date to a Date object
         """
         return Date(datetime.strptime(data, format), scale=scale)
 
     @classmethod
-    def now(cls, scale="UTC"):
+    def now(cls, scale=DEFAULT_SCALE):
         """
         Args:
             scale (str)
