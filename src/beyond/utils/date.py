@@ -30,20 +30,30 @@ class _Scale(Node):
         return cls.HEAD[name]
 
     def _scale_ut1_minus_utc(self, mjd):
+        """Definition of Universal Time relatively to Coordinated Universal Time
+        """
         ut1_utc, tai_utc = get_timescales(mjd)
         return ut1_utc
 
     def _scale_tai_minus_utc(self, mjd):
+        """Definition of International Atomic Time relatively to Coordinated Universal Time
+        """
         ut1_utc, tai_utc = get_timescales(mjd)
         return tai_utc
 
     def _scale_tt_minus_tai(self, mjd):
+        """Definition of Terrestrial Time relatively to International Atomic Time
+        """
         return 32.184
 
     def _scale_tai_minus_gps(self, mjd):
+        """Definition of International Atomic Time relatively to GPS time
+        """
         return 19.
 
     def _scale_tdb_minus_tt(self, mjd):
+        """Definition of the Barycentric Dynamic Time scale relatively to Terrestrial Time
+        """
         jd = mjd + Date.JD_MJD
         jj = Date._julian_century(jd)
         m = radians(357.5277233 + 35999.05034 * jj)
@@ -78,12 +88,12 @@ class _Scale(Node):
         return delta
 
 
-UT1 = _Scale('UT1')
-GPS = _Scale('GPS')
-TDB = _Scale('TDB')
-UTC = _Scale('UTC', [UT1])
-TAI = _Scale('TAI', [UTC, GPS])
-TT = _Scale('TT', [TAI, TDB])
+UT1 = _Scale('UT1')  # Universal Time
+GPS = _Scale('GPS')  # GPS Time
+TDB = _Scale('TDB')  # Barycentric Dynamical Time
+UTC = _Scale('UTC', [UT1])  # Coordinated Universal Time
+TAI = _Scale('TAI', [UTC, GPS])  # International Atomic Time
+TT = _Scale('TT', [TAI, TDB])  # Terrestrial Time
 _Scale.HEAD = TT
 
 
@@ -91,10 +101,12 @@ class Date:
     """Date object
 
     All computations and in-memory saving are made in
-    `MJD <https://en.wikipedia.org/wiki/Julian_day>`__.
-
+    `MJD <https://en.wikipedia.org/wiki/Julian_day>`__. and TAI.
     In the current implementation, the Date object does not handle the
     leap second.
+
+    Keyword Arguments:
+        scale (str) : One of the following scales : "UT1", "UTC", "GPS", "TDB", "TAI", "TT"
 
     Examples:
 
@@ -106,16 +118,19 @@ class Date:
             Date(57709, 69540.752649)
             Date(datetime(2016, 11, 17, 19, 16, 40))  # builtin datetime object
             Date.now()
+
     """
 
     __slots__ = ["_d", "_s", "_offset", "scale", "_cache"]
 
     MJD_T0 = datetime(1858, 11, 17)
     """Origin of MJD"""
+
     JD_MJD = 2400000.5
     """Offset between JD and MJD"""
+
     REF_SCALE = 'TAI'
-    """Scale used internlly"""
+    """Scale used internally"""
 
     def __init__(self, *args, **kwargs):
 
@@ -149,13 +164,13 @@ class Date:
             d, s = args
         elif len(args) in range(3, 8) and list(map(type, args)) == [int] * len(args):
             # Same constructor as datetime.datetime
-            # (year, month, day hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+            # (year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
             dt = datetime(*args, **kwargs)
             d, s = self._convert_dt(dt)
         else:
             raise ValueError("Unknown arguments")
 
-        # Retrieve the offset for the current date
+        # Retrieve the offset from REF_SCALE for the current date
         offset = scale.offset(d + s / 86400., self.REF_SCALE)
 
         d += int((s + offset) // 86400)
