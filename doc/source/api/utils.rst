@@ -4,7 +4,7 @@ Utils
 Date
 ----
 
-.. automodule:: beyond.utils.date
+.. autoclass:: beyond.utils.date.Date
     :members:
     :show-inheritance:
 

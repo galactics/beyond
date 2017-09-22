@@ -9,10 +9,12 @@ from numpy import sin, radians
 from ..env.poleandtimes import get_timescales
 from .node import Node
 
-__all__ = ['Date']
+__all__ = ['Date', 'timedelta']
 
 
 class _Scale(Node):
+    """Definition of a time scale and its interactions with others
+    """
 
     HEAD = None
     """Define the top Node of the tree. This one will be used as reference to search for the path
@@ -105,11 +107,17 @@ class Date:
     In the current implementation, the Date object does not handle the
     leap second.
 
+    The constructor can take:
+        * the same arguments as the standard library's datetime object (year, month, day, hour,
+          minute, second, micronsecond)
+        * MJD as :py:class:`float`
+        * MJD as :py:class:`int` for days and :py:class:`float` for seconds
+        * a :py:class:`Date` or :py:class:`datetime` object
+
     Keyword Arguments:
         scale (str) : One of the following scales : "UT1", "UTC", "GPS", "TDB", "TAI", "TT"
 
     Examples:
-
         .. code-block:: python
 
             Date(2016, 11, 17, 19, 16, 40)
@@ -119,6 +127,7 @@ class Date:
             Date(datetime(2016, 11, 17, 19, 16, 40))  # builtin datetime object
             Date.now()
 
+    Date objects interact with :py:class:`timedelta` as datetime do.
     """
 
     __slots__ = ["_d", "_s", "_offset", "scale", "_cache"]
@@ -135,9 +144,7 @@ class Date:
     DEFAULT_SCALE = "UTC"
     """Default scale"""
 
-    def __init__(self, *args, **kwargs):
-
-        scale = kwargs.pop('scale', self.DEFAULT_SCALE)
+    def __init__(self, *args, scale=DEFAULT_SCALE, **kwargs):
 
         if type(scale) is str:
             scale = _Scale.get(scale.upper())
