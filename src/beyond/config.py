@@ -42,8 +42,8 @@ class Config(ConfigDict):
         .. code-block:: python
 
             from space.config import config
-            print(config['env']['earth_orientation_source'])
-            print(config.env.earth_orientation_source)
+            print(config['env']['eop_source'])
+            print(config.env.eop_source)
     """
 
     _instance = None

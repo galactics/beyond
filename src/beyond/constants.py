@@ -43,7 +43,7 @@ class Body:
             'f': 'flattening',
             chr(956): 'mu',
             'µ': 'mu',
-            'e': 'eccentricity',
+            'e': 'excentricity',
         }
 
         try:
@@ -58,7 +58,7 @@ class Body:
         return self.mass * G
 
     @property
-    def eccentricity(self):
+    def excentricity(self):
         """Excentricity of the body
         """
         return sqrt(self.f * 2 - self.f ** 2)
