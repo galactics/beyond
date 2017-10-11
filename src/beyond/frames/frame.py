@@ -12,26 +12,28 @@ The relations may be circular, thanks to the use of the Node2 class.
                    |EME2000|..bias..|GCRF|
                    `-------'        `----'
                        |              |
-                   precesion          |
+                   Precesion          |
                        |              |
-                     ,---.        prececion
+                     ,---.        Prececion
                      |MOD|            +
-                     `---'         nutation
-                       |              |
-                    nutation          |
+                     `---'         Nutation
+                       |     + model corrections
+                    Nutation          |
+              + model corrections     |
                        |              |
     ,----.           ,---.         ,----.
-    |TEME|--equinox--|TOD|         |CIRF|
+    |TEME|--Equinox--|TOD|         |CIRF|
     `----'           `---'         `----'
                        |              |
-                    sideral        sideral
+                 Sideral time   Sideral time
                        |              |
                      ,---.         ,----.
                      |PEF|         |TIRF|
                      `---'         `----'
                         \            /
-           model corrections      model corrections
-                     IAU1980      IAU2010
+                    IAU 1980       IAU 2010
+           Earth Orientation       Earth Orientation
+                  Parameters       Parameters
                            \      /
          ,-----.            ,----.
          |WGS84|--identity--|ITRF|
