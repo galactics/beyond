@@ -8,6 +8,7 @@ Each release is linked to a git commit.
 ### Added
 - Config get() method to implement default behaviour in case of missing parameter
 - Documentation of orbital forms (cartesian, keplerian, etc.)
+- TDB timescale
 
 ### Removed
 - automatic loading of `~/.beyond` folder
@@ -15,6 +16,7 @@ Each release is linked to a git commit.
 ### Changed
 - replacement of incorrect 'pole_motion' functions and variables names for
   'earth_orientation'
+- Moon analytic position now computed with respect to TDB timescale
 
 ## [v0.3] - 2017-06-27
 
