@@ -18,7 +18,6 @@ setup(
     url="https://github.com/galactics/beyond",
     packages=find_packages('src'),
     package_dir={'': 'src'},
-    namespace_packages=['beyond'],
     include_package_data=True,
     zip_safe=False,
     classifiers=[
