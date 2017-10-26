@@ -100,7 +100,7 @@ class Tle:
     """TLE parsing
     """
 
-    def __init__(self, text):
+    def __init__(self, text, **kwargs):
         """
         Args:
             text (str):
@@ -140,6 +140,9 @@ class Tle:
         self.ω = np.deg2rad(float(second[5]))   # argument of periapsis
         self.M = np.deg2rad(float(second[6]))   # mean anomaly
         self.n = float(second[7][:11]) * 2 * np.pi / 86400.  # mean motion (rev/day converted to s⁻¹)
+
+        # To store additional data (such as source, date of creation, etc.)
+        self.kwargs = kwargs
 
     def __str__(self):
         return self.text
