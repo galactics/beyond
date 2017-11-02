@@ -281,17 +281,28 @@ class TopocentricFrame(Frame):
             start (Date): starting date of the visibility search
             stop (Date or datetime.timedelta) end of the visibility search
             step (datetime.timedelta): step of the computation
-            events (bool): If True, compute AOS, LOS and MAX elevation for
-                each pass
+            events (bool, Listener or list): If evaluate to True, compute
+                AOS, LOS and MAX elevation for each pass on this station.
+                If 'events' is a Listener or an iterable of Listeners, they
+                will be added to the computation
 
         Yield:
             Orbit: In-visibility point of the orbit. This Orbit is already
             in the frame of the station and in spherical form.
         """
 
-        from ..orbits.listeners import stations_listeners
+        from ..orbits.listeners import stations_listeners, Listener
 
-        listeners = stations_listeners(cls) if events else []
+        listeners = []
+
+        if events:
+            # Handling of the listeners passed in the 'events' kwarg
+            if isinstance(events, Listener):
+                listeners.append(events)
+            elif isinstance(events, (list, tuple)):
+                listeners.extend(events)
+
+            listeners.extend(stations_listeners(cls))
 
         for point in orb.iter(start=start, stop=stop, step=step, listeners=listeners):
 
@@ -299,7 +310,7 @@ class TopocentricFrame(Frame):
             point.form = 'spherical'
 
             # Not very clean !
-            if point.phi < 0 and point.info == "":
+            if point.phi < 0 and point.info[:3] not in ('AOS', 'LOS', 'MAX'):
                 continue
 
             yield point
