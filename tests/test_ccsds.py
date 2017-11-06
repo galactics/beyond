@@ -1,21 +1,19 @@
 
 from pytest import fixture, raises
 
-import numpy as np
 from datetime import timedelta
 
 from beyond.orbits import Tle
-from beyond.utils import Date
 from beyond.utils.ccsds import CCSDS
 
 
 ref_opm = """CCSDS_OPM_VERS = 2.0
 CREATION_DATE = 2017-06-21T13:20:25
-ORIGINATOR = ???
+ORIGINATOR = N/A
 
 META_START
-OBJECT_NAME          = ???
-OBJECT_ID            = ???
+OBJECT_NAME          = N/A
+OBJECT_ID            = N/A
 CENTER_NAME          = Earth
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC
@@ -40,11 +38,11 @@ TRUE_ANOMALY         =    35.015255 [deg]"""
 
 ref_opm_no_units = """CCSDS_OPM_VERS = 2.0
 CREATION_DATE = 2017-06-21T13:20:25
-ORIGINATOR = ???
+ORIGINATOR = N/A
 
 META_START
-OBJECT_NAME          = ???
-OBJECT_ID            = ???
+OBJECT_NAME          = N/A
+OBJECT_ID            = N/A
 CENTER_NAME          = Earth
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC
@@ -69,11 +67,11 @@ TRUE_ANOMALY         =    35.015255"""
 
 ref_opm_strange_units = """CCSDS_OPM_VERS = 2.0
 CREATION_DATE = 2017-06-21T13:20:25
-ORIGINATOR = ???
+ORIGINATOR = N/A
 
 META_START
-OBJECT_NAME          = ???
-OBJECT_ID            = ???
+OBJECT_NAME          = N/A
+OBJECT_ID            = N/A
 CENTER_NAME          = Earth
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC
@@ -98,11 +96,11 @@ TRUE_ANOMALY         =    35.015255 [deg]"""
 
 ref_oem = """CCSDS_OEM_VERS = 2.0
 CREATION_DATE = 2017-06-21T13:21:32
-ORIGINATOR = ???
+ORIGINATOR = N/A
 
 META_START
-OBJECT_NAME          = ???
-OBJECT_ID            = ???
+OBJECT_NAME          = N/A
+OBJECT_ID            = N/A
 CENTER_NAME          = Earth
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC
@@ -215,11 +213,11 @@ def test_dump_oem_linear(ephem):
     ephem.method = ephem.LINEAR
     txt = CCSDS.dumps(ephem).splitlines()
 
-    assert "\n".join(txt[2:14]) == """ORIGINATOR = ???
+    assert "\n".join(txt[2:14]) == """ORIGINATOR = N/A
 
 META_START
-OBJECT_NAME          = ???
-OBJECT_ID            = ???
+OBJECT_NAME          = N/A
+OBJECT_ID            = N/A
 CENTER_NAME          = Earth
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC

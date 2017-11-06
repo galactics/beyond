@@ -70,7 +70,7 @@ class CCSDS:
             value, sep, unit = field.partition("[")
             unit = sep + unit
 
-            # As defined in the CCSDS Orbital Data Message Blue Book, the une should
+            # As defined in the CCSDS Orbital Data Message Blue Book, the unit should
             # be the same as defined in table 3-3 which are for km and km/s for position and
             # velocity respectively. Thus, there should be no other conversion to make
             if unit in ("[km]", "[km/s]"):
@@ -124,7 +124,7 @@ class CCSDS:
             if not data_block:
                 continue
 
-            # From now ow, each non-empty line is a state vector
+            # From now on, each non-empty line is a state vector
             date, *state_vector = line.split()
             date = Date.strptime(date, "%Y-%m-%dT%H:%M:%S.%f", scale=scale)
 
@@ -178,27 +178,35 @@ class CCSDS:
         return Orbit(date, [x, y, z, vx, vy, vz], 'cartesian', frame, None)
 
     @classmethod
-    def _dump_header(cls, data, ccsds_type, **kwargs):
+    def _dump_header(cls, data, ccsds_type, version="1.0", **kwargs):
 
-        header = """CCSDS_{type}_VERS = 2.0
+        header = """CCSDS_{type}_VERS = {version}
 CREATION_DATE = {creation_date:%Y-%m-%dT%H:%M:%S}
 ORIGINATOR = {originator}
 
-META_START
+"""     .format(
+            type=ccsds_type.upper(),
+            creation_date=Date.now(),
+            originator=kwargs.get("originator", "N/A"),
+            version=version
+        )
+
+        return header
+
+    @classmethod
+    def _dump_meta(cls, data, **kwargs):
+        meta = """META_START
 OBJECT_NAME          = {name}
 OBJECT_ID            = {cospar_id}
 CENTER_NAME          = {orb.frame.center.name}
 REF_FRAME            = {orb.frame}
 """     .format(
-            creation_date=Date.now(),
-            originator=kwargs.get("originator", "???"),
-            name=kwargs.get("name", "???"),
-            cospar_id=kwargs.get("cospar_id", "???"),
+            name=kwargs.get("name", "N/A"),
+            cospar_id=kwargs.get("cospar_id", "N/A"),
             orb=data,
-            type=ccsds_type.upper()
         )
 
-        return header
+        return meta
 
     @classmethod
     def _dump_oem(cls, data, **kwargs):
@@ -208,8 +216,9 @@ REF_FRAME            = {orb.frame}
         if data.method != data.LINEAR:
             interp += "\nINTERPOLATION_DEGREE = {}".format(data.order - 1)
 
-        header = cls._dump_header(data, "OEM", **kwargs)
-        header += """TIME_SYSTEM          = {orb.start.scale.name}
+        header = cls._dump_header(data, "OEM", version="2.0", **kwargs)
+        meta = cls._dump_meta(data, **kwargs)
+        meta += """TIME_SYSTEM          = {orb.start.scale.name}
 START_TIME           = {orb.start:%Y-%m-%dT%H:%M:%S.%f}
 STOP_TIME            = {orb.stop:%Y-%m-%dT%H:%M:%S.%f}
 INTERPOLATION        = {interp}
@@ -217,9 +226,9 @@ META_STOP
 
 """     .format(
             creation_date=Date.now(),
-            originator=kwargs.get("originator", "???"),
-            name=kwargs.get("name", "???"),
-            cospar_id=kwargs.get("cospar_id", "???"),
+            originator=kwargs.get("originator", "N/A"),
+            name=kwargs.get("name", "N/A"),
+            cospar_id=kwargs.get("cospar_id", "N/A"),
             orb=data,
             interp=interp
         )
@@ -232,7 +241,7 @@ META_STOP
                 fmt=" 10f"
             ))
 
-        return header + "\n".join(text)
+        return header + meta + "\n".join(text)
 
     @classmethod
     def _dump_opm(cls, data, **kwargs):
@@ -240,10 +249,13 @@ META_STOP
         cart = data.copy(form="cartesian")
         kep = data.copy(form="keplerian")
 
-        header = cls._dump_header(data, "OPM", **kwargs) + """TIME_SYSTEM          = {orb.date.scale.name}
+        header = cls._dump_header(data, "OPM", version="2.0", **kwargs)
+
+        meta = cls._dump_meta(data, **kwargs)
+        meta += """TIME_SYSTEM          = {orb.date.scale.name}
 META_STOP
 
-""".format(orb=cart)
+"""     .format(orb=cart)
 
         text = """COMMENT  State Vector
 EPOCH                = {cartesian.date:%Y-%m-%dT%H:%M:%S.%f}
@@ -263,4 +275,4 @@ ARG_OF_PERICENTER    = {angles[2]: 12.6f} [deg]
 TRUE_ANOMALY         = {angles[3]: 12.6f} [deg]
 """.format(cartesian=cart / 1000, kep_a=kep.a / 1000, kep_e=kep.e, angles=np.degrees(kep[2:]))
 
-        return header + text
+        return header + meta + text
