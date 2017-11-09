@@ -54,7 +54,7 @@ def _get_timescales(date: int):
     """Retrieve raw timescale data from different file classes
     """
     try:
-        ut1_utc = Finals2000A()[date]['time']['UT1-UTC']
+        ut1_utc = Finals2000A()[date]['UT1-UTC']
         tai_utc = TaiUtc()[date]
     except ConfigError:
         ut1_utc = 0
@@ -92,8 +92,8 @@ def _get_pole(date: int):
         date (int): Date in MJD
     """
     try:
-        values = Finals2000A()[date]['pole'].copy()
-        values.update(Finals()[date]['pole'])
+        values = Finals2000A()[date].copy()
+        values.update(Finals()[date])
     except ConfigError:
         values = {
             'X': 0.,
@@ -220,40 +220,38 @@ class Finals2000A():
                 try:
                     cls._instance.data[mjd] = {
                         'mjd': mjd,
-                        'pole': {
-                            # 'flag': line[16],
-                            'X': float(line[18:27]),
-                            cls._deltas[0]: None,
-                            # 'Xerror': float(line[27:36]),
-                            'Y': float(line[37:46]),
-                            cls._deltas[1]: None,
-                            # 'Yerror': float(line[46:55]),
-                            'LOD': None,
-                        },
-                        'time': {
-                            'UT1-UTC': float(line[58:68])
-                        }
+                        # 'flag': line[16],
+                        'X': float(line[18:27]),
+                        cls._deltas[0]: None,
+                        # 'Xerror': float(line[27:36]),
+                        'Y': float(line[37:46]),
+                        cls._deltas[1]: None,
+                        # 'Yerror': float(line[46:55]),
+                        'LOD': None,
+                        'UT1-UTC': float(line[58:68])
                     }
                 except ValueError:
                     # Common values (X, Y, UT1-UTC) are not available anymore
                     break
                 else:
                     try:
-                        cls._instance.data[mjd]['pole'][cls._deltas[0]] = float(line[97:106])
-                        cls._instance.data[mjd]['pole'][cls._deltas[1]] = float(line[116:125])
+                        cls._instance.data[mjd][cls._deltas[0]] = float(line[97:106])
+                        cls._instance.data[mjd][cls._deltas[1]] = float(line[116:125])
                     except ValueError:
                         # dX and dY are not available for this date, so we take
                         # the last value available
-                        cls._instance.data[mjd]['pole'][cls._deltas[0]] = \
-                            cls._instance.data[mjd - 1]['pole'][cls._deltas[0]]
-                        cls._instance.data[mjd]['pole'][cls._deltas[1]] = \
-                            cls._instance.data[mjd - 1]['pole'][cls._deltas[1]]
+                        cls._instance.data[mjd][cls._deltas[0]] = \
+                            cls._instance.data[mjd - 1][cls._deltas[0]]
+                        cls._instance.data[mjd][cls._deltas[1]] = \
+                            cls._instance.data[mjd - 1][cls._deltas[1]]
+                        pass
                     try:
-                        cls._instance.data[mjd]['pole']['LOD'] = float(line[79:86])
+                        cls._instance.data[mjd]['LOD'] = float(line[79:86])
                     except ValueError:
                         # LOD is not available for this date so we take the last value available
-                        cls._instance.data[mjd]['pole']['LOD'] = \
-                            cls._instance.data[mjd - 1]['pole']['LOD']
+                        cls._instance.data[mjd]['LOD'] = \
+                            cls._instance.data[mjd - 1]['LOD']
+                        pass
 
         return cls._instance
 
