@@ -6,7 +6,7 @@
 from datetime import datetime, timedelta
 from numpy import sin, radians
 
-from ..env.poleandtimes import get_timescales
+from ..env.poleandtimes import EnvDatabase
 from .node import Node
 
 __all__ = ['Date', 'timedelta']
@@ -34,14 +34,12 @@ class _Scale(Node):
     def _scale_ut1_minus_utc(self, mjd):
         """Definition of Universal Time relatively to Coordinated Universal Time
         """
-        ut1_utc, tai_utc = get_timescales(mjd)
-        return ut1_utc
+        return EnvDatabase.get(mjd).ut1_utc
 
     def _scale_tai_minus_utc(self, mjd):
         """Definition of International Atomic Time relatively to Coordinated Universal Time
         """
-        ut1_utc, tai_utc = get_timescales(mjd)
-        return tai_utc
+        return EnvDatabase.get(mjd).tai_utc
 
     def _scale_tt_minus_tai(self, mjd):
         """Definition of Terrestrial Time relatively to International Atomic Time

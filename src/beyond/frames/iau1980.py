@@ -9,7 +9,7 @@ import numpy as np
 
 from ..utils.matrix import rot1, rot2, rot3
 from ..utils.memoize import memoize
-from ..env.poleandtimes import get_pole
+from ..env.poleandtimes import EnvDatabase
 
 
 @memoize
@@ -39,15 +39,15 @@ def _tab(max_i=None):
 def rate(date):
     """Return the rotation rate vector of the earth for a given date
     """
-    lod = get_pole(date.mjd)['LOD'] / 1000.
+    lod = EnvDatabase.get(date.mjd).lod / 1000.
     return np.array([0, 0, 7.292115146706979e-5 * (1 - lod / 86400.)])
 
 
 def _earth_orientation(date):
     """Earth Orientation Parameters in degrees
     """
-    p = get_pole(date.mjd)
-    return p['X'] / 3600., p['Y'] / 3600.
+    eop = EnvDatabase.get(date.mjd)
+    return eop.x / 3600., eop.y / 3600.
 
 
 def earth_orientation(date):  # pragma: no cover
@@ -142,9 +142,9 @@ def _nutation(date, eop_correction=True, terms=106):
         delta_eps += (C + D * ttt) * np.cos(np.deg2rad(a_p))
 
     if eop_correction:
-        pole = get_pole(date.mjd)
-        delta_eps += pole['deps'] / 3600000.
-        delta_psi += pole['dpsi'] / 3600000.
+        eop = EnvDatabase.get(date.mjd)
+        delta_eps += eop.deps / 3600000.
+        delta_psi += eop.dpsi / 3600000.
 
     return epsilon_bar, delta_psi, delta_eps
 

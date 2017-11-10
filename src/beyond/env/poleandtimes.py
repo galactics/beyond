@@ -5,134 +5,66 @@
 """
 
 import math
+import sqlite3
+from contextlib import contextmanager
 
-from collections import namedtuple
+from ..config import config
+from ..utils.memoize import memoize
 
-from ..config import config, ConfigError
+__all__ = ['EnvDatabase']
 
-__all__ = ['get_timescales', 'get_pole']
+"""
+Overlap needed between data
+A database should be in order to keep all historical data
+The default should be something like
 
+.all as default
+.daily if available
 
-ScalesDiff = namedtuple('ScalesDiff', ('ut1_utc', 'tai_utc'))
+2017-01-01 ..... (all)
+2017-01-02 ..... (all)
+2017-01-03 ..... (all)
+2017-01-04 ..... (all)
+2017-01-05 ..... (all)
+2017-01-06 ..... (all)
+2016-01-07 ..... (daily)
+2016-01-07 ..... (daily)
+...
+2016-03-15 ..... (all)
+2016-03-16 ..... (all)
+2016-03-17 ..... (all)
+2016-03-18 ..... (all)
 
+Always take bulletin B if available
 
-def linear(x: float, x_list: tuple, y_list: tuple):
-    """Linear interpolation
+If no fresh data for the required date, duplicate the last value available
+If no data whatsoever, return 0
+These two case may return a warning, depending of a config variable
+eop_missing_policy = disable|warning|error
 
-    Args:
-        x (float): Coordinate of the interpolated value
-        x_list (tuple): x-coordinates of data
-        y_list (tuple): y-coordinates of data
-    Return:
-        float
+The user could decide to not take into account any eop
+eop_source = None
 
-    Example:
-        >>> x_list = [1, 2]
-        >>> y_list = [12, 4]
-        >>> linear(1.75, x_list, y_list)
-        6.0
+The API should be something like this
 
-    """
-    x0, x1 = x_list
-    y0, y1 = y_list
-    return y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+>>> db = EnvDatabase(interpolate=True)
+>>> db.insert(
+        finals=Finals(filepath),
+        finals2000A=Finals2000A(filepath),
+        tai_utc=TaiUtc(filepath)
+    )
+>>> db.get(58067.93195277059)  # Provide interpolation
+Eop(X=xx, Y=xx, dX=xx, dY=xx, deps=xx, dpsi=xx, LOD=xx, ut1_utc=xx, tai_utc=xx)
 
+Every insertion should be logged.
+TWo tables will be used :
+    one for TAI-UTC data
+    an other for EOP
 
-def _day_boundaries(day: float) -> tuple:
-    """
-    Args:
-        day: Date as a MJD
+It is not possible to insert in the second table without having both
+(dX dY) and (dpsi deps).
 
-    Example:
-        >>> _day_boundaries(57687.71847184054)
-        (57687, 57688)
-    """
-    return int(math.floor(day)), int(math.ceil(day))
-
-
-def _get_timescales(date: int):
-    """Retrieve raw timescale data from different file classes
-    """
-    try:
-        ut1_utc = Finals2000A()[date]['UT1-UTC']
-        tai_utc = TaiUtc()[date]
-    except ConfigError:
-        ut1_utc = 0
-        tai_utc = 0
-
-    return ScalesDiff(ut1_utc, tai_utc)
-
-
-def get_timescales(date: float) -> tuple:
-    """Get the various time-scale differences from environment data
-
-    Args:
-        date (float): Date in MJD
-    Return:
-        tuple: 2-element (UT1-UTC, TAI-UTC)
-    """
-
-    if date == int(date):
-        return _get_timescales(int(date))
-    else:
-        dates = _day_boundaries(date)
-        start = _get_timescales(dates[0])
-        stop = _get_timescales(dates[1])
-
-        result = ScalesDiff(
-            linear(date, dates, (start[0], stop[0])),
-            start[1]
-        )
-        return result
-
-
-def _get_pole(date: int):
-    """
-    Args:
-        date (int): Date in MJD
-    """
-    try:
-        values = Finals2000A()[date].copy()
-        values.update(Finals()[date])
-    except ConfigError:
-        values = {
-            'X': 0.,
-            'Y': 0.,
-            'dX': 0.,
-            'dY': 0.,
-            'dpsi': 0.,
-            'deps': 0.,
-            'LOD': 0.,
-        }
-    return values
-
-
-def get_pole(date: float):
-    """Get the pole-motion informations from environment data
-
-    Args:
-        date (float): Date in MJD
-    Return:
-        dict
-
-    X and Y in arcsecond, dpsi, deps, dX and dY in milli-arcsecond and LOD
-    in millisecond.
-    """
-
-    if date == int(date):
-        # no need for interpolation
-        return _get_pole(int(date))
-    else:
-        # linear interpolation
-        dates = _day_boundaries(date)
-        start = _get_pole(dates[0])
-        stop = _get_pole(dates[1])
-
-        result = {}
-        for k in start.keys():
-            result[k] = linear(date, dates, (start[k], stop[k]))
-
-        return result
+"""
 
 
 class TaiUtc():
@@ -143,29 +75,24 @@ class TaiUtc():
 
     _instance = None
 
-    def __new__(cls):
-        if cls._instance is None:
+    def __init__(self, path):
 
-            cls._instance = super().__new__(cls)
+        self.path = path
+        self.data = []
 
-            cls._instance.path = config['folder'] / "env" / "tai-utc.dat"
-            cls._instance.data = []
+        with self.path.open() as fhandler:
+            lines = fhandler.read().splitlines()
 
-            with cls._instance.path.open() as fhandler:
-                lines = fhandler.read().splitlines()
+        for line in lines:
+            if not line:
+                continue
 
-            for line in lines:
-                if not line:
-                    continue
-
-                line = line.split()
-                mjd = float(line[4]) - 2400000.5
-                value = float(line[6])
-                cls._instance.data.append(
-                    (mjd, value)
-                )
-
-        return cls._instance
+            line = line.split()
+            mjd = float(line[4]) - 2400000.5
+            value = float(line[6])
+            self.data.append(
+                (mjd, value)
+            )
 
     def __getitem__(self, date):
         for mjd, value in reversed(self.data):
@@ -197,74 +124,195 @@ class Finals2000A():
     This file can be retrived at http://maia.usno.navy.mil/ser7/finals2000A.all
     """
 
-    filename = 'finals2000A'
-    _instance = None
-    _deltas = ('dX', 'dY')
+    deltas = ('dX', 'dY')
 
-    def __new__(cls):
-        if cls._instance is None:
-            filename = cls.filename + "." + config['env']['eop_source']
-            path = config['folder'] / "env" / filename
+    def __init__(self, path):
 
-            cls._instance = super().__new__(cls)
-            cls._instance.path = path
+        self.path = path
+        d1, d2 = self.deltas
 
-            with cls._instance.path.open() as fhandler:
-                lines = fhandler.read().splitlines()
+        with self.path.open() as fp:
+            lines = fp.read().splitlines()
 
-            cls._instance.data = {}
-            for line in lines:
-                line = line.rstrip()
-                mjd = int(float(line[7:15]))
+        self.data = {}
+        for line in lines:
+            line = line.rstrip()
+            mjd = int(float(line[7:15]))
 
+            try:
+                self.data[mjd] = {
+                    'mjd': mjd,
+                    # 'flag': line[16],
+                    'x': float(line[18:27]),
+                    d1: None,
+                    # 'Xerror': float(line[27:36]),
+                    'y': float(line[37:46]),
+                    d2: None,
+                    # 'Yerror': float(line[46:55]),
+                    'lod': None,
+                    'ut1_utc': float(line[58:68])
+                }
+            except ValueError:
+                # Common values (X, Y, UT1-UTC) are not available anymore
+                break
+            else:
                 try:
-                    cls._instance.data[mjd] = {
-                        'mjd': mjd,
-                        # 'flag': line[16],
-                        'X': float(line[18:27]),
-                        cls._deltas[0]: None,
-                        # 'Xerror': float(line[27:36]),
-                        'Y': float(line[37:46]),
-                        cls._deltas[1]: None,
-                        # 'Yerror': float(line[46:55]),
-                        'LOD': None,
-                        'UT1-UTC': float(line[58:68])
-                    }
+                    self.data[mjd][d1] = float(line[97:106])
+                    self.data[mjd][d2] = float(line[116:125])
                 except ValueError:
-                    # Common values (X, Y, UT1-UTC) are not available anymore
-                    break
-                else:
-                    try:
-                        cls._instance.data[mjd][cls._deltas[0]] = float(line[97:106])
-                        cls._instance.data[mjd][cls._deltas[1]] = float(line[116:125])
-                    except ValueError:
-                        # dX and dY are not available for this date, so we take
-                        # the last value available
-                        cls._instance.data[mjd][cls._deltas[0]] = \
-                            cls._instance.data[mjd - 1][cls._deltas[0]]
-                        cls._instance.data[mjd][cls._deltas[1]] = \
-                            cls._instance.data[mjd - 1][cls._deltas[1]]
-                        pass
-                    try:
-                        cls._instance.data[mjd]['LOD'] = float(line[79:86])
-                    except ValueError:
-                        # LOD is not available for this date so we take the last value available
-                        cls._instance.data[mjd]['LOD'] = \
-                            cls._instance.data[mjd - 1]['LOD']
-                        pass
-
-        return cls._instance
+                    # dX and dY are not available for this date, so we take
+                    # the last value available
+                    self.data[mjd][d1] = \
+                        self.data[mjd - 1][d1]
+                    self.data[mjd][d2] = \
+                        self.data[mjd - 1][d2]
+                    pass
+                try:
+                    self.data[mjd]['lod'] = float(line[79:86])
+                except ValueError:
+                    # LOD is not available for this date so we take the last value available
+                    self.data[mjd]['lod'] = \
+                        self.data[mjd - 1]['lod']
+                    pass
 
     def __getitem__(self, key):
         return self.data[key]
 
 
 class Finals(Finals2000A):
-    """History of Earth orientation correction for IAU1980 model
+    deltas = ('dpsi', 'deps')
 
-    This file can be retrived at http://maia.usno.navy.mil/ser7/finals.all
-    """
 
-    filename = "finals"
+class Eop:
+
+    def __init__(self, **kwargs):
+        self.x = kwargs['x']
+        self.y = kwargs['y']
+        self.dx = kwargs['dx']
+        self.dy = kwargs['dy']
+        self.deps = kwargs['deps']
+        self.dpsi = kwargs['dpsi']
+        self.lod = kwargs['lod']
+        self.ut1_utc = kwargs['ut1_utc']
+        self.tai_utc = kwargs['tai_utc']
+
+    def __repr__(self):
+        return "{name}(x={x}, y={y}, dx={dx}, dy={dy}, deps={deps}, dpsi={dpsi}, lod={lod}, ut1_utc={ut1_utc}, tai_utc={tai_utc})".format(
+            name=self.__class__.__name__,
+            **self.__dict__
+        )
+
+
+class EnvError(Exception):
+    pass
+
+
+class EnvDatabase:
+
     _instance = None
-    _deltas = ('dpsi', 'deps')
+    _cursor = None
+
+    def __new__(cls, interpolation=True):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.path = str(config['folder'] / "env.db")
+
+        return cls._instance
+
+    @contextmanager
+    def connect(self):
+        with sqlite3.connect(self.path) as connect:
+            yield connect.cursor()
+
+    @property
+    def cursor(self):
+        if self._cursor is None:
+            connect = sqlite3.connect(self.path)
+            self._cursor = connect.cursor()
+        return self._cursor
+
+    @classmethod
+    def get(cls, mjd: float):
+        """Retrieve Earth Orientation Parameters and timescales differences
+        for a given date
+        """
+        return cls()._get(mjd)
+
+    @memoize
+    def _get(self, mjd: float):
+
+        if isinstance(mjd, int) or mjd.is_integer():
+            data = self._get_finals(int(mjd))
+        else:
+            mjd0 = int(math.floor(mjd))
+            mjd1 = int(math.ceil(mjd))
+            data_start = self._get_finals(mjd0)
+            data_stop = self._get_finals(mjd1)
+
+            data = {}
+            for field in data_start.keys():
+                y0 = data_start[field]
+                y1 = data_stop[field]
+                data[field] = y0 + (y1 - y0) * (mjd - mjd0) / (mjd1 - mjd0)
+
+        data['tai_utc'] = self._get_tai_utc(mjd)
+
+        return Eop(**data)
+
+    def _get_finals(self, mjd: int):
+
+        self.cursor.execute("SELECT * FROM finals WHERE mjd = ? LIMIT 1", (mjd, ))
+        raw_data = self.cursor.fetchone()
+
+        # In the case of a missing value, we take the last available
+        if raw_data is None:
+            self.cursor.execute("SELECT * FROM finals WHERE mjd <= ? ORDER BY mjd DESC LIMIT 1", (mjd, ))
+            raw_data = self.cursor.fetchone()
+            if raw_data is None:
+                raise ValueError("No finals data for mjd = '%d'" % mjd)
+
+        # removal of MJD
+        keys = ("x", "y", "dx", "dy", "deps", "dpsi", "lod", "ut1_utc")
+        return dict(zip(keys, raw_data[1:]))
+
+    def _get_tai_utc(self, mjd: float):
+        self.cursor.execute("SELECT * FROM tai_utc WHERE mjd <= ? ORDER BY mjd DESC LIMIT 1", (mjd, ))
+        tai_utc = self.cursor.fetchone()[1]
+
+        return tai_utc
+
+    def insert(self, *, finals=None, finals2000a=None, tai_utc=None):
+
+        if None in (finals, finals2000a, tai_utc):
+            raise TypeError("All three arguments are required")
+
+        data = {}
+        for date in finals.data.keys():
+            data[date] = finals.data[date].copy()
+            data[date].update(finals2000a.data[date])
+
+        self._insert_eops(data)
+        self._insert_tai_utc(tai_utc.data)
+
+    def _insert_eops(self, eops: dict):
+        with self.connect() as cursor:
+            for mjd, eop in eops.items():
+                cursor.execute(
+                    "INSERT OR REPLACE INTO finals VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        mjd, eop['x'], eop["y"], eop["dx"], eop["dy"],
+                        eop["deps"], eop["dpsi"], eop["lod"], eop["ut1_utc"],
+                    )
+                )
+
+    def _insert_tai_utc(self, tai_utcs: dict):
+
+        with self.connect() as cursor:
+
+            try:
+                cursor.execute("DELETE FROM tai_utc")
+            except sqlite3.OperationalError:
+                pass
+
+            for mjd, tai_utc in tai_utcs:
+                cursor.execute("INSERT INTO tai_utc VALUES (?, ?)", (mjd, tai_utc))
