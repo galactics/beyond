@@ -7,7 +7,7 @@ from unittest.mock import patch
 from numpy.testing import assert_almost_equal
 
 from beyond.utils.date import Date
-from beyond.env.poleandtimes import ScalesDiff
+from beyond.env.poleandtimes import Eop
 from beyond.frames.iau1980 import _earth_orientation, _precesion, _nutation, _sideral, rate
 
 
@@ -16,25 +16,13 @@ def date():
     return Date(2004, 4, 6, 7, 51, 28, 386009)
 
 
-@yield_fixture
-def time(date):
-    with patch('beyond.utils.date.get_timescales') as mock_ts:
-        mock_ts.return_value = ScalesDiff(-0.4399619, 32)
-        yield
-
-
 @yield_fixture()
-def model_correction(time):
-    with patch('beyond.frames.iau1980.get_pole') as mock_pole:
-        mock_pole.return_value = {
-            'X': -0.140682,
-            'Y': 0.333309,
-            'dpsi': -52.195,
-            'deps': -3.875,
-            'dX': -0.000205,
-            'dY': -0.000136,
-            'LOD': 1.5563,
-        }
+def model_correction():
+    with patch('beyond.frames.iau1980.EnvDatabase.get') as mock_pole:
+        mock_pole.return_value = Eop(
+            x=-0.140682, y=0.333309, dpsi=-52.195, deps=-3.875, dx=-0.000205,
+            dy=-0.000136, lod=1.5563, ut1_utc=-0.4399619, tai_utc=32
+        )
         yield
 
 
@@ -44,7 +32,7 @@ def test_earth_orientation(date, model_correction):
     assert y == 9.258583333333334e-05
 
 
-def test_precesion(date, time):
+def test_precesion(date):
     zeta, theta, z = _precesion(date)
 
     assert_almost_equal(zeta, 0.0273055)

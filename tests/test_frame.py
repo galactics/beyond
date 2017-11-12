@@ -7,7 +7,7 @@ from unittest.mock import patch
 import numpy as np
 from numpy.testing import assert_almost_equal
 from numpy.linalg import norm
-from beyond.env.poleandtimes import ScalesDiff
+from beyond.env.poleandtimes import Eop
 from datetime import timedelta
 
 from beyond.utils.date import Date
@@ -21,25 +21,13 @@ def date():
     return Date(2004, 4, 6, 7, 51, 28, 386009)
 
 
-@yield_fixture
-def time(date):
-    with patch('beyond.utils.date.get_timescales') as mock_ts:
-        mock_ts.return_value = ScalesDiff(-0.4399619, 32)
-        yield
-
-
 @yield_fixture()
-def model_correction(time):
-    with patch('beyond.frames.iau1980.get_pole') as mock_pole1, patch('beyond.frames.iau2010.get_pole') as mock_pole2:
-        mock_pole1.return_value = {
-            'X': -0.140682,
-            'Y': 0.333309,
-            'dpsi': -52.195,
-            'deps': -3.875,
-            'dX': -0.205,
-            'dY': -0.136,
-            'LOD': 1.5563,
-        }
+def model_correction():
+    with patch('beyond.frames.iau1980.EnvDatabase.get') as mock_pole1, patch('beyond.frames.iau2010.EnvDatabase.get') as mock_pole2:
+        mock_pole1.return_value = Eop(
+            x=-0.140682, y=0.333309, dpsi=-52.195, deps=-3.875,
+            dx=-0.205, dy=-0.136, lod=1.5563, ut1_utc=-0.4399619, tai_utc=32
+        )
         mock_pole2.return_value = mock_pole1.return_value
         yield
 
@@ -57,17 +45,13 @@ def ref_orbit():
 
 @yield_fixture
 def station_env():
-    with patch('beyond.frames.iau1980.get_pole') as m, patch('beyond.utils.date.get_timescales') as m2:
-        m.return_value = {
-            'X': -0.00951054166666622,
-            'Y': 0.31093590624999734,
-            'dpsi': -94.19544791666682,
-            'deps': -10.295645833333051,
-            'dY': -0.10067361111115315,
-            'dX': -0.06829513888889051,
-            'LOD': 1.6242802083331438,
-        }
-        m2.return_value = ScalesDiff(0.01756018472222477, 36.0)
+    with patch('beyond.frames.iau1980.EnvDatabase.get') as m, patch('beyond.utils.date.EnvDatabase.get') as m2:
+        m.return_value = Eop(
+            x=-0.00951054166666622, y=0.31093590624999734, dpsi=-94.19544791666682, deps=-10.295645833333051,
+            dy=-0.10067361111115315, dx=-0.06829513888889051, lod=1.6242802083331438,
+            ut1_utc=0.01756018472222477, tai_utc=36.0
+        )
+        m2.return_value = m.return_value
 
         yield
 
@@ -192,32 +176,25 @@ def test_change_tle():
     # print(get_pole(t))
     # assert False
 
-    with patch('beyond.frames.iau1980.get_pole') as m:
-        m.return_value = {
-            'X': 0.11019218256776,
-            'Y': 0.28053771387248,
-            'dX': -0.06607524689999991,
-            'dY': -0.05407524689999991,
-            'dpsi': -54.91309785252,
-            'deps': -6.363882395480003,
-            'LOD': 0.06999515274799778,
-        }
+    with patch('beyond.frames.iau1980.EnvDatabase.get') as m:
+        m.return_value = Eop(
+            x=0.11019218256776, y=0.28053771387248, dx=-0.06607524689999991, dy=-0.05407524689999991,
+            dpsi=-54.91309785252, deps=-6.363882395480003, lod=0.06999515274799778,
+            ut1_utc=0.20415904149231798, tai_utc=32.0
+        )
 
-        with patch('beyond.utils.date.get_timescales') as m2:
-            m2.return_value = ScalesDiff(0.20415904149231798, 32.0)
+        tle = Orbit(
+            Date(2000, 6, 30, 18, 50, 19, 733568),
+            [-9060473.7357, 4658709.52502, 813686.731536,
+             -2232.83278274, -4110.45348994, -3157.34543346],
+            "cartesian", "TEME", None
+        )
+        tle.frame = 'EME2000'
 
-            tle = Orbit(
-                Date(2000, 6, 30, 18, 50, 19, 733568),
-                [-9060473.7357, 4658709.52502, 813686.731536,
-                 -2232.83278274, -4110.45348994, -3157.34543346],
-                "cartesian", "TEME", None
-            )
-            tle.frame = 'EME2000'
+        eme2000_ref = [-9059942.6552, 4659694.9162, 813957.7525,
+                       -2233.346698, -4110.136822, -3157.394202]
 
-            eme2000_ref = [-9059942.6552, 4659694.9162, 813957.7525,
-                           -2233.346698, -4110.136822, -3157.394202]
-
-            assert_vector(eme2000_ref, tle)
+        assert_vector(eme2000_ref, tle)
 
 
 def test_station(station_env):

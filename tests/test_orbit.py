@@ -7,6 +7,7 @@ import numpy as np
 
 from beyond.constants import Earth
 from beyond.utils.date import Date
+from beyond.orbits.tle import Tle
 from beyond.orbits.orbit import Orbit
 from beyond.orbits.forms import FormTransform, Form
 
@@ -18,18 +19,22 @@ ref_cart = np.array([
     -1.77079285e+06, 3.04066799e+06, -6.29108469e+06,
     5.05386500e+03, -4.20539671e+03, -3.45695733e+03
 ])
-ref_date = Date(2015, 9, 21, 12)
 ref_form = FormTransform.KEPL_M
 ref_frame = "EME2000"
 ref_propagator = 'Sgp4'
 
 
 @fixture
-def ref_orbit():
+def ref_date():
+    return Date(2015, 9, 21, 12)
+
+
+@fixture
+def ref_orbit(ref_date):
     return Orbit(ref_date, ref_coord, ref_form, ref_frame, ref_propagator)
 
 
-def test_coord_init(ref_orbit):
+def test_coord_init(ref_date, ref_orbit):
 
     assert ref_orbit['a'] == 7192631.11295
     assert ref_orbit['e'] == 0.00218439
@@ -49,7 +54,7 @@ def test_coord_init(ref_orbit):
     assert str(e.value) == "Should be 6 in length"
 
 
-def test_init_cart():
+def test_init_cart(ref_date):
     a = Orbit(ref_date, ref_cart, FormTransform.CART.name, ref_frame, ref_propagator)
     assert a.form == FormTransform.CART
 
@@ -120,6 +125,16 @@ def test_orbit_change_form(ref_orbit):
     assert ref_orbit.form == FormTransform.CART
     assert np.allclose(ref_orbit, ref_cart)
 
+
+def test_tle_back_and_fro():
+
+    txt = """1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927
+             2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537"""
+    orb = Tle(txt).orbit()
+    new_txt = Tle.from_orbit(orb, norad_id=25544, cospar_id='1998-067A')
+
+    assert str(new_txt) == """1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  9991
+2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391999990"""
 
 # def test_orbit_properties(ref_orbit):
 

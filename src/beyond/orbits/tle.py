@@ -208,14 +208,6 @@ class Tle:
             cospar_id (str):
         Return:
             str: TLE representation
-
-        Example:
-            >>> txt = "1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927\\n2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537"
-            >>> orb = Tle(txt).orbit()
-            >>> new_txt = Tle.from_orbit(orb, norad_id=25544, cospar_id='1998-067A')
-            >>> print(new_txt)
-            1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  9991
-            2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391999990
         """
 
         name = "0 %s\n" % name if name is not None else ""

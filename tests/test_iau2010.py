@@ -4,10 +4,9 @@
 import numpy as np
 from pytest import fixture, yield_fixture
 from unittest.mock import patch
-from numpy.testing import assert_almost_equal
 
 from beyond.utils.date import Date
-from beyond.env.poleandtimes import ScalesDiff
+from beyond.env.poleandtimes import Eop
 from beyond.frames.iau2010 import _earth_orientation, _sideral, _planets, _xys, _xysxy2
 
 
@@ -16,25 +15,13 @@ def date():
     return Date(2004, 4, 6, 7, 51, 28, 386009)
 
 
-@yield_fixture
-def time(date):
-    with patch('beyond.utils.date.get_timescales') as mock_ts:
-        mock_ts.return_value = ScalesDiff(-0.4399619, 32)
-        yield
-
-
 @yield_fixture()
-def model_correction(time):
-    with patch('beyond.frames.iau2010.get_pole') as mock_pole:
-        mock_pole.return_value = {
-            'X': -0.140682,
-            'Y': 0.333309,
-            'dpsi': -52.195,
-            'deps': -3.875,
-            'dX': -0.205,
-            'dY': -0.136,
-            'LOD': 1.5563,
-        }
+def model_correction():
+    with patch('beyond.frames.iau2010.EnvDatabase.get') as mock_pole:
+        mock_pole.return_value = Eop(
+            x=-0.140682, y=0.333309, dpsi=-52.195, deps=-3.875, dx=-0.205,
+            dy=-0.136, lod=1.5563, ut1_utc=-0.4399619, tai_utc=32
+        )
         yield
 
 

@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from datetime import datetime, timedelta, timezone
 
-from beyond.env.poleandtimes import ScalesDiff
+from beyond.env.poleandtimes import Eop
 from beyond.utils.date import Date
 
 
@@ -104,8 +104,8 @@ def test_operations():
 
 def test_change_scale():
 
-    with patch('beyond.utils.date.get_timescales') as m:
-        m.return_value = ScalesDiff(0.1242558, 36.0)
+    with patch('beyond.utils.date.EnvDatabase.get') as m:
+        m.return_value = Eop(x=0, y=0, dx=0, dy=0, dpsi=0, deps=0, lod=0, ut1_utc=0.1242558, tai_utc=36.0)
 
         t = Date(2015, 12, 6)  # UTC object
         assert str(t.scale) == "UTC"
@@ -129,8 +129,8 @@ def test_change_scale():
 
 
 def test_barycenter():
-    with patch('beyond.utils.date.get_timescales') as m:
-        m.return_value = ScalesDiff(-0.463326, 32.0)
+    with patch('beyond.utils.date.EnvDatabase.get') as m:
+        m.return_value = Eop(x=0, y=0, dx=0, dy=0, dpsi=0, deps=0, lod=0, ut1_utc=-0.463326, tai_utc=32.0)
 
         t = Date(2004, 5, 14, 16, 43)  # UTC
 
@@ -147,8 +147,8 @@ def test_barycenter():
 
 def test_julian():
 
-    with patch('beyond.utils.date.get_timescales') as m:
-        m.return_value = ScalesDiff(0.10362957986110499, 36.0)
+    with patch('beyond.utils.date.EnvDatabase.get') as m:
+        m.return_value = Eop(x=0, y=0, dx=0, dy=0, dpsi=0, deps=0, lod=0, ut1_utc=0.10362957986110499, tai_utc=36.0)
 
         t = Date(2015, 12, 18, 22, 25)
         assert t.mjd == 57374.93402777778
@@ -158,8 +158,8 @@ def test_julian():
 
 def test_comparison():
 
-    with patch('beyond.utils.date.get_timescales') as m:
-        m.return_value = ScalesDiff(0.10362957986110499, 36.0)
+    with patch('beyond.utils.date.EnvDatabase.get') as m:
+        m.return_value = Eop(x=0, y=0, dx=0, dy=0, dpsi=0, deps=0, lod=0, ut1_utc=0.10362957986110499, tai_utc=36.0)
 
         # Same scale
         t1 = Date(2016, 11, 14)
@@ -182,13 +182,13 @@ def test_comparison():
 
 def test_leap_second():
 
-    with patch('beyond.utils.date.get_timescales') as m:
-        m.return_value = ScalesDiff(0., 36.0)
+    with patch('beyond.utils.date.EnvDatabase.get') as m:
+        m.return_value = Eop(x=0, y=0, dx=0, dy=0, dpsi=0, deps=0, lod=0, ut1_utc=0., tai_utc=36.0)
 
         t1 = Date(2016, 12, 31, 23, 59, 59)
 
-    with patch('beyond.utils.date.get_timescales') as m:
-        m.return_value = ScalesDiff(0., 37.0)
+    with patch('beyond.utils.date.EnvDatabase.get') as m:
+        m.return_value = Eop(x=0, y=0, dx=0, dy=0, dpsi=0, deps=0, lod=0, ut1_utc=0., tai_utc=37.0)
         t2 = Date(2017, 1, 1, 0, 0, 0)
 
     t3 = Date(2017, 1, 1, 0, 0, 36, scale='TAI')

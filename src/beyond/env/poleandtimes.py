@@ -6,9 +6,11 @@
 
 import math
 import sqlite3
+import warnings
+from pathlib import Path
 from contextlib import contextmanager
 
-from ..config import config
+from ..config import config, ConfigError
 from ..utils.memoize import memoize
 
 __all__ = ['EnvDatabase']
@@ -77,7 +79,7 @@ class TaiUtc():
 
     def __init__(self, path):
 
-        self.path = path
+        self.path = Path(path)
         self.data = []
 
         with self.path.open() as fhandler:
@@ -121,14 +123,14 @@ class TaiUtc():
 class Finals2000A():
     """History of Earth orientation correction for IAU2000 model
 
-    This file can be retrived at http://maia.usno.navy.mil/ser7/finals2000A.all
+    This file can be retrived at http://maia.usno.navy.mil/ser7/
     """
 
-    deltas = ('dX', 'dY')
+    deltas = ('dx', 'dy')
 
     def __init__(self, path):
 
-        self.path = path
+        self.path = Path(path)
         d1, d2 = self.deltas
 
         with self.path.open() as fp:
@@ -207,27 +209,64 @@ class EnvError(Exception):
     pass
 
 
+class EnvWarning(Warning):
+    pass
+
+
 class EnvDatabase:
 
     _instance = None
     _cursor = None
 
-    def __new__(cls, interpolation=True):
+    PASS = "pass"
+    EXTRA = "extrapolate"
+    WARN = "warning"
+    ERROR = "error"
+
+    MIS_DEFAULT = ERROR  # Default behaviour in case of missing value
+
+    def __new__(cls):
         if cls._instance is None:
+
             cls._instance = super().__new__(cls)
-            cls._instance.path = str(config['folder'] / "env.db")
+            self = cls._instance
+
+            try:
+                folder = config['folder']
+            except ConfigError as e:
+                if self._policy() == self.WARN:
+                    warnings.warn(str(e), EnvWarning)
+                elif self._policy() == self.ERROR:
+                    raise e
+
+                folder = Path.home()
+
+            self.path = folder / "env.db"
 
         return cls._instance
 
+    @classmethod
+    def _policy(cls):
+        return config.get("env", "eop_missing_policy", cls.MIS_DEFAULT)
+
+    def uri(self, create=False):
+        return "{uri}?mode={mode}".format(
+            uri=self.path.as_uri(),
+            mode="rwc" if create else "rw"
+        )
+
     @contextmanager
-    def connect(self):
-        with sqlite3.connect(self.path) as connect:
+    def connect(self, create=False):
+        with sqlite3.connect(self.uri(create=create), uri=True) as connect:
             yield connect.cursor()
 
     @property
     def cursor(self):
         if self._cursor is None:
-            connect = sqlite3.connect(self.path)
+            try:
+                connect = sqlite3.connect(self.uri(), uri=True)
+            except sqlite3.DatabaseError as e:
+                raise EnvError("{} : {}".format(e, self.path))
             self._cursor = connect.cursor()
         return self._cursor
 
@@ -236,7 +275,15 @@ class EnvDatabase:
         """Retrieve Earth Orientation Parameters and timescales differences
         for a given date
         """
-        return cls()._get(mjd)
+        try:
+            return cls()._get(mjd)
+        except EnvError as e:
+            if cls._policy() == cls.WARN:
+                warnings.warn(str(e), EnvWarning)
+            elif cls._policy() == cls.ERROR:
+                raise e
+
+        return Eop(x=0, y=0, dx=0, dy=0, deps=0, dpsi=0, lod=0, ut1_utc=0, tai_utc=0)
 
     @memoize
     def _get(self, mjd: float):
@@ -261,15 +308,19 @@ class EnvDatabase:
 
     def _get_finals(self, mjd: int):
 
-        self.cursor.execute("SELECT * FROM finals WHERE mjd = ? LIMIT 1", (mjd, ))
+        self.cursor.execute("SELECT * FROM finals WHERE mjd = ?", (mjd, ))
         raw_data = self.cursor.fetchone()
 
         # In the case of a missing value, we take the last available
-        if raw_data is None:
+        if raw_data is None and self._policy() in (self.WARN, self.EXTRA):
+
             self.cursor.execute("SELECT * FROM finals WHERE mjd <= ? ORDER BY mjd DESC LIMIT 1", (mjd, ))
             raw_data = self.cursor.fetchone()
-            if raw_data is None:
-                raise ValueError("No finals data for mjd = '%d'" % mjd)
+            if raw_data is not None and self._policy() == self.WARN:
+                warnings.warn("Missing EOP data. Extrapolating from previous")
+
+        if raw_data is None:
+            raise EnvError("Missing EOP data for mjd = %d." % mjd)
 
         # removal of MJD
         keys = ("x", "y", "dx", "dy", "deps", "dpsi", "lod", "ut1_utc")
@@ -277,14 +328,57 @@ class EnvDatabase:
 
     def _get_tai_utc(self, mjd: float):
         self.cursor.execute("SELECT * FROM tai_utc WHERE mjd <= ? ORDER BY mjd DESC LIMIT 1", (mjd, ))
-        tai_utc = self.cursor.fetchone()[1]
+        raw_data = self.cursor.fetchone()
 
-        return tai_utc
+        if raw_data is None:
+            raise EnvError("No TAI-UTC data for mjd = '%d'" % mjd)
 
-    def insert(self, *, finals=None, finals2000a=None, tai_utc=None):
+        # only return the tai-utc data, not the mjd
+        return raw_data[1]
+
+    @classmethod
+    def get_range(cls):
+        self = cls()
+        self.cursor.execute("SELECT MIN(mjd) AS min, MAX(mjd) AS max FROM finals")
+        raw_data = self.cursor.fetchone()
+
+        if raw_data is None:
+            raise EnvError("No data for range")
+
+        return raw_data
+
+    @classmethod
+    def get_framing_leap_seconds(cls, current_mjd):
+        self = cls()
+        self.cursor.execute("SELECT * FROM tai_utc ORDER BY mjd DESC")
+
+        l, n = (None, None), (None, None)
+
+        for mjd, value in self.cursor:
+            if mjd <= current_mjd:
+                l = (mjd, value)
+                break
+            n = (mjd, value)
+
+        return l, n
+
+    @classmethod
+    def insert(cls, *, finals=None, finals2000a=None, tai_utc=None):
+        return cls()._insert(finals=finals, finals2000a=finals2000a, tai_utc=tai_utc)
+
+    def _insert(self, *, finals=None, finals2000a=None, tai_utc=None):
 
         if None in (finals, finals2000a, tai_utc):
             raise TypeError("All three arguments are required")
+
+        if not self.path.exists():
+            self.create_tables()  # file doesn't exists
+        else:
+            # The file exists, but we can't connect
+            try:
+                self.connect()
+            except sqlite3.OperationalError:
+                self.create_tables()  # file exists
 
         data = {}
         for date in finals.data.keys():
@@ -316,3 +410,24 @@ class EnvDatabase:
 
             for mjd, tai_utc in tai_utcs:
                 cursor.execute("INSERT INTO tai_utc VALUES (?, ?)", (mjd, tai_utc))
+
+    def create_tables(self):
+        with self.connect(create=True) as cursor:
+            cursor.executescript("""
+                CREATE TABLE `finals` (
+                    `mjd`       INTEGER NOT NULL UNIQUE,
+                    `x`         REAL NOT NULL,
+                    `y`         REAL NOT NULL,
+                    `dx`        REAL NOT NULL,
+                    `dy`        REAL NOT NULL,
+                    `dpsi`      REAL NOT NULL,
+                    `deps`      REAL NOT NULL,
+                    `lod`       REAL NOT NULL,
+                    `ut1_utc`   REAL NOT NULL,
+                    PRIMARY KEY(`mjd`)
+                );
+                CREATE TABLE `tai_utc` (
+                    `mjd`   INTEGER NOT NULL,
+                    `tai_utc`   INTEGER NOT NULL,
+                    PRIMARY KEY(`mjd`)
+                );""")

@@ -6,7 +6,10 @@ from beyond.orbits import Tle
 
 from pytest import raises, fixture
 
-start = Date(2008, 9, 20, 12, 30)
+
+@fixture
+def start(config_override):
+    return Date(2008, 9, 20, 12, 30)
 stop = timedelta(hours=1)
 step = timedelta(minutes=3)
 
@@ -20,11 +23,11 @@ def ref_orb():
 
 
 @fixture
-def ephem(ref_orb):
+def ephem(ref_orb, start):
     return ref_orb.ephem(start, stop, step)
 
 
-def test_create(ephem):
+def test_create(ephem, start):
 
     assert ephem.start == start
     assert ephem.stop == start + stop
@@ -50,7 +53,7 @@ def test_interpolate(ephem):
         ephem.propagate(ephem.start + timedelta(days=2))
 
 
-def test_subephem(ref_orb, ephem):
+def test_subephem(ref_orb, ephem, start):
 
     # Same ephemeris
     subephem = ephem.ephem()
