@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Retrieve and interpolate data for Earth orientation and timescales conversions
+"""Retrieve and interpolate data for Earth Orientation and timescales conversions
 """
 
 import math
@@ -13,60 +13,7 @@ from contextlib import contextmanager
 from ..config import config
 from ..utils.memoize import memoize
 
-__all__ = ['EnvDatabase']
-
-"""
-Overlap needed between data
-A database should be in order to keep all historical data
-The default should be something like
-
-.all as default
-.daily if available
-
-2017-01-01 ..... (all)
-2017-01-02 ..... (all)
-2017-01-03 ..... (all)
-2017-01-04 ..... (all)
-2017-01-05 ..... (all)
-2017-01-06 ..... (all)
-2016-01-07 ..... (daily)
-2016-01-07 ..... (daily)
-...
-2016-03-15 ..... (all)
-2016-03-16 ..... (all)
-2016-03-17 ..... (all)
-2016-03-18 ..... (all)
-
-Always take bulletin B if available
-
-If no fresh data for the required date, duplicate the last value available
-If no data whatsoever, return 0
-These two case may return a warning, depending of a config variable
-eop_missing_policy = disable|warning|error
-
-The user could decide to not take into account any eop
-eop_source = None
-
-The API should be something like this
-
->>> db = EnvDatabase(interpolate=True)
->>> db.insert(
-        finals=Finals(filepath),
-        finals2000A=Finals2000A(filepath),
-        tai_utc=TaiUtc(filepath)
-    )
->>> db.get(58067.93195277059)  # Provide interpolation
-Eop(X=xx, Y=xx, dX=xx, dY=xx, deps=xx, dpsi=xx, LOD=xx, ut1_utc=xx, tai_utc=xx)
-
-Every insertion should be logged.
-TWo tables will be used :
-    one for TAI-UTC data
-    an other for EOP
-
-It is not possible to insert in the second table without having both
-(dX dY) and (dpsi deps).
-
-"""
+__all__ = ['EnvDatabase', 'TaiUtc', 'Finals', 'Finals2000A']
 
 
 class TaiUtc():
@@ -74,8 +21,6 @@ class TaiUtc():
 
     This file can be retrieved at http://maia.usno.navy.mil/ser7/tai-utc.dat
     """
-
-    _instance = None
 
     def __init__(self, path):
 
@@ -182,10 +127,16 @@ class Finals2000A():
 
 
 class Finals(Finals2000A):
+    """History of Earth orientation correction for IAU1980 model
+
+    This file can be retrived at http://maia.usno.navy.mil/ser7/
+    """
     deltas = ('dpsi', 'deps')
 
 
 class Eop:
+    """Earth Orientation Parameters
+    """
 
     def __init__(self, **kwargs):
         self.x = kwargs['x']
@@ -232,11 +183,12 @@ class EnvDatabase:
             self = cls._instance
             self.path = config.folder / "env.db"
 
-        return cls._instance
+            pol = config.get("env", "eop_missing_policy", fallback=cls.MIS_DEFAULT)
+            if pol not in (cls.PASS, cls.EXTRA, cls.WARN, cls.ERROR):
+                raise RuntimeError("Unknown config value for 'env.eop_missing_policy'")
+            self._policy = pol
 
-    @classmethod
-    def _policy(cls):
-        return config.get("env", "eop_missing_policy", fallback=cls.MIS_DEFAULT)
+        return cls._instance
 
     def uri(self, create=False):
         return "{uri}?mode={mode}".format(
@@ -263,13 +215,21 @@ class EnvDatabase:
     def get(cls, mjd: float):
         """Retrieve Earth Orientation Parameters and timescales differences
         for a given date
+
+        Args:
+            mjd: Date expressed as Mean Julian Date
+        Return:
+            Eop:
         """
+
+        self = cls()
+
         try:
-            return cls()._get(mjd)
+            return self._get(mjd)
         except EnvError as e:
-            if cls._policy() == cls.WARN:
+            if self._policy == self.WARN:
                 warnings.warn(str(e), EnvWarning)
-            elif cls._policy() == cls.ERROR:
+            elif self._policy == self.ERROR:
                 raise e
 
         return Eop(x=0, y=0, dx=0, dy=0, deps=0, dpsi=0, lod=0, ut1_utc=0, tai_utc=0)
@@ -278,7 +238,7 @@ class EnvDatabase:
     def _get(self, mjd: float):
 
         if isinstance(mjd, int) or mjd.is_integer():
-            data = self._get_finals(int(mjd))
+            data = self._get_finals(int(mjd)).copy()
         else:
             mjd0 = int(math.floor(mjd))
             mjd1 = int(math.ceil(mjd))
@@ -291,21 +251,23 @@ class EnvDatabase:
                 y1 = data_stop[field]
                 data[field] = y0 + (y1 - y0) * (mjd - mjd0) / (mjd1 - mjd0)
 
-        data['tai_utc'] = self._get_tai_utc(mjd)
+        data['tai_utc'] = self._get_tai_utc(int(mjd))
 
         return Eop(**data)
 
+    @memoize
     def _get_finals(self, mjd: int):
 
         self.cursor.execute("SELECT * FROM finals WHERE mjd = ?", (mjd, ))
         raw_data = self.cursor.fetchone()
 
         # In the case of a missing value, we take the last available
-        if raw_data is None and self._policy() in (self.WARN, self.EXTRA):
+        if raw_data is None and self._policy in (self.WARN, self.EXTRA):
 
             self.cursor.execute("SELECT * FROM finals WHERE mjd <= ? ORDER BY mjd DESC LIMIT 1", (mjd, ))
             raw_data = self.cursor.fetchone()
-            if raw_data is not None and self._policy() == self.WARN:
+
+            if raw_data is not None and self._policy == self.WARN:
                 warnings.warn("Missing EOP data. Extrapolating from previous")
 
         if raw_data is None:
@@ -315,7 +277,8 @@ class EnvDatabase:
         keys = ("x", "y", "dx", "dy", "deps", "dpsi", "lod", "ut1_utc")
         return dict(zip(keys, raw_data[1:]))
 
-    def _get_tai_utc(self, mjd: float):
+    @memoize
+    def _get_tai_utc(self, mjd: int):
         self.cursor.execute("SELECT * FROM tai_utc WHERE mjd <= ? ORDER BY mjd DESC LIMIT 1", (mjd, ))
         raw_data = self.cursor.fetchone()
 
@@ -327,6 +290,11 @@ class EnvDatabase:
 
     @classmethod
     def get_range(cls):
+        """Get the first and last date available for Earth Orientation Parameters
+
+        Return:
+            tuple
+        """
         self = cls()
         self.cursor.execute("SELECT MIN(mjd) AS min, MAX(mjd) AS max FROM finals")
         raw_data = self.cursor.fetchone()
@@ -337,25 +305,35 @@ class EnvDatabase:
         return raw_data
 
     @classmethod
-    def get_framing_leap_seconds(cls, current_mjd):
+    def get_framing_leap_seconds(cls, mjd: float):
+        """
+        Args:
+            mjd (float):
+        Return:
+            tuple: previous and next leap second relative to mjd
+
+        If no data is available, return None
+        """
         self = cls()
         self.cursor.execute("SELECT * FROM tai_utc ORDER BY mjd DESC")
 
         l, n = (None, None), (None, None)
 
-        for mjd, value in self.cursor:
-            if mjd <= current_mjd:
-                l = (mjd, value)
+        for mjd_i, value in self.cursor:
+            if mjd_i <= mjd:
+                l = (mjd_i, value)
                 break
-            n = (mjd, value)
+            n = (mjd_i, value)
 
         return l, n
 
     @classmethod
     def insert(cls, *, finals=None, finals2000a=None, tai_utc=None):
-        return cls()._insert(finals=finals, finals2000a=finals2000a, tai_utc=tai_utc)
+        """Insert values extracted from Finals, Finals2000A and tai-utc files
+        into the environment database
+        """
 
-    def _insert(self, *, finals=None, finals2000a=None, tai_utc=None):
+        self = cls()
 
         if None in (finals, finals2000a, tai_utc):
             raise TypeError("All three arguments are required")
@@ -378,6 +356,16 @@ class EnvDatabase:
         self._insert_tai_utc(tai_utc.data)
 
     def _insert_eops(self, eops: dict):
+        """Insert EOP values into the database, for later use
+
+        Prime sources for these values are :py:class:`Finals` and
+        :py:class:`Finals2000A` files
+
+        Args:
+            eops (dict): The keys are the date of the value in MJD (int) and the
+                values are dictionaries containing the x, y, dx, dy, deps, dpsi,
+                lod and ut1_utc data
+        """
         with self.connect() as cursor:
             for mjd, eop in eops.items():
                 cursor.execute(
@@ -389,6 +377,8 @@ class EnvDatabase:
                 )
 
     def _insert_tai_utc(self, tai_utcs: dict):
+        """Insert TAI-UTC values into the database
+        """
 
         with self.connect() as cursor:
 
@@ -401,6 +391,8 @@ class EnvDatabase:
                 cursor.execute("INSERT INTO tai_utc VALUES (?, ?)", (mjd, tai_utc))
 
     def create_tables(self):
+        """Create the base tables to store all the data
+        """
         with self.connect(create=True) as cursor:
             cursor.executescript("""
                 CREATE TABLE `finals` (

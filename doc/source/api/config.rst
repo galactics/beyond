@@ -12,49 +12,33 @@ behaviour. A description of the fields is provided :ref:`here <beyondconf>`.
 .. code-block:: ini
 
     [env]
-    eop_source = all
+    eop_missing_policy = "error"
 
 You can create a directory containing the beyond.conf file and load it
 
 .. code-block:: python
 
     from beyond.config import config
-    config.load('/home/user/project-X/data/')
-    # or
-    config.load('/home/user/project-X/data/beyond.conf')
+    config.read('/home/user/project-X/data/beyond.conf')
 
 .. _beyondconf:
 
 beyond.conf
 -----------
 
+This file follows the `TOML <https://github.com/toml-lang/toml>`__ specification.
+
 env
 ^^^
 
-eop_source
-    Either ``all`` or ``daily`` depending on the files you want to use for Earth Orientation
-    Parameters.
+eop_missing_policy
+    Define the behaviour of the library when encountering a missing value in the
+    environment data. Current vailable behaviour are:
 
-    These are necessary for precision of frame transformations and date handling
-
-        - finals.all
-        - finals2000A.all
-        - finals.daily
-        - finals2000A.daily
-        - tai-utc.dat
-
-    The differences between the ``.daily`` and ``.all`` files, explained `here <http://maia.usno.navy.mil/ser7/readme>`__, are mainly about freshness and timespan.
-    They are available on the `US Naval Observatory <http://maia.usno.navy.mil/ser7/>`__
-    web server. 
-    In order to use them into the Beyond library, you should place them into
-    the following file tree::
-
-        data/
-         |_ beyond.conf
-         |_ env/
-             |_ finals.all
-             |_ finals2000A.all
-             |_ tai-tuc.dat
+        * ``pass`` - Use zero as a value
+        * ``extrapolate`` - Duplicate the last available data
+        * ``warning`` - Same as ``extrapolate`` but issue a warning
+        * ``error`` - Raise an exception
 
 planets_source
     This variable is optional and is only needed if you wish to track planets or other

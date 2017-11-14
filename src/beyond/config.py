@@ -48,9 +48,6 @@ class Config(dict):
 
         filepath = Path(filepath)
 
-        if filepath.is_dir():
-            filepath /= "beyond.conf"
-
         self.clear()
         self['folder'] = filepath.parent
 
