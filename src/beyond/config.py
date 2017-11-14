@@ -1,51 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import toml
 from pathlib import Path
-from configparser import ConfigParser
 
 
-class ConfigError(AttributeError, KeyError):
-    pass
-
-
-class ConfigDict(dict):
-
-    def __getitem__(self, name):
-        if name not in self:
-            raise ConfigError("Unknown configuration variable '%s'" % name)
-        return super().__getitem__(name)
-
-    def __getattr__(self, name):
-        return self[name]
-
-    def _get(self, key, default):
-        return super().get(key, default)
-
-    def get(self, section, value, default):
-        """Retrieve a value in the config, if the value is not available
-        give the default value specified.
-        """
-
-        out = self._get(section, default)
-
-        if isinstance(out, ConfigDict):
-            return out._get(value, default)
-        else:
-            return out
-
-
-class Config(ConfigDict):
+class Config(dict):
     """Configuration
 
     Example:
         .. code-block:: python
 
             from space.config import config
-            print(config['env']['eop_source'])
-            print(config.env.eop_source)
+            print(config['env']['eop_missing_policy'])
     """
-
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -53,39 +21,40 @@ class Config(ConfigDict):
             cls._instance = super().__new__(cls, *args, **kwargs)
         return cls._instance
 
-    @classmethod
-    def load(cls, path):
-        """
-        Args:
-            path (pathlib.Path or str):
+    def get(self, section, value, fallback):
+        """Retrieve a value in the config, if the value is not available
+        give the fallback value specified.
         """
 
-        path = Path(path)
+        out = super().get(section, fallback)
 
-        if not path.exists():
-            raise FileNotFoundError(path)
-
-        if path.is_file():
-            # if the path provided is a conf file
-            folder_path = path.parent
-            conf_path = path
+        if isinstance(out, dict):
+            return out.get(value, fallback)
         else:
-            folder_path = path
-            conf_path = path / "beyond.conf"
+            return out
 
-        if not conf_path.exists():
-            raise FileNotFoundError(conf_path)
+    @property
+    def folder(self):
+        return self['folder']
 
-        # reading of the conf file
-        confparser = ConfigParser()
-        confparser.read(str(conf_path))
+    def read(self, filepath):
+        """Read the config file and load it in memory
 
-        obj = cls()
+        Args:
+            filepath (pathlib.Path or str)
+        Raises:
+            FileNotFoundError
+        """
 
-        for section in confparser.sections():
-            obj[section] = ConfigDict(confparser[section])
+        filepath = Path(filepath)
 
-        obj['folder'] = folder_path
+        if filepath.is_dir():
+            filepath /= "beyond.conf"
+
+        self.clear()
+        self['folder'] = filepath.parent
+
+        self.update(toml.load(str(filepath)))
 
 
 config = Config()

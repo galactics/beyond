@@ -10,6 +10,7 @@ from pytest import raises, fixture
 @fixture
 def start(config_override):
     return Date(2008, 9, 20, 12, 30)
+
 stop = timedelta(hours=1)
 step = timedelta(minutes=3)
 

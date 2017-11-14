@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-install_requires = ['numpy', 'sgp4', 'jplephem']
+install_requires = ['numpy', 'sgp4', 'jplephem', 'toml']
 version = "0.3"
 
 setup(

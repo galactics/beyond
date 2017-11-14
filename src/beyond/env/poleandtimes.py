@@ -10,7 +10,7 @@ import warnings
 from pathlib import Path
 from contextlib import contextmanager
 
-from ..config import config, ConfigError
+from ..config import config
 from ..utils.memoize import memoize
 
 __all__ = ['EnvDatabase']
@@ -230,24 +230,13 @@ class EnvDatabase:
 
             cls._instance = super().__new__(cls)
             self = cls._instance
-
-            try:
-                folder = config['folder']
-            except ConfigError as e:
-                if self._policy() == self.WARN:
-                    warnings.warn(str(e), EnvWarning)
-                elif self._policy() == self.ERROR:
-                    raise e
-
-                folder = Path.home()
-
-            self.path = folder / "env.db"
+            self.path = config.folder / "env.db"
 
         return cls._instance
 
     @classmethod
     def _policy(cls):
-        return config.get("env", "eop_missing_policy", cls.MIS_DEFAULT)
+        return config.get("env", "eop_missing_policy", fallback=cls.MIS_DEFAULT)
 
     def uri(self, create=False):
         return "{uri}?mode={mode}".format(
