@@ -334,7 +334,7 @@ class Date:
         Return:
             Date
         """
-        offset = self.scale.offset(self.mjd, new_scale)
+        offset = self.scale.offset(self._mjd, new_scale)
         result = self.datetime + timedelta(seconds=offset)
 
         return Date(result, scale=new_scale)
