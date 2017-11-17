@@ -6,8 +6,8 @@
 from datetime import datetime, timedelta
 from numpy import sin, radians
 
-from ..env.poleandtimes import EnvDatabase
-from .node import Node
+from .eop import EnvDatabase
+from ..utils.node import Node
 
 __all__ = ['Date', 'timedelta']
 
@@ -101,7 +101,8 @@ class Date:
     """Date object
 
     All computations and in-memory saving are made in
-    `MJD <https://en.wikipedia.org/wiki/Julian_day>`__. and TAI.
+    `MJD <https://en.wikipedia.org/wiki/Julian_day>`__ and
+    `TAI <https://en.wikipedia.org/wiki/International_Atomic_Time>`__.
     In the current implementation, the Date object does not handle the
     leap second.
 
@@ -137,7 +138,7 @@ class Date:
     """Offset between JD and MJD"""
 
     REF_SCALE = 'TAI'
-    """Scale used internally"""
+    """Scale used as reference internally"""
 
     DEFAULT_SCALE = "UTC"
     """Default scale"""
@@ -292,7 +293,7 @@ class Date:
 
     @property
     def datetime(self):
-        """Transform the Date object into a ``datetime.datetime`` object
+        """Convertion of the Date object into a ``datetime.datetime``
 
         The resulting object is a timezone-naive instance with the same scale
         as the originating Date object.
@@ -303,7 +304,7 @@ class Date:
 
     @property
     def _datetime(self):
-        """Transform the Date object into a :py:class:`datetime.datetime` object.
+        """Convertion of the Date object into a :py:class:`datetime.datetime`.
 
         The resulting object is a timezone-naive instance in the REF_SCALE time-scale
         """

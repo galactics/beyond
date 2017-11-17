@@ -6,7 +6,7 @@ from numpy import sqrt, zeros
 
 from ..constants import G
 from .base import NumericalPropagator
-from ..utils import Date
+from ..dates import Date
 
 
 class Kepler(NumericalPropagator):

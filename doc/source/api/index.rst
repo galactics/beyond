@@ -6,6 +6,7 @@ Beyond modules
 
     config
     constants
+    date
     env
     frames
     orbits

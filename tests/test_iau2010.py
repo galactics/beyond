@@ -5,8 +5,8 @@ import numpy as np
 from pytest import fixture, yield_fixture
 from unittest.mock import patch
 
-from beyond.utils.date import Date
-from beyond.env.poleandtimes import Eop
+from beyond.dates.date import Date
+from beyond.dates.eop import Eop
 from beyond.frames.iau2010 import _earth_orientation, _sideral, _planets, _xys, _xysxy2
 
 

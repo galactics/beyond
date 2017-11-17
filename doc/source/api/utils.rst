@@ -1,13 +1,6 @@
 Utils
 =====
 
-Date
-----
-
-.. autoclass:: beyond.utils.date.Date
-    :members:
-    :show-inheritance:
-
 Matrix
 ------
 

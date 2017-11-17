@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from ..config import config
 from ..utils.memoize import memoize
 
-__all__ = ['EnvDatabase', 'TaiUtc', 'Finals', 'Finals2000A']
+__all__ = ['EnvDatabase']
 
 
 class TaiUtc():
@@ -165,6 +165,11 @@ class EnvWarning(Warning):
 
 
 class EnvDatabase:
+    """Database storing and providing data for Earth Orientation Parameters
+    and Timescales differences.
+
+    It uses sqlite3 as engine.
+    """
 
     _instance = None
     _cursor = None
@@ -174,7 +179,8 @@ class EnvDatabase:
     WARN = "warning"
     ERROR = "error"
 
-    MIS_DEFAULT = ERROR  # Default behaviour in case of missing value
+    MIS_DEFAULT = ERROR
+    """Default behaviour in case of missing value, see :ref:`configuration <eop-missing-policy>`."""
 
     def __new__(cls):
         if cls._instance is None:
@@ -219,7 +225,7 @@ class EnvDatabase:
         Args:
             mjd: Date expressed as Mean Julian Date
         Return:
-            Eop:
+            Eop: Interpolated data for this particuliar MJD
         """
 
         self = cls()
@@ -331,6 +337,15 @@ class EnvDatabase:
     def insert(cls, *, finals=None, finals2000a=None, tai_utc=None):
         """Insert values extracted from Finals, Finals2000A and tai-utc files
         into the environment database
+
+        Keyword Args:
+            finals (str): Path to the `finals`
+            finals2000A (str): Path to the `finals2000A`
+            tai_utc (str): Path to the `tai-utc.dat`
+
+        For `finals` and `finals2000A` files, extension can be 'daily', 'data', 'all'
+        depending on the freshness and the range of the data desired by
+        the user.
         """
 
         self = cls()
@@ -346,6 +361,10 @@ class EnvDatabase:
                 self.connect()
             except sqlite3.OperationalError:
                 self.create_tables()  # file exists
+
+        finals = Finals(finals)
+        finals2000a = Finals2000A(finals2000a)
+        tai_utc = TaiUtc(tai_utc)
 
         data = {}
         for date in finals.data.keys():

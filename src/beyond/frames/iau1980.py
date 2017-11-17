@@ -9,7 +9,7 @@ import numpy as np
 
 from ..utils.matrix import rot1, rot2, rot3
 from ..utils.memoize import memoize
-from ..env.poleandtimes import EnvDatabase
+from ..dates.eop import EnvDatabase
 
 
 @memoize

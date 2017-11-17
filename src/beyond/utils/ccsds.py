@@ -5,7 +5,7 @@ It is based ond the CCSDS ODM Blue Book from Nov. 2009 (502.0-B-2)
 
 import numpy as np
 
-from .date import Date
+from ..dates import Date
 from ..orbits import Orbit, Ephem
 
 

@@ -31,6 +31,8 @@ This file follows the `TOML <https://github.com/toml-lang/toml>`__ specification
 env
 ^^^
 
+.. _eop-missing-policy:
+
 eop_missing_policy
     Define the behaviour of the library when encountering a missing value in the
     environment data. Current vailable behaviour are:
@@ -39,6 +41,8 @@ eop_missing_policy
         * ``extrapolate`` - Duplicate the last available data
         * ``warning`` - Same as ``extrapolate`` but issue a warning
         * ``error`` - Raise an exception
+
+    If this variable is not set, The EnvDatabase will use :py:attr:`~beyond.dates.eop.EnvDatabase.MIS_DEFAULT`
 
 planets_source
     This variable is optional and is only needed if you wish to track planets or other

@@ -6,8 +6,8 @@ from pytest import fixture, yield_fixture
 from unittest.mock import patch
 from numpy.testing import assert_almost_equal
 
-from beyond.utils.date import Date
-from beyond.env.poleandtimes import Eop
+from beyond.dates.date import Date
+from beyond.dates.eop import Eop
 from beyond.frames.iau1980 import _earth_orientation, _precesion, _nutation, _sideral, rate
 
 

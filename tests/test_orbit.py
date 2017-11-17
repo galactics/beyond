@@ -6,7 +6,7 @@ from pytest import raises, fixture
 import numpy as np
 
 from beyond.constants import Earth
-from beyond.utils.date import Date
+from beyond.dates.date import Date
 from beyond.orbits.tle import Tle
 from beyond.orbits.orbit import Orbit
 from beyond.orbits.forms import FormTransform, Form

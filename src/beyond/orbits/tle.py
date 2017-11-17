@@ -41,7 +41,7 @@ from datetime import datetime, timedelta
 import numpy as np
 
 from .orbit import Orbit
-from ..utils.date import Date
+from ..dates.date import Date
 
 
 def _float(text):

@@ -4,7 +4,7 @@
 from pytest import raises
 import numpy as np
 
-from beyond.utils.date import Date
+from beyond.dates.date import Date
 from beyond.orbits.tle import Tle
 
 ref = """0 ISS (ZARYA)

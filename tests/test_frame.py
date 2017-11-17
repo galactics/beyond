@@ -7,10 +7,10 @@ from unittest.mock import patch
 import numpy as np
 from numpy.testing import assert_almost_equal
 from numpy.linalg import norm
-from beyond.env.poleandtimes import Eop
 from datetime import timedelta
 
-from beyond.utils.date import Date
+from beyond.dates.eop import Eop
+from beyond.dates.date import Date
 from beyond.orbits.orbit import Orbit
 from beyond.orbits.tle import Tle
 from beyond.frames.frame import *
@@ -45,7 +45,7 @@ def ref_orbit():
 
 @yield_fixture
 def station_env():
-    with patch('beyond.frames.iau1980.EnvDatabase.get') as m, patch('beyond.utils.date.EnvDatabase.get') as m2:
+    with patch('beyond.frames.iau1980.EnvDatabase.get') as m, patch('beyond.dates.eop.EnvDatabase.get') as m2:
         m.return_value = Eop(
             x=-0.00951054166666622, y=0.31093590624999734, dpsi=-94.19544791666682, deps=-10.295645833333051,
             dy=-0.10067361111115315, dx=-0.06829513888889051, lod=1.6242802083331438,
@@ -169,7 +169,7 @@ def test_change_tle():
     # tle = Tle(lines).orbit()
     # tle = tle.propagate(timedelta(days=3))
 
-    # from beyond.env.poleandtimes import get_pole
+    # from beyond.dates.eop import get_pole
     # t = Date(2000, 6, 30, 18, 50, 19, 733568).mjd
 
     # print(get_timescales(t))
@@ -205,7 +205,7 @@ def test_station(station_env):
     # orb = Tle(lines).orbit()
     # orb = orb.propagate(Date(2016, 2, 7, 16, 55))
 
-    # from beyond.env.poleandtimes import get_pole
+    # from beyond.dates.eop import get_pole
 
     # print(get_pole(Date(2016, 2, 7, 16, 55).mjd))
     # assert False

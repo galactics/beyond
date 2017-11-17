@@ -9,7 +9,7 @@ from numpy import cos, sqrt, sin, arctan2
 
 import numpy as np
 
-from ..utils.date import Date
+from ..dates.date import Date
 from ..orbits.forms import FormTransform
 
 __all__ = ['Sgp4Beta']
