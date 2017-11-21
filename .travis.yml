@@ -3,7 +3,9 @@ python:
   - "3.5"
   - "3.6"
 # command to install dependencies
-install: "pip install numpy pytest-cov coveralls sgp4 jplephem toml"
+install: 
+  - "pip install numpy pytest-cov coveralls sgp4 jplephem toml"
+  - "pip install -e ."
 # command to run tests
 script:
   - py.test

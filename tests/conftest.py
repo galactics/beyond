@@ -12,4 +12,4 @@ def config_override(tmpdir):
 
     p = tmpdir.join("beyond.conf")
     p.write(toml.dumps({"env": {"eop_missing_policy": "pass"}}))
-    config.read(p)
+    config.read(str(p))
