@@ -3,30 +3,22 @@
 Configuration
 =============
 
-.. note:: Setting up a configuration, althought it will degrade the precision
-    of the library, is presently optional. This may change in a future version.
-
-The ``beyond.conf`` file contains a few fields usefull for the library
-behaviour. A description of the fields is provided :ref:`here <beyondconf>`.
-
-.. code-block:: ini
-
-    [env]
-    eop_missing_policy = "error"
-
-You can create a directory containing the beyond.conf file and load it
-
-.. code-block:: python
+The configuration of the library is handled via a dictionnary.
+It is accessible via::
 
     from beyond.config import config
-    config.read('/home/user/project-X/data/beyond.conf')
+    print(config)
+
+In order to dynamically modify values of the dictionnary, it is preferable
+to use the :py:meth:`~Config.update` method.
+
+The configuration dictionnary contains a few fields usefull for the library
+behaviour. A description of the fields is provided :ref:`here <beyondconf>`.
 
 .. _beyondconf:
 
-beyond.conf
------------
-
-This file follows the `TOML <https://github.com/toml-lang/toml>`__ specification.
+Config dict specification
+-------------------------
 
 env
 ^^^

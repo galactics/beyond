@@ -1,6 +1,6 @@
 
-import toml
 import pytest
+from pathlib import Path
 
 from beyond.config import config
 
@@ -10,6 +10,9 @@ def config_override(tmpdir):
     """Create a dummy config file containing basic data
     """
 
-    p = tmpdir.join("beyond.conf")
-    p.write(toml.dumps({"env": {"eop_missing_policy": "pass"}}))
-    config.read(str(p))
+    config.update({
+        "env": {
+            "eop_missing_policy": "pass",
+            "folder": Path(str(tmpdir))
+        }
+    })
