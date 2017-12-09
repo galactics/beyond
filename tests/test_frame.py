@@ -258,13 +258,16 @@ def test_station_visibility(station_env):
     # Three more points than precedently, due to the events computation
     assert len(points) == 24
 
-    assert points[0].info == 'AOS Toulouse'
+    assert points[0].event.info == 'AOS'
+    assert points[0].event.station == tls
     assert points[0].date == Date(2016, 2, 7, 16, 49, 51, 266783)
 
-    assert points[12].info == "MAX Toulouse"
+    assert points[12].event.info == "MAX"
+    assert points[12].event.station == tls
     assert points[12].date == Date(2016, 2, 7, 16, 55, 9, 268318)
 
-    assert points[-1].info == 'LOS Toulouse'
+    assert points[-1].event.info == 'LOS'
+    assert points[-1].event.station == tls
     assert points[-1].date == Date(2016, 2, 7, 17, 0, 25, 271351)
 
 

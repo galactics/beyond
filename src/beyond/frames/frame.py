@@ -294,6 +294,7 @@ class TopocentricFrame(Frame):
         from ..orbits.listeners import stations_listeners, Listener
 
         listeners = []
+        events_classes = tuple()
 
         if events:
             # Handling of the listeners passed in the 'events' kwarg
@@ -302,7 +303,11 @@ class TopocentricFrame(Frame):
             elif isinstance(events, (list, tuple)):
                 listeners.extend(events)
 
-            listeners.extend(stations_listeners(cls))
+            sta_list = stations_listeners(cls)
+            listeners.extend(sta_list)
+
+            # Retrieve the list of events associated with the desired listeners
+            events_classes = tuple(listener.event for listener in sta_list)
 
         for point in orb.iter(start=start, stop=stop, step=step, listeners=listeners):
 
@@ -310,7 +315,7 @@ class TopocentricFrame(Frame):
             point.form = 'spherical'
 
             # Not very clean !
-            if point.phi < 0 and point.info[:3] not in ('AOS', 'LOS', 'MAX'):
+            if point.phi < 0 and not isinstance(point.event, events_classes):
                 continue
 
             yield point
