@@ -4,16 +4,13 @@
 """Retrieve and interpolate data for Earth Orientation and timescales conversions
 """
 
-import math
-import sqlite3
 import warnings
 from pathlib import Path
-from contextlib import contextmanager
+from inspect import isclass
 
 from ..config import config
-from ..utils.memoize import memoize
 
-__all__ = ['EnvDatabase']
+__all__ = ['register', 'get_eop', "TaiUtc", "Finals", "Finals2000A"]
 
 
 class TaiUtc():
@@ -35,7 +32,7 @@ class TaiUtc():
                 continue
 
             line = line.split()
-            mjd = float(line[4]) - 2400000.5
+            mjd = int(float(line[4]) - 2400000.5)
             value = float(line[6])
             self.data.append(
                 (mjd, value)
@@ -125,6 +122,12 @@ class Finals2000A():
     def __getitem__(self, key):
         return self.data[key]
 
+    def items(self):
+        return self.data.items()
+
+    def dates(self):
+        return self.data.dates()
+
 
 class Finals(Finals2000A):
     """History of Earth orientation correction for IAU1980 model
@@ -164,270 +167,171 @@ class EnvWarning(Warning):
     pass
 
 
-class EnvDatabase:
-    """Database storing and providing data for Earth Orientation Parameters
-    and Timescales differences.
+databases = {}
+DEFAULT_DBNAME = "default"
+"""Default name used for EOP database lookup see :ref:`configuration <eop-dbname>`."""
 
-    It uses sqlite3 as engine.
+PASS = "pass"
+EXTRA = "extrapolate"
+WARN = "warning"
+ERROR = "error"
+
+MIS_DEFAULT = ERROR
+"""Default behaviour in case of missing value, see :ref:`configuration <eop-missing-policy>`."""
+
+
+def get_db(dbname=None):
+    """Retrieve the database
     """
 
-    _instance = None
-    _cursor = None
+    if dbname is None:
+        dbname = config.get('eop', 'dbname', fallback=DEFAULT_DBNAME)
 
-    PASS = "pass"
-    EXTRA = "extrapolate"
-    WARN = "warning"
-    ERROR = "error"
+    if dbname not in databases.keys():
+        raise EnvError("Unknown database '%s'" % dbname)
 
-    MIS_DEFAULT = ERROR
-    """Default behaviour in case of missing value, see :ref:`configuration <eop-missing-policy>`."""
-
-    def __new__(cls):
-        if cls._instance is None:
-
-            cls._instance = super().__new__(cls)
-            self = cls._instance
-            self.path = config.folder / "env.db"
-
-            pol = config.get("env", "eop_missing_policy", fallback=cls.MIS_DEFAULT)
-            if pol not in (cls.PASS, cls.EXTRA, cls.WARN, cls.ERROR):
-                raise RuntimeError("Unknown config value for 'env.eop_missing_policy'")
-            self._policy = pol
-
-        return cls._instance
-
-    def uri(self, create=False):
-        return "{uri}?mode={mode}".format(
-            uri=self.path.as_uri(),
-            mode="rwc" if create else "rw"
-        )
-
-    @contextmanager
-    def connect(self, create=False):
-        with sqlite3.connect(self.uri(create=create), uri=True) as connect:
-            yield connect.cursor()
-
-    @property
-    def cursor(self):
-        if self._cursor is None:
-            try:
-                connect = sqlite3.connect(self.uri(), uri=True)
-            except sqlite3.DatabaseError as e:
-                raise EnvError("{} : {}".format(e, self.path))
-            self._cursor = connect.cursor()
-        return self._cursor
-
-    @classmethod
-    def get(cls, mjd: float):
-        """Retrieve Earth Orientation Parameters and timescales differences
-        for a given date
-
-        Args:
-            mjd: Date expressed as Mean Julian Date
-        Return:
-            Eop: Interpolated data for this particuliar MJD
-        """
-
-        self = cls()
-
+    if isclass(databases[dbname]):
+        # Instanciation
         try:
-            return self._get(mjd)
-        except EnvError as e:
-            if self._policy == self.WARN:
-                warnings.warn(str(e), EnvWarning)
-            elif self._policy == self.ERROR:
-                raise e
+            databases[dbname] = databases[dbname]()
+        except Exception as e:
+            # Keep the exception in cache in order to not retry instanciation
+            # every single time the get_db() function is called, as instanciation
+            # of database is generally a time consumming operation.
+            # If it failed once, it will most probably fail again
+            databases[dbname] = e
 
-        return Eop(x=0, y=0, dx=0, dy=0, deps=0, dpsi=0, lod=0, ut1_utc=0, tai_utc=0)
+    if isinstance(databases[dbname], Exception):
+        raise EnvError("Problem at database instanciation") from databases[dbname]
 
-    @memoize
-    def _get(self, mjd: float):
+    return databases[dbname]
 
-        if isinstance(mjd, int) or mjd.is_integer():
-            data = self._get_finals(int(mjd)).copy()
+
+def get_eop(mjd: float, dbname: str=None) -> Eop:
+    """Retrieve Earth Orientation Parameters and timescales differences
+    for a given date
+
+    Args:
+        mjd: Date expressed as Mean Julian Date
+        dbname: Name of the database to use
+    Return:
+        Eop: Interpolated data for this particuliar MJD
+    """
+
+    try:
+        return get_db(dbname)[mjd]
+    except (EnvError, KeyError) as e:
+        if isinstance(e, KeyError):
+            msg = "Missing EOP data for mjd = '%s'" % e
         else:
-            mjd0 = int(math.floor(mjd))
-            mjd1 = int(math.ceil(mjd))
-            data_start = self._get_finals(mjd0)
-            data_stop = self._get_finals(mjd1)
+            msg = str(e)
 
-            data = {}
-            for field in data_start.keys():
-                y0 = data_start[field]
-                y1 = data_stop[field]
-                data[field] = y0 + (y1 - y0) * (mjd - mjd0) / (mjd1 - mjd0)
+        if policy() == WARN:
+            warnings.warn(msg, EnvWarning)
+        elif policy() == ERROR:
+            raise
 
-        data['tai_utc'] = self._get_tai_utc(int(mjd))
+    return Eop(x=0, y=0, dx=0, dy=0, deps=0, dpsi=0, lod=0, ut1_utc=0, tai_utc=0)
+
+
+def policy():
+    pol = config.get("eop", "missing_policy", fallback=MIS_DEFAULT)
+    if pol not in (PASS, EXTRA, WARN, ERROR):
+        raise RuntimeError("Unknown config value for 'eop.missing_policy'")
+
+    return pol
+
+
+def register(name=DEFAULT_DBNAME):
+    """Register an Eop Database
+
+    The only requirement of this database is that it should have ``__getitem__``
+    method accepting MJD as float.
+
+    Example:
+
+    .. code-block:: python
+
+        @register()
+        class SqliteEnvDatabase:
+            # sqlite implementation
+            # this database will be known as 'default'
+
+        @register('json')
+        class JsonEnvDatabase:
+            # JSON implementation
+
+        get_eop(58090.2)                    # get Eop from SqliteEnvDatabase
+        get_eop(58090.2, dbname='default')  # same as above
+        get_eop(58090.2, dbname='json')     # get Eop from JsonEnvDatabase
+    """
+
+    # I had a little trouble setting this function up, due to the fact that
+    # I wanted it to be usable both as a simple decorator (``@register``)
+    # and a decorator with arguments (``@register('mydatabase')``).
+    # The current implementation allows this dual-use, but it's a bit hacky.
+
+    # In the simple decorator mode, when the @register decorator is called
+    # the argument passed is the class to decorate. So it *is* the decorated
+    # function
+
+    # In the decorator-with-arguments mode, the @register decorator should provide
+    # a callable that will be the decorated function. This callable takes
+    # the class you want to decorate
+
+    if isinstance(name, str):
+        # decorator with argument
+        def wrapper(klass):
+            databases[name] = klass
+            return klass
+
+        return wrapper
+
+    else:
+        # simple decorator mode
+        klass = name
+        name = DEFAULT_DBNAME
+
+        databases[name] = klass
+        return klass
+
+
+@register
+class SimpleEopDatabase():
+    """Simple implementation of database
+
+    Uses ``tai-utc.dat``, ``finals.all`` and ``finals2000A.all`` directly
+    without caching nor interpolation.
+    """
+
+    def __init__(self):
+        path = config.get('eop', 'folder', fallback=Path.cwd())
+
+        # Data reading
+        f = Finals(path / 'finals.all')
+        f2 = Finals2000A(path / 'finals2000A.all')
+        t = TaiUtc(path / "tai-utc.dat")
+
+        # Extracting data from finals files
+        self._finals = {}
+        for date, values in f.items():
+            self._finals[date] = values
+            self._finals[date].update(f2[date])
+
+        self._tai_utc = t.data.copy()
+
+    def __getitem__(self, mjd):
+        data = self.finals(mjd)
+        data["tai_utc"] = self.tai_utc(mjd)
 
         return Eop(**data)
 
-    @memoize
-    def _get_finals(self, mjd: int):
+    def finals(self, mjd: float):
+        return self._finals[int(mjd)].copy()
 
-        self.cursor.execute("SELECT * FROM finals WHERE mjd = ?", (mjd, ))
-        raw_data = self.cursor.fetchone()
-
-        # In the case of a missing value, we take the last available
-        if raw_data is None and self._policy in (self.WARN, self.EXTRA):
-
-            self.cursor.execute("SELECT * FROM finals WHERE mjd <= ? ORDER BY mjd DESC LIMIT 1", (mjd, ))
-            raw_data = self.cursor.fetchone()
-
-            if raw_data is not None and self._policy == self.WARN:
-                warnings.warn("Missing EOP data. Extrapolating from previous")
-
-        if raw_data is None:
-            raise EnvError("Missing EOP data for mjd = %d." % mjd)
-
-        # removal of MJD
-        keys = ("x", "y", "dx", "dy", "deps", "dpsi", "lod", "ut1_utc")
-        return dict(zip(keys, raw_data[1:]))
-
-    @memoize
-    def _get_tai_utc(self, mjd: int):
-        self.cursor.execute("SELECT * FROM tai_utc WHERE mjd <= ? ORDER BY mjd DESC LIMIT 1", (mjd, ))
-        raw_data = self.cursor.fetchone()
-
-        if raw_data is None:
-            raise EnvError("No TAI-UTC data for mjd = '%d'" % mjd)
-
-        # only return the tai-utc data, not the mjd
-        return raw_data[1]
-
-    @classmethod
-    def get_range(cls):
-        """Get the first and last date available for Earth Orientation Parameters
-
-        Return:
-            tuple
-        """
-        self = cls()
-        self.cursor.execute("SELECT MIN(mjd) AS min, MAX(mjd) AS max FROM finals")
-        raw_data = self.cursor.fetchone()
-
-        if raw_data is None:
-            raise EnvError("No data for range")
-
-        return raw_data
-
-    @classmethod
-    def get_framing_leap_seconds(cls, mjd: float):
-        """
-        Args:
-            mjd (float):
-        Return:
-            tuple: previous and next leap second relative to mjd
-
-        If no data is available, return None
-        """
-        self = cls()
-        self.cursor.execute("SELECT * FROM tai_utc ORDER BY mjd DESC")
-
-        l, n = (None, None), (None, None)
-
-        for mjd_i, value in self.cursor:
-            if mjd_i <= mjd:
-                l = (mjd_i, value)
-                break
-            n = (mjd_i, value)
-
-        return l, n
-
-    @classmethod
-    def insert(cls, *, finals=None, finals2000a=None, tai_utc=None):
-        """Insert values extracted from Finals, Finals2000A and tai-utc files
-        into the environment database
-
-        Keyword Args:
-            finals (str): Path to the `finals`
-            finals2000A (str): Path to the `finals2000A`
-            tai_utc (str): Path to the `tai-utc.dat`
-
-        For `finals` and `finals2000A` files, extension can be 'daily', 'data', 'all'
-        depending on the freshness and the range of the data desired by
-        the user.
-        """
-
-        self = cls()
-
-        if None in (finals, finals2000a, tai_utc):
-            raise TypeError("All three arguments are required")
-
-        if not self.path.exists():
-            self.create_tables()  # file doesn't exists
+    def tai_utc(self, mjd: float):
+        for date, value in reversed(self._tai_utc):
+            if date <= mjd:
+                return value
         else:
-            # The file exists, but we can't connect
-            try:
-                self.connect()
-            except sqlite3.OperationalError:
-                self.create_tables()  # file exists
-
-        finals = Finals(finals)
-        finals2000a = Finals2000A(finals2000a)
-        tai_utc = TaiUtc(tai_utc)
-
-        data = {}
-        for date in finals.data.keys():
-            data[date] = finals.data[date].copy()
-            data[date].update(finals2000a.data[date])
-
-        self._insert_eops(data)
-        self._insert_tai_utc(tai_utc.data)
-
-    def _insert_eops(self, eops: dict):
-        """Insert EOP values into the database, for later use
-
-        Prime sources for these values are :py:class:`Finals` and
-        :py:class:`Finals2000A` files
-
-        Args:
-            eops (dict): The keys are the date of the value in MJD (int) and the
-                values are dictionaries containing the x, y, dx, dy, deps, dpsi,
-                lod and ut1_utc data
-        """
-        with self.connect() as cursor:
-            for mjd, eop in eops.items():
-                cursor.execute(
-                    "INSERT OR REPLACE INTO finals VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (
-                        mjd, eop['x'], eop["y"], eop["dx"], eop["dy"],
-                        eop["deps"], eop["dpsi"], eop["lod"], eop["ut1_utc"],
-                    )
-                )
-
-    def _insert_tai_utc(self, tai_utcs: dict):
-        """Insert TAI-UTC values into the database
-        """
-
-        with self.connect() as cursor:
-
-            try:
-                cursor.execute("DELETE FROM tai_utc")
-            except sqlite3.OperationalError:
-                pass
-
-            for mjd, tai_utc in tai_utcs:
-                cursor.execute("INSERT INTO tai_utc VALUES (?, ?)", (mjd, tai_utc))
-
-    def create_tables(self):
-        """Create the base tables to store all the data
-        """
-        with self.connect(create=True) as cursor:
-            cursor.executescript("""
-                CREATE TABLE `finals` (
-                    `mjd`       INTEGER NOT NULL UNIQUE,
-                    `x`         REAL NOT NULL,
-                    `y`         REAL NOT NULL,
-                    `dx`        REAL NOT NULL,
-                    `dy`        REAL NOT NULL,
-                    `dpsi`      REAL NOT NULL,
-                    `deps`      REAL NOT NULL,
-                    `lod`       REAL NOT NULL,
-                    `ut1_utc`   REAL NOT NULL,
-                    PRIMARY KEY(`mjd`)
-                );
-                CREATE TABLE `tai_utc` (
-                    `mjd`   INTEGER NOT NULL,
-                    `tai_utc`   INTEGER NOT NULL,
-                    PRIMARY KEY(`mjd`)
-                );""")
+            raise KeyError(mjd)

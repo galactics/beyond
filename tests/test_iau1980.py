@@ -12,21 +12,22 @@ from beyond.frames.iau1980 import _earth_orientation, _precesion, _nutation, _si
 
 
 @fixture
-def date():
+def date(model_correction):
     return Date(2004, 4, 6, 7, 51, 28, 386009)
 
 
 @yield_fixture()
 def model_correction():
-    with patch('beyond.frames.iau1980.EnvDatabase.get') as mock_pole:
+    with patch('beyond.frames.iau1980.get_eop') as mock_pole, patch('beyond.dates.date.get_eop') as mock_date:
         mock_pole.return_value = Eop(
             x=-0.140682, y=0.333309, dpsi=-52.195, deps=-3.875, dx=-0.000205,
             dy=-0.000136, lod=1.5563, ut1_utc=-0.4399619, tai_utc=32
         )
+        mock_date.return_value = mock_pole.return_value
         yield
 
 
-def test_earth_orientation(date, model_correction):
+def test_earth_orientation(date):
     x, y = _earth_orientation(date)
     assert x == -3.9078333333333335e-05
     assert y == 9.258583333333334e-05
@@ -40,7 +41,7 @@ def test_precesion(date):
     assert_almost_equal(z, 0.0273059)
 
 
-def test_nutation(date, model_correction):
+def test_nutation(date):
     epsilon_bar, delta_psi, delta_eps = _nutation(date, eop_correction=False)
 
     assert_almost_equal(epsilon_bar, 23.4387368)
@@ -48,7 +49,7 @@ def test_nutation(date, model_correction):
     assert_almost_equal(delta_eps, 0.0020316)
 
 
-def test_sideral(date, model_correction):
+def test_sideral(date):
     gmst = _sideral(date)
     assert_almost_equal(gmst, 312.8098943)
 
@@ -56,5 +57,5 @@ def test_sideral(date, model_correction):
     assert_almost_equal(gast, 312.8067654)
 
 
-def test_rate(date, model_correction):
+def test_rate(date):
     assert_almost_equal(rate(date), np.array([0, 0, 7.2921150153560662e-05]))

@@ -17,18 +17,19 @@ from beyond.frames.frame import *
 
 
 @fixture
-def date():
+def date(model_correction):
     return Date(2004, 4, 6, 7, 51, 28, 386009)
 
 
 @yield_fixture()
 def model_correction():
-    with patch('beyond.frames.iau1980.EnvDatabase.get') as mock_pole1, patch('beyond.frames.iau2010.EnvDatabase.get') as mock_pole2:
+    with patch('beyond.frames.iau1980.get_eop') as mock_pole1, patch('beyond.frames.iau2010.get_eop') as mock_pole2, patch('beyond.dates.date.get_eop') as mock_date:
         mock_pole1.return_value = Eop(
             x=-0.140682, y=0.333309, dpsi=-52.195, deps=-3.875,
             dx=-0.205, dy=-0.136, lod=1.5563, ut1_utc=-0.4399619, tai_utc=32
         )
         mock_pole2.return_value = mock_pole1.return_value
+        mock_date.return_value = mock_pole1.return_value
         yield
 
 
@@ -45,7 +46,7 @@ def ref_orbit():
 
 @yield_fixture
 def station_env():
-    with patch('beyond.frames.iau1980.EnvDatabase.get') as m, patch('beyond.dates.eop.EnvDatabase.get') as m2:
+    with patch('beyond.frames.iau1980.get_eop') as m, patch('beyond.dates.date.get_eop') as m2:
         m.return_value = Eop(
             x=-0.00951054166666622, y=0.31093590624999734, dpsi=-94.19544791666682, deps=-10.295645833333051,
             dy=-0.10067361111115315, dx=-0.06829513888889051, lod=1.6242802083331438,
@@ -176,12 +177,14 @@ def test_change_tle():
     # print(get_pole(t))
     # assert False
 
-    with patch('beyond.frames.iau1980.EnvDatabase.get') as m:
+    with patch('beyond.frames.iau1980.get_eop') as m, patch('beyond.frames.iau2010.get_eop') as m2, patch('beyond.dates.date.get_eop') as m3:
         m.return_value = Eop(
             x=0.11019218256776, y=0.28053771387248, dx=-0.06607524689999991, dy=-0.05407524689999991,
             dpsi=-54.91309785252, deps=-6.363882395480003, lod=0.06999515274799778,
             ut1_utc=0.20415904149231798, tai_utc=32.0
         )
+        m2.return_value = m.return_value
+        m3.return_value = m.return_value
 
         tle = Orbit(
             Date(2000, 6, 30, 18, 50, 19, 733568),

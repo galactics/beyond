@@ -7,7 +7,7 @@ import numpy as np
 
 from ..utils.matrix import rot1, rot2, rot3
 from ..utils.memoize import memoize
-from ..dates.eop import EnvDatabase
+from ..dates.eop import get_eop
 
 __all__ = ['sideral', 'precesion_nutation', 'earth_orientation', 'rate']
 
@@ -62,7 +62,7 @@ def _earth_orientation(date):
     # s_prime = -0.0015 * (a_c ** 2 / 1.2 + a_a ** 2) * ttt
     s_prime = - 0.000047 * ttt
 
-    eop = EnvDatabase.get(date.mjd)
+    eop = get_eop(date.mjd)
     return eop.x / 3600., eop.y / 3600., s_prime / 3600
 
 
@@ -90,7 +90,7 @@ def sideral(date):
 def rate(date):
     """Return the rotation rate vector of the earth for a given date
     """
-    lod = EnvDatabase.get(date.mjd).lod / 1000.
+    lod = get_eop(date.mjd).lod / 1000.
     return np.array([0, 0, 7.292115146706979e-5 * (1 - lod / 86400.)])
 
 
@@ -198,7 +198,7 @@ def _xys(date):
 
     X, Y, s_xy2 = _xysxy2(date)
 
-    eop = EnvDatabase.get(date.mjd)
+    eop = get_eop(date.mjd)
     # convert milli-arcsecond to arcsecond
     dX, dY = eop.dx / 1000., eop.dy / 1000.
 

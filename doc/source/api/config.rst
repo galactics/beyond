@@ -20,12 +20,11 @@ behaviour. A description of the fields is provided :ref:`here <beyondconf>`.
 Config dict specification
 -------------------------
 
-env
+eop
 ^^^
-
 .. _eop-missing-policy:
 
-eop_missing_policy
+missing_policy
     Define the behaviour of the library when encountering a missing value in the
     environment data. Current vailable behaviour are:
 
@@ -34,7 +33,17 @@ eop_missing_policy
         * ``warning`` - Same as ``extrapolate`` but issue a warning
         * ``error`` - Raise an exception
 
-    If this variable is not set, The EnvDatabase will use :py:attr:`~beyond.dates.eop.EnvDatabase.MIS_DEFAULT`
+    If this variable is not set, the library will use :py:data:`~beyond.dates.eop.MIS_DEFAULT`
+
+.. _eop-dbname:
+
+dbname
+    Define the database used by the library in order to retrieve model corrections
+    and time-scales differences. See :py:mod:`~beyond.dates.eop`.
+    If omited, the default database will be :py:data:`~beyond.dates.eop.DEFAULT_DBNAME`
+
+env
+^^^
 
 planets_source
     This variable is optional and is only needed if you wish to track planets or other

@@ -12,7 +12,9 @@ def config_override(tmpdir):
 
     config.update({
         "env": {
-            "eop_missing_policy": "pass",
             "folder": Path(str(tmpdir))
+        },
+        "eop": {
+            "missing_policy": "pass",
         }
     })

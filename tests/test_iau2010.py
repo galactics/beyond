@@ -11,21 +11,22 @@ from beyond.frames.iau2010 import _earth_orientation, _sideral, _planets, _xys, 
 
 
 @fixture
-def date():
+def date(model_correction):
     return Date(2004, 4, 6, 7, 51, 28, 386009)
 
 
 @yield_fixture()
 def model_correction():
-    with patch('beyond.frames.iau2010.EnvDatabase.get') as mock_pole:
+    with patch('beyond.frames.iau2010.get_eop') as mock_pole, patch('beyond.dates.date.get_eop') as mock_date:
         mock_pole.return_value = Eop(
             x=-0.140682, y=0.333309, dpsi=-52.195, deps=-3.875, dx=-0.205,
             dy=-0.136, lod=1.5563, ut1_utc=-0.4399619, tai_utc=32
         )
+        mock_date.return_value = mock_pole.return_value
         yield
 
 
-def test_earth_orientation(model_correction, date):
+def test_earth_orientation(date):
 
     x_p, y_p, s_prime = _earth_orientation(date)
     assert x_p == -0.140682 / 3600.
@@ -33,14 +34,14 @@ def test_earth_orientation(model_correction, date):
     assert abs(np.radians(s_prime) + 9.712e-12) < 1e-15
 
 
-def test_sideral(model_correction, date):
+def test_sideral(date):
 
     theta = np.degrees(_sideral(date)) % 360.
 
     assert abs(theta - 312.7552829) < 1e-7
 
 
-def test_planets(model_correction, date):
+def test_planets(date):
 
     p = np.degrees(_planets(date))
 
@@ -61,7 +62,7 @@ def test_planets(model_correction, date):
     assert abs(p[13] % 360. - 0.059545) < 1e-6
 
 
-def test_xys(model_correction, date):
+def test_xys(date):
 
     X, Y, s_xy2 = _xysxy2(date)
     assert abs(X - 80.531880) < 1e-6
