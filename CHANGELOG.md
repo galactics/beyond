@@ -9,14 +9,21 @@ Each release is linked to a git commit.
 - Config get() method to implement default behaviour in case of missing parameter
 - Documentation of orbital forms (cartesian, keplerian, etc.)
 - TDB timescale
+- Tle now keep any keyword argument passed in a kwargs attribute
+- Others listeners can be added to a visibility computation
+- Possibility to issue an error, a warning or nothing in case of missing Earth Orientation Parameters
+- Possibility to define a custom Earth Orientation Parameters database
 
 ### Removed
-- automatic loading of `~/.beyond` folder
+- The config variable does not depend on a specific file anymore (previously ConfigParser, then TOML)
+  but is a dictionnary
 
 ### Changed
 - replacement of incorrect 'pole_motion' functions and variables names for
   'earth_orientation'
 - Moon analytic position now computed with respect to TDB timescale
+- A Listener does not return a string anymore, but an Event object
+- Tests are now conducted by tox
 
 ## [v0.3] - 2017-06-27
 
