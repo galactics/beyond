@@ -4,9 +4,11 @@
 *.swp
 *.pyc
 
+.cache/
+.tox/
+
 __pycache__/
 htmlcov/
 dist/
 build/
-.cache/
 doc/build/

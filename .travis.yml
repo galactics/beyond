@@ -1,13 +1,18 @@
 language: python
-python:
-  - "3.5"
-  - "3.6"
-# command to install dependencies
+
+matrix:
+  include:
+  # Create travis test builds using specific tox environment
+  - python: 3.5
+    env: TOX_ENV=py35
+  - python: 3.6
+    env: TOX_ENV=py36
+
 install: 
-  - "pip install numpy pytest-cov coveralls sgp4 jplephem toml"
-  - "pip install -e ."
-# command to run tests
+  - pip install tox coveralls
+
 script:
-  - py.test
+  - tox -e $TOX_ENV
+
 after_success:
   - coveralls
