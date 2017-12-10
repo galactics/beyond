@@ -1,11 +1,12 @@
-*.egg-info
-__pycache__
 .coverage
 
+*.egg-info
 *.swp
+*.pyc
+
+__pycache__/
 htmlcov/
 dist/
 build/
 .cache/
-*.pyc
 doc/build/
