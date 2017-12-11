@@ -3,7 +3,7 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
-## [Unreleased]
+## [v0.4] - 2017-12-10
 
 ### Added
 - Config get() method to implement default behaviour in case of missing parameter

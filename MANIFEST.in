@@ -1,2 +1,2 @@
 include *.md
-include src/beyond/frames/data/*
+include beyond/frames/data/*
