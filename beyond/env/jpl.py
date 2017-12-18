@@ -11,10 +11,20 @@ should list the files to use, in a coma-separated string
 The following configuration will provide access to the Solar System, Mars, Jupiter, Saturn and
 their respective major satellites
 
-.. code-block:: text
+.. code-block:: python
 
-    [env]
-    planets_source = de430.bsp, mar097.bsp, jup310.bsp, sat360xl.bsp
+    from beyond.config import config
+
+    config.update({
+        "env": {
+            "jpl": [
+                /path/to/de430.bsp,
+                /path/to/mar097.bsp,
+                /path/to/jup310.bsp,
+                /path/to/sat360xl.bsp
+            ]
+        }
+    })
 
 This module rely heavily on the jplephem library, which parse the binary .BSP format
 """
@@ -112,9 +122,8 @@ class Bsp:
         segments = []
 
         # Extraction of segments from each .bsp file
-        for filename in config['env']['planets_source'].split(','):
-            filepath = config['folder'] / 'env' / filename.strip()
-            segments.extend(SPK.open(filepath).segments)
+        for filepath in config['env']['jpl']:
+            segments.extend(SPK.open(str(filepath)).segments)
 
         # list of available segments
         self.segments = dict(((s.center, s.target), s) for s in segments)
