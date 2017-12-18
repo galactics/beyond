@@ -93,7 +93,7 @@ class CCSDS:
             Ephem:
         """
 
-        method, order, frame, scale = None, None, None, None
+        name, cospar_id, method, order, frame, scale = None, None, None, None, None, None
         data_block = False
         ephem = []
 
@@ -101,6 +101,12 @@ class CCSDS:
 
             if not line or line.startswith("COMMENT"):  # pragma: no cover
                 continue
+
+            elif line.startswith("OBJECT_NAME"):
+                name = line.partition("=")[-1].strip()
+
+            elif line.startswith("OBJECT_ID"):
+                cospar_id = line.partition("=")[-1].strip()
 
             elif line.startswith("TIME_SYSTEM"):
                 scale = line.partition("=")[-1].strip()
@@ -136,7 +142,12 @@ class CCSDS:
         if not ephem:
             raise ValueError("Empty ephemeris")
 
-        return Ephem(ephem, method=method, order=order)
+        ephem = Ephem(ephem, method=method, order=order)
+
+        ephem.name = name
+        ephem.cospar_id = cospar_id
+
+        return ephem
 
     @classmethod
     def _read_opm(cls, string):
@@ -147,11 +158,15 @@ class CCSDS:
             Orbit:
         """
 
-        scale, frame, date, x, y, z, vx, vy, vz = [None] * 9
+        name, cospar_id, scale, frame, date, x, y, z, vx, vy, vz = [None] * 11
 
         for line in string.splitlines():
             if not line or line.startswith("COMMENT"):
                 continue
+            elif line.startswith("OBJECT_NAME"):
+                name = line.partition("=")[-1].strip()
+            elif line.startswith("OBJECT_ID"):
+                cospar_id = line.partition("=")[-1].strip()
             elif line.startswith("TIME_SYSTEM"):
                 scale = line.partition("=")[-1].strip()
             elif line.startswith("REF_FRAME"):
@@ -175,7 +190,12 @@ class CCSDS:
         if None in [scale, frame, x, y, z, vx, vy, vz] or not isinstance(date, Date):
             raise ValueError("Missing mandatory parameter")
 
-        return Orbit(date, [x, y, z, vx, vy, vz], 'cartesian', frame, None)
+        orb = Orbit(date, [x, y, z, vx, vy, vz], 'cartesian', frame, None)
+
+        orb.name = name
+        orb.cospar_id = cospar_id
+
+        return orb
 
     @classmethod
     def _dump_header(cls, data, ccsds_type, version="1.0", **kwargs):
@@ -195,14 +215,15 @@ ORIGINATOR = {originator}
 
     @classmethod
     def _dump_meta(cls, data, **kwargs):
+
         meta = """META_START
 OBJECT_NAME          = {name}
 OBJECT_ID            = {cospar_id}
 CENTER_NAME          = {orb.frame.center.name}
 REF_FRAME            = {orb.frame}
 """     .format(
-            name=kwargs.get("name", "N/A"),
-            cospar_id=kwargs.get("cospar_id", "N/A"),
+            name=kwargs.get("name", getattr(data, "name", "N/A")),
+            cospar_id=kwargs.get("cospar_id", getattr(data, "cospar_id", "N/A")),
             orb=data,
         )
 
