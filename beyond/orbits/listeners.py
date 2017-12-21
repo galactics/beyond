@@ -301,7 +301,8 @@ class StationMaxListener(Listener):
     def check(self, orb):
         # Override to disable the computation when the object is not
         # in view of the station
-        if orb.copy(frame=self.station, form='spherical').phi <= 0:
+        orb2 = orb.copy(frame=self.station, form='spherical')
+        if orb2.phi <= 0 or orb2.phi_dot > 0:
             return False
         else:
             return super().check(orb)
