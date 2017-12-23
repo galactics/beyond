@@ -43,6 +43,7 @@ class Orbit(np.ndarray):
         obj._frame = frame
         obj.propagator = propagator
         obj.complements = kwargs
+        obj.event = None
 
         return obj
 
