@@ -273,7 +273,7 @@ class TopocentricFrame(Frame):
     """
 
     @classmethod
-    def visibility(cls, orb, start, stop, step, events=False):
+    def visibility(cls, orb, start=None, stop=None, step=None, events=False):
         """Visibility from a topocentric frame
 
         Args:

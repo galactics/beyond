@@ -247,13 +247,13 @@ def test_station_visibility(station_env):
 
     tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
 
-    points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16, 45), timedelta(minutes=16), timedelta(seconds=30))]
+    points = [point for point in tls.visibility(orb, start=Date(2016, 2, 7, 16, 45), stop=timedelta(minutes=16), step=timedelta(seconds=30))]
     assert len(points) == 21
-    points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16, 45), Date(2016, 2, 7, 17, 1), timedelta(seconds=30))]
+    points = [point for point in tls.visibility(orb, start=Date(2016, 2, 7, 16, 45), stop=Date(2016, 2, 7, 17, 1), step=timedelta(seconds=30))]
     assert len(points) == 21
 
     # Events (AOS, MAX and LOS)
-    points = [point for point in tls.visibility(orb, Date(2016, 2, 7, 16, 45), timedelta(minutes=16), timedelta(seconds=30), events=True)]
+    points = [point for point in tls.visibility(orb, start=Date(2016, 2, 7, 16, 45), stop=timedelta(minutes=16), step=timedelta(seconds=30), events=True)]
 
     # Three more points than precedently, due to the events computation
     assert len(points) == 24

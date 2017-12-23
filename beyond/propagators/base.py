@@ -20,7 +20,7 @@ class Propagator(Speaker, metaclass=ABCMeta):
     def propagate(self, start):
         pass
 
-    def iter(self, *, start=None, stop=None, step=None, **kwargs):
+    def iter(self, start=None, stop=None, step=None, **kwargs):
         """
         Examples:
 

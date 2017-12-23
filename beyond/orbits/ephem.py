@@ -165,7 +165,7 @@ class Ephem(Speaker):
         """
         return self.interpolate(date)
 
-    def iter(self, *, start=None, stop=None, step=None, **kwargs):
+    def iter(self, start=None, stop=None, step=None, **kwargs):
         """Ephemeris generator based on the data of this one, but with different dates
 
         If an argument is set to ``None`` it will keep the same property as the generating ephemeris
@@ -230,7 +230,9 @@ class Ephem(Speaker):
                 for listen_orb in self.listen(orb, listeners):
                     yield listen_orb
 
-                yield orb
+                # yield a copy of the recorded orbit to avoid later modification
+                # which could have dire consequences
+                yield orb.copy()
         else:
             # create as ephemeris with a different step than the original
             date = start
