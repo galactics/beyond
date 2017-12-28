@@ -223,15 +223,15 @@ def test_station(station_env):
 
     tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
 
-    orb.frame = 'Toulouse'
+    orb.frame = tls
     orb.form = 'spherical'
 
     # azimuth
-    assert -np.degrees(orb.theta) - 159.75001561831209 <= 1e-9
+    assert abs(-np.degrees(orb.theta) - 159.75001561831209) <= 1e-9
     # elevation
-    assert np.degrees(orb.phi) - 57.894234537351593 <= 1e-9
+    assert abs(np.degrees(orb.phi) - 57.894234049230583) <= 1e-9
     # range
-    assert orb.r - 471467.6615039421 <= 1e-9
+    assert abs(orb.r - 471467.65510239213) <= 1e-9
 
     orb.frame = archive.frame
     orb.form = archive.form

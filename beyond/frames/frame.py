@@ -135,12 +135,13 @@ class Frame(metaclass=_MetaFrame):
 
     @classmethod
     def _convert(cls, x=None, y=None):
-        x = np.identity(3) if x is None else x
-        y = np.identity(3) if y is None else y
+        m = np.identity(6)
 
-        m = np.identity(7)
-        m[:3, :3] = x
-        m[3:6, 3:6] = y
+        if x is not None:
+            m[:3, :3] = x
+        if y is not None:
+            m[3:, 3:] = y
+
         return m
 
     def transform(self, new_frame):
@@ -153,8 +154,8 @@ class Frame(metaclass=_MetaFrame):
         """
         steps = self.__class__.steps(new_frame)
 
-        orbit = np.ones(7)
-        orbit[:6] = self.orbit
+        orbit = self.orbit
+
         for _from, _to in steps:
 
             from_obj = _from(self.date, orbit)
@@ -168,17 +169,17 @@ class Frame(metaclass=_MetaFrame):
                 if hasattr(to_obj, inverse):
                     rotation, offset = getattr(to_obj, inverse)()
                     rotation = rotation.T
-                    offset[:6, -1] = - offset[:6, -1]
+                    offset = - offset
                 else:
                     raise NotImplementedError("Unknown transformation {} to {}".format(_from, _to))
 
             if issubclass(_from, TopocentricFrame):
                 # In case of topocentric frame, the rotation is done before the translation
-                orbit = offset @ rotation @ orbit
+                orbit = offset + (rotation @ orbit)
             else:
-                orbit = rotation @ offset @ orbit
+                orbit = rotation @ (offset + orbit)
 
-        return orbit[:6]
+        return orbit
 
 
 class TEME(Frame):
@@ -187,7 +188,7 @@ class TEME(Frame):
     def _to_TOD(self):
         equin = iau1980.equinox(self.date, eop_correction=False, terms=4, kinematic=False)
         m = rot3(-np.deg2rad(equin))
-        return self._convert(m, m), np.identity(7)
+        return self._convert(m, m), np.zeros(6)
 
 
 class GTOD(Frame):
@@ -199,7 +200,7 @@ class WGS84(Frame):
     """World Geodetic System 1984"""
 
     def _to_ITRF(self):
-        return np.identity(7), np.identity(7)
+        return np.identity(6), np.zeros(6)
 
 
 class PEF(Frame):
@@ -207,8 +208,8 @@ class PEF(Frame):
 
     def _to_TOD(self):
         m = iau1980.sideral(self.date, model='apparent', eop_correction=False)
-        offset = np.identity(7)
-        offset[3:6, -1] = np.cross(iau1980.rate(self.date), self.orbit[:3])
+        offset = np.zeros(6)
+        offset[3:] = np.cross(iau1980.rate(self.date), self.orbit[:3])
         return self._convert(m, m), offset
 
 
@@ -217,7 +218,7 @@ class TOD(Frame):
 
     def _to_MOD(self):
         m = iau1980.nutation(self.date, eop_correction=False)
-        return self._convert(m, m), np.identity(7)
+        return self._convert(m, m), np.zeros(6)
 
 
 class MOD(Frame):
@@ -225,7 +226,7 @@ class MOD(Frame):
 
     def _to_EME2000(self):
         m = iau1980.precesion(self.date)
-        return self._convert(m, m), np.identity(7)
+        return self._convert(m, m), np.zeros(6)
 
 
 class EME2000(Frame):
@@ -238,11 +239,11 @@ class ITRF(Frame):
 
     def _to_PEF(self):
         m = iau1980.earth_orientation(self.date)
-        return self._convert(m, m), np.identity(7)
+        return self._convert(m, m), np.zeros(6)
 
     def _to_TIRF(self):
         m = iau2010.earth_orientation(self.date)
-        return self._convert(m, m), np.identity(7)
+        return self._convert(m, m), np.zeros(6)
 
 
 class TIRF(Frame):
@@ -250,8 +251,8 @@ class TIRF(Frame):
 
     def _to_CIRF(self):
         m = iau2010.sideral(self.date)
-        offset = np.identity(7)
-        offset[3:6, -1] = np.cross(iau2010.rate(self.date), self.orbit[:3])
+        offset = np.zeros(6)
+        offset[3:] = np.cross(iau2010.rate(self.date), self.orbit[:3])
         return self._convert(m, m), offset
 
 
@@ -260,7 +261,7 @@ class CIRF(Frame):
 
     def _to_GCRF(self):
         m = iau2010.precesion_nutation(self.date)
-        return self._convert(m, m), np.identity(7)
+        return self._convert(m, m), np.zeros(6)
 
 
 class GCRF(Frame):
@@ -380,8 +381,8 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
         """
         lat, lon, _ = self.latlonalt
         m = rot3(-lon) @ rot2(lat - np.pi / 2.) @ rot3(self.orientation)
-        offset = np.identity(7)
-        offset[0:3, -1] = self.coordinates
+        offset = np.zeros(6)
+        offset[:3] = self.coordinates
         return self._convert(m, m), offset
 
     mtd = '_to_%s' % parent_frame.__name__
@@ -421,12 +422,11 @@ def orbit2frame(name, ref_orbit, orientation=None):
     def _convert(self):
         """Conversion from orbit frame to parent frame
         """
-        offset = np.identity(7)
-        offset[0:6, -1] = ref_orbit.propagate(self.date).base
+        offset = ref_orbit.propagate(self.date).base.copy()
 
         if orientation is None:
             # The orientation is the same as the parent reference frame
-            rotation = np.identity(7)
+            rotation = np.identity(6)
         elif orientation.upper() in ("QSW", "TNW"):
 
             # propagation of the reference orbit to the date of the
