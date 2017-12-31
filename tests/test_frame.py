@@ -290,11 +290,11 @@ def test_orbit2frame():
     # as done during propagation
     soyouz = soyouz.propagate(soyouz.date)
 
-    iss.register_as_frame('iss_inert')
-    iss.register_as_frame('iss_qsw', 'QSW')
-    iss.register_as_frame('iss_tnw', 'TNW')
+    iss.as_frame('iss_inert')
+    iss.as_frame('iss_qsw', orientation='QSW')
+    iss.as_frame('iss_tnw', orientation='TNW')
     with raises(ValueError):
-        iss.register_as_frame('iss_unknown', 'unknow')
+        iss.as_frame('iss_unknown', orientation='unknow')
 
     s1 = soyouz.copy(frame='iss_inert')
     assert_almost_equal(s1[:3], [70.5889585, 73.6584008, -62.5406308])

@@ -247,10 +247,10 @@ class Ephem(Speaker):
                 yield orb
                 date += step
 
-    def ephemeris(self, **kwargs):
-        return self.iter(**kwargs)
+    def ephemeris(self, *args, **kwargs):
+        return self.iter(*args, **kwargs)
 
-    def ephem(self, **kwargs):
+    def ephem(self, *args, **kwargs):
         """Create an Ephem object which is a subset of this one
 
         Take the same keyword arguments as :py:meth:`ephemeris`
@@ -259,11 +259,11 @@ class Ephem(Speaker):
             Ephem:
         """
 
-        return self.__class__(self.ephemeris(**kwargs))
+        return self.__class__(self.ephemeris(*args, **kwargs))
 
-    def register_as_frame(self, name, orientation=None):  # pragma: no cover
+    def as_frame(self, name, **kwargs):  # pragma: no cover
         """Register the Ephem object as a frame
 
         see :py:func:`beyond.frames.frame.orbit2frame` for details of the arguments
         """
-        return orbit2frame(name, self, orientation)
+        return orbit2frame(name, self, **kwargs)

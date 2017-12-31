@@ -277,9 +277,9 @@ class Orbit(np.ndarray):
         """
         return Ephem(self.ephemeris(start, stop, step))
 
-    def register_as_frame(self, name, orientation=None):  # pragma: no cover
+    def as_frame(self, name, **kwargs):  # pragma: no cover
         """Register the orbit as frame.
 
         see :py:func:`beyond.frames.frame.orbit2frame` for details of the arguments
         """
-        return orbit2frame(name, self, orientation)
+        return orbit2frame(name, self, **kwargs)

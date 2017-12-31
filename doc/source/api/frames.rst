@@ -58,8 +58,8 @@ Local Orbital Reference Frame
 -----------------------------
 
 It is possible to attach a frame to a moving object by calling the method
-:py:meth:`Orbit.register_as_frame() <beyond.orbits.orbit.Orbit.register_as_frame>` or
-:py:meth:`Ephem.register_as_frame() <beyond.orbits.ephem.Ephem.register_as_frame>`.
+:py:meth:`Orbit.as_frame() <beyond.orbits.orbit.Orbit.as_frame>` or
+:py:meth:`Ephem.as_frame() <beyond.orbits.ephem.Ephem.as_frame>`.
 Both are a simple shortcut to the :py:func:`~beyond.frames.frame.orbit2frame` function.
 
 .. autofunction:: beyond.frames.frame.orbit2frame

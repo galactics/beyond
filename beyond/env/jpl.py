@@ -218,7 +218,7 @@ def get_body(name, date):
             )
 
             # Register the Orbit as a frame
-            propagator.vector(date).register_as_frame(b.name)
+            propagator.vector(date).as_frame(b.name, center=body)
             _propagator_cache[b.name] = propagator
 
     return _propagator_cache[name].vector(date)
