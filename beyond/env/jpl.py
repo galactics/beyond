@@ -4,9 +4,8 @@ and integrate them in the frames stack.
 See the `NAIF website <https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/>`__
 for more informations about the format and content of these files.
 
-For the module to work properly, the .bsp files should be placed in the "env" folder
-(the one already containing the 'finals'), and the `env.planest_source` configuration variable
-should list the files to use, in a coma-separated string
+For the module to work properly, the .bsp files should be sourced via the `env.jpl.bsp`
+configuration variable.
 
 The following configuration will provide access to the Solar System, Mars, Jupiter, Saturn and
 their respective major satellites
@@ -18,10 +17,10 @@ their respective major satellites
     config.update({
         "env": {
             "jpl": [
-                /path/to/de430.bsp,
-                /path/to/mar097.bsp,
-                /path/to/jup310.bsp,
-                /path/to/sat360xl.bsp
+                "/path/to/de430.bsp",
+                "/path/to/mar097.bsp",
+                "/path/to/jup310.bsp",
+                "/path/to/sat360xl.bsp"
             ]
         }
     })
@@ -53,51 +52,29 @@ class Target(Node):
         super().__init__(name)
         self.index = index
 
-    def __contains__(self, value):
-        return value in [x.index for x in self.list]
-
-
-class EarthPropagator(AnalyticalPropagator):
-
-    FRAME = "EME2000"
-    ORIGIN = [0] * 6
-
-    @classmethod
-    def vector(cls, date):
-        orb = Orbit(
-            date,
-            cls.ORIGIN,
-            form='cartesian',
-            frame=cls.FRAME,
-            propagator=cls()
-        )
-        return orb
-
-    def propagate(self, date):
-        return self.vector(date)
-
 
 class GenericBspPropagator(AnalyticalPropagator):
     """Generic propagator
     """
 
+    BASE_FRAME = "EME2000"
+
     @classmethod
-    def vector(cls, date):
+    def propagate(cls, date):
 
         frame_name = cls.src.name
         if frame_name == 'Earth':
-            frame_name = EarthPropagator.FRAME
+            frame_name = cls.BASE_FRAME
+
+        date = date.change_scale("TDB")
 
         return Orbit(
             date,
-            Bsp().get(cls.src.index, cls.dst.index, date),
+            Bsp().get(cls.src, cls.dst, date),
             form="cartesian",
             frame=frame_name,
             propagator=cls()
         )
-
-    def propagate(self, date):
-        return self.vector(date)
 
 
 class Bsp:
@@ -133,13 +110,9 @@ class Bsp:
         targets = {}
 
         for center_id, target_id in self.segments.keys():
-            try:
-                center_name = target_names[center_id].title().replace(" ", "")
-                target_name = target_names[target_id].title().replace(" ", "")
-            except KeyError:
-                # In case of an Unknown Object, from a jplephem library standpoint,
-                # we discard it.
-                continue
+
+            center_name = target_names.get(center_id, 'Unknown').title().replace(' ', '')
+            target_name = target_names.get(target_id, 'Unknown').title().replace(' ', '')
 
             # Retrieval of the Target object representing the center if it exists
             # or creation of said object if it doesn't.
@@ -154,28 +127,30 @@ class Bsp:
         # from the `frames.frame` module.
         self.top = targets[399]
 
-    def get(self, center_id, target_id, date):
+    def get(self, center, target, date):
         """Retrieve the position and velocity of a target with respect to a center
 
         Args:
-            center_id (int):
-            target_id (int):
+            center (Target):
+            target (Target):
             date (Date):
         Return:
             numpy.array: lenght-6 array position and velocity (in m and m/s) of the
                 target, with respect to the center
         """
 
-        try:
-            pos, vel = self.segments[center_id, target_id].compute_and_differentiate(date.jd)
+        if (center.index, target.index) in self.segments:
+            pos, vel = self.segments[center.index, target.index].compute_and_differentiate(date.jd)
             sign = 1
-        except KeyError:
-            # Some times we want to get the reversed vector of what is available
-            pos, vel = self.segments[target_id, center_id].compute_and_differentiate(date.jd)
+        else:
+            # When we wish to get a segment that is not available in the files (such as
+            # EarthBarycenter with respect to the Moon, for example), we take the segment
+            # representing the inverse vector if available and reverse it
+            pos, vel = self.segments[target.index, center.index].compute_and_differentiate(date.jd)
             sign = -1
 
         # In some cases, the pos vector contains both position and velocity
-        pv = np.array(pos) if len(pos) == 6 else np.concatenate((pos, vel))
+        pv = np.array(pos) if len(pos) == 6 else np.concatenate((pos, -vel))
 
         return sign * pv * 1000
 
@@ -196,16 +171,6 @@ def get_body(name, date):
             the .bsp file
     """
 
-    # Special case for earth
-    if name == 'Earth':
-        return Orbit(
-            date,
-            EarthPropagator.ORIGIN,
-            form="cartesian",
-            frame=EarthPropagator.FRAME,
-            propagator=EarthPropagator()
-        )
-
     # On-demand Propagator and Frame generation
     for a, b in Bsp().top.steps(name):
         if b.name not in _propagator_cache:
@@ -218,10 +183,10 @@ def get_body(name, date):
             )
 
             # Register the Orbit as a frame
-            propagator.vector(date).as_frame(b.name, center=body)
+            propagator.propagate(date).as_frame(b.name)
             _propagator_cache[b.name] = propagator
 
-    return _propagator_cache[name].vector(date)
+    return _propagator_cache[name].propagate(date)
 
 
 def list_bodies():

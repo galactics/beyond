@@ -399,7 +399,7 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
     return cls
 
 
-def orbit2frame(name, ref_orbit, orientation=None):
+def orbit2frame(name, ref_orbit, orientation=None, center=None):
     """Create a frame based on a Orbit or Ephem object.
 
     Args:
@@ -418,6 +418,9 @@ def orbit2frame(name, ref_orbit, orientation=None):
 
     if orientation is not None and orientation.upper() not in ("QSW", "TNW"):
         raise ValueError("Unknown orientation '%s'" % orientation)
+
+    if center is None:
+        center = Earth
 
     def _convert(self):
         """Conversion from orbit frame to parent frame
@@ -453,6 +456,7 @@ def orbit2frame(name, ref_orbit, orientation=None):
 
     # Creation of the class
     cls = _MetaFrame(name, (Frame,), dct)
+    cls.center = center
 
     # Link to the parent
     cls + ref_orbit.frame
