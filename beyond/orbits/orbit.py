@@ -6,7 +6,7 @@
 
 import numpy as np
 
-from .forms import FormTransform
+from .forms import get_form, Form
 from .ephem import Ephem
 from ..frames.frame import get_frame, orbit2frame
 from ..propagators import get_propagator
@@ -30,9 +30,7 @@ class Orbit(np.ndarray):
             raise ValueError("Should be 6 in length")
 
         if isinstance(form, str):
-            form = FormTransform._tree[form]
-        elif form.name not in FormTransform._tree:
-            raise ValueError("Unknown form '{}'".format(form))
+            form = get_form(form)
 
         if isinstance(frame, str):
             frame = get_frame(frame)
@@ -111,8 +109,8 @@ class Orbit(np.ndarray):
     def __getattr__(self, name):
 
         # Conversion of variable name to utf-8
-        if name in FormTransform.alt:
-            name = FormTransform.alt[name]
+        if name in Form.alt:
+            name = Form.alt[name]
 
         # Verification if the variable is available in the current form
         if name not in self.form.param_names:
@@ -174,10 +172,8 @@ class Orbit(np.ndarray):
     @form.setter
     def form(self, new_form):
         if isinstance(new_form, str):
-            new_form = FormTransform._tree[new_form]
-
-        fmt = FormTransform(self)
-        self.base.setfield(fmt.transform(new_form), dtype=float)
+            new_form = get_form(new_form)
+        self.base.setfield(self._form(self, new_form), dtype=float)
         self._form = new_form
 
     @property

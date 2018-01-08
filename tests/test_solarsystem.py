@@ -15,7 +15,7 @@ def test_moon():
         moon = get_body('Moon')
         moon_orb = moon.propagate(Date(1994, 4, 28))
 
-    assert str(moon_orb.form) == 'Cartesian'
+    assert str(moon_orb.form) == 'cartesian'
     assert str(moon_orb.frame) == 'EME2000'
     assert isinstance(moon_orb.propagator, MoonPropagator)
     np.testing.assert_array_equal(
@@ -34,7 +34,7 @@ def test_sun():
         sun = get_body('Sun')
         sun_orb = sun.propagate(Date(2006, 4, 2))
 
-    assert str(sun_orb.form) == 'Cartesian'
+    assert str(sun_orb.form) == 'cartesian'
     assert str(sun_orb.frame) == 'MOD'
     assert isinstance(sun_orb.propagator, SunPropagator)
 

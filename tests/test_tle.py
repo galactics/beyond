@@ -45,7 +45,7 @@ def test_convert_to_orbit():
     orb = tle.orbit()
 
     assert repr(orb.frame) == "<Frame 'TEME'>"
-    assert repr(orb.form) == "<Form 'TLE'>"
+    assert repr(orb.form) == "<Form 'tle'>"
     assert repr(orb.date) == "<Date '2008-09-20T12:25:40.104192 UTC'>"
     assert orb['i'] == np.deg2rad(51.6416)
     assert orb['Ω'] == np.deg2rad(247.4627)

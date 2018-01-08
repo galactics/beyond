@@ -9,7 +9,7 @@ from beyond.constants import Earth
 from beyond.dates.date import Date
 from beyond.orbits.tle import Tle
 from beyond.orbits.orbit import Orbit
-from beyond.orbits.forms import FormTransform, Form
+from beyond.orbits.forms import Form, CART, KEPL_M, KEPL, TLE
 
 ref_coord = [
     7192631.11295, 0.00218439, np.deg2rad(98.50639978),
@@ -19,7 +19,7 @@ ref_cart = np.array([
     -1.77079285e+06, 3.04066799e+06, -6.29108469e+06,
     5.05386500e+03, -4.20539671e+03, -3.45695733e+03
 ])
-ref_form = FormTransform.KEPL_M
+ref_form = KEPL_M
 ref_frame = "EME2000"
 ref_propagator = 'Sgp4'
 
@@ -43,11 +43,10 @@ def test_coord_init(ref_date, ref_orbit):
     assert ref_orbit['ω'] == 1.1789060198505055
     assert ref_orbit['M'] == 3.043341444376126
 
-    unknown_form = Form("Dummy", None, None)
-
     with raises(ValueError) as e:
-        Orbit(ref_date, ref_coord, unknown_form, ref_frame, ref_propagator)
-    assert str(e.value) == "Unknown form 'Dummy'"
+        Orbit(ref_date, ref_coord, "Dummy", ref_frame, ref_propagator)
+
+    assert str(e.value) == "Unknown Form : 'Dummy'"
 
     with raises(ValueError) as e:
         Orbit(ref_date, ref_coord[:-1], ref_form, ref_frame, ref_propagator)
@@ -55,33 +54,33 @@ def test_coord_init(ref_date, ref_orbit):
 
 
 def test_init_cart(ref_date):
-    a = Orbit(ref_date, ref_cart, FormTransform.CART.name, ref_frame, ref_propagator)
-    assert a.form == FormTransform.CART
+    a = Orbit(ref_date, ref_cart, CART.name, ref_frame, ref_propagator)
+    assert a.form == CART
 
 
 def test_coord_unit_transform(ref_orbit):
 
-    kep = FormTransform._keplerian_mean_to_keplerian(ref_orbit, Earth)
+    kep = Form._keplerian_mean_to_keplerian(ref_orbit, Earth)
     assert np.allclose(ref_orbit[:5], kep[:5])
 
-    new = FormTransform._keplerian_to_keplerian_mean(kep, Earth)
+    new = Form._keplerian_to_keplerian_mean(kep, Earth)
     assert np.allclose(ref_orbit, new)
 
-    tle = FormTransform._keplerian_mean_to_tle(ref_orbit, Earth)
-    tle_dict = dict(zip(FormTransform.TLE.param_names, tle))
+    tle = Form._keplerian_mean_to_tle(ref_orbit, Earth)
+    tle_dict = dict(zip(TLE.param_names, tle))
     assert tle_dict['i'] == ref_orbit['i']
     assert tle_dict['Ω'] == ref_orbit['Ω']
     assert tle_dict['e'] == ref_orbit['e']
     assert tle_dict['ω'] == ref_orbit['ω']
     assert tle_dict['M'] == ref_orbit['M']
 
-    new = FormTransform._tle_to_keplerian_mean(tle, Earth)
+    new = Form._tle_to_keplerian_mean(tle, Earth)
     assert np.allclose(new, ref_orbit)
 
-    cart = FormTransform._keplerian_to_cartesian(kep, Earth)
+    cart = Form._keplerian_to_cartesian(kep, Earth)
     assert np.allclose(cart, ref_cart)
 
-    new = FormTransform._cartesian_to_keplerian(cart, Earth)
+    new = Form._cartesian_to_keplerian(cart, Earth)
     assert np.allclose(new, kep)
 
 
@@ -93,7 +92,7 @@ def test_coord_global_transform(ref_orbit):
     ref_orbit.form = 'keplerian_mean'
     assert all(ref_orbit == backup)
 
-    ref_orbit.form = FormTransform.CART
+    ref_orbit.form = CART
     assert np.allclose(ref_orbit, ref_cart)
 
 
@@ -115,14 +114,14 @@ def test_coord_attributes_access(ref_orbit):
     with raises(KeyError):
         ref_orbit["ν"]
 
-    ref_orbit.form = FormTransform.KEPL
+    ref_orbit.form = KEPL
     assert ref_orbit.ν == ref_orbit[5]
 
 
 def test_orbit_change_form(ref_orbit):
 
-    ref_orbit.form = FormTransform.CART.name
-    assert ref_orbit.form == FormTransform.CART
+    ref_orbit.form = CART.name
+    assert ref_orbit.form == CART
     assert np.allclose(ref_orbit, ref_cart)
 
 

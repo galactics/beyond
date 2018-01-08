@@ -9,61 +9,12 @@ from numpy import cos, arccos, sin, arcsin, arctan2, sqrt, arccosh, sinh
 
 import numpy as np
 
-from ..utils.node import Node
+from ..utils.node import Node2
 
 
-class Form(Node):
+class Form(Node2):
     """Base class for orbital form definition
     """
-
-    _case = False
-
-    def __init__(self, name, param_names, subcoord=None):
-        super().__init__(name, subcoord)
-        self.param_names = param_names
-
-    def __str__(self):  # pragma: no cover
-        return self.name
-
-
-class FormTransform:
-    """Class handling the conversions between the differents forms availables
-    """
-
-    TLE = Form("TLE", ["i", "Ω", "e", "ω", "M", "n"])
-    """TLE form"""
-
-    KEPL_C = Form("Keplerian_Circular", ["a", "ex", "ey", "i", "Ω", "λ"])
-    """Keplerian near-circular form"""
-
-    KEPL_M = Form("Keplerian_Mean", ["a", "e", "i", "Ω", "ω", "M"], [TLE, KEPL_C])
-    """Keplerian with Mean anomaly"""
-
-    KEPL = Form("Keplerian", ["a", "e", "i", "Ω", "ω", "ν"], [KEPL_M])
-    """The keplerian form is
-
-        * a : semi-major axis
-        * e : excentricity
-        * i : inclination
-        * Ω : right-ascencion of ascending node
-        * ω : Arguement of perigee
-        * ν : True anomaly
-    """
-
-    SPHE = Form("Spherical", ["r", "θ", "φ", "r_dot", "θ_dot", "φ_dot"])
-    """Spherical form
-        * r : radial distance
-        * θ : azimuth
-        * φ : elevation
-        * r_dot : first derivative of radial distance
-        * θ_dot : first derivative of azimuth
-        * φ_dot : first derivative of elevation
-    """
-
-    CART = Form("Cartesian", ["x", "y", "z", "vx", "vy", "vz"], [KEPL, SPHE])
-    """Cartesian form"""
-
-    _tree = CART
 
     alt = {
         'theta': 'θ',
@@ -76,13 +27,18 @@ class FormTransform:
         'lambda': 'λ',
     }
 
-    def __init__(self, orbit):
-        self.orbit = orbit
+    def __init__(self, name, param_names):
+        super().__init__(name)
+        self.param_names = param_names
 
-    def transform(self, new_form):
+    def __str__(self):  # pragma: no cover
+        return self.name
+
+    def __call__(self, orbit, new_form):
         """Gives the result of the transformation without inplace modifications
 
         Args:
+            orbit (Orbit):
             new_form (str or Form):
         Returns:
             Coord
@@ -91,12 +47,11 @@ class FormTransform:
         if isinstance(new_form, Form):
             new_form = new_form.name
 
-        coord = self.orbit.copy()
-        if new_form != self.orbit.form.name:
-            for a, b in self._tree.steps(self.orbit.form.name, new_form):
-                a = a.name.lower()
-                b = b.name.lower()
-                coord = getattr(self, "_{}_to_{}".format(a, b))(coord, self.orbit.frame.center)
+        coord = orbit.copy()
+        if new_form != orbit.form.name:
+            for a, b in self.steps(new_form):
+
+                coord = getattr(self, "_{}_to_{}".format(a.name.lower(), b.name.lower()))(coord, orbit.frame.center)
 
         return coord
 
@@ -317,3 +272,58 @@ class FormTransform:
         vz = r_dot * z / r + r * phi_dot * cos(phi)
 
         return np.array([x, y, z, vx, vy, vz], dtype=float)
+
+
+TLE = Form("tle", ["i", "Ω", "e", "ω", "M", "n"])
+"""TLE form"""
+
+KEPL_C = Form("keplerian_circular", ["a", "ex", "ey", "i", "Ω", "λ"])
+"""Keplerian near-circular form"""
+
+KEPL_M = Form("keplerian_mean", ["a", "e", "i", "Ω", "ω", "M"])
+"""Keplerian with Mean anomaly"""
+
+KEPL = Form("keplerian", ["a", "e", "i", "Ω", "ω", "ν"])
+"""The keplerian form is
+
+    * a : semi-major axis
+    * e : excentricity
+    * i : inclination
+    * Ω : right-ascencion of ascending node
+    * ω : Arguement of perigee
+    * ν : True anomaly
+"""
+
+SPHE = Form("spherical", ["r", "θ", "φ", "r_dot", "θ_dot", "φ_dot"])
+"""Spherical form
+    * r : radial distance
+    * θ : azimuth
+    * φ : elevation
+    * r_dot : first derivative of radial distance
+    * θ_dot : first derivative of azimuth
+    * φ_dot : first derivative of elevation
+"""
+
+CART = Form("cartesian", ["x", "y", "z", "vx", "vy", "vz"])
+"""Cartesian form"""
+
+
+SPHE + CART + KEPL + KEPL_M + TLE
+KEPL_M + KEPL_C
+
+
+_cache = {
+    "tle": TLE,
+    'keplerian_circular': KEPL_C,
+    'keplerian_mean': KEPL_M,
+    'keplerian': KEPL,
+    'spherical': SPHE,
+    'cartesian': CART
+}
+
+
+def get_form(form):  # pragma: no cover
+    if form.lower() in _cache:
+        return _cache[form.lower()]
+    else:
+        raise ValueError("Unknown Form : '%s'" % form)

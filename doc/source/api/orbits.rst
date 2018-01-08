@@ -9,11 +9,11 @@ Forms
 
 Available forms are
 
-.. autoattribute:: beyond.orbits.forms.FormTransform.CART
+.. autoattribute:: beyond.orbits.forms.CART
 
     Cartesian form (x, y, z, vx, vy, vz)
 
-.. autoattribute:: beyond.orbits.forms.FormTransform.KEPL
+.. autoattribute:: beyond.orbits.forms.KEPL
 
     Keplerian form
 
@@ -26,7 +26,7 @@ Available forms are
 
     see `wikipedia <https://en.wikipedia.org/wiki/Orbital_elements>`__ for details
 
-.. autoattribute:: beyond.orbits.forms.FormTransform.SPHE
+.. autoattribute:: beyond.orbits.forms.SPHE
 
     Spherical form
 
@@ -37,7 +37,7 @@ Available forms are
     * θ_dot : first derivative of azimuth / longitude
     * φ_dot : first derivative of elevation / latitude
 
-.. autoattribute:: beyond.orbits.forms.FormTransform.TLE
+.. autoattribute:: beyond.orbits.forms.TLE
 
     TLE special form
 
@@ -50,11 +50,11 @@ Available forms are
 
     see :py:class:`~beyond.orbits.tle.Tle` for details
 
-.. autoattribute:: beyond.orbits.forms.FormTransform.KEPL_M
+.. autoattribute:: beyond.orbits.forms.KEPL_M
 
     Same as Keplerian, but replaces True anomaly with `Mean anomaly <https://en.wikipedia.org/wiki/Mean_anomaly>`__
 
-.. autoattribute:: beyond.orbits.forms.FormTransform.KEPL_C
+.. autoattribute:: beyond.orbits.forms.KEPL_C
 
     Special case for near-circular orbits
 

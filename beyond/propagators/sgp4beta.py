@@ -10,7 +10,7 @@ from numpy import cos, sqrt, sin, arctan2
 import numpy as np
 
 from ..dates.date import Date
-from ..orbits.forms import FormTransform
+from ..orbits.forms import TLE
 
 __all__ = ['Sgp4Beta']
 
@@ -70,7 +70,7 @@ class Sgp4Beta:
     @orbit.setter
     def orbit(self, orbit):
 
-        if orbit.form != FormTransform.TLE:
+        if orbit.form != TLE:
             raise TypeError("Not TLE")
 
         self.gravity = self.MODEL
