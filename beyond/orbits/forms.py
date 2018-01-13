@@ -9,10 +9,10 @@ from numpy import cos, arccos, sin, arcsin, arctan2, sqrt, arccosh, sinh
 
 import numpy as np
 
-from ..utils.node import Node2
+from ..utils.node import Node
 
 
-class Form(Node2):
+class Form(Node):
     """Base class for orbital form definition
     """
 

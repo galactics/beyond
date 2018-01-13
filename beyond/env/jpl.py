@@ -33,7 +33,7 @@ import numpy as np
 
 from ..config import config
 from ..orbits import Orbit
-from ..utils.node import Node2
+from ..utils.node import Node
 from ..propagators.base import AnalyticalPropagator
 
 from jplephem.spk import SPK
@@ -42,7 +42,7 @@ from jplephem.names import target_names
 __all__ = ['get_body', 'list_bodies']
 
 
-class Target(Node2):
+class Target(Node):
     """Class representing the relations between the differents segments
     of .bsp files
 

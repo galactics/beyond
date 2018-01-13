@@ -4,7 +4,7 @@
 """This module define the Frames available for computation and their relations
 to each other.
 
-The relations may be circular, thanks to the use of the Node2 class.
+The relations may be circular, thanks to the use of the Node class.
 
 .. code-block:: text
 
@@ -46,7 +46,7 @@ import numpy as np
 
 from ..constants import Earth
 from ..utils.matrix import rot2, rot3
-from ..utils.node import Node2
+from ..utils.node import Node
 from . import iau1980, iau2010
 from .local import to_qsw, to_tnw
 
@@ -92,8 +92,8 @@ def get_frame(frame):
         raise ValueError("Unknown Frame : '{}'".format(frame))
 
 
-class _MetaFrame(type, Node2):
-    """This MetaClass is here to join the behaviours of ``type`` and ``Node2``
+class _MetaFrame(type, Node):
+    """This MetaClass is here to join the behaviours of ``type`` and ``Node``
     """
 
     def __init__(cls, name, bases, dct):

@@ -8,144 +8,8 @@ hierarchy or in a graph.
 from collections import OrderedDict
 
 
-def _merge(x, y):
-    """Remove commons ancestors and concatenate two passes
-
-    Args:
-        x (list)
-        y (list)
-    Returns:
-        list
-    """
-
-    shortest, longuest = sorted((x, y), key=len)
-    for _ in range(-len(shortest), 0):
-        if shortest[-1] == longuest[-1]:
-            try:
-                if longuest[-2] == shortest[-2]:
-                    longuest.pop(-1)
-                    shortest.pop(-1)
-                else:
-                    longuest.pop(-1)
-            except IndexError:
-                shortest.pop()
-
-    return x + list(reversed(y))
-
-
-class Node:
-    """Class representing a child in a tree
-    """
-
-    _case = True
-    """If True, the search trought the tree is case sensitive"""
-
-    def __init__(self, name, subtree=None):
-
-        if not isinstance(subtree, (list, type(None))):
-            raise TypeError("subtree should be list or None, %s given" % type(subtree))
-
-        self.name = name
-        self.subtree = subtree
-
-    def __repr__(self):  # pragma: no cover
-        return "<{} '{}'>".format(self.__class__.__name__, self.name)
-
-    def __getitem__(self, item):
-        return self.walk(item)[0]
-
-    def __contains__(self, item):
-        """Special method for membership test (e.g. ``if 'B' in node``).
-        """
-        if self.name == item or (not self._case and self.name.lower() == item.lower()):
-            return True
-        try:
-            self._walk(item)
-        except ValueError:
-            return False
-        else:
-            return True
-
-    def _walk(self, goal, subtree=None):
-        """
-        Args:
-            goal (str)
-            subtree (list optional)
-        Returns:
-            list
-        """
-
-        if subtree is None:
-            subtree = self.subtree
-
-        for node in subtree:
-            if node.name == goal or (not self._case and node.name.lower() == goal.lower()):
-                return [node]
-            elif node.subtree:
-                try:
-                    res = self._walk(goal, node.subtree)
-                except ValueError:
-                    # print("Not in %s" % node.name)
-                    continue
-                else:
-                    break
-        else:
-            raise ValueError("'{}' not found".format(goal))
-
-        return res + [node]
-
-    def walk(self, goal):
-        """Get the shortest path between ``self`` and ``goal``
-
-        Args:
-            goal (str): Name of the node you want to reach
-        Return:
-            list: List of nodes
-        """
-        # This method is only here to insert the top node in the loop
-        name = self.name
-        if not self._case:
-            goal = goal.lower()
-            name = self.name.lower()
-
-        return self._walk(goal) + [self] if goal != name else [self]
-
-    def path(self, start, stop):
-        """Get the sortest path to go from one node to an other
-
-        Args:
-            start (str): Name of the source node
-            stop (str): Name of node you want to reach
-        Returns:
-            list: List of nodes names
-        """
-
-        start = start.name if isinstance(start, self.__class__) else start
-        stop = stop.name if isinstance(stop, self.__class__) else stop
-
-        x = self.walk(start)
-        y = self.walk(stop)
-
-        final = _merge(x, y)
-
-        return final
-
-    def steps(self, start, stop):
-        """Same as :py:meth:`path` but gives a list of couple
-
-        Args:
-            start (str): Name of the source node
-            stop (str): Name of node you want to reach
-        Returns:
-            list: List of nodes names
-        """
-        path = self.path(start, stop)
-        for i in range(len(path) - 1):
-            yield path[i], path[i + 1]
-
-
 class Route:
-    """Class used by :py:class:`Node2` to describe where to find
+    """Class used by :py:class:`Node` to describe where to find
     another node.
     """
 
@@ -157,17 +21,17 @@ class Route:
         return "<d={0}, s={1}>".format(self.direction, self.steps)
 
 
-class Node2:
+class Node:
     """Class representing a node in a graph, relations may be circular.
 
     .. code-block:: python
 
-        A = Node2('A')
-        B = Node2('B')
-        C = Node2('C')
-        D = Node2('D')
-        E = Node2('E')
-        F = Node2('F')
+        A = Node('A')
+        B = Node('B')
+        C = Node('C')
+        D = Node('D')
+        E = Node('E')
+        F = Node('F')
 
         A + B + C + D + E + F + A
         F + C
@@ -203,7 +67,7 @@ class Node2:
         """
 
         self.routes = {}
-        """Route mapping. Where direction to follow in order to reach a
+        """Route mapping. What direction to follow in order to reach a
         particular target
         """
 
@@ -257,7 +121,7 @@ class Node2:
         Args:
             goal (str): Name of the targeted node
         Return:
-            list of Node2
+            list of Node
         """
         if goal == self.name:
             return [self]
@@ -280,7 +144,7 @@ class Node2:
         Args:
             goal (str): Name of the targeted node
         Return:
-            list of tuple of Node2
+            list of tuple of Node
         """
 
         path = self.path(goal)

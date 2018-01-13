@@ -7,12 +7,12 @@ from datetime import datetime, timedelta
 from numpy import sin, radians
 
 from .eop import get_eop
-from ..utils.node import Node2
+from ..utils.node import Node
 
 __all__ = ['Date', 'timedelta']
 
 
-class Timescale(Node2):
+class Timescale(Node):
     """Definition of a time scale and its interactions with others
     """
 
