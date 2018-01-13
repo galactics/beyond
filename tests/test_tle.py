@@ -38,6 +38,20 @@ def test_read():
         ref2 = ref[:-1] + "8"
         Tle(ref2)
 
+    orbs = list(Tle.from_string("# comment\n" + ref))
+    assert len(orbs) == 1
+    assert (orbs[0].orbit() == tle.orbit()).all()
+
+    tle3 = Tle("Name\n" + "\n".join(ref.splitlines()[1:]))
+    assert (tle3.orbit() == tle.orbit()).all()
+
+    with raises(ValueError) as eee:
+        l = ref.splitlines()
+        l[1] = "3" + l[1][1:]
+        Tle("\n".join(l))
+
+    assert str(eee.value) == "Line number check failed"
+
 
 def test_convert_to_orbit():
 
@@ -61,6 +75,9 @@ def test_to_and_from():
     orb = tle.orbit()
 
     tle2 = Tle.from_orbit(orb, name=tle.name, norad_id=tle.norad_id, cospar_id=tle.cospar_id)
+    tle3 = Tle.from_orbit(orb, name=tle.name, norad_id=tle.norad_id)
+
+    assert tle3.cospar_id == "2000-001A"
 
     tle, tle2 = tle.text.splitlines(), tle2.text.splitlines()
     for i in range(2):

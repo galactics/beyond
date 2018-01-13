@@ -157,7 +157,7 @@ class Tle:
             ValueError
         """
 
-        if not text[0].lstrip().startswith('1 ') and not text[1].lstrip().startswith('2 '):
+        if not text[0].lstrip().startswith('1 ') or not text[1].lstrip().startswith('2 '):
             raise ValueError("Line number check failed")
 
         for line in text:
@@ -216,6 +216,8 @@ class Tle:
         if cospar_id is not None:
             y, _, i = cospar_id.partition('-')
             cospar_id = y[2:] + i
+        else:
+            cospar_id = "00001A"
 
         orbit = orbit.copy(form='TLE', frame='TEME')
 
