@@ -7,18 +7,13 @@ from datetime import datetime, timedelta
 from numpy import sin, radians
 
 from .eop import get_eop
-from ..utils.node import Node
+from ..utils.node import Node2
 
 __all__ = ['Date', 'timedelta']
 
 
-class _Scale(Node):
+class Timescale(Node2):
     """Definition of a time scale and its interactions with others
-    """
-
-    HEAD = None
-    """Define the top Node of the tree. This one will be used as reference to search for the path
-    linking two Nodes together
     """
 
     def __repr__(self):  # pragma: no cover
@@ -26,10 +21,6 @@ class _Scale(Node):
 
     def __str__(self):
         return self.name
-
-    @classmethod
-    def get(cls, name):
-        return cls.HEAD[name]
 
     def _scale_ut1_minus_utc(self, mjd):
         """Definition of Universal Time relatively to Coordinated Universal Time
@@ -71,7 +62,7 @@ class _Scale(Node):
         """
 
         delta = 0
-        for one, two in self.HEAD.steps(self.name, new_scale):
+        for one, two in self.steps(new_scale):
             one = one.name.lower()
             two = two.name.lower()
             # find the operation
@@ -88,13 +79,32 @@ class _Scale(Node):
         return delta
 
 
-UT1 = _Scale('UT1')  # Universal Time
-GPS = _Scale('GPS')  # GPS Time
-TDB = _Scale('TDB')  # Barycentric Dynamical Time
-UTC = _Scale('UTC', [UT1])  # Coordinated Universal Time
-TAI = _Scale('TAI', [UTC, GPS])  # International Atomic Time
-TT = _Scale('TT', [TAI, TDB])  # Terrestrial Time
-_Scale.HEAD = TT
+UT1 = Timescale('UT1')  # Universal Time
+GPS = Timescale('GPS')  # GPS Time
+TDB = Timescale('TDB')  # Barycentric Dynamical Time
+UTC = Timescale('UTC')  # Coordinated Universal Time
+TAI = Timescale('TAI')  # International Atomic Time
+TT = Timescale('TT')    # Terrestrial Time
+
+GPS + TAI + UTC + UT1
+TDB + TT + TAI
+
+
+_cache = {
+    "UT1": UT1,
+    "GPS": GPS,
+    "TDB": TDB,
+    "UTC": UTC,
+    "TAI": TAI,
+    "TT": TT,
+}
+
+
+def get_scale(name):
+    if name in _cache.keys():
+        return _cache[name]
+    else:
+        raise ValueError("Unknown Scale : '%s'" % name)
 
 
 class Date:
@@ -146,7 +156,7 @@ class Date:
     def __init__(self, *args, scale=DEFAULT_SCALE, **kwargs):
 
         if type(scale) is str:
-            scale = _Scale.get(scale.upper())
+            scale = get_scale(scale.upper())
 
         if len(args) == 1:
             arg = args[0]
