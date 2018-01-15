@@ -204,7 +204,8 @@ class Date:
         super().__setattr__('scale', scale)
         super().__setattr__('_cache', {})
 
-    def __getstate__(self):
+    def __getstate__(self):  # pragma: no cover
+        """Used for pickling"""
         return {
             'd': self._d,
             's': self._s,
@@ -212,7 +213,8 @@ class Date:
             'scale': self.scale,
         }
 
-    def __setstate__(self, state):
+    def __setstate__(self, state):  # pragma: no cover
+        """Used for unpickling"""
         super().__setattr__('_d', state['d'])
         super().__setattr__('_s', state['s'])
         super().__setattr__('_offset', state['offset'])
@@ -390,15 +392,6 @@ class Date:
             float
         """
         return self.d + self.s / 86400.
-
-    @property
-    def _to_ref(self):
-        """Convert to the reference time-scale
-
-        Return:
-            Date:
-        """
-        return self.change_scale(self.REF_SCALE)
 
     @classmethod
     def range(cls, start, stop, step, inclusive=False):
