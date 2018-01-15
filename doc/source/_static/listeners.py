@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
-from datetime import timedelta
-
-from beyond.utils import Date
+from beyond.dates import Date, timedelta
 from beyond.orbits import Tle
 from beyond.frames import create_station
 from beyond.orbits.listeners import stations_listeners, NodeListener, ApsideListener, LightListener
+from beyond.config import config
+
+# Bypass the need of Earth Orientation Parameters data
+config.update({"eop": {"missing_policy": "pass"}})
 
 tle = Tle("""ISS (ZARYA)
 1 25544U 98067A   17153.89608442  .00001425  00000-0  28940-4 0  9997
@@ -25,4 +27,5 @@ stop = timedelta(minutes=100)
 step = timedelta(seconds=180)
 
 for orb in tle.iter(start=start, stop=stop, step=step, listeners=listeners):
-    print("{orb.date:%Y-%m-%d %H:%M:%S} {orb.info}".format(orb=orb))
+    event = orb.event if orb.event is not None else ""
+    print("{orb.date:%Y-%m-%d %H:%M:%S} {event}".format(orb=orb, event=event))

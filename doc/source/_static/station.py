@@ -2,11 +2,14 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import timedelta
 
-from beyond.utils import Date
+from beyond.dates import Date, timedelta
 from beyond.orbits import Tle
 from beyond.frames import create_station
+from beyond.config import config
+
+# Bypass the need of Earth Orientation Parameters data
+config.update({"eop": {"missing_policy": "pass"}})
 
 tle = Tle("""ISS (ZARYA)
 1 25544U 98067A   16086.49419020  .00003976  00000-0  66962-4 0  9998
@@ -31,11 +34,11 @@ for orb in station.visibility(tle, start=Date.now(), stop=timedelta(hours=24), s
     elevs.append(90 - elev)
 
     r = orb.r / 1000.
-    print("{orb.info:7} {orb.date:%H:%M:%S} {azim:7.2f} {elev:7.2f} {r:10.2f} {orb.r_dot:10.2f}".format(
-        orb=orb, r=r, azim=azim, elev=elev
+    print("{event:7} {orb.date:%H:%M:%S} {azim:7.2f} {elev:7.2f} {r:10.2f} {orb.r_dot:10.2f}".format(
+        orb=orb, r=r, azim=azim, elev=elev, event=orb.event.info if orb.event is not None else ""
     ))
 
-    if orb.info.startswith("LOS"):
+    if orb.event and orb.event.info.startswith("LOS"):
         # We stop at the end of the first pass
         print()
         break

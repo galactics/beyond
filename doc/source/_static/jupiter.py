@@ -5,9 +5,23 @@ in order to supply the data needed.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from beyond.utils import Date
+from beyond.dates import Date
 from beyond.env.jpl import get_body
 from beyond.frames import create_station
+from beyond.config import config
+
+# Bypass the need of Earth Orientation Parameters data
+# and load the ".bsp" file
+config.update({
+    "eop": {
+        "missing_policy": "pass"
+    },
+    "env": {
+        "jpl": [
+            "/path/to/jup310.bsp"
+        ]
+    }
+})
 
 date = Date.now()
 

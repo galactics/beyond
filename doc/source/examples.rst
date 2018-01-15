@@ -1,8 +1,6 @@
 Examples of utilisation
 =======================
 
-.. warning:: Don't forget to set the :ref:`configuration` straight before anything.
-
 Ground track
 ------------
 
