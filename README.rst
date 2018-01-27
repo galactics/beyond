@@ -33,7 +33,7 @@ Installation
 
 Beyond requires Python 3.5+, numpy and `sgp4 <https://github.com/brandon-rhodes/python-sgp4>`__. To install it use pip
 
-.. code-block:: python
+.. code-block:: shell
 
     pip install beyond
 
