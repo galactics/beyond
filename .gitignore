@@ -5,6 +5,7 @@
 *.pyc
 
 .cache/
+.pytest_cache/
 .tox/
 
 __pycache__/

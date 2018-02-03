@@ -6,6 +6,8 @@
 
 import numpy as np
 
+from ..constants import c
+from ..dates import timedelta
 from .forms import get_form, Form
 from .ephem import Ephem
 from ..frames.frame import get_frame, orbit2frame
@@ -224,6 +226,21 @@ class Orbit(np.ndarray):
             new_propagator = get_propagator(new_propagator)()
 
         self._propagator = new_propagator
+
+    @property
+    def delay(self):
+        """:py:class:`~datetime.timedelta`: Light propagation delay from the point
+        in space described by ``self`` to the center of the reference frame
+        """
+        return timedelta(seconds=self.copy(form='spherical').r / c)
+
+    @property
+    def delayed_date(self):
+        """:py:class:`~beyond.dates.date.Date`: Date taking into account the
+        light propagation delay from the point in space described by ``self``
+        to the center of the reference frame
+        """
+        return self.date + self.delay
 
     def propagate(self, date):
         """Propagate the orbit to a new date

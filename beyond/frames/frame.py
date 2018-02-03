@@ -274,7 +274,7 @@ class TopocentricFrame(Frame):
     """
 
     @classmethod
-    def visibility(cls, orb, start=None, stop=None, step=None, events=False):
+    def visibility(cls, orb, start=None, stop=None, step=None, events=False, delay=False):
         """Visibility from a topocentric frame
 
         Args:
@@ -286,6 +286,10 @@ class TopocentricFrame(Frame):
                 AOS, LOS and MAX elevation for each pass on this station.
                 If 'events' is a Listener or an iterable of Listeners, they
                 will be added to the computation
+            delay (bool): If True, the yielded orbits will be computed in a way
+                to have their ``delayed_date`` attribute match the steps, instead of
+                the normal ``date`` attribute. This allow to compute fixed steps
+                from a station standpoint.
 
         Yield:
             Orbit: In-visibility point of the orbit. This Orbit is already
@@ -318,6 +322,14 @@ class TopocentricFrame(Frame):
             # Not very clean !
             if point.phi < 0 and not isinstance(point.event, events_classes):
                 continue
+
+            if delay and not point.event:
+                # Compute the delay and retro-propagate
+                date = point.date
+                while point.delayed_date != date:
+                    point = point.propagate(date - point.delay)
+                    point.frame = cls
+                    point.form = "spherical"
 
             yield point
 
