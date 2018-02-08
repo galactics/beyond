@@ -6,7 +6,7 @@ import numpy as np
 from datetime import timedelta
 
 from .listeners import Speaker
-from ..frames.frame import orbit2frame
+from ..frames.frames import orbit2frame
 
 
 class Ephem(Speaker):
@@ -264,6 +264,6 @@ class Ephem(Speaker):
     def as_frame(self, name, **kwargs):  # pragma: no cover
         """Register the Ephem object as a frame
 
-        see :py:func:`beyond.frames.frame.orbit2frame` for details of the arguments
+        see :py:func:`beyond.frames.frames.orbit2frame` for details of the arguments
         """
         return orbit2frame(name, self, **kwargs)

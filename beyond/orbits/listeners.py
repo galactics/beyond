@@ -332,7 +332,7 @@ class ZeroDopplerListener(Listener):
     def __init__(self, frame, sight=False):
         """
         Args:
-            frame (~beyond.frames.frame.Frame): Frame from which the computation is made
+            frame (~beyond.frames.frames.Frame): Frame from which the computation is made
             sight (bool): If the frame used is a station, it could be interesting to only compute
                 the Zero Doppler when the object is in sight
         """

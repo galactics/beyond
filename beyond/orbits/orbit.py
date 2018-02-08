@@ -10,7 +10,7 @@ from ..constants import c
 from ..dates import timedelta
 from .forms import get_form, Form
 from .ephem import Ephem
-from ..frames.frame import get_frame, orbit2frame
+from ..frames.frames import get_frame, orbit2frame
 from ..propagators import get_propagator
 
 
@@ -180,7 +180,7 @@ class Orbit(np.ndarray):
 
     @property
     def frame(self):
-        """:py:class:`~beyond.frames.frame.Frame`: Reference frame of the orbit
+        """:py:class:`~beyond.frames.frames.Frame`: Reference frame of the orbit
 
         if set as a string (e.g. ``"EME2000"``) will be automatically converted to the corresponding
         Frame class.
@@ -293,6 +293,6 @@ class Orbit(np.ndarray):
     def as_frame(self, name, **kwargs):  # pragma: no cover
         """Register the orbit as frame.
 
-        see :py:func:`beyond.frames.frame.orbit2frame` for details of the arguments
+        see :py:func:`beyond.frames.frames.orbit2frame` for details of the arguments
         """
         return orbit2frame(name, self, **kwargs)
