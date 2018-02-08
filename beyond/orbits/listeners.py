@@ -3,8 +3,11 @@ import numpy as np
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 
-__all__ = ['Speaker', 'Listener', 'stations_listeners', 'StationSignalListener',
-    'StationMaxListener', 'LightListener', 'ApsideListener', 'NodeListener', 'ZeroDopplerEvent']
+__all__ = [
+    'Speaker', 'Listener', 'stations_listeners', 'StationSignalListener',
+    'StationMaxListener', 'LightListener', 'ApsideListener', 'NodeListener',
+    'ZeroDopplerEvent'
+]
 
 
 class Speaker(metaclass=ABCMeta):

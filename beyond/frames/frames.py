@@ -45,7 +45,7 @@ import warnings
 import numpy as np
 
 from ..constants import Earth
-from ..utils.matrix import rot2, rot3
+from ..utils.matrix import rot3
 from ..utils.node import Node
 from . import iau1980, iau2010
 from .local import to_qsw, to_tnw

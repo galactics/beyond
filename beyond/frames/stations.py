@@ -146,4 +146,3 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
     cls + parent_frame
 
     return cls
-
