@@ -3,6 +3,21 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [Unreleased]
+
+### Added
+
+- TLE tests and coverages
+- Possibility to compute passes with light propagation delay taken into account
+- CCSDS OEM handle multiple Ephems
+
+### Changed
+
+- The CCSDS API now mimicks the json (load, loads, dump, dumps)
+- Frames translation now directly with vectors
+- Node harmonisation, only one implementation used
+- Stations handling has a proper module
+
 ## [v0.4] - 2017-12-10
 
 ### Added

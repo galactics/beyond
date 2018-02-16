@@ -31,7 +31,8 @@ are under the GPLv3.
 Installation
 ------------
 
-Beyond requires Python 3.5+, numpy and `sgp4 <https://github.com/brandon-rhodes/python-sgp4>`__. To install it use pip
+Beyond requires Python 3.5+, numpy and `sgp4 <https://github.com/brandon-rhodes/python-sgp4>`__.
+To install the library and its dependencies use pip
 
 .. code-block:: shell
 
@@ -40,16 +41,19 @@ Beyond requires Python 3.5+, numpy and `sgp4 <https://github.com/brandon-rhodes/
 Documentation
 -------------
 
-The documentation of the library can be found `here <http://beyond.readthedocs.io/en/latest/>`__.
+  * `Last release <http://beyond.readthedocs.io/en/stable/>`__ (stable)
+  * `Dev <http://beyond.readthedocs.io/en/latest/>`__ (latest)
 
 Usage
 -----
 
+This library is used as basis for the `Space-Command <https://github.com/galactics/space-command>`__ utility.
+
 Commons usages for this library are:
 
-   * `Predicting of satellite visibility <http://beyond.readthedocs.io/en/latest//examples.html#station-pointings>`__
-   * `Computing satellite ground track <http://beyond.readthedocs.io/en/latest//examples.html#ground-track>`__
-   * `Computing planets visibility <http://beyond.readthedocs.io/en/latest//examples.html#jupiter-and-its-moons>`__
+  * `Predicting of satellite visibility <http://beyond.readthedocs.io/en/stable//examples.html#station-pointings>`__
+  * `Computing satellite ground track <http://beyond.readthedocs.io/en/stable//examples.html#ground-track>`__
+  * `Computing planets visibility <http://beyond.readthedocs.io/en/stable//examples.html#jupiter-and-its-moons>`__
 
 References
 ----------
