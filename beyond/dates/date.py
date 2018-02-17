@@ -340,6 +340,11 @@ class Date:
         """
         return cls(datetime.utcnow()).change_scale(scale)
 
+    def strftime(self, fmt):  # pragma: no cover
+        """Format the date following the given format
+        """
+        return self.datetime.strftime(fmt)
+
     def change_scale(self, new_scale):
         """
         Args:
