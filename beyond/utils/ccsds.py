@@ -104,6 +104,7 @@ def _read_oem(string):
                 'method': None,
                 'order': None,
                 'frame': None,
+                'center': None,
                 'scale': None
             }
             ephem_dicts.append(ephem)
@@ -121,6 +122,9 @@ def _read_oem(string):
         elif line.startswith("REF_FRAME"):
             ephem['frame'] = line.partition('=')[-1].strip()
 
+        elif line.startswith("CENTER_NAME"):
+            ephem['center'] = line.partition('=')[-1].strip()
+
         elif line.startswith('INTERPOLATION_DEGREE'):
             ephem['order'] = int(line.partition("=")[-1].strip()) + 1
 
@@ -128,10 +132,14 @@ def _read_oem(string):
             ephem['method'] = line.partition("=")[-1].strip().lower()
 
         elif line.startswith('META_STOP'):
-            if None in (ephem['frame'], ephem['scale']):
+            if None in (ephem['frame'], ephem['center'], ephem['scale']):
                 raise ValueError("Missing field")
 
             data_block = True
+
+            if ephem['center'].lower() != "earth":
+                ephem['frame'] = ephem['center'].title().replace(" ", "")
+
             continue
 
         if not data_block:
@@ -229,12 +237,13 @@ def _dump_meta(data, **kwargs):
     meta = """META_START
 OBJECT_NAME          = {name}
 OBJECT_ID            = {cospar_id}
-CENTER_NAME          = {orb.frame.center.name}
-REF_FRAME            = {orb.frame}
+CENTER_NAME          = {center}
+REF_FRAME            = {frame}
 """     .format(
         name=kwargs.get("name", getattr(data, "name", "N/A")),
         cospar_id=kwargs.get("cospar_id", getattr(data, "cospar_id", "N/A")),
-        orb=data,
+        center=data.frame.center.name.upper(),
+        frame=data.frame.orientation.upper()
     )
 
     return meta

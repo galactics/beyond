@@ -14,7 +14,7 @@ ORIGINATOR = N/A
 META_START
 OBJECT_NAME          = N/A
 OBJECT_ID            = N/A
-CENTER_NAME          = Earth
+CENTER_NAME          = EARTH
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC
 META_STOP
@@ -43,7 +43,7 @@ ORIGINATOR = N/A
 META_START
 OBJECT_NAME          = N/A
 OBJECT_ID            = N/A
-CENTER_NAME          = Earth
+CENTER_NAME          = EARTH
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC
 META_STOP
@@ -72,7 +72,7 @@ ORIGINATOR = N/A
 META_START
 OBJECT_NAME          = N/A
 OBJECT_ID            = N/A
-CENTER_NAME          = Earth
+CENTER_NAME          = EARTH
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC
 META_STOP
@@ -101,7 +101,7 @@ ORIGINATOR = N/A
 META_START
 OBJECT_NAME          = N/A
 OBJECT_ID            = N/A
-CENTER_NAME          = Earth
+CENTER_NAME          = EARTH
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC
 START_TIME           = 2008-09-20T12:25:40.104192
@@ -160,7 +160,7 @@ ORIGINATOR = N/A
 META_START
 OBJECT_NAME          = N/A
 OBJECT_ID            = N/A
-CENTER_NAME          = Earth
+CENTER_NAME          = EARTH
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC
 START_TIME           = 2008-09-20T12:25:40.104192
@@ -214,7 +214,7 @@ META_STOP
 META_START
 OBJECT_NAME          = N/A
 OBJECT_ID            = N/A
-CENTER_NAME          = Earth
+CENTER_NAME          = EARTH
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC
 START_TIME           = 2008-09-20T12:25:40.104192
@@ -366,7 +366,7 @@ def test_dump_oem_linear(ephem):
 META_START
 OBJECT_NAME          = N/A
 OBJECT_ID            = N/A
-CENTER_NAME          = Earth
+CENTER_NAME          = EARTH
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC
 START_TIME           = 2008-09-20T12:25:40.104192
