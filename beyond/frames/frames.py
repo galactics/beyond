@@ -185,6 +185,8 @@ class Frame(metaclass=_MetaFrame):
 class TEME(Frame):
     """True Equator Mean Equinox"""
 
+    orientation = "TEME"
+
     def _to_TOD(self):
         equin = iau1980.equinox(self.date, eop_correction=False, terms=4, kinematic=False)
         m = rot3(-np.deg2rad(equin))
@@ -193,11 +195,13 @@ class TEME(Frame):
 
 class GTOD(Frame):
     """Greenwich True Of Date"""
-    pass
+    orientation = "GTOD"
 
 
 class WGS84(Frame):
     """World Geodetic System 1984"""
+
+    orientation = "WGS84"
 
     def _to_ITRF(self):
         return np.identity(6), np.zeros(6)
@@ -205,6 +209,8 @@ class WGS84(Frame):
 
 class PEF(Frame):
     """Pseudo Earth Fixed"""
+
+    orientation = "PEF"
 
     def _to_TOD(self):
         m = iau1980.sideral(self.date, model='apparent', eop_correction=False)
@@ -216,6 +222,8 @@ class PEF(Frame):
 class TOD(Frame):
     """True (Equator) Of Date"""
 
+    orientation = "TOD"
+
     def _to_MOD(self):
         m = iau1980.nutation(self.date, eop_correction=False)
         return self._convert(m, m), np.zeros(6)
@@ -224,6 +232,8 @@ class TOD(Frame):
 class MOD(Frame):
     """Mean (Equator) Of Date"""
 
+    orientation = "MOD"
+
     def _to_EME2000(self):
         m = iau1980.precesion(self.date)
         return self._convert(m, m), np.zeros(6)
@@ -231,11 +241,14 @@ class MOD(Frame):
 
 class EME2000(Frame):
     """EME2000 inertial frame (also known as J2000)"""
-    pass
+
+    orientation = "EME2000"
 
 
 class ITRF(Frame):
     """International Terrestrial Reference Frame"""
+
+    orientation = "ITRF"
 
     def _to_PEF(self):
         m = iau1980.earth_orientation(self.date)
@@ -249,6 +262,8 @@ class ITRF(Frame):
 class TIRF(Frame):
     """Terrestrial Intermediate Reference Frame"""
 
+    orientation = "TIRF"
+
     def _to_CIRF(self):
         m = iau2010.sideral(self.date)
         offset = np.zeros(6)
@@ -259,6 +274,8 @@ class TIRF(Frame):
 class CIRF(Frame):
     """Celestial Intermediate Reference Frame"""
 
+    orientation = "CIRF"
+
     def _to_GCRF(self):
         m = iau2010.precesion_nutation(self.date)
         return self._convert(m, m), np.zeros(6)
@@ -266,7 +283,8 @@ class CIRF(Frame):
 
 class GCRF(Frame):
     """Geocentric Celestial Reference Frame"""
-    pass
+
+    orientation = "GCRF"
 
 
 def orbit2frame(name, ref_orbit, orientation=None, center=None):
@@ -286,21 +304,20 @@ def orbit2frame(name, ref_orbit, orientation=None, center=None):
     for informations regarding these orientations.
     """
 
-    if orientation is not None and orientation.upper() not in ("QSW", "TNW"):
+    if orientation is None:
+        orientation = ref_orbit.frame.orientation
+    elif orientation.upper() not in ("QSW", "TNW"):
         raise ValueError("Unknown orientation '%s'" % orientation)
 
     if center is None:
         center = Earth
 
-    def _convert(self):
+    def _to_parent_frame(self):
         """Conversion from orbit frame to parent frame
         """
         offset = ref_orbit.propagate(self.date).base.copy()
 
-        if orientation is None:
-            # The orientation is the same as the parent reference frame
-            rotation = np.identity(6)
-        elif orientation.upper() in ("QSW", "TNW"):
+        if orientation.upper() in ("QSW", "TNW"):
 
             # propagation of the reference orbit to the date of the
             # converted orbit
@@ -308,11 +325,12 @@ def orbit2frame(name, ref_orbit, orientation=None, center=None):
 
             m = to_qsw(orb) if orientation.upper() == "QSW" else to_tnw(orb)
 
-            # we transpose the matrix because it represent the conversion
+            # we transpose the matrix because it represents the conversion
             # from inertial to local frame, and we'd like the other way around
             rotation = Frame._convert(m, m).T
         else:
-            raise ValueError("Unknown orientation '%s'" % orientation)
+            # The orientation is the same as the parent reference frame
+            rotation = np.identity(6)
 
         return rotation, offset
 
@@ -321,12 +339,13 @@ def orbit2frame(name, ref_orbit, orientation=None, center=None):
 
     # dictionnary which defines attributes of the created class
     dct = {
-        mtd: _convert
+        mtd: _to_parent_frame,
+        "orientation": orientation,
+        "center": center
     }
 
     # Creation of the class
     cls = _MetaFrame(name, (Frame,), dct)
-    cls.center = center
 
     # Link to the parent
     cls + ref_orbit.frame

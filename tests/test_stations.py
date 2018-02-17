@@ -53,6 +53,8 @@ def test_station(station_env):
 
     tls = create_station('Toulouse', (43.604482, 1.443962, 172.))
 
+    assert tls.orientation == "N"
+
     orb.frame = tls
     orb.form = 'spherical'
 

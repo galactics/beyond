@@ -70,6 +70,15 @@ class TopocentricFrame(Frame):
 
             yield point
 
+    def _to_parent_frame(self, *args, **kwargs):
+        """Conversion from Topocentric Frame to parent frame
+        """
+        lat, lon, _ = self.latlonalt
+        m = rot3(-lon) @ rot2(lat - np.pi / 2.) @ rot3(self.heading)
+        offset = np.zeros(6)
+        offset[:3] = self.coordinates
+        return self._convert(m, m), offset
+
     @classmethod
     def _geodetic_to_cartesian(cls, lat, lon, alt):
         """Conversion from latitude, longitue and altitude coordinates to
@@ -119,28 +128,23 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
 
     if isinstance(orientation, str):
         orient = {'N': np.pi, 'S': 0., 'E': np.pi / 2., 'W': 3 * np.pi / 2.}
-        orientation = orient[orientation]
+        heading = orient[orientation]
+    else:
+        heading = orientation
 
     latlonalt = list(latlonalt)
     latlonalt[:2] = np.radians(latlonalt[:2])
     coordinates = TopocentricFrame._geodetic_to_cartesian(*latlonalt)
 
-    def _convert(self):
-        """Conversion from Topocentric Frame to parent frame
-        """
-        lat, lon, _ = self.latlonalt
-        m = rot3(-lon) @ rot2(lat - np.pi / 2.) @ rot3(self.orientation)
-        offset = np.zeros(6)
-        offset[:3] = self.coordinates
-        return self._convert(m, m), offset
-
     mtd = '_to_%s' % parent_frame.__name__
     dct = {
-        mtd: _convert,
+        mtd: TopocentricFrame._to_parent_frame,
         'latlonalt': latlonalt,
         'coordinates': coordinates,
         'parent_frame': parent_frame,
+        'heading': heading,
         'orientation': orientation
+
     }
     cls = _MetaFrame(name, (TopocentricFrame,), dct)
     cls + parent_frame

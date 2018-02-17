@@ -205,11 +205,13 @@ def test_orbit2frame():
     # as done during propagation
     soyouz = soyouz.propagate(soyouz.date)
 
-    iss.as_frame('iss_inert')
-    iss.as_frame('iss_qsw', orientation='QSW')
-    iss.as_frame('iss_tnw', orientation='TNW')
-    with raises(ValueError):
-        iss.as_frame('iss_unknown', orientation='unknow')
+    inert = iss.as_frame('iss_inert')
+    qsw = iss.as_frame('iss_qsw', orientation='QSW')
+    tnw = iss.as_frame('iss_tnw', orientation='TNW')
+
+    assert inert.orientation == "TEME"
+    assert qsw.orientation == "QSW"
+    assert tnw.orientation == "TNW"
 
     s1 = soyouz.copy(frame='iss_inert')
     assert_almost_equal(s1[:3], [70.5889585, 73.6584008, -62.5406308])
