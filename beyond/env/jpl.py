@@ -34,6 +34,7 @@ from ..config import config
 from ..orbits import Orbit
 from ..utils.node import Node
 from ..propagators.base import AnalyticalPropagator
+from ..dates import Date
 
 from jplephem.spk import SPK
 from jplephem.names import target_names
@@ -197,3 +198,16 @@ def list_bodies():
     """
     for x in Bsp().top.list[:-1]:
         yield x
+
+
+def create_frames(until=None):
+    """Create all frames availables in the JPL files
+    """
+
+    now = Date.now()
+
+    if until:
+        get_body(until, now)
+    else:
+        for body in list_bodies():
+            get_body(body.name, now)
