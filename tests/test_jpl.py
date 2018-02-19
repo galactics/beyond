@@ -7,13 +7,16 @@ from beyond.config import config
 from beyond.env.jpl import get_body, list_bodies
 from beyond.dates import Date
 from beyond.orbits import Orbit
+from beyond.utils.units import AU
 
 
 @fixture
 def jplfiles():
     config['env'].update({
         'jpl': [
-            str(Path(__file__).parent / "data" / "jpl" / "de403_2000-2020.bsp")
+            str(Path(__file__).parent / "data" / "jpl" / "de403_2000-2020.bsp"),
+            str(Path(__file__).parent / "data" / "jpl" / "pck00010.tpc"),
+            str(Path(__file__).parent / "data" / "jpl" / "gm_de431.tpc"),
         ]
     })
 
@@ -26,6 +29,7 @@ def test_get(jplfiles):
     assert mars.date.scale.name == "TDB"
     assert mars.date.change_scale("UTC") == Date(2018, 1, 14)
     assert str(mars.frame) == "MarsBarycenter"
+    assert mars.frame.center.name == "Mars Barycenter"
     assert str(mars.form) == "cartesian"
 
     # Check if conversion to other frame works as espected
@@ -33,7 +37,7 @@ def test_get(jplfiles):
 
     assert np.allclose(mars, [
         -1.69346160e+11, -2.00501413e+11, -8.26925988e+10,
-        -3.18886341e+09, 6.70198374e+08, 3.52617883e+08
+        36908.14137465, -7756.92562483, -4081.22549533
     ])
 
 
@@ -45,8 +49,20 @@ def test_propagate(jplfiles):
     assert str(venus.form) == "cartesian"
     assert np.allclose(venus, [
         5.23110445e+10, -8.51235950e+10, -4.16279990e+10,
-        -2.63594991e+09, -1.37156213e+09, -4.50301386e+08
+        3.05086795e+04, 1.58745616e+04, 5.21182159e+03
     ])
+
+
+def test_transform(jplfiles):
+
+    mars = get_body('Mars', Date(2018, 2, 25))
+    mars.frame = "SolarSystemBarycenter"
+    mars.form = "keplerian"
+
+    assert mars.frame.center.name == "Sun"
+    assert mars.frame.center.m > 1.9e30
+
+    assert 1.3 * AU <= mars.a <= 1.7 * AU
 
 
 def test_list(jplfiles):

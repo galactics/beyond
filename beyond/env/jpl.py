@@ -26,17 +26,44 @@ their respective major satellites
     })
 
 This module rely heavily on the jplephem library, which parse the binary .BSP format
+
+In addition to .BSP files, you can provide files in the
+`PCK text format <https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/>`__ (generally with a
+``.tpc`` extension), which contain informations about masses and dimensions of most of the solar
+system bodies.
+
+These files allows to convert to keplerian elements with correct physical constants
+(mainly µ).
+
+.. code-block:: python
+
+    config.update({
+        "env": {
+            "jpl": [
+                "/path/to/de430.bsp",
+                "/path/to/mar097.bsp",
+                "/path/to/jup310.bsp",
+                "/path/to/sat360xl.bsp",
+                "/path/to/pck00010.tpc",
+                "/path/to/gm_de431.tpc"
+            ]
+        }
+    })
+
+Examples of both .bsp and .tcp files are available in the ``tests/data/jpl`` folder.
 """
 
 import numpy as np
+from pathlib import Path
 
 from ..config import config
 from ..orbits import Orbit
 from ..utils.node import Node
 from ..propagators.base import AnalyticalPropagator
 from ..dates import Date
+from ..constants import Body, G
 
-from jplephem.spk import SPK
+from jplephem.spk import SPK, S_PER_DAY
 from jplephem.names import target_names
 
 __all__ = ['get_body', 'list_bodies']
@@ -50,7 +77,8 @@ class Target(Node):
     """
 
     def __init__(self, name, index):
-        super().__init__(name)
+        super().__init__(name.title().replace(' ', ''))
+        self.full_name = name
         self.index = index
 
 
@@ -101,6 +129,12 @@ class Bsp:
 
         # Extraction of segments from each .bsp file
         for filepath in config['env']['jpl']:
+
+            filepath = Path(filepath)
+
+            if filepath.suffix.lower() != ".bsp":
+                continue
+
             segments.extend(SPK.open(str(filepath)).segments)
 
         # list of available segments
@@ -112,8 +146,8 @@ class Bsp:
 
         for center_id, target_id in self.segments.keys():
 
-            center_name = target_names.get(center_id, 'Unknown').title().replace(' ', '')
-            target_name = target_names.get(target_id, 'Unknown').title().replace(' ', '')
+            center_name = target_names.get(center_id, 'Unknown')
+            target_name = target_names.get(target_id, 'Unknown')
 
             # Retrieval of the Target object representing the center if it exists
             # or creation of said object if it doesn't.
@@ -151,9 +185,136 @@ class Bsp:
             sign = -1
 
         # In some cases, the pos vector contains both position and velocity
-        pv = np.array(pos) if len(pos) == 6 else np.concatenate((pos, -vel))
+        if len(pos) == 3:
+            # The velocity is given in km/days, so we convert to km/s
+            # see: https://github.com/brandon-rhodes/python-jplephem/issues/19 for clarifications
+            pv = np.concatenate((pos, vel / S_PER_DAY))
+        elif len(pos) == 6:
+            pv = np.array(pos)
+        else:
+            raise ValueError("Unknown state vector format")
 
         return sign * pv * 1000
+
+
+class Pck(dict):
+    """Parser of PCK file containing orientation and shape models for solar system bodies
+    """
+
+    def __new__(cls, *args, **kwargs):
+
+        # Caching mechanism
+        if not hasattr(cls, '_instance'):
+            cls._instance = super().__new__(cls, *args, **kwargs)
+            cls._instance.parse()
+
+        return cls._instance
+
+    @classmethod
+    def parse_float(cls, txt):
+        if "d" in txt:
+            # Exponent
+            txt = txt.replace("d", "e")
+
+        return float(txt)
+
+    def parse(self):
+
+        self.clear()
+
+        # Parsing of mutliple files provided in the configuration variable
+        for filepath in config['env']['jpl']:
+
+            filepath = Path(filepath)
+
+            if filepath.suffix.lower() != ".tpc":
+                continue
+
+            with filepath.open() as fp:
+                lines = fp.read().splitlines()
+
+            datablock = False
+
+            # Checking for header
+            if lines[0].strip() != "KPL/PCK":
+                raise ValueError("Unknown file format")
+
+            for i, line in enumerate(lines):
+
+                # Seek the begining of a data block
+                if line.strip() == "\\begindata":
+                    datablock = True
+                    continue
+
+                # End of a datablock
+                if line.strip() == "\\begintext":
+                    datablock = False
+                    continue
+
+                # Variable extraction
+                if datablock and line.strip().lower().startswith('body'):
+
+                    # retrieval of body ID, parameter name and value
+                    line = line.strip().lower().lstrip('body')
+                    body_id, _, param = line.partition('_')
+                    key, _, value = param.partition("=")
+
+                    # If possible, retrieval of the name of the body
+                    # if not, use the ID as name
+                    name = target_names.get(int(body_id), body_id).title().strip()
+
+                    # If already existing, check out the dictionnary describing the body
+                    # caracteristics
+                    body_dict = self.setdefault(name, {})
+
+                    # Extraction of interesting data
+                    value = value.strip()
+
+                    # List of value scattered on multiple lines
+                    if not value.endswith(")"):
+                        for next_line in lines[i + 1:]:
+                            value += " " + next_line.strip()
+                            if next_line.strip().endswith(")"):
+                                break
+
+                    value = [self.parse_float(v) for v in value[1:-2].split()]
+
+                    body_dict[key.upper().strip()] = value
+
+    def __getitem__(self, name):
+        """Retrieve infos for a given body, if available.
+
+        If not, use default values of 0
+        """
+
+        if name == "Solar System Barycenter":
+            name = "Sun"
+
+        try:
+            obj = super().__getitem__(name)
+        except KeyError:
+            obj = {}
+
+        # Shape
+        if "RADII" in obj:
+            radii = obj['RADII'][0] * 1000.
+            flattening = 1 - (obj['RADII'][2] / obj['RADII'][0])
+        else:
+            radii = 0
+            flattening = 0
+
+        # mass
+        if 'GM' in obj:
+            mass = obj['GM'][0] * 1e9 / G
+        else:
+            mass = 0
+
+        return Body(
+            name=name.title(),
+            mass=mass,
+            equatorial_radius=radii,
+            flattening=flattening
+        )
 
 
 # Cache containing all the propagators used
@@ -183,8 +344,12 @@ def get_body(name, date):
                 {'src': a, 'dst': b}
             )
 
+            # Retrieve informations for the central body. If unavailable, create a virtual body with
+            # dummy values
+            center = Pck()[b.full_name.title()]
+
             # Register the Orbit as a frame
-            propagator.propagate(date).as_frame(b.name)
+            propagator.propagate(date).as_frame(b.name, center=center)
             _propagator_cache[b.name] = propagator
 
     return _propagator_cache[name].propagate(date)
@@ -201,7 +366,27 @@ def list_bodies():
 
 
 def create_frames(until=None):
-    """Create all frames availables in the JPL files
+    """Create frames availables in the JPL files
+
+    Args:
+        until (str): Name of the body you want to create the frame of, and all frames in between.
+                     If ``None`` all the frames available in the .bsp files will be created
+
+    Example:
+
+    .. code-block:: python
+
+        # All frames between Earth and Mars are created (Earth, EarthBarycenter,
+        # SolarSystemBarycenter, MarsBarycenter and Mars)
+        create_frames(until='Mars')
+
+        # All frames between Earth and Phobos are created (Earth, EarthBarycenter,
+        # SolarSystemBarycenter, MarsBarycenter and Phobos)
+        create_frames(until='Phobos')
+
+        # All frames available in the .bsp files are created
+        create_frames()
+
     """
 
     now = Date.now()
