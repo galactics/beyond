@@ -1,6 +1,6 @@
-***********************
-Frames and Pole motions
-***********************
+****************
+Reference Frames
+****************
 
 Frames
 ======
@@ -43,17 +43,6 @@ IAU1980 based Frames
 .. autoclass:: beyond.frames.frames.TEME
     :members:
 
-Ground Station
---------------
-
-Ground Station may be created using the :py:func:`~beyond.frames.stations.create_station` function. This
-will ensure correct frames conversions.
-
-.. autofunction:: beyond.frames.stations.create_station
-
-.. autoclass:: beyond.frames.stations.TopocentricFrame
-    :members:
-
 Local Orbital Reference Frame
 -----------------------------
 
@@ -67,6 +56,16 @@ Both are a simple shortcut to the :py:func:`~beyond.frames.frames.orbit2frame` f
 .. automodule:: beyond.frames.local
     :members:
 
+Ground Stations
+===============
+
+A ground station may be created using the :py:func:`~beyond.frames.stations.create_station` function. This
+will ensure correct frames conversions.
+
+.. autofunction:: beyond.frames.stations.create_station
+
+.. autoclass:: beyond.frames.stations.TopocentricFrame
+    :members:
 
 Earth Orientation Parameters
 ============================
