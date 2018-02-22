@@ -1,13 +1,14 @@
 
 import numpy as np
-from pytest import fixture
+from pytest import fixture, raises
 from pathlib import Path
 
 from beyond.config import config
-from beyond.env.jpl import get_body, list_bodies
+from beyond.env.jpl import get_body, list_bodies, create_frames
 from beyond.dates import Date
 from beyond.orbits import Orbit
 from beyond.utils.units import AU
+from beyond.frames import get_frame
 
 
 @fixture
@@ -69,3 +70,21 @@ def test_list(jplfiles):
 
     l = list(list_bodies())
     assert len(l) == 15
+
+
+def test_create_frames(jplfiles):
+    create_frames(until='Mars')
+
+    mars = get_frame('Mars')
+    assert mars.name == "Mars"
+
+    # The frame for Venus is not yet created, due to the use of the 'until' keyword in the
+    # create_frame call
+    with raises(ValueError):
+        get_frame("Venus")
+
+    # Create all the frames available in the .bsp files
+    create_frames()
+
+    venus = get_frame('Venus')
+    assert venus.name == "Venus"

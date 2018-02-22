@@ -66,7 +66,7 @@ from ..constants import Body, G
 from jplephem.spk import SPK, S_PER_DAY
 from jplephem.names import target_names
 
-__all__ = ['get_body', 'list_bodies']
+__all__ = ['get_body', 'list_bodies', 'create_frames']
 
 
 class Target(Node):
