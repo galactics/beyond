@@ -13,13 +13,13 @@ from beyond.frames import get_frame
 
 @fixture
 def jplfiles():
-    config['env'].update({
+    config['env'] = {
         'jpl': [
             str(Path(__file__).parent / "data" / "jpl" / "de403_2000-2020.bsp"),
             str(Path(__file__).parent / "data" / "jpl" / "pck00010.tpc"),
             str(Path(__file__).parent / "data" / "jpl" / "gm_de431.tpc"),
         ]
-    })
+    }
 
 
 def test_get(jplfiles):

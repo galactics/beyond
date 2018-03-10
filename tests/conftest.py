@@ -1,6 +1,5 @@
 
 import pytest
-from pathlib import Path
 
 from beyond.config import config
 
@@ -11,9 +10,6 @@ def config_override(tmpdir):
     """
 
     config.update({
-        "env": {
-            "folder": Path(str(tmpdir))
-        },
         "eop": {
             "missing_policy": "pass",
         }
