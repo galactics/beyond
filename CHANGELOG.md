@@ -10,6 +10,10 @@ Each release is linked to a git commit.
 - TLE tests and coverages
 - Possibility to compute passes with light propagation delay taken into account
 - CCSDS OEM handle multiple Ephems
+- CCSDS handling of frame central body
+- JPL frames bulk creation
+- JPL .tpc files handling for frame central body definition
+- Date.strftime
 
 ### Changed
 
