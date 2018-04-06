@@ -37,7 +37,7 @@
 
 from string import ascii_uppercase
 from datetime import datetime, timedelta
-
+import warnings
 import numpy as np
 
 from .orbit import Orbit
@@ -54,6 +54,7 @@ def _float(text):
     0.0
     >>> _float('34473-3')
     0.00034473
+
     >>> _float('-60129-4')
     -6.0129e-05
     >>> _float('+45871-4')
@@ -249,12 +250,14 @@ class Tle:
         return cls("%s%s\n%s" % (name, line1, line2))
 
     @classmethod
-    def from_string(cls, text, comments="#"):
+    def from_string(cls, text, comments="#", error="warn"):
         """Generator of TLEs from a string
 
         Args:
             text (str): A text containing many TLEs
             comments (str): If a line starts with this character, it is ignored
+            error (str): How to handle errors while parsing the text. Could be
+                'raise', 'warn' or 'ignore'.
         Yields:
             Tle:
         """
@@ -273,7 +276,16 @@ class Tle:
                 cache.append(line)
             elif line.startswith('2 '):
                 cache.append(line)
-                yield cls("\n".join(cache))
+                try:
+                    yield cls("\n".join(cache))
+                except ValueError as e:
+                    if error in ('raise', 'warn'):
+                        print("\n".join(cache))
+                        if error == "raise":
+                            raise
+                        else:
+                            warnings.warn(str(e))
+
                 cache = []
             else:
                 # In the 3LE format, the first line (numbered 0, or unumbered) contains the name
