@@ -14,6 +14,7 @@ Each release is linked to a git commit.
 - JPL frames bulk creation
 - JPL .tpc files handling for frame central body definition
 - Date.strftime
+- Define a mask for a station
 
 ### Changed
 

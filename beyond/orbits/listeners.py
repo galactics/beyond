@@ -3,10 +3,13 @@ import numpy as np
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 
+from ..frames.frames import get_frame
+
+
 __all__ = [
     'Speaker', 'Listener', 'stations_listeners', 'StationSignalListener',
-    'StationMaxListener', 'LightListener', 'ApsideListener', 'NodeListener',
-    'ZeroDopplerEvent'
+    'StationMaxListener', 'StationMaskListener', 'LightListener', 'ApsideListener',
+    'NodeListener', 'ZeroDopplerEvent'
 ]
 
 
@@ -269,11 +272,49 @@ class StationSignalListener(Listener):
 
     def info(self, orb):
         orb = orb.copy(frame=self.station, form='spherical')
-        return SignalEvent(self, "AOS" if orb.phi_dot > 0 else "LOS")
+        return self.event(self, "AOS" if orb.phi_dot > 0 else "LOS")
 
     def __call__(self, orb):
         orb = orb.copy(form='spherical', frame=self.station)
         return orb.phi - self.elev
+
+
+class MaskEvent(SignalEvent):
+
+    @property
+    def elev(self):
+        return "Mask"
+
+
+class StationMaskListener(StationSignalListener):
+    """Listener for time of rising above the physical horizon (real horizon may be blocked by
+    terrain, vegetation, buildings, etc.).
+    """
+
+    event = MaskEvent
+
+    def __init__(self, station):
+
+        if station.mask is None:
+            raise ValueError("No mask defined for this station")
+
+        self.station = station
+
+    def info(self, orb):
+        return self.event(self, "AOS" if self(orb) > self(self.prev) else "LOS")
+
+    def check(self, orb):
+        # Override to disable the computation when the object is not
+        # in view of the station
+        orb2 = orb.copy(frame=self.station, form='spherical')
+        if orb2.phi <= 0:
+            return False
+        else:
+            return super().check(orb)
+
+    def __call__(self, orb):
+        orb = orb.copy(form='spherical', frame=self.station)
+        return orb.phi - self.station.get_mask(orb.theta)
 
 
 class MaxEvent(Event):
@@ -368,7 +409,10 @@ def stations_listeners(stations):
 
     listeners = []
     for sta in stations:
+
         listeners.append(StationSignalListener(sta))
         listeners.append(StationMaxListener(sta))
+        if sta.mask is not None:
+            listeners.append(StationMaskListener(sta))
 
     return listeners

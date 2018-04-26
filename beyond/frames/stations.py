@@ -104,8 +104,32 @@ class TopocentricFrame(Frame):
             np.sin(lat)
         ])
 
+    @classmethod
+    def get_mask(cls, azim):
+        """Linear interpolation between two points of the mask
+        """
 
-def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
+        azim %= 2 * np.pi
+
+        if azim in cls.mask[0, :]:
+            return cls.mask[1, np.where(azim == cls.mask[0, :])[0][0]]
+
+        for next_i, mask_azim in enumerate(cls.mask[0, :]):
+            if mask_azim > azim:
+                break
+        else:
+            next_i = 0
+
+        x0, y0 = cls.mask[:, next_i - 1]
+        x1, y1 = cls.mask[:, next_i]
+
+        if next_i - 1 == -1:
+            x0 = 0
+
+        return y0 + (y1 - y0) * (azim - x0) / (x1 - x0)
+
+
+def create_station(name, latlonalt, parent_frame=WGS84, orientation='N', mask=None):
     """Create a ground station instance
 
     Args:
@@ -121,6 +145,8 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
             coordinates.
         orientation (str or float): Heading of the station
             Acceptables values are 'N', 'S', 'E', 'W' or any angle in radians
+        mask: (2D array of float): First dimension is azimut counterclockwise strictly increasing.
+            Second dimension is elevation. Both in radians
 
     Return:
         TopocentricFrame
@@ -143,8 +169,8 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N'):
         'coordinates': coordinates,
         'parent_frame': parent_frame,
         'heading': heading,
-        'orientation': orientation
-
+        'orientation': orientation,
+        'mask': np.array(mask) if mask else None,
     }
     cls = _MetaFrame(name, (TopocentricFrame,), dct)
     cls + parent_frame
