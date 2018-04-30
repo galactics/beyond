@@ -22,7 +22,7 @@ Each release is linked to a git commit.
 - Frames translation now directly with vectors
 - Node harmonisation, only one implementation used
 - Stations handling has a proper module
-- BSD license
+- MIT license
 
 ## [v0.4] - 2017-12-10
 
