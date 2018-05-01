@@ -163,10 +163,11 @@ def test_kepl(ref_kepl):
     # Hyperbolic case
     ref_kepl_h = ref_kepl.copy()
     ref_kepl_h[1] = 1.2
+    ref_kepl_h[-1] = 0.2
     keplm_h = KEPL(ref_kepl_h, KEPL_M)
-    assert np.allclose(keplm_h[:-1], [
+    assert np.allclose(keplm_h, [
         7.19263111e+06, 1.20000000e+00, 1.71926101e+00,
-        5.51044450e+00, 1.17890602e+00
+        5.51044450e+00, 1.17890602e+00, 1.21488570e-02
     ])
 
 

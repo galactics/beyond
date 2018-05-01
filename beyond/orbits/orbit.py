@@ -133,7 +133,7 @@ class Orbit(np.ndarray):
 
     def __repr__(self):  # pragma: no cover
         coord_str = '\n'.join(
-            [" " * 4 + "%s = %s" % (name, arg) for name, arg in zip(self.form.param_names, self)]
+            ["    %s = %s" % (name, arg) for name, arg in zip(self.form.param_names, self)]
         )
 
         if self.propagator is None:
@@ -146,7 +146,12 @@ class Orbit(np.ndarray):
             # Propagator instanciated
             propagator = "%s (initialised)" % self.propagator.__class__.__name__
 
-        fmt = "Orbit =\n  date = {date}\n  form = {form}\n  frame = {frame}\n  propag = {propag}\n  coord =\n{coord}".format(
+        fmt = """Orbit =
+  date = {date}
+  form = {form}
+  frame = {frame}
+  propag = {propag}
+  coord =\n{coord}""".format(
             date=self.date,
             coord=coord_str,
             form=self.form,
@@ -159,8 +164,8 @@ class Orbit(np.ndarray):
     def form(self):
         """:py:class:`~beyond.orbits.forms.Form`: Form of the coordinates of the orbit
 
-        If set as a string (e.g. ``"cartesian"``) will be automatically converted to the corresponding
-        Form object.
+        If set as a string (e.g. ``"cartesian"``) will be automatically converted to the
+        corresponding Form object.
 
         .. code-block:: python
 

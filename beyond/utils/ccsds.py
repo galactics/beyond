@@ -259,7 +259,7 @@ def _dump_oem(data, **kwargs):
 
         data.form = 'cartesian'
 
-        interp = data.method.title()
+        interp = data.method.upper()
         if data.method != data.LINEAR:
             interp += "\nINTERPOLATION_DEGREE = {}".format(data.order - 1)
 

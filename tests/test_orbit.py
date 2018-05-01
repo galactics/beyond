@@ -4,6 +4,7 @@
 from pytest import raises, fixture
 
 import numpy as np
+from pickle import loads, dumps
 
 from beyond.constants import Earth
 from beyond.dates.date import Date
@@ -134,6 +135,22 @@ def test_tle_back_and_fro():
 
     assert str(new_txt) == """1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  9991
 2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391999990"""
+
+
+def test_pickle(ref_orbit):
+
+    # Pickling is used when distributing objects to multprocesses, so it's useful to check if
+    # we can still do it
+    txt = dumps(ref_orbit)
+    orb = loads(txt)
+
+    assert all(ref_orbit == orb)
+    assert ref_orbit.date == orb.date
+    assert ref_orbit.frame == orb.frame
+    assert ref_orbit.form.name == orb.form.name
+    assert ref_orbit.propagator.__class__ == orb.propagator.__class__
+    assert ref_orbit.complements == orb.complements
+
 
 # def test_orbit_properties(ref_orbit):
 

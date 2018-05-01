@@ -17,11 +17,25 @@ class Propagator(Speaker, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def propagate(self, start):
+    def propagate(self, date):
+        """Propagate the orbit to a given date
+        Args:
+            date (Date)
+        Return:
+            ~beyond.orbits.orbit.Orbit:
+        """
         pass
 
     def iter(self, start=None, stop=None, step=None, **kwargs):
-        """
+        """Compute a range of orbits between two dates
+
+        Args:
+            start (Date)
+            stop (Date or timedelta)
+            step (timedelta)
+        Yield:
+            :py:class:`~beyond.orbits.orbit.Orbit`:
+
         Examples:
 
         .. code-block:: python
@@ -51,7 +65,7 @@ class Propagator(Speaker, metaclass=ABCMeta):
 
 
 class AnalyticalPropagator(Propagator):
-    """Base class for analytical propagators (RGP4, Eckstein-Heschler, etc.)
+    """Base class for analytical propagators (SGP4, Eckstein-Heschler, etc.)
     """
 
     def _iter(self, start, stop, step, **kwargs):
