@@ -9,7 +9,7 @@ from ..frames.frames import get_frame
 __all__ = [
     'Speaker', 'Listener', 'stations_listeners', 'StationSignalListener',
     'StationMaxListener', 'StationMaskListener', 'LightListener', 'ApsideListener',
-    'NodeListener', 'ZeroDopplerEvent'
+    'NodeListener', 'ZeroDopplerListener'
 ]
 
 
@@ -18,6 +18,8 @@ class Speaker(metaclass=ABCMeta):
 
     By calling :py:meth:`listen`, the subclass can trigger the listeners.
     """
+
+    SPEAKER_MODE = "global"
 
     def listen(self, orb, listeners):
         """This method allows to loop over the listeners and trigger the :py:meth:`_bisect` method
@@ -29,6 +31,9 @@ class Speaker(metaclass=ABCMeta):
         Return:
             list of Orbit: Orbits corresponding to events, sorted by dates
         """
+
+        if isinstance(listeners, Listener):
+            listeners = [listeners]
 
         orb.event = None
         results = []
@@ -53,17 +58,21 @@ class Speaker(metaclass=ABCMeta):
         eps = timedelta.resolution
 
         step = (end.date - begin.date) / 2
+
         while abs(step) >= eps:
             date = begin.date + step
-            orb = self.propagate(date)
+            if self.SPEAKER_MODE == "global":
+                orb = self.propagate(date)
+            else:
+                orb = begin.propagate(date)
             if listener(begin) * listener(orb) > 0:
                 begin = orb
             else:
                 end = orb
             step = (end.date - begin.date) / 2
         else:
-            orb.event = listener.info(end if listener.binary else orb)
-            return orb
+            end.event = listener.info(end)
+            return end
 
 
 class Listener(metaclass=ABCMeta):
@@ -71,7 +80,6 @@ class Listener(metaclass=ABCMeta):
     """
 
     prev = None
-    binary = False
 
     def check(self, orb):
         """Method that check whether or not the listener is trigered
@@ -86,7 +94,7 @@ class Listener(metaclass=ABCMeta):
         return self.prev is not None and np.sign(self(orb)) != np.sign(self(self.prev))
 
     @abstractmethod
-    def info(self, orb):
+    def info(self, orb):  # pragma: no cover
         """
         Args:
             orb (Orbit)
@@ -96,7 +104,7 @@ class Listener(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def __call__(self, orb):
+    def __call__(self, orb):  # pragma: no cover
         pass
 
 
@@ -106,10 +114,10 @@ class Event:
         self.listener = listener
         self.info = info
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return self.info
 
-    def __format__(self, fmt):
+    def __format__(self, fmt):  # pragma: no cover
         return format(str(self), fmt)
 
 
@@ -123,7 +131,6 @@ class LightListener(Listener):
     """
 
     event = LightEvent
-    binary = True
 
     UMBRA = "umbra"
     PENUMBRA = "penumbra"
@@ -188,7 +195,7 @@ class LightListener(Listener):
                     umb_vert = np.tan(alpha_umb) * (y - sat_horiz)
 
                     if sat_vert <= umb_vert:
-                        # Unmbra
+                        # Umbra
                         return -1
 
         return 1
@@ -317,7 +324,7 @@ class StationMaskListener(StationSignalListener):
         return orb.phi - self.station.get_mask(orb.theta)
 
 
-class MaxEvent(Event):
+class MaxEvent(Event):  # pragma: no cover
 
     def __init__(self, listener):
         super().__init__(listener, "MAX")
@@ -356,7 +363,7 @@ class StationMaxListener(Listener):
         return orb.phi_dot
 
 
-class ZeroDopplerEvent(Event):
+class ZeroDopplerEvent(Event):  # pragma: no cover
 
     def __init__(self, listener):
         super().__init__(listener, "Zero Doppler")
