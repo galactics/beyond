@@ -106,3 +106,19 @@ Listeners
     2017-06-03 23:12:11 
     2017-06-03 23:15:11 
     2017-06-03 23:18:11 
+
+.. _maneuvers:
+
+Maneuvers
+---------
+
+.. literalinclude:: _static/hohmann.py
+
+.. code-block:: text
+
+    2018-05-04T14:41:09.984493 UTC
+    2018-05-04T15:33:11.374985 UTC
+
+.. image:: _static/hohmann_1.png
+
+.. image:: _static/hohmann_2.png

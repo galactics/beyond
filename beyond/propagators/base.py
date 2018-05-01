@@ -26,6 +26,9 @@ class Propagator(Speaker, metaclass=ABCMeta):
         """
         pass
 
+    def copy(self):
+        return self.__class__()
+
     def iter(self, start=None, stop=None, step=None, **kwargs):
         """Compute a range of orbits between two dates
 
@@ -53,7 +56,7 @@ class Propagator(Speaker, metaclass=ABCMeta):
 
         if isinstance(stop, timedelta):
             stop = start + stop
-        if start > stop and step > 0:
+        if start > stop and step.total_seconds() > 0:
             step = -step
 
         listeners = kwargs.pop('listeners', [])

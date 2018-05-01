@@ -12,6 +12,7 @@ from .forms import get_form, Form
 from .ephem import Ephem
 from ..frames.frames import get_frame, orbit2frame
 from ..propagators import get_propagator
+from .man import Maneuver
 
 
 class Orbit(np.ndarray):
@@ -101,7 +102,9 @@ class Orbit(np.ndarray):
         """
         new_obj = self.__class__(
             self.date, self.base.copy(), self.form,
-            self.frame, self.propagator, **self.complements)
+            self.frame, self.propagator.copy() if self.propagator is not None else None,
+            **self.complements
+        )
         if frame and frame != self.frame:
             new_obj.frame = frame
         if form and form != self.form:
@@ -139,11 +142,9 @@ class Orbit(np.ndarray):
         if self.propagator is None:
             # No propagator defined
             propagator = self.propagator
-        elif isinstance(self.propagator, type):
-            # Propagator defined but not used yet
-            propagator = self.propagator.__name__
+        elif self.propagator.orbit is None:
+            propagator = self.propagator.__class__.__name__
         else:
-            # Propagator instanciated
             propagator = "%s (initialised)" % self.propagator.__class__.__name__
 
         fmt = """Orbit =
@@ -159,6 +160,31 @@ class Orbit(np.ndarray):
             propag=propagator
         )
         return fmt
+
+    @property
+    def maneuvers(self):
+        """list of :py:class:`~beyond.orbits.man.Maneuver`: Maneuver descriptions usable by the
+        propagator. Not all propagators can handle maneuvers. Check their respective documentations
+        for more details.
+        """
+        mans = self.complements.get('maneuvers', [])
+
+        if isinstance(mans, Maneuver):
+            mans = [mans]
+            self.complements['maneuvers'] = mans
+
+        return mans
+
+    @maneuvers.setter
+    def maneuvers(self, mans):
+        if isinstance(mans, Maneuver):
+            mans = [mans]
+
+        self.complements['maneuvers'] = mans
+
+    @maneuvers.deleter
+    def maneuvers(self):
+        del self.complements['maneuvers']
 
     @property
     def form(self):

@@ -6,6 +6,10 @@ All propagators follow the :py:class:`Propagator` interface.
 .. autoclass:: beyond.propagators.base.Propagator
     :members:
 
+.. autoclass:: beyond.propagators.base.NumericalPropagator
+
+.. autoclass:: beyond.propagators.base.AnalyticalPropagator
+
 SGP4
 ----
 
@@ -51,3 +55,10 @@ Kepler
 Basic Keplerian propagator, computing the position of the next iteration by integrating
 of the acceleration components applied to the satellite by numerous bodies (Earth, Moon, Sun, etc.).
 This propagator is currently in development.
+
+This propagator is able do handle maneuvers, as exposed in the :ref:`maneuvers` example.
+
+.. automodule:: beyond.propagators.kepler
+    :members:
+    :special-members: __init__
+    :show-inheritance:

@@ -103,3 +103,10 @@ seen from a station.
 
 .. automodule:: beyond.orbits.listeners
     :members:
+
+Maneuver
+--------
+
+.. autoclass:: beyond.orbits.man.Maneuver
+    :members:
+    :special-members: __init__
