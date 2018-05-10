@@ -6,8 +6,9 @@ It is based ond the CCSDS ODM Blue Book from Nov. 2009 (502.0-B-2)
 import numpy as np
 from collections import Iterable
 
-from ..dates import Date
+from ..dates import Date, timedelta
 from ..orbits import Orbit, Ephem
+from ..orbits.man import Maneuver
 
 __all__ = ['load', 'loads', 'dump', "dumps"]
 
@@ -69,6 +70,8 @@ def _float(line):
         # velocity respectively. Thus, there should be no other conversion to make
         if unit in ("[km]", "[km/s]"):
             multiplier = 1000
+        elif unit == "[s]":
+            multiplier = 1
         else:
             raise ValueError("Unknown unit for this field", unit)
     else:
@@ -180,6 +183,8 @@ def _read_opm(string):
 
     name, cospar_id, scale, frame, date, x, y, z, vx, vy, vz = [None] * 11
 
+    maneuvers = []
+
     for line in string.splitlines():
         if not line or line.startswith("COMMENT"):
             continue
@@ -206,11 +211,26 @@ def _read_opm(string):
             y = _float(line)
         elif line.startswith("Z"):
             z = _float(line)
+        elif line.startswith("MAN_EPOCH_IGNITION"):
+            man = {}
+            maneuvers.append(man)
+            man_date = line.partition("=")[-1].strip()
+            man['date'] = Date.strptime(man_date, "%Y-%m-%dT%H:%M:%S.%f", scale=scale)
+        elif line.startswith("MAN_DURATION"):
+            man['duration'] = timedelta(seconds=_float(line))
+        elif line.startswith("MAN_REF_FRAME"):
+            man['frame'] = line.partition('=')[-1].strip()
+        elif line.startswith("MAN_DV_"):
+            man.setdefault('dv', []).append(_float(line))
 
     if None in [scale, frame, x, y, z, vx, vy, vz] or not isinstance(date, Date):
         raise ValueError("Missing mandatory parameter")
 
     orb = Orbit(date, [x, y, z, vx, vy, vz], 'cartesian', frame, None)
+
+    for man in maneuvers:
+        if man['duration'].total_seconds() == 0:
+            orb.maneuvers.append(Maneuver(man['date'], man['dv'], frame=man['frame']))
 
     orb.name = name
     orb.cospar_id = cospar_id
@@ -324,5 +344,18 @@ RA_OF_ASC_NODE       = {angles[1]: 12.6f} [deg]
 ARG_OF_PERICENTER    = {angles[2]: 12.6f} [deg]
 TRUE_ANOMALY         = {angles[3]: 12.6f} [deg]
 """.format(cartesian=cart / 1000, kep_a=kep.a / 1000, kep_e=kep.e, angles=np.degrees(kep[2:]))
+
+    if cart.maneuvers:
+        for i, man in enumerate(cart.maneuvers):
+            text += """
+COMMENT  Maneuver {i}
+MAN_EPOCH_IGNITION   = {man.date:%Y-%m-%dT%H:%M:%S.%f}
+MAN_DURATION         = 0.000 [s]
+MAN_DELTA_MASS       = 0.000 [kg]
+MAN_REF_FRAME        = {man.frame}
+MAN_DV_1             = {dv[0]:.6f} [km/s]
+MAN_DV_2             = {dv[1]:.6f} [km/s]
+MAN_DV_3             = {dv[2]:.6f} [km/s]
+""".format(i=i + 1, man=man, dv=man._dv / 1000.)
 
     return header + meta + text

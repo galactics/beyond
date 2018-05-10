@@ -167,7 +167,7 @@ class Orbit(np.ndarray):
         propagator. Not all propagators can handle maneuvers. Check their respective documentations
         for more details.
         """
-        mans = self.complements.get('maneuvers', [])
+        mans = self.complements.setdefault('maneuvers', [])
 
         if isinstance(mans, Maneuver):
             mans = [mans]
