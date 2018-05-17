@@ -8,7 +8,7 @@ from pytest import raises, fixture
 
 
 @fixture
-def start(config_override):
+def start():
     return Date(2008, 9, 20, 12, 30)
 
 stop = timedelta(hours=1)
@@ -75,9 +75,9 @@ def test_subephem(ref_orb, ephem, start):
 
     # Trying to generate ephemeris out of the range of the current one
     with raises(ValueError):
-        subephem = ephem.ephem(start=ephem.start - timedelta(minutes=10))
+        subephem = ephem.ephem(start=ephem.start - timedelta(minutes=10), strict=True)
     with raises(ValueError):
-        subephem = ephem.ephem(stop=ephem.stop + timedelta(minutes=10))
+        subephem = ephem.ephem(stop=ephem.stop + timedelta(minutes=10), strict=True)
 
     # Changing of the starting date but with concervation of the step
     # (i.e. the start date provided is on already contained in the ephem object)
@@ -117,3 +117,39 @@ def test_getitem(ephem):
     with raises(IndexError):
         # too many dimensions
         ephem[:, 1, :]
+
+
+def test_tolerant(ephem):
+
+    # Test for out of range starting and stoping points
+
+    start = Date(2008, 9, 20, 12, 15)
+    stop = timedelta(minutes=24)
+
+    with raises(ValueError):
+        ephem.ephem(start=start, stop=stop)
+
+    with raises(ValueError):
+        ephem.ephem(stop=timedelta(hours=1.5))
+
+    subephem = ephem.ephem(start=start, stop=stop, strict=False)
+
+    assert subephem.start == ephem.start
+    assert subephem.stop == start + stop
+
+    subephem = ephem.ephem(stop=timedelta(hours=1.5), strict=False)
+    assert subephem.start == ephem.start
+    assert subephem.stop == ephem.stop
+
+    # Case where both start and stop are BEFORE the first date of the initial ephem
+    subephem = ephem.ephem(start=start, stop=timedelta(minutes=6), strict=False)
+    assert len(subephem) == 0
+
+    # Case where both start and stop are AFTER the last date of the initial ephem
+    subephem = ephem.ephem(start=ephem.start + timedelta(hours=2), stop=timedelta(minutes=6), strict=False)
+    assert len(subephem) == 0
+
+    # Case where start is before and stop is after
+    subephem = ephem.ephem(start=start, stop=timedelta(hours=1, minutes=15), strict=False)
+    assert subephem.start == ephem.start
+    assert subephem.stop == ephem.stop

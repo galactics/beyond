@@ -165,7 +165,7 @@ class Ephem(Speaker):
         """
         return self.interpolate(date)
 
-    def iter(self, start=None, stop=None, step=None, **kwargs):
+    def iter(self, start=None, stop=None, step=None, strict=True, **kwargs):
         """Ephemeris generator based on the data of this one, but with different dates
 
         If an argument is set to ``None`` it will keep the same property as the generating ephemeris
@@ -175,6 +175,9 @@ class Ephem(Speaker):
             stop (Date, timedelta or None): Date of the last point
             step (timedelta or None): Step to use during the computation. Use the same step as
                 `self` if `None`
+            strict (bool): If True, the method will return a ValueError if ``start`` or ``stop`` is
+                not in the range of the ephemeris. If False, it will take the closest point in each
+                case.
         Yield:
             :py:class:`Orbit`:
 
@@ -200,10 +203,15 @@ class Ephem(Speaker):
             ephem.iter(start=Date(2017, 1, 1, 8), stop=Date(2017, 1, 1, 16))
         """
 
+        real_start = None
+
         if start is None:
             start = self.start
         elif start < self.start:
-            raise ValueError("Start date not in range")
+            if strict:
+                raise ValueError("Start date not in range")
+            else:
+                real_start = self.start
 
         if stop is None:
             stop = self.stop
@@ -211,7 +219,13 @@ class Ephem(Speaker):
             if isinstance(stop, timedelta):
                 stop = start + stop
             if stop > self.stop:
-                raise ValueError("Stop date not in range")
+                if strict:
+                    raise ValueError("Stop date not in range")
+                else:
+                    stop = self.stop
+
+        if real_start is not None:
+            start = real_start
 
         listeners = kwargs.get('listeners', [])
 
