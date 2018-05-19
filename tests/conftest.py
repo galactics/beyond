@@ -7,8 +7,8 @@ from beyond.dates.eop import Eop
 from beyond.frames.stations import create_station
 
 
-@fixture(autouse=True)
-def config_override(tmpdir):
+@fixture(autouse=True, scope="session")
+def config_override():
     """Create a dummy config dict containing basic data
     """
 
