@@ -36,6 +36,7 @@ class TopocentricFrame(Frame):
         """
 
         from ..orbits.listeners import stations_listeners, Listener
+        from ..orbits import Ephem
 
         listeners = []
         events_classes = tuple()
@@ -67,7 +68,13 @@ class TopocentricFrame(Frame):
                 date = point.date
                 event = point.event
                 while point.delayed_date != date:
-                    point = point.propagate(date - point.delay)
+
+                    # TODO : Change this condition to something less hacky and more generic
+                    if isinstance(orb, Ephem):
+                        point = orb.propagate(date - point.delay)
+                    else:
+                        point = point.propagate(date - point.delay)
+
                     point.frame = cls
                     point.form = "spherical"
 
