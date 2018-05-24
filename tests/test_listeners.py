@@ -1,26 +1,8 @@
 
-from pytest import fixture, raises
+from pytest import raises
 
 from beyond.dates import Date, timedelta
-from beyond.orbits import Tle
 from beyond.orbits.listeners import *
-
-
-@fixture(scope='session', params=["orb", "ephem"])
-def orbit(request):
-
-    orb = Tle("""ISS (ZARYA)
-1 25544U 98067A   18124.55610684  .00001524  00000-0  30197-4 0  9997
-2 25544  51.6421 236.2139 0003381  47.8509  47.6767 15.54198229111731""").orbit()
-
-    if request.param == "orb":
-        return orb
-    else:
-        start = Date(2018, 4, 5, 16, 50)
-        stop = timedelta(minutes=103)
-        step = timedelta(minutes=0.25)
-
-        return orb.ephem(start, stop, step)
 
 
 def iter_listeners(orb, listeners):

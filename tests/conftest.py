@@ -5,6 +5,10 @@ from unittest.mock import patch
 from beyond.config import config
 from beyond.dates.eop import Eop
 from beyond.frames.stations import create_station
+from beyond.orbits import Tle
+from beyond.propagators.kepler import Kepler
+from beyond.dates import Date, timedelta
+from beyond.env.solarsystem import get_body
 
 
 @fixture(autouse=True, scope="session")
@@ -35,3 +39,25 @@ def station_env():
 @fixture(scope='session')
 def station(station_env):
     return create_station('Toulouse', (43.604482, 1.443962, 172.), delay=True)
+
+@fixture(scope='session', params=["tle", "ephem"])
+def orbit(request):
+
+    orb = Tle("""ISS (ZARYA)
+1 25544U 98067A   18124.55610684  .00001524  00000-0  30197-4 0  9997
+2 25544  51.6421 236.2139 0003381  47.8509  47.6767 15.54198229111731""").orbit()
+
+    if request.param == "tle":
+        return orb
+    elif request.param == "ephem":
+        start = Date(2018, 4, 5, 16, 50)
+        stop = timedelta(hours=6)
+        step = timedelta(seconds=15)
+
+        return orb.ephem(start, stop, step)
+    elif request.param == "kepler":
+        orb.propagator = Kepler(
+            timedelta(seconds=60),
+            get_body('Earth')
+        )
+        return orb

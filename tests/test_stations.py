@@ -11,13 +11,6 @@ from beyond.orbits.tle import Tle
 from beyond.orbits.listeners import SignalEvent, MaxEvent, MaskEvent
 
 
-@fixture
-def orb():
-    return Tle("""ISS (ZARYA)
-1 25544U 98067A   16038.20499631  .00009950  00000-0  15531-3 0  9993
-2 25544  51.6445 351.2284 0006997  89.9621  48.8570 15.54478078984606""").orbit()
-
-
 def assert_vector(ref, pv, precision=(4, 6)):
     assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
     assert_almost_equal(ref[3:], pv[3:], precision[1], "Velocity")
@@ -61,7 +54,7 @@ def test_station(station):
     assert_vector(archive, orb)
 
 
-def test_station_visibility(orb, station):
+def test_station_visibility(orbit, station):
 
     station.mask = np.array([
         [1.97222205, 2.11184839, 2.53072742, 2.74016693, 3.00196631,
@@ -69,13 +62,13 @@ def test_station_visibility(orb, station):
         [0.35255651, 0.34906585, 0.27401669, 0.18675023, 0.28099801,
          0.16580628, 0.12915436, 0.03490659, 0.62831853, 1.3962634]])
 
-    points = [point for point in station.visibility(orb, start=Date(2016, 2, 7, 16, 45), stop=timedelta(minutes=16), step=timedelta(seconds=30))]
+    points = list(station.visibility(orbit, start=Date(2018, 4, 5, 21), stop=timedelta(minutes=30), step=timedelta(seconds=30)))
     assert len(points) == 21
-    points = [point for point in station.visibility(orb, start=Date(2016, 2, 7, 16, 45), stop=Date(2016, 2, 7, 17, 1), step=timedelta(seconds=30))]
+    points = list(station.visibility(orbit, start=Date(2018, 4, 5, 21), stop=Date(2018, 4, 5, 21, 30), step=timedelta(seconds=30)))
     assert len(points) == 21
 
     # Events (AOS, MAX and LOS)
-    points = [point for point in station.visibility(orb, start=Date(2016, 2, 7, 16, 45), stop=timedelta(minutes=16), step=timedelta(seconds=30), events=True)]
+    points = list(station.visibility(orbit, start=Date(2018, 4, 5, 21), stop=timedelta(minutes=70), step=timedelta(seconds=30), events=True))
 
     # Three more points than precedently, due to the events computation
     assert len(points) == 26
@@ -85,33 +78,28 @@ def test_station_visibility(orb, station):
     assert points[0].event.elev == 0
     assert abs(points[0].phi) < 1e-5
     assert points[0].event.station == station
-    assert points[0].delayed_date == Date(2016, 2, 7, 16, 49, 51, 266784)
-    # assert points[0].delayed_date == Date(2016, 2, 7, 16, 49, 51, 274501)
+    assert (points[0].date - Date(2018, 4, 5, 21, 4, 41, 789681)).total_seconds() <= 1e-5
 
-    assert isinstance(points[7].event, MaskEvent)
-    assert points[7].event.info == "AOS"
-    assert points[7].event.elev == "Mask"
-    assert points[7].event.station == station
-    assert points[7].delayed_date == Date(2016, 2, 7, 16, 52, 47, 758685)
-    # assert points[7].delayed_date == Date(2016, 2, 7, 16, 52, 47, 762404)
+    assert isinstance(points[10].event, MaskEvent)
+    assert points[10].event.info == "AOS"
+    assert points[10].event.elev == "Mask"
+    assert points[10].event.station == station
+    assert (points[10].date - Date(2018, 4, 5, 21, 9, 4, 977230)).total_seconds() <= 1e-5
 
     assert isinstance(points[13].event, MaxEvent)
     assert points[13].event.info == "MAX"
     assert points[13].event.station == station
-    assert points[13].delayed_date == Date(2016, 2, 7, 16, 55, 9, 268318)
-    # assert points[13].delayed_date == Date(2016, 2, 7, 16, 55, 9, 269875)
+    assert (points[13].date - Date(2018, 4, 5, 21, 10, 2, 884540)).total_seconds() <= 1e-5
 
-    assert isinstance(points[16].event, MaskEvent)
-    assert points[16].event.info == "LOS"
-    assert points[16].event.elev == "Mask"
-    assert points[16].event.station == station
-    assert points[16].delayed_date == Date(2016, 2, 7, 16, 56, 5, 522006)
-    # assert points[16].delayed_date == Date(2016, 2, 7, 16, 56, 5, 524061)
+    assert isinstance(points[23].event, MaskEvent)
+    assert points[23].event.info == "LOS"
+    assert points[23].event.elev == "Mask"
+    assert points[23].event.station == station
+    assert (points[23].date - Date(2018, 4, 5, 21, 14, 33, 978945)).total_seconds() <= 5e-5
 
     assert isinstance(points[-1].event, SignalEvent)
     assert points[-1].event.info == 'LOS'
     assert points[-1].event.elev == 0
     assert abs(points[-1].phi) < 1e-5
     assert points[-1].event.station == station
-    assert points[-1].delayed_date == Date(2016, 2, 7, 17, 0, 25, 271351)
-    # assert points[-1].delayed_date == Date(2016, 2, 7, 17, 0, 25, 279017)
+    assert (points[-1].date - Date(2018, 4, 5, 21, 15, 25, 169655)).total_seconds() <= 1e-5
