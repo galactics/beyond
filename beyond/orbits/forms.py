@@ -275,13 +275,33 @@ class Form(Node):
 
 
 TLE = Form("tle", ["i", "Ω", "e", "ω", "M", "n"])
-"""TLE form"""
+"""TLE special form
+
+    * i : inclination
+    * Ω : right-ascencion of ascending node
+    * e : excentricity
+    * ω : arguement of perigee
+    * M : mean anomaly
+    * n : mean motion
+
+see :py:class:`~beyond.orbits.tle.Tle` for details
+"""
 
 KEPL_C = Form("keplerian_circular", ["a", "ex", "ey", "i", "Ω", "λ"])
-"""Keplerian near-circular form"""
+"""Special case for near-circular orbits
+
+    * a : semi-major axis
+    * ex : e * cos(ω)
+    * ey : e * sin(ω)
+    * i : inclination
+    * Ω : right-ascencion of ascending node
+    * λ : ω + M
+"""
 
 KEPL_M = Form("keplerian_mean", ["a", "e", "i", "Ω", "ω", "M"])
-"""Keplerian with Mean anomaly"""
+"""Same as Keplerian, but replaces True anomaly with
+`Mean anomaly <https://en.wikipedia.org/wiki/Mean_anomaly>`__
+"""
 
 KEPL = Form("keplerian", ["a", "e", "i", "Ω", "ω", "ν"])
 """The keplerian form is
@@ -292,16 +312,19 @@ KEPL = Form("keplerian", ["a", "e", "i", "Ω", "ω", "ν"])
     * Ω : right-ascencion of ascending node
     * ω : Arguement of perigee
     * ν : True anomaly
+
+see `wikipedia <https://en.wikipedia.org/wiki/Orbital_elements>`__ for details
 """
 
 SPHE = Form("spherical", ["r", "θ", "φ", "r_dot", "θ_dot", "φ_dot"])
 """Spherical form
-    * r : radial distance
-    * θ : azimuth
-    * φ : elevation
-    * r_dot : first derivative of radial distance
-    * θ_dot : first derivative of azimuth
-    * φ_dot : first derivative of elevation
+
+    * r : radial distance / altitude
+    * θ : azimuth / longitude
+    * φ : elevation / latitude
+    * r_dot : first derivative of radial distance / altitude
+    * θ_dot : first derivative of azimuth / longitude
+    * φ_dot : first derivative of elevation / latitude
 """
 
 CART = Form("cartesian", ["x", "y", "z", "vx", "vy", "vz"])
