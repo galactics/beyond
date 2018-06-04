@@ -69,43 +69,49 @@ def test_station_visibility(orb, station):
         [0.35255651, 0.34906585, 0.27401669, 0.18675023, 0.28099801,
          0.16580628, 0.12915436, 0.03490659, 0.62831853, 1.3962634]])
 
-    points = [point for point in station.visibility(orb, start=Date(2016, 2, 7, 16, 45), stop=timedelta(minutes=16), step=timedelta(seconds=30), delay=True)]
+    points = [point for point in station.visibility(orb, start=Date(2016, 2, 7, 16, 45), stop=timedelta(minutes=16), step=timedelta(seconds=30))]
     assert len(points) == 21
-    points = [point for point in station.visibility(orb, start=Date(2016, 2, 7, 16, 45), stop=Date(2016, 2, 7, 17, 1), step=timedelta(seconds=30), delay=True)]
+    points = [point for point in station.visibility(orb, start=Date(2016, 2, 7, 16, 45), stop=Date(2016, 2, 7, 17, 1), step=timedelta(seconds=30))]
     assert len(points) == 21
 
     # Events (AOS, MAX and LOS)
-    points = [point for point in station.visibility(orb, start=Date(2016, 2, 7, 16, 45), stop=timedelta(minutes=16), step=timedelta(seconds=30), delay=True, events=True)]
+    points = [point for point in station.visibility(orb, start=Date(2016, 2, 7, 16, 45), stop=timedelta(minutes=16), step=timedelta(seconds=30), events=True)]
 
     # Three more points than precedently, due to the events computation
     assert len(points) == 26
 
     assert isinstance(points[0].event, SignalEvent)
     assert points[0].event.info == 'AOS'
+    assert points[0].event.elev == 0
+    assert abs(points[0].phi) < 1e-5
     assert points[0].event.station == station
-    assert points[0].date == Date(2016, 2, 7, 16, 49, 51, 266784)
-    assert points[0].delayed_date == Date(2016, 2, 7, 16, 49, 51, 274501)
+    assert points[0].delayed_date == Date(2016, 2, 7, 16, 49, 51, 266784)
+    # assert points[0].delayed_date == Date(2016, 2, 7, 16, 49, 51, 274501)
 
     assert isinstance(points[7].event, MaskEvent)
     assert points[7].event.info == "AOS"
+    assert points[7].event.elev == "Mask"
     assert points[7].event.station == station
-    assert points[7].date == Date(2016, 2, 7, 16, 52, 47, 758685)
-    assert points[7].delayed_date == Date(2016, 2, 7, 16, 52, 47, 762404)
+    assert points[7].delayed_date == Date(2016, 2, 7, 16, 52, 47, 758685)
+    # assert points[7].delayed_date == Date(2016, 2, 7, 16, 52, 47, 762404)
 
     assert isinstance(points[13].event, MaxEvent)
     assert points[13].event.info == "MAX"
     assert points[13].event.station == station
-    assert points[13].date == Date(2016, 2, 7, 16, 55, 9, 268318)
-    assert points[13].delayed_date == Date(2016, 2, 7, 16, 55, 9, 269875)
+    assert points[13].delayed_date == Date(2016, 2, 7, 16, 55, 9, 268318)
+    # assert points[13].delayed_date == Date(2016, 2, 7, 16, 55, 9, 269875)
 
     assert isinstance(points[16].event, MaskEvent)
     assert points[16].event.info == "LOS"
+    assert points[16].event.elev == "Mask"
     assert points[16].event.station == station
-    assert points[16].date == Date(2016, 2, 7, 16, 56, 5, 522006)
-    assert points[16].delayed_date == Date(2016, 2, 7, 16, 56, 5, 524061)
+    assert points[16].delayed_date == Date(2016, 2, 7, 16, 56, 5, 522006)
+    # assert points[16].delayed_date == Date(2016, 2, 7, 16, 56, 5, 524061)
 
     assert isinstance(points[-1].event, SignalEvent)
     assert points[-1].event.info == 'LOS'
+    assert points[-1].event.elev == 0
+    assert abs(points[-1].phi) < 1e-5
     assert points[-1].event.station == station
-    assert points[-1].date == Date(2016, 2, 7, 17, 0, 25, 271351)
-    assert points[-1].delayed_date == Date(2016, 2, 7, 17, 0, 25, 279017)
+    assert points[-1].delayed_date == Date(2016, 2, 7, 17, 0, 25, 271351)
+    # assert points[-1].delayed_date == Date(2016, 2, 7, 17, 0, 25, 279017)

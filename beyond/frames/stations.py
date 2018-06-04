@@ -10,8 +10,14 @@ class TopocentricFrame(Frame):
 
     _rotation_before_translation = True
 
+    delay = False
+    """If evaluate to True, during visibility computation, the yielded orbits will
+    be computed in a way to have their ``delayed_date`` attribute match the steps, instead of
+    the normal ``date`` attribute. This allow to compute fixed steps from a station standpoint.
+    """
+
     @classmethod
-    def visibility(cls, orb, start=None, stop=None, step=None, events=False, delay=False):
+    def visibility(cls, orb, start=None, stop=None, step=None, events=False):
         """Visibility from a topocentric frame
 
         Args:
@@ -23,10 +29,6 @@ class TopocentricFrame(Frame):
                 AOS, LOS and MAX elevation for each pass on this station.
                 If 'events' is a Listener or an iterable of Listeners, they
                 will be added to the computation
-            delay (bool): If True, the yielded orbits will be computed in a way
-                to have their ``delayed_date`` attribute match the steps, instead of
-                the normal ``date`` attribute. This allow to compute fixed steps
-                from a station standpoint.
 
         Yield:
             Orbit: In-visibility point of the orbit. This Orbit is already
@@ -60,13 +62,16 @@ class TopocentricFrame(Frame):
             if point.phi < 0 and not isinstance(point.event, events_classes):
                 continue
 
-            if delay and not point.event:
+            if cls.delay:
                 # Compute the delay and retro-propagate
                 date = point.date
+                event = point.event
                 while point.delayed_date != date:
                     point = point.propagate(date - point.delay)
                     point.frame = cls
                     point.form = "spherical"
+
+                point.event = event
 
             yield point
 
@@ -129,7 +134,7 @@ class TopocentricFrame(Frame):
         return y0 + (y1 - y0) * (azim - x0) / (x1 - x0)
 
 
-def create_station(name, latlonalt, parent_frame=WGS84, orientation='N', mask=None):
+def create_station(name, latlonalt, parent_frame=WGS84, orientation='N', mask=None, delay=False):
     """Create a ground station instance
 
     Args:
@@ -147,6 +152,7 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N', mask=No
             Acceptables values are 'N', 'S', 'E', 'W' or any angle in radians
         mask: (2D array of float): First dimension is azimut counterclockwise strictly increasing.
             Second dimension is elevation. Both in radians
+        delay (bool): Take the light propagation delay into account (:py:attr:`TopocentricFrame.delay`)
 
     Return:
         TopocentricFrame
@@ -171,6 +177,7 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N', mask=No
         'heading': heading,
         'orientation': orientation,
         'mask': np.array(mask) if mask else None,
+        'delay': delay,
     }
     cls = _MetaFrame(name, (TopocentricFrame,), dct)
     cls + parent_frame

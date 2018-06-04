@@ -34,4 +34,4 @@ def station_env():
 
 @fixture(scope='session')
 def station(station_env):
-    return create_station('Toulouse', (43.604482, 1.443962, 172.))
+    return create_station('Toulouse', (43.604482, 1.443962, 172.), delay=True)
