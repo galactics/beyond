@@ -3,6 +3,15 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [Unreleased]
+
+### Added
+
+- Tle generator error handling
+- Maneuvers for the Kepler propagator
+- CCSDS handling of maneuvers
+- Possibility to have tolerant ephems regarding date inputs
+
 ## [v0.5] - 2018-05-01
 
 ### Added
