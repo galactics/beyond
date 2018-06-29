@@ -28,6 +28,7 @@ def test_get(jplfiles):
 
     assert isinstance(mars, Orbit)
     assert mars.date.scale.name == "TDB"
+    assert abs(32.184313430881999806842941325158 + mars.date._offset) <= np.finfo(float).eps
     assert mars.date.change_scale("UTC") == Date(2018, 1, 14)
     assert str(mars.frame) == "MarsBarycenter"
     assert mars.frame.center.name == "Mars Barycenter"
@@ -46,6 +47,7 @@ def test_propagate(jplfiles):
     venus = get_body('VenusBarycenter', Date(2018, 1, 14))
     venus = venus.propagate(Date(2018, 1, 15, 12, 27))
 
+    assert abs(32.18435609745404946124835987575 + venus.date._offset) <= np.finfo(float).eps
     assert str(venus.frame) == "SolarSystemBarycenter"
     assert str(venus.form) == "cartesian"
     assert np.allclose(venus, [

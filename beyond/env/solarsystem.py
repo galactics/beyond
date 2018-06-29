@@ -78,7 +78,8 @@ class MoonPropagator(AnalyticalPropagator):
                 #     vz = 0.0
         """
 
-        t_tdb = date.change_scale('TDB').julian_century
+        date = date.change_scale('TDB')
+        t_tdb = date.julian_century
 
         def cos(angle):
             """cosine in degrees"""
@@ -149,7 +150,8 @@ class SunPropagator(AnalyticalPropagator):
                 #     vz = 0.0
         """
 
-        t_ut1 = date.change_scale('UT1').julian_century
+        date = date.change_scale('UT1')
+        t_ut1 = date.julian_century
 
         lambda_M = 280.460 + 36000.771 * t_ut1
         M = np.radians(357.5291092 + 35999.05034 * t_ut1)

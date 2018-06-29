@@ -22,27 +22,27 @@ class Timescale(Node):
     def __str__(self):
         return self.name
 
-    def _scale_ut1_minus_utc(self, mjd):
+    def _scale_ut1_minus_utc(self, mjd, eop):
         """Definition of Universal Time relatively to Coordinated Universal Time
         """
-        return get_eop(mjd).ut1_utc
+        return eop.ut1_utc
 
-    def _scale_tai_minus_utc(self, mjd):
+    def _scale_tai_minus_utc(self, mjd, eop):
         """Definition of International Atomic Time relatively to Coordinated Universal Time
         """
-        return get_eop(mjd).tai_utc
+        return eop.tai_utc
 
-    def _scale_tt_minus_tai(self, mjd):
+    def _scale_tt_minus_tai(self, mjd, eop):
         """Definition of Terrestrial Time relatively to International Atomic Time
         """
         return 32.184
 
-    def _scale_tai_minus_gps(self, mjd):
+    def _scale_tai_minus_gps(self, mjd, eop):
         """Definition of International Atomic Time relatively to GPS time
         """
         return 19.
 
-    def _scale_tdb_minus_tt(self, mjd):
+    def _scale_tdb_minus_tt(self, mjd, eop):
         """Definition of the Barycentric Dynamic Time scale relatively to Terrestrial Time
         """
         jd = mjd + Date.JD_MJD
@@ -51,7 +51,7 @@ class Timescale(Node):
         delta_lambda = radians(246.11 + 0.90251792 * (jd - 2451545.))
         return 0.001657 * sin(m) + 0.000022 * sin(delta_lambda)
 
-    def offset(self, mjd, new_scale):
+    def offset(self, mjd, new_scale, eop):
         """Compute the offset necessary in order to convert from one time-scale to another
 
         Args:
@@ -70,9 +70,9 @@ class Timescale(Node):
             # find the reverse operation
             roper = "_scale_{}_minus_{}".format(one, two)
             if hasattr(self, oper):
-                delta += getattr(self, oper)(mjd)
+                delta += getattr(self, oper)(mjd, eop)
             elif hasattr(self, roper):
-                delta -= getattr(self, roper)(mjd)
+                delta -= getattr(self, roper)(mjd, eop)
             else:  # pragma: no cover
                 raise ValueError("Unknown convertion {} => {}".format(one, two))
 
@@ -139,7 +139,7 @@ class Date:
     Date objects interact with :py:class:`timedelta` as datetime do.
     """
 
-    __slots__ = ["_d", "_s", "_offset", "scale", "_cache"]
+    __slots__ = ["_d", "_s", "_offset", "scale", "_cache", "eop"]
 
     MJD_T0 = datetime(1858, 11, 17)
     """Origin of MJD"""
@@ -189,8 +189,13 @@ class Date:
         else:
             raise ValueError("Unknown arguments")
 
+        mjd = d + s / 86400.
+
+        # Retrieve EOP for the given date and store
+        eop = get_eop(mjd)
+
         # Retrieve the offset from REF_SCALE for the current date
-        offset = scale.offset(d + s / 86400., self.REF_SCALE)
+        offset = scale.offset(mjd, self.REF_SCALE, eop)
 
         d += int((s + offset) // 86400)
         s = (s + offset) % 86400.
@@ -202,6 +207,7 @@ class Date:
         super().__setattr__('_s', s)
         super().__setattr__('_offset', offset)
         super().__setattr__('scale', scale)
+        super().__setattr__('eop', eop)
         super().__setattr__('_cache', {})
 
     def __getstate__(self):  # pragma: no cover
@@ -352,7 +358,7 @@ class Date:
         Return:
             Date
         """
-        offset = self.scale.offset(self._mjd, new_scale)
+        offset = self.scale.offset(self._mjd, new_scale, self.eop)
         result = self.datetime + timedelta(seconds=offset)
 
         return Date(result, scale=new_scale)
