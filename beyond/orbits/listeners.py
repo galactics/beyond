@@ -128,6 +128,10 @@ class LightEvent(Event):
 class LightListener(Listener):
     """This class compute, for a given orbit, its illumination by the sun, allowing to detect
     umbra and penumbra events.
+
+    .. image:: /_static/light.svg
+
+    Angles in this image are over-exagerated
     """
 
     event = LightEvent
@@ -162,24 +166,30 @@ class LightListener(Listener):
 
         orb = orb.copy(form="cartesian", frame=self.FRAME)
 
-        alpha_umb = np.radians(0.264121687)
-        alpha_pen = np.radians(0.269007205)
-
         sun = get_body("Sun")
 
         sun_orb = sun.propagate(orb.date)
         sun_orb.frame = orb.frame
-        vec_r_sun = sun_orb[:3]
-        r_sun_norm = np.linalg.norm(vec_r_sun)
+        x_sun = sun_orb[:3]
+        norm_x_sun = np.linalg.norm(x_sun)
 
-        vec_r = orb[:3]
-        r_norm = np.linalg.norm(vec_r)
+        x_sat = orb[:3]
+        norm_x_sat = np.linalg.norm(x_sat)
 
-        if vec_r_sun @ vec_r < 0:
-            zeta = np.arccos(-vec_r_sun @ vec_r / (r_sun_norm * r_norm))
+        # This should be the real way to compute alpha_umb and alpha_pen, but the benefit is not
+        # that great, as the angles don't change a lot throughout the year.
+        alpha_umb = np.arcsin((sun.r - orb.frame.center.r) / norm_x_sun)
+        alpha_pen = np.arcsin((sun.r - orb.frame.center.r) / norm_x_sun)
 
-            sat_horiz = r_norm * np.cos(zeta)
-            sat_vert = r_norm * np.sin(zeta)
+        # Fixed values of angles, for a simplified computation
+        # alpha_umb = np.radians(0.264121687)
+        # alpha_pen = np.radians(0.269007205)
+
+        if x_sun @ x_sat < 0:
+            zeta = np.arccos(-x_sun @ x_sat / (norm_x_sun * norm_x_sat))
+
+            sat_horiz = norm_x_sat * np.cos(zeta)
+            sat_vert = norm_x_sat * np.sin(zeta)
 
             x = orb.frame.center.r / np.sin(alpha_pen)
             pen_vert = np.tan(alpha_pen) * (x + sat_horiz)
