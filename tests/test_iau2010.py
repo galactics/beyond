@@ -17,7 +17,7 @@ def date(model_correction):
 
 @yield_fixture()
 def model_correction():
-    with patch('beyond.dates.date.get_eop') as m:
+    with patch('beyond.dates.date.EopDb.get') as m:
         m.return_value = Eop(
             x=-0.140682, y=0.333309, dpsi=-52.195, deps=-3.875, dx=-0.205,
             dy=-0.136, lod=1.5563, ut1_utc=-0.4399619, tai_utc=32

@@ -9,7 +9,7 @@ from beyond.env.solarsystem import get_body, SunPropagator, EarthPropagator, Moo
 
 
 def test_moon():
-    with patch('beyond.dates.date.get_eop') as m:
+    with patch('beyond.dates.date.EopDb.get') as m:
         m.return_value = Eop(x=0, y=0, dx=0, dy=0, deps=0, dpsi=0, lod=0, ut1_utc=-0.0889898, tai_utc=28.0)
         moon = get_body('Moon')
         moon_orb = moon.propagate(Date(1994, 4, 28))
@@ -29,7 +29,7 @@ def test_moon():
 
 def test_sun():
 
-    with patch('beyond.dates.date.get_eop') as m:
+    with patch('beyond.dates.date.EopDb.get') as m:
         m.return_value = Eop(x=0, y=0, dx=0, dy=0, deps=0, dpsi=0, lod=0, ut1_utc=0.2653703, tai_utc=33.0)
         sun = get_body('Sun')
         sun_orb = sun.propagate(Date(2006, 4, 2))

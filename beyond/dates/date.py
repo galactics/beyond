@@ -6,7 +6,7 @@
 from datetime import datetime, timedelta
 from numpy import sin, radians
 
-from .eop import get_eop
+from .eop import EopDb
 from ..utils.node import Node
 
 __all__ = ['Date', 'timedelta']
@@ -117,6 +117,7 @@ class Date:
     leap second.
 
     The constructor can take:
+
         * the same arguments as the standard library's datetime object (year, month, day, hour,
           minute, second, micronsecond)
         * MJD as :py:class:`float`
@@ -127,6 +128,7 @@ class Date:
         scale (str) : One of the following scales : "UT1", "UTC", "GPS", "TDB", "TAI", "TT"
 
     Examples:
+
         .. code-block:: python
 
             Date(2016, 11, 17, 19, 16, 40)
@@ -137,6 +139,11 @@ class Date:
             Date.now()
 
     Date objects interact with :py:class:`timedelta` as datetime do.
+
+    Attributes:
+        eop: Value of the Earth Orientation Parameters for this particular date (see
+            :ref:`eop`)
+        scale: Scale in which this date is represented
     """
 
     __slots__ = ["_d", "_s", "_offset", "scale", "_cache", "eop"]
@@ -192,7 +199,7 @@ class Date:
         mjd = d + s / 86400.
 
         # Retrieve EOP for the given date and store
-        eop = get_eop(mjd)
+        eop = EopDb.get(mjd)
 
         # Retrieve the offset from REF_SCALE for the current date
         offset = scale.offset(mjd, self.REF_SCALE, eop)

@@ -7,16 +7,17 @@
 import warnings
 from pathlib import Path
 from inspect import isclass
+from pkg_resources import iter_entry_points
 
 from ..config import config
 
-__all__ = ['register', 'get_eop', "TaiUtc", "Finals", "Finals2000A"]
+__all__ = ["register", "EopDb", "TaiUtc", "Finals", "Finals2000A"]
 
 
 class TaiUtc():
     """File listing all leap seconds throught history
 
-    This file can be retrieved at http://maia.usno.navy.mil/ser7/tai-utc.dat
+    This file can be retrieved `here <http://maia.usno.navy.mil/ser7/tai-utc.dat>`__.
     """
 
     def __init__(self, path):
@@ -65,7 +66,14 @@ class TaiUtc():
 class Finals2000A():
     """History of Earth orientation correction for IAU2000 model
 
-    This file can be retrived at http://maia.usno.navy.mil/ser7/
+    Three files are available `here <http://maia.usno.navy.mil/ser7/>`__ for this model:
+
+        - **finals2000A.all**, from 1976-01-02 to present, updated weekly
+        - **finals2000A.data**, from 1992-01-01 to present, updated weekly
+        - **finals2000A.daily**, last 90 days + 90 days of prediction, updated daily
+
+    See the associated `readme <http://maia.usno.navy.mil/ser7/readme.finals2000A>`__ for more
+    informations about the content of these files.
     """
 
     deltas = ('dx', 'dy')
@@ -132,7 +140,14 @@ class Finals2000A():
 class Finals(Finals2000A):
     """History of Earth orientation correction for IAU1980 model
 
-    This file can be retrived at http://maia.usno.navy.mil/ser7/
+    Three files are available `here <http://maia.usno.navy.mil/ser7/>`__ for this model:
+
+        - **finals.all**, from 1976-01-02 to present, updated weekly
+        - **finals.data**, from 1992-01-01 to present, updated weekly
+        - **finals.daily**, last 90 days + 90 days of prediction, updated daily
+
+    See the associated `readme <http://maia.usno.navy.mil/ser7/readme.finals>`__ for more
+    informations about the content of these files.
     """
     deltas = ('dpsi', 'deps')
 
@@ -167,92 +182,129 @@ class EnvWarning(Warning):
     pass
 
 
-databases = {}
-DEFAULT_DBNAME = "default"
-"""Default name used for EOP database lookup see :ref:`configuration <eop-dbname>`."""
+class EopDb:
+    """Class handling the different EOP databases available, in a simple abstraction layer.
 
-PASS = "pass"
-EXTRA = "extrapolate"
-WARN = "warning"
-ERROR = "error"
+    By defining a simple parameter in the config dict, this class will handle the instanciation
+    of the database and queries in a transparent manner.
 
-MIS_DEFAULT = ERROR
-"""Default behaviour in case of missing value, see :ref:`configuration <eop-missing-policy>`."""
-
-
-def get_db(dbname=None):
-    """Retrieve the database
+    see :ref:`dbname <eop-dbname>` and :ref:`missing policy <eop-missing-policy>` configurations.
     """
 
-    if dbname is None:
-        dbname = config.get('eop', 'dbname', fallback=DEFAULT_DBNAME)
+    _dbs = {}
+    DEFAULT_DBNAME = "default"
+    """Default name used for EOP database lookup."""
 
-    if dbname not in databases.keys():
-        raise EnvError("Unknown database '%s'" % dbname)
+    PASS = "pass"
+    WARN = "warning"
+    ERROR = "error"
 
-    if isclass(databases[dbname]):
-        # Instanciation
+    MIS_DEFAULT = ERROR
+    """Default behaviour in case of missing value"""
+
+    @classmethod
+    def _load_entry_points(cls):
+
+        if not hasattr(cls, '_entry_points_loaded'):
+            # Loading external DB, via entry points
+            for entry in iter_entry_points('beyond.eopdb'):
+                EopDb.register(entry.load(), entry.name)
+            cls._entry_points_loaded = True
+
+    @classmethod
+    def db(cls, dbname=None):
+        """Retrieve the database
+
+        Args:
+            dbname: Specify the name of the database to retrieve. If set to `None`, take the name
+                from the configuration (see :ref:`configuration <eop-dbname>`)
+        Return:
+            object
+        """
+
+        cls._load_entry_points()
+
+        dbname = dbname or config.get('eop', 'dbname', fallback=cls.DEFAULT_DBNAME)
+
+        if dbname not in cls._dbs.keys():
+            raise EnvError("Unknown database '%s'" % dbname)
+
+        if isclass(cls._dbs[dbname]):
+            # Instanciation
+            try:
+                cls._dbs[dbname] = cls._dbs[dbname]()
+            except Exception as e:
+                # Keep the exception in cache in order to not retry instanciation
+                # every single time EopDb.db() is called, as instanciation
+                # of database is generally a time consumming operation.
+                # If it failed once, it will most probably fail again
+                cls._dbs[dbname] = e
+
+        if isinstance(cls._dbs[dbname], Exception):
+            raise EnvError("Problem at database instanciation") from cls._dbs[dbname]
+
+        return cls._dbs[dbname]
+
+    @classmethod
+    def get(cls, mjd: float, dbname: str=None) -> Eop:
+        """Retrieve Earth Orientation Parameters and timescales differences
+        for a given date
+
+        Args:
+            mjd: Date expressed as Mean Julian Date
+            dbname: Name of the database to use
+        Return:
+            Eop: Interpolated data for this particuliar MJD
+        """
+
         try:
-            databases[dbname] = databases[dbname]()
-        except Exception as e:
-            # Keep the exception in cache in order to not retry instanciation
-            # every single time the get_db() function is called, as instanciation
-            # of database is generally a time consumming operation.
-            # If it failed once, it will most probably fail again
-            databases[dbname] = e
+            value = cls.db(dbname)[mjd]
+        except (EnvError, KeyError) as e:
+            if isinstance(e, KeyError):
+                msg = "Missing EOP data for mjd = '%s'" % e
+            else:
+                msg = str(e)
 
-    if isinstance(databases[dbname], Exception):
-        raise EnvError("Problem at database instanciation") from databases[dbname]
+            if cls.policy() == cls.WARN:
+                warnings.warn(msg, EnvWarning)
+            elif cls.policy() == cls.ERROR:
+                raise
 
-    return databases[dbname]
+            value = Eop(x=0, y=0, dx=0, dy=0, deps=0, dpsi=0, lod=0, ut1_utc=0, tai_utc=0)
 
+        return value
 
-def get_eop(mjd: float, dbname: str=None) -> Eop:
-    """Retrieve Earth Orientation Parameters and timescales differences
-    for a given date
+    @classmethod
+    def policy(cls):
+        pol = config.get("eop", "missing_policy", fallback=cls.MIS_DEFAULT)
+        if pol not in (cls.PASS, cls.WARN, cls.ERROR):
+            raise RuntimeError("Unknown config value for 'eop.missing_policy'")
 
-    Args:
-        mjd: Date expressed as Mean Julian Date
-        dbname: Name of the database to use
-    Return:
-        Eop: Interpolated data for this particuliar MJD
-    """
+        return pol
 
-    try:
-        return get_db(dbname)[mjd]
-    except (EnvError, KeyError) as e:
-        if isinstance(e, KeyError):
-            msg = "Missing EOP data for mjd = '%s'" % e
-        else:
-            msg = str(e)
+    @classmethod
+    def register(cls, klass, name=DEFAULT_DBNAME):
+        """Register an Eop Database
 
-        if policy() == WARN:
+        The only requirement of this database is that it should have ``__getitem__``
+        method accepting MJD as float.
+        """
+
+        if name in cls._dbs:
+            msg = "'{}' is already registered for an Eop database. Skipping".format(name)
             warnings.warn(msg, EnvWarning)
-        elif policy() == ERROR:
-            raise
-
-    return Eop(x=0, y=0, dx=0, dy=0, deps=0, dpsi=0, lod=0, ut1_utc=0, tai_utc=0)
+        else:
+            cls._dbs[name] = klass
 
 
-def policy():
-    pol = config.get("eop", "missing_policy", fallback=MIS_DEFAULT)
-    if pol not in (PASS, EXTRA, WARN, ERROR):
-        raise RuntimeError("Unknown config value for 'eop.missing_policy'")
-
-    return pol
-
-
-def register(name=DEFAULT_DBNAME):
-    """Register an Eop Database
-
-    The only requirement of this database is that it should have ``__getitem__``
-    method accepting MJD as float.
+def register(name=EopDb.DEFAULT_DBNAME):
+    """Decorator for registering an Eop Database
 
     Example:
 
     .. code-block:: python
 
-        @register()
+        @register
         class SqliteEnvDatabase:
             # sqlite implementation
             # this database will be known as 'default'
@@ -261,9 +313,9 @@ def register(name=DEFAULT_DBNAME):
         class JsonEnvDatabase:
             # JSON implementation
 
-        get_eop(58090.2)                    # get Eop from SqliteEnvDatabase
-        get_eop(58090.2, dbname='default')  # same as above
-        get_eop(58090.2, dbname='json')     # get Eop from JsonEnvDatabase
+        EopDb.get(58090.2)                    # get Eop from SqliteEnvDatabase
+        EopDb.get(58090.2, dbname='default')  # same as above
+        EopDb.get(58090.2, dbname='json')     # get Eop from JsonEnvDatabase
     """
 
     # I had a little trouble setting this function up, due to the fact that
@@ -282,7 +334,7 @@ def register(name=DEFAULT_DBNAME):
     if isinstance(name, str):
         # decorator with argument
         def wrapper(klass):
-            databases[name] = klass
+            EopDb.register(klass, name)
             return klass
 
         return wrapper
@@ -290,9 +342,8 @@ def register(name=DEFAULT_DBNAME):
     else:
         # simple decorator mode
         klass = name
-        name = DEFAULT_DBNAME
 
-        databases[name] = klass
+        EopDb.register(klass)
         return klass
 
 
@@ -300,16 +351,31 @@ def register(name=DEFAULT_DBNAME):
 class SimpleEopDatabase():
     """Simple implementation of database
 
-    Uses ``tai-utc.dat``, ``finals.all`` and ``finals2000A.all`` directly
+    Uses ``tai-utc.dat``, ``finals.all`` and ``finals2000A.all`` files directly
     without caching nor interpolation.
+
+    In order to use these files, you have to provide the directory containing them as a config
+    variable. Optionnally, you can provide the type of data you want to extract from finals files
+    ('all', 'data' or 'daily').
+
+    .. code-block:: python
+
+        from beyond.config import config
+        config.update({
+            'eop': {
+                'folder': "/path/to/eop/data/",
+                'type': "all"
+            }
+        })
     """
 
     def __init__(self):
         path = config.get('eop', 'folder', fallback=Path.cwd())
+        type = config.get('eop', 'type', fallback="all")
 
         # Data reading
-        f = Finals(path / 'finals.all')
-        f2 = Finals2000A(path / 'finals2000A.all')
+        f = Finals(path / ('finals.%s' % type))
+        f2 = Finals2000A(path / ('finals2000A.%s' % type))
         t = TaiUtc(path / "tai-utc.dat")
 
         # Extracting data from finals files

@@ -29,28 +29,29 @@ missing_policy
     environment data. Current vailable behaviour are:
 
         * ``pass`` - Use zero as a value
-        * ``extrapolate`` - Duplicate the last available data
         * ``warning`` - Same as ``extrapolate`` but issue a warning
         * ``error`` - Raise an exception
 
-    If this variable is not set, the library will use :py:data:`~beyond.dates.eop.MIS_DEFAULT`
+    If this variable is not set, the library will use
+    :py:data:`~beyond.dates.eop.EopDb.MIS_DEFAULT`
 
 .. _eop-dbname:
 
 dbname
-    Define the database used by the library in order to retrieve model corrections
-    and time-scales differences. See :py:mod:`~beyond.dates.eop`.
-    If omited, the default database will be :py:data:`~beyond.dates.eop.DEFAULT_DBNAME`
+    Define the database used by the library in order to retrieve model
+    corrections and time-scales differences. See :py:mod:`~beyond.dates.eop`.
+    If omited, the default database will be
+    :py:data:`~beyond.dates.eop.EopDb.DEFAULT_DBNAME`
 
 env
 ^^^
 
 jpl
-    This variable is optional and is only needed if you wish to track planets or other
-    solar system bodies.
+    This variable is optional and is only needed if you wish to track planets or
+    other solar system bodies.
 
-    Defines a list of BSP files in which to look solar system bodies (planets, moons, comets, etc.).
-    de430.bsp, mar097.bsp, jup310.bsp, sat360xl.bsp
+    Defines a list of BSP files in which to look solar system bodies (planets,
+    moons, comets, etc.). de430.bsp, mar097.bsp, jup310.bsp, sat360xl.bsp
 
     More information in the :py:mod:`beyond.env.jpl` module.
 

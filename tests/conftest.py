@@ -25,7 +25,7 @@ def config_override():
 
 @fixture
 def common_env():
-    with patch('beyond.dates.date.get_eop') as m:
+    with patch('beyond.dates.date.EopDb.get') as m:
         m.return_value = Eop(
             x=-0.00951054166666622, y=0.31093590624999734, dpsi=-94.19544791666682,
             deps=-10.295645833333051, dy=-0.10067361111115315, dx=-0.06829513888889051,

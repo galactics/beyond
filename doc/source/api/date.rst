@@ -5,18 +5,38 @@ The Date object
 ---------------
 
 .. autoclass:: beyond.dates.date.Date
-    :members:
-    :show-inheritance:
+    :members: datetime, mjd, jd, now, change_scale, strftime, strptime, range
+
+.. _eop:
 
 Earth Orientation and leap second
 ---------------------------------
 
-.. autofunction:: beyond.dates.eop.register
+Input data
+^^^^^^^^^^
 
-This library provide a simple (as simplistic) database implementation for Earth Orientation Parameters (EOP) : :py:class:`~beyond.dates.eop.SimpleEopDatabase`.
-If you need/want another database engine, you just have to create a new
-class defining a ``__getitem__`` method and regitring it under the name
-you wish.
+In order to parse Earth Orientation Parameters (EOP) input data, you can use the
+following classes
+
+.. autoclass:: beyond.dates.eop.Finals
+.. autoclass:: beyond.dates.eop.Finals2000A
+.. autoclass:: beyond.dates.eop.TaiUtc
+
+Databases
+^^^^^^^^^
+
+Beyond provides a simple (as simplistic) database implementation for EOP :
+:py:class:`~beyond.dates.eop.SimpleEopDatabase`.
+
+.. autoclass:: beyond.dates.eop.SimpleEopDatabase
+    :members:
+
+
+If you need/want another database engine, you just have to create a new class
+defining a ``__getitem__`` method and register it under the name you wish.
+
+There is two methods for registering a database. The first one, is via the
+:py:func:`~beyond.dates.eop.register` decorator
 
 .. code-block:: python
 
@@ -33,18 +53,41 @@ you wish.
 
             return data
 
-.. autoclass:: beyond.dates.eop.SimpleEopDatabase
-    :members:
+The second is via the `entry point <https://setuptools.readthedocs.io/en/latest/pkg_resources.html#entry-points>`__ ``beyond.eopdb``.
 
-In order to parse EOP input data, you can use the following classes
+If you create a python package that contain an EOP database, you can declare
+that database directly during install time.
+For that, in the *setup.py* file of your package, you have to provide the import
+path to this database in the following fashion:
 
-.. automodule:: beyond.dates.eop
-    :members: Finals, Finals2000A, TaiUtc
+.. code-block:: python
 
-.. autodata:: beyond.dates.eop.DEFAULT_DBNAME
-.. autodata:: beyond.dates.eop.MIS_DEFAULT
+    from setuptools import setup
 
-Database behaviour
-^^^^^^^^^^^^^^^^^^
+    setup(
+        name=mypackage,
+        version="12.4.beta",
+        description="My awesome package",
+        author="John Doe",
+        ...
+        entry_points={
+            'beyond.eopdb': [
+                "my_personnal_db = mypackage.module:MyDatabase"
+            ]
+        }
+    )
 
-See :ref:`configuration <eop-missing-policy>` for details on missing values response.
+This way, the class ``MyDatabase`` will always be available to the beyond
+library, and will be instanciated if needed (i.e. if the :ref:`dbname config
+variable <eop-dbname>` is set to "*my_personnal_db*").
+
+Internals
+^^^^^^^^^
+
+In order to access different databases with the same interface, beyond uses the
+:py:class:`~beyond.dates.eop.EopDb` class.
+It is this class that handle registered databases, and select the activated one.
+
+.. autoclass:: beyond.dates.eop.EopDb
+
+.. autofunction:: beyond.dates.eop.register

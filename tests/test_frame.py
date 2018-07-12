@@ -22,7 +22,7 @@ def date(model_correction):
 
 @yield_fixture()
 def model_correction():
-    with patch('beyond.dates.date.get_eop') as m:
+    with patch('beyond.dates.date.EopDb.get') as m:
         m.return_value = Eop(
             x=-0.140682, y=0.333309, dpsi=-52.195, deps=-3.875,
             dx=-0.205, dy=-0.136, lod=1.5563, ut1_utc=-0.4399619, tai_utc=32
@@ -161,7 +161,7 @@ def test_change_tle():
     # print(get_pole(t))
     # assert False
 
-    with patch('beyond.dates.date.get_eop') as m:
+    with patch('beyond.dates.date.EopDb.get') as m:
         m.return_value = Eop(
             x=0.11019218256776, y=0.28053771387248, dx=-0.06607524689999991, dy=-0.05407524689999991,
             dpsi=-54.91309785252, deps=-6.363882395480003, lod=0.06999515274799778,
