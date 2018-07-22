@@ -11,6 +11,11 @@ Each release is linked to a git commit.
 - Maneuvers for the Kepler propagator
 - CCSDS handling of maneuvers
 - Possibility to have tolerant ephems regarding date inputs
+- Entry points for EOP databases registration
+
+### Changed
+
+- Eop acquisition is done at Date creation, instead of at frame transformation
 
 ## [v0.5] - 2018-05-01
 
