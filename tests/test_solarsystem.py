@@ -20,7 +20,7 @@ def test_moon():
     assert moon_orb.date.scale.name == "TDB"
     assert abs(32.185528758994394138426287099719 + moon_orb.date._offset) <= np.finfo(float).eps
     np.testing.assert_array_equal(
-        moon_orb,
+        moon_orb.base,
         np.array([
             -134181155.8063418, -311598172.21627569, -126699062.57176001, 0.0, 0.0, 0.0
         ])
@@ -41,7 +41,7 @@ def test_sun():
     assert abs(32.734629699999999274950823746622 - sun_orb.date._offset) <= np.finfo(float).eps
 
     np.testing.assert_array_equal(
-        sun_orb,
+        sun_orb.base,
         np.array([
             146186235643.53641, 28789144480.499767, 12481136552.345926, 0.0, 0.0, 0.0
         ])

@@ -42,6 +42,12 @@ def ref_orbit(date):
 
 
 def assert_vector(ref, pv, precision=(4, 6)):
+
+    if isinstance(ref, Orbit):
+        ref = ref.base
+    if isinstance(pv, Orbit):
+        pv = pv.base
+
     assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
     assert_almost_equal(ref[3:], pv[3:], precision[1], "Velocity")
 
@@ -210,21 +216,18 @@ def test_orbit2frame():
     assert tnw.orientation == "TNW"
 
     s1 = soyouz.copy(frame='iss_inert')
-    assert_almost_equal(s1[:3], [70.5889585, 73.6584008, -62.5406308])
-    assert_almost_equal(s1[3:], [0.0521557, 0.0998631, -0.0423856])
+    assert_vector(s1, np.array([70.5889585, 73.6584008, -62.5406308, 0.0521557, 0.0998631, -0.0423856]))
 
     s2 = soyouz.copy(frame="iss_qsw")
-    assert_almost_equal(s2[:3], [4.5450528, -18.6989377, -118.107503])
-    assert_almost_equal(s2[3:], [0.0393978, -0.0046244, -0.1136478])
+    assert_vector(s2, np.array([4.5450528, -18.6989377, -118.107503, 0.0393978, -0.0046244, -0.1136478]))
 
     s3 = soyouz.copy(frame="iss_tnw")
-    assert_almost_equal(s3[:3], [-18.6974528, -4.5511611, -118.107503])
-    assert_almost_equal(s3[3:], [-0.0046116, -0.0393993, -0.1136478])
+    assert_vector(s3, np.array([-18.6974528, -4.5511611, -118.107503, -0.0046116, -0.0393993, -0.1136478]))
 
     # Whatever the local reference frame, the W vector is the same
     assert s2[2] == s3[2]
 
     # The norm of the position vectors should the same, because it's always the
     # same relative positions, but expressed in differents frames
-    assert_almost_equal(norm(s1[:3]), norm(s2[:3]), 4)
-    assert_almost_equal(norm(s2[:3]), norm(s3[:3]), 6)
+    assert_almost_equal(norm(s1[:3]), norm(s2[:3]), decimal=5)
+    assert_almost_equal(norm(s2[:3]), norm(s3[:3]))

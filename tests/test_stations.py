@@ -12,6 +12,12 @@ from beyond.orbits.listeners import SignalEvent, MaxEvent, MaskEvent
 
 
 def assert_vector(ref, pv, precision=(4, 6)):
+
+    if isinstance(ref, Orbit):
+        ref = ref.base
+    if isinstance(pv, Orbit):
+        pv = pv.base
+
     assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
     assert_almost_equal(ref[3:], pv[3:], precision[1], "Velocity")
 
