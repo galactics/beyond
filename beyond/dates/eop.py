@@ -10,6 +10,7 @@ from inspect import isclass
 from pkg_resources import iter_entry_points
 
 from ..config import config
+from ..errors import EopError, EopWarning, ConfigError
 
 __all__ = ["register", "EopDb", "TaiUtc", "Finals", "Finals2000A"]
 
@@ -174,14 +175,6 @@ class Eop:
         )
 
 
-class EnvError(Exception):
-    pass
-
-
-class EnvWarning(Warning):
-    pass
-
-
 class EopDb:
     """Class handling the different EOP databases available, in a simple abstraction layer.
 
@@ -227,7 +220,7 @@ class EopDb:
         dbname = dbname or config.get('eop', 'dbname', fallback=cls.DEFAULT_DBNAME)
 
         if dbname not in cls._dbs.keys():
-            raise EnvError("Unknown database '%s'" % dbname)
+            raise EopError("Unknown database '%s'" % dbname)
 
         if isclass(cls._dbs[dbname]):
             # Instanciation
@@ -241,7 +234,7 @@ class EopDb:
                 cls._dbs[dbname] = e
 
         if isinstance(cls._dbs[dbname], Exception):
-            raise EnvError("Problem at database instanciation") from cls._dbs[dbname]
+            raise EopError("Problem at database instanciation") from cls._dbs[dbname]
 
         return cls._dbs[dbname]
 
@@ -259,14 +252,14 @@ class EopDb:
 
         try:
             value = cls.db(dbname)[mjd]
-        except (EnvError, KeyError) as e:
+        except (EopError, KeyError) as e:
             if isinstance(e, KeyError):
                 msg = "Missing EOP data for mjd = '%s'" % e
             else:
                 msg = str(e)
 
             if cls.policy() == cls.WARN:
-                warnings.warn(msg, EnvWarning)
+                warnings.warn(msg, EopWarning)
             elif cls.policy() == cls.ERROR:
                 raise
 
@@ -278,7 +271,7 @@ class EopDb:
     def policy(cls):
         pol = config.get("eop", "missing_policy", fallback=cls.MIS_DEFAULT)
         if pol not in (cls.PASS, cls.WARN, cls.ERROR):
-            raise RuntimeError("Unknown config value for 'eop.missing_policy'")
+            raise ConfigError("Unknown config value for 'eop.missing_policy'")
 
         return pol
 
@@ -292,7 +285,7 @@ class EopDb:
 
         if name in cls._dbs:
             msg = "'{}' is already registered for an Eop database. Skipping".format(name)
-            warnings.warn(msg, EnvWarning)
+            warnings.warn(msg, EopWarning)
         else:
             cls._dbs[name] = klass
 

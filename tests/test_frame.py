@@ -8,6 +8,7 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 from numpy.linalg import norm
 
+from beyond.errors import UnknownFrameError
 from beyond.dates import Date
 from beyond.dates.eop import Eop
 from beyond.orbits.orbit import Orbit
@@ -190,7 +191,7 @@ def test_change_tle():
 
 def test_errors(ref_orbit):
 
-    with raises(ValueError):
+    with raises(UnknownFrameError):
         ref_orbit.frame = 'Inexistant'
 
 

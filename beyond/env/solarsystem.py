@@ -4,6 +4,7 @@
 import numpy as np
 
 from ..constants import Earth, Moon, Sun
+from ..errors import UnknownBodyError
 from ..orbits import Orbit
 from ..utils.units import AU
 from ..propagators.base import AnalyticalPropagator
@@ -25,12 +26,16 @@ def get_body(*bodies):
     }
 
     result = []
-    for name in bodies:
 
-        body, propag = _bodies[name.lower()]
-        # attach a propagator to the object
-        body.propagate = propag.propagate
-        result.append(body)
+    try:
+        for name in bodies:
+
+            body, propag = _bodies[name.lower()]
+            # attach a propagator to the object
+            body.propagate = propag.propagate
+            result.append(body)
+    except KeyError as e:
+        raise UnknownBodyError(e.args[0])
 
     return result[0] if len(bodies) == 1 else result
 

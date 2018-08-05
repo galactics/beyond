@@ -1,6 +1,8 @@
 """This module defines the propagators availables
 """
 
+from ..errors import UnknownPropagatorError
+
 
 def get_propagator(name):
     """Retrieve a named propagator
@@ -16,7 +18,8 @@ def get_propagator(name):
 
     scope = locals().copy()
     scope.update(globals())
-    try:
-        return scope[name]
-    except KeyError:
-        raise TypeError("Unknown propagator '%s'" % name)
+
+    if name not in scope:
+        raise UnknownPropagatorError(name)
+
+    return scope[name]

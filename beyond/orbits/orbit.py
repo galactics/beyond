@@ -8,6 +8,7 @@ import numpy as np
 
 from ..constants import c
 from ..dates import timedelta
+from ..errors import OrbitError
 from .forms import get_form, Form
 from .ephem import Ephem
 from ..frames.frames import get_frame, orbit2frame
@@ -30,7 +31,7 @@ class Orbit(np.ndarray):
         """
 
         if len(coord) != 6:
-            raise ValueError("Should be 6 in length")
+            raise OrbitError("Should be 6 in length")
 
         if isinstance(form, str):
             form = get_form(form)

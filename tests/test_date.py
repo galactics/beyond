@@ -7,7 +7,7 @@ from unittest.mock import patch
 from datetime import datetime, timedelta, timezone
 
 from beyond.dates.eop import Eop
-from beyond.dates.date import Date
+from beyond.dates.date import Date, DateError, UnknownScaleError
 
 
 def test_creation():
@@ -58,14 +58,14 @@ def test_creation():
     with raises(TypeError):
         t = Date((2015, 12, 6))
 
-    with raises(ValueError):
+    with raises(TypeError):
         t = Date(2015, 12, 6, 16, 52, 37, 2156, 'utc')
 
     # Scale
     t = Date(2015, 12, 6, 16, 52, 37, 2156, scale='TAI')
 
     # Unknown scale
-    with raises(ValueError):
+    with raises(UnknownScaleError):
         t = Date(2015, 12, 6, 16, 52, 37, 2156, scale='unknown')
 
     t = Date.now()

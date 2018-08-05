@@ -57,6 +57,7 @@ import numpy as np
 from pathlib import Path
 
 from ..config import config
+from ..errors import UnknownBodyError, JplConfigError, JplError
 from ..orbits import Orbit
 from ..utils.node import Node
 from ..propagators.base import AnalyticalPropagator
@@ -127,8 +128,13 @@ class Bsp:
         """
         segments = []
 
+        files = config.get('env', 'jpl', fallback=[])
+
+        if not files:
+            raise JplConfigError("No JPL file defined")
+
         # Extraction of segments from each .bsp file
-        for filepath in config['env']['jpl']:
+        for filepath in files:
 
             filepath = Path(filepath)
 
@@ -192,7 +198,7 @@ class Bsp:
         elif len(pos) == 6:
             pv = np.array(pos)
         else:
-            raise ValueError("Unknown state vector format")
+            raise JplError("Unknown state vector format")
 
         return sign * pv * 1000
 
@@ -237,49 +243,53 @@ class Pck(dict):
 
             # Checking for header
             if lines[0].strip() != "KPL/PCK":
-                raise ValueError("Unknown file format")
+                raise JplError("Unknown file format")
 
-            for i, line in enumerate(lines):
+            try:
+                for i, line in enumerate(lines):
 
-                # Seek the begining of a data block
-                if line.strip() == "\\begindata":
-                    datablock = True
-                    continue
+                    # Seek the begining of a data block
+                    if line.strip() == "\\begindata":
+                        datablock = True
+                        continue
 
-                # End of a datablock
-                if line.strip() == "\\begintext":
-                    datablock = False
-                    continue
+                    # End of a datablock
+                    if line.strip() == "\\begintext":
+                        datablock = False
+                        continue
 
-                # Variable extraction
-                if datablock and line.strip().lower().startswith('body'):
+                    # Variable extraction
+                    if datablock and line.strip().lower().startswith('body'):
 
-                    # retrieval of body ID, parameter name and value
-                    line = line.strip().lower().lstrip('body')
-                    body_id, _, param = line.partition('_')
-                    key, _, value = param.partition("=")
+                        # retrieval of body ID, parameter name and value
+                        line = line.strip().lower().lstrip('body')
+                        body_id, _, param = line.partition('_')
+                        key, _, value = param.partition("=")
 
-                    # If possible, retrieval of the name of the body
-                    # if not, use the ID as name
-                    name = target_names.get(int(body_id), body_id).title().strip()
+                        # If possible, retrieval of the name of the body
+                        # if not, use the ID as name
+                        name = target_names.get(int(body_id), body_id).title().strip()
 
-                    # If already existing, check out the dictionnary describing the body
-                    # caracteristics
-                    body_dict = self.setdefault(name, {})
+                        # If already existing, check out the dictionnary describing the body
+                        # caracteristics
+                        body_dict = self.setdefault(name, {})
 
-                    # Extraction of interesting data
-                    value = value.strip()
+                        # Extraction of interesting data
+                        value = value.strip()
 
-                    # List of value scattered on multiple lines
-                    if not value.endswith(")"):
-                        for next_line in lines[i + 1:]:
-                            value += " " + next_line.strip()
-                            if next_line.strip().endswith(")"):
-                                break
+                        # List of value scattered on multiple lines
+                        if not value.endswith(")"):
+                            for next_line in lines[i + 1:]:
+                                value += " " + next_line.strip()
+                                if next_line.strip().endswith(")"):
+                                    break
 
-                    value = [self.parse_float(v) for v in value[1:-2].split()]
+                        value = [self.parse_float(v) for v in value[1:-2].split()]
 
-                    body_dict[key.upper().strip()] = value
+                        body_dict[key.upper().strip()] = value
+            except Exception as e:
+                raise JplError("Parsing error on file '{}'".format(filepath)) from e
+
 
     def __getitem__(self, name):
         """Retrieve infos for a given body, if available.
@@ -334,6 +344,10 @@ def get_body(name, date):
     """
 
     # On-demand Propagator and Frame generation
+
+    if name not in [x.name for x in Bsp().top.list]:
+        raise UnknownBodyError(name)
+
     for a, b in Bsp().top.steps(name):
         if b.name not in _propagator_cache:
 

@@ -6,6 +6,7 @@
 from datetime import datetime, timedelta
 from numpy import sin, radians
 
+from ..errors import DateError, UnknownScaleError
 from .eop import EopDb
 from ..utils.node import Node
 
@@ -74,7 +75,7 @@ class Timescale(Node):
             elif hasattr(self, roper):
                 delta -= getattr(self, roper)(mjd, eop)
             else:  # pragma: no cover
-                raise ValueError("Unknown convertion {} => {}".format(one, two))
+                raise DateError("Unknown convertion {} => {}".format(one, two))
 
         return delta
 
@@ -104,7 +105,7 @@ def get_scale(name):
     if name in _cache.keys():
         return _cache[name]
     else:
-        raise ValueError("Unknown Scale : '%s'" % name)
+        raise UnknownScaleError(name)
 
 
 class Date:
@@ -194,7 +195,7 @@ class Date:
             dt = datetime(*args, **kwargs)
             d, s = self._convert_dt(dt)
         else:
-            raise ValueError("Unknown arguments")
+            raise TypeError("Unknown arguments")
 
         mjd = d + s / 86400.
 

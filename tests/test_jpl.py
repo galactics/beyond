@@ -3,6 +3,7 @@ import numpy as np
 from pytest import fixture, raises
 from pathlib import Path
 
+from beyond.errors import UnknownFrameError, UnknownBodyError
 from beyond.config import config
 from beyond.env.jpl import get_body, list_bodies, create_frames
 from beyond.dates import Date
@@ -41,6 +42,9 @@ def test_get(jplfiles):
         -1.69346160e+11, -2.00501413e+11, -8.26925988e+10,
         36908.14137465, -7756.92562483, -4081.22549533
     ])
+
+    with raises(UnknownBodyError):
+        get_body('Jupiter', Date(2018, 1, 14))
 
 
 def test_propagate(jplfiles):
@@ -82,7 +86,7 @@ def test_create_frames(jplfiles):
 
     # The frame for Venus is not yet created, due to the use of the 'until' keyword in the
     # create_frame call
-    with raises(ValueError):
+    with raises(UnknownFrameError):
         get_frame("Venus")
 
     # Create all the frames available in the .bsp files

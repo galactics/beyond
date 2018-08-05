@@ -44,6 +44,7 @@ import sys
 import warnings
 import numpy as np
 
+from ..errors import UnknownFrameError
 from ..constants import Earth
 from ..utils.matrix import rot3
 from ..utils.node import Node
@@ -85,10 +86,10 @@ def get_frame(frame):
     Return:
         ~beyond.frames.frames.Frame
     """
-    if frame in dynamic.keys():
-        return dynamic[frame]
-    else:
-        raise ValueError("Unknown Frame : '{}'".format(frame))
+    if frame not in dynamic.keys():
+        raise UnknownFrameError(frame)
+
+    return dynamic[frame]
 
 
 class _MetaFrame(type, Node):

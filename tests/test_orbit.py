@@ -6,6 +6,7 @@ from pytest import raises, fixture
 import numpy as np
 from pickle import loads, dumps
 
+from beyond.errors import UnknownFormError, OrbitError
 from beyond.constants import Earth
 from beyond.dates.date import Date
 from beyond.orbits.tle import Tle
@@ -44,12 +45,12 @@ def test_coord_init(ref_date, ref_orbit):
     assert ref_orbit['ω'] == 1.1789060198505055
     assert ref_orbit['M'] == 3.043341444376126
 
-    with raises(ValueError) as e:
+    with raises(UnknownFormError) as e:
         Orbit(ref_date, ref_coord, "Dummy", ref_frame, ref_propagator)
 
-    assert str(e.value) == "Unknown Form : 'Dummy'"
+    assert str(e.value) == "Unknown form 'Dummy'"
 
-    with raises(ValueError) as e:
+    with raises(OrbitError) as e:
         Orbit(ref_date, ref_coord[:-1], ref_form, ref_frame, ref_propagator)
     assert str(e.value) == "Should be 6 in length"
 

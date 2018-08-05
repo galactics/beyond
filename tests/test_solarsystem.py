@@ -1,8 +1,10 @@
 
+from pytest import raises
 from unittest.mock import patch
 
 import numpy as np
 
+from beyond.errors import UnknownBodyError
 from beyond.dates.date import Date
 from beyond.dates.eop import Eop
 from beyond.env.solarsystem import get_body, SunPropagator, EarthPropagator, MoonPropagator
@@ -66,3 +68,6 @@ def test_multi():
     assert isinstance(sun_orb.propagator, SunPropagator)
     assert isinstance(earth_orb.propagator, EarthPropagator)
     assert isinstance(moon_orb.propagator, MoonPropagator)
+
+    with raises(UnknownBodyError):
+        get_body("Mars")

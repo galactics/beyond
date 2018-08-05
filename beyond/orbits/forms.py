@@ -9,6 +9,7 @@ from numpy import cos, arccos, sin, arcsin, arctan2, sqrt, arccosh, sinh
 
 import numpy as np
 
+from ..errors import UnknownFormError
 from ..utils.node import Node
 
 
@@ -346,7 +347,7 @@ _cache = {
 
 
 def get_form(form):  # pragma: no cover
-    if form.lower() in _cache:
-        return _cache[form.lower()]
-    else:
-        raise ValueError("Unknown Form : '%s'" % form)
+    if form.lower() not in _cache:
+        raise UnknownFormError(form)
+
+    return _cache[form.lower()]
