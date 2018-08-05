@@ -225,6 +225,7 @@ class Date:
             's': self._s,
             'offset': self._offset,
             'scale': self.scale,
+            'eop': self.eop,
         }
 
     def __setstate__(self, state):  # pragma: no cover
@@ -233,6 +234,7 @@ class Date:
         super().__setattr__('_s', state['s'])
         super().__setattr__('_offset', state['offset'])
         super().__setattr__('scale', state['scale'])
+        super().__setattr__('eop', state['eop'])
         super().__setattr__('_cache', {})
 
     def __setattr__(self, *args):  # pragma: no cover

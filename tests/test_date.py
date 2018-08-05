@@ -3,7 +3,7 @@
 
 from pytest import raises
 from unittest.mock import patch
-
+from pickle import dumps, loads
 from datetime import datetime, timedelta, timezone
 
 from beyond.dates.eop import Eop
@@ -234,3 +234,26 @@ def test_range():
     # Error when the step is null.
     with raises(ValueError):
         list(Date.range(start, stop, timedelta(0)))
+
+
+def test_pickle():
+
+    date1 = Date(2018, 5, 8, 15, 55, 52, 232)
+
+    txt = dumps(date1)
+    date2 = loads(txt)
+
+    assert date1 == date2
+    assert date1.scale.name == date2.scale.name
+
+    assert date1.eop.x == date2.eop.x
+    assert date1.eop.y == date2.eop.y
+    assert date1.eop.dx == date2.eop.dx
+    assert date1.eop.dy == date2.eop.dy
+    assert date1.eop.deps == date2.eop.deps
+    assert date1.eop.dpsi == date2.eop.dpsi
+    assert date1.eop.lod == date2.eop.lod
+    assert date1.eop.ut1_utc == date2.eop.ut1_utc
+    assert date1.eop.tai_utc == date2.eop.tai_utc
+
+    assert date1.change_scale('UT1') == date2.change_scale('UT1')
