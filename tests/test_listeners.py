@@ -22,19 +22,19 @@ def test_light(orbit):
 
     p = next(events)
     assert abs(p.date - Date(2018, 4, 5, 17, 5, 57, 760757)).total_seconds() <= 8e-6
-    assert p.event.info == "Umbra out"
+    assert p.event.info == "Umbra exit"
 
     p = next(events)
     assert abs(p.date - Date(2018, 4, 5, 17, 6, 6, 20177)).total_seconds() <= 8e-6
-    assert p.event.info == "Penumbra out"
+    assert p.event.info == "Penumbra exit"
 
     p = next(events)
     assert abs(p.date - Date(2018, 4, 5, 18, 2, 37, 568025)).total_seconds() <= 8e-6
-    assert p.event.info == "Penumbra in"
+    assert p.event.info == "Penumbra entry"
 
     p = next(events)
     assert abs(p.date - Date(2018, 4, 5, 18, 2, 45, 814490)).total_seconds() <= 60e-6
-    assert p.event.info == "Umbra in"
+    assert p.event.info == "Umbra entry"
 
     with raises(StopIteration):
         next(events)

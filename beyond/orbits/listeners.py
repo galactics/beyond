@@ -149,9 +149,9 @@ class LightListener(Listener):
 
     def info(self, orb):
         if self.type == self.UMBRA:
-            return LightEvent(self, "Umbra in" if self(orb) <= 0 else "Umbra out")
+            return LightEvent(self, "Umbra entry" if self(orb) <= 0 else "Umbra exit")
         else:
-            return LightEvent(self, "Penumbra in" if self(orb) <= 0 else "Penumbra out")
+            return LightEvent(self, "Penumbra entry" if self(orb) <= 0 else "Penumbra exit")
 
     def __call__(self, orb):
         """
