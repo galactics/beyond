@@ -290,7 +290,6 @@ class Pck(dict):
             except Exception as e:
                 raise JplError("Parsing error on file '{}'".format(filepath)) from e
 
-
     def __getitem__(self, name):
         """Retrieve infos for a given body, if available.
 
@@ -410,3 +409,30 @@ def create_frames(until=None):
     else:
         for body in list_bodies():
             get_body(body.name, now)
+
+
+if __name__ == '__main__':
+
+    import sys
+
+    config.update({
+        'eop': {
+            'missing_policy': "pass"
+        }
+    })
+
+    for file in sys.argv[1:]:
+        print(file)
+        print("*" * len(file))
+        for segment in SPK.open(file).segments:
+
+            start = Date(segment.start_jd - Date.JD_MJD)
+            end = Date(segment.end_jd - Date.JD_MJD)
+
+            center = target_names[segment.center]
+            target = target_names[segment.target]
+            print("from {start:{fmt}} to {end:{fmt}} : {center} -> {target}".format(
+                start=start, end=end, center=center, target=target,
+                fmt="%Y-%m-%d"
+            ))
+        print()
