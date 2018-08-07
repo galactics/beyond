@@ -280,7 +280,6 @@ class Tle:
                     yield cls("\n".join(cache))
                 except ValueError as e:
                     if error in ('raise', 'warn'):
-                        print("\n".join(cache))
                         if error == "raise":
                             raise
                         else:
