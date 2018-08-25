@@ -363,7 +363,7 @@ class SimpleEopDatabase():
     """
 
     def __init__(self):
-        path = config.get('eop', 'folder', fallback=Path.cwd())
+        path = Path(config.get('eop', 'folder', fallback=Path.cwd()))
         type = config.get('eop', 'type', fallback="all")
 
         # Data reading
