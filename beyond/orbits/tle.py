@@ -225,7 +225,7 @@ class Tle:
         date = orbit.date.datetime
         i, Ω, e, ω, M, n = orbit
 
-        line1 = "1 {norad_id}U {cospar_id:<8} {date:%y}{day:.8f} {ndot} {ndotdot:>8} {bstar} 0  999".format(
+        line1 = "1 {norad_id}U {cospar_id:<8} {date:%y}{day:012.8f} {ndot:>10} {ndotdot:>8} {bstar:>8} 0  999".format(
             norad_id=norad_id,
             cospar_id=cospar_id,
             date=date,

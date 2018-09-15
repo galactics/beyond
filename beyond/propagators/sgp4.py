@@ -2,6 +2,7 @@
 from datetime import timedelta
 
 from .base import AnalyticalPropagator
+from ..orbits import Tle
 
 from sgp4.earth_gravity import wgs72
 from sgp4.io import twoline2rv
@@ -25,7 +26,8 @@ class Sgp4(AnalyticalPropagator):
         """
 
         self._orbit = orbit
-        lines = orbit.complements['tle'].splitlines()
+        tle = Tle.from_orbit(orbit)
+        lines = tle.text.splitlines()
 
         if len(lines) == 3:
             _, line1, line2 = lines
