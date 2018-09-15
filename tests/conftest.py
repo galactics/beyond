@@ -36,7 +36,7 @@ def common_env():
 
 @fixture
 def station(common_env):
-    return create_station('Toulouse', (43.604482, 1.443962, 172.), delay=True)
+    return create_station('Toulouse', (43.604482, 1.443962, 172.))
 
 
 @fixture(params=["tle", "ephem"])
