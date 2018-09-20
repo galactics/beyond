@@ -119,11 +119,15 @@ class Orbit(np.ndarray):
             name = Form.alt[name]
 
         # Verification if the variable is available in the current form
-        if name not in self.form.param_names:
+        if name in self.form.param_names:
+            i = self.form.param_names.index(name)
+            res = self[i]
+        elif name in self.complements.keys():
+            res = self.complements[name]
+        else:
             raise AttributeError("'{}' object has no attribute {!r}".format(self.__class__, name))
 
-        i = self.form.param_names.index(name)
-        return self[i]
+        return res
 
     def __getitem__(self, key):
 
