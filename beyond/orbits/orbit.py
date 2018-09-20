@@ -57,7 +57,7 @@ class Orbit(np.ndarray):
         self._form = obj._form
         self._frame = obj._frame
         self._propagator = obj._propagator
-        self.complements = obj.complements
+        self.complements = obj.complements.copy()
 
     def __reduce__(self):
         """For pickling
