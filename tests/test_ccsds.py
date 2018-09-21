@@ -21,12 +21,12 @@ META_STOP
 
 COMMENT  State Vector
 EPOCH                = 2008-09-20T12:25:40.104192
-X                    =  3459.023611 [km]
-Y                    =  5617.725542 [km]
-Z                    =  1316.222323 [km]
-X_DOT                =    -3.535844 [km/s]
-Y_DOT                =     3.550405 [km/s]
-Z_DOT                =    -5.846067 [km/s]
+X                    =  4086.147180 [km]
+Y                    =  -994.936814 [km]
+Z                    =  5250.678791 [km]
+X_DOT                =     2.511071 [km/s]
+Y_DOT                =     7.255240 [km/s]
+Z_DOT                =    -0.583165 [km/s]
 
 COMMENT  Keplerian elements
 SEMI_MAJOR_AXIS      =  6730.963463 [km]
@@ -34,7 +34,7 @@ ECCENTRICITY         =     0.000670
 INCLINATION          =    51.641600 [deg]
 RA_OF_ASC_NODE       =   247.462700 [deg]
 ARG_OF_PERICENTER    =   130.536000 [deg]
-TRUE_ANOMALY         =    35.015255 [deg]"""
+TRUE_ANOMALY         =   324.984745 [deg]"""
 
 ref_opm_no_units = """CCSDS_OPM_VERS = 2.0
 CREATION_DATE = 2017-06-21T13:20:25
@@ -50,12 +50,12 @@ META_STOP
 
 COMMENT  State Vector
 EPOCH                = 2008-09-20T12:25:40.104192
-X                    =  3459.023611
-Y                    =  5617.725542
-Z                    =  1316.222323
-X_DOT                =    -3.535844
-Y_DOT                =     3.550405
-Z_DOT                =    -5.846067
+X                    =  4086.147180
+Y                    =  -994.936814
+Z                    =  5250.678791
+X_DOT                =     2.511071
+Y_DOT                =     7.255240
+Z_DOT                =    -0.583165
 
 COMMENT  Keplerian elements
 SEMI_MAJOR_AXIS      =  6730.963463
@@ -63,7 +63,7 @@ ECCENTRICITY         =     0.000670
 INCLINATION          =    51.641600
 RA_OF_ASC_NODE       =   247.462700
 ARG_OF_PERICENTER    =   130.536000
-TRUE_ANOMALY         =    35.015255"""
+TRUE_ANOMALY         =   324.984745"""
 
 ref_opm_strange_units = """CCSDS_OPM_VERS = 2.0
 CREATION_DATE = 2017-06-21T13:20:25

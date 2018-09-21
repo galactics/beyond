@@ -134,7 +134,7 @@ def test_kepl_m(ref_kepl_m):
     kep = KEPL_M(kepl_m, KEPL)
     assert np.allclose(kep, [
         7.19263111e+06, 2.18439000e-03, 1.71926101e+00,
-        5.51044450e+00, 1.17890602e+00, 3.04376883e+00
+        5.51044450e+00, 1.17890602e+00, 3.23941648e+00
     ])
 
     kepl_m = ref_kepl_m.copy()

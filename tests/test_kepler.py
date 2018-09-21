@@ -111,4 +111,4 @@ def test_man(orb):
     before = np.mean(altitude[:80])
     after = np.mean(altitude[140:])
 
-    assert 97000 < after - before < 98000
+    assert 98000 < after - before < 99000

@@ -84,7 +84,7 @@ class Form(Node):
         Ω = arctan2(h[0], -h[1]) % (2 * np.pi)  # right ascencion of the ascending node
 
         ω_ν = arctan2(r[2] / sin(i), r[0] * cos(Ω) + r[1] * sin(Ω))
-        ν = arctan2(sqrt(p / center.µ) * np.dot(v, r), p - r_norm)
+        ν = arctan2(sqrt(p / center.µ) * np.dot(v, r), p - r_norm) % (2 * np.pi)
         ω = (ω_ν - ν) % (2 * np.pi)             # argument of the perigee
 
         return np.array([a, e, i, Ω, ω, ν], dtype=float)
@@ -118,7 +118,9 @@ class Form(Node):
         a, e, i, Ω, ω, ν = coord
         if e < 1:
             # Elliptic case
-            E = arccos((e + cos(ν)) / (1 + e * cos(ν)))  # Eccentric anomaly
+            cos_E = (e + cos(ν)) / (1 + e * cos(ν))
+            sin_E = (sin(ν) * sqrt(1 - e ** 2)) / (1 + e * cos(ν))
+            E = arctan2(sin_E, cos_E) % (2 * np.pi)
             M = E - e * sin(E)  # Mean anomaly
         else:
             # Hyperbolic case
@@ -133,7 +135,10 @@ class Form(Node):
         """
         a, e, i, Ω, ω, M = coord
         E = cls._m_to_e(e, M)
-        ν = arccos((cos(E) - e) / (1 - e * cos(E)))
+        cos_ν = (cos(E) - e) / (1 - e * cos(E))
+        sin_ν = (sin(E) * sqrt(1 - e**2)) / (1 - e * cos(E))
+
+        ν = arctan2(sin_ν, cos_ν) % (np.pi * 2)
 
         return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
@@ -205,7 +210,7 @@ class Form(Node):
         a, ex, ey, i, Ω, λ = coord
 
         e = sqrt(ex ** 2 + ey ** 2)
-        ω = arccos(ex / e)
+        ω = arctan2(ey / e, ex / e)
         M = λ - ω
 
         return np.array([a, e, i, Ω, ω, M], dtype=float)
