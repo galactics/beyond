@@ -114,9 +114,7 @@ class Orbit(np.ndarray):
 
     def __getattr__(self, name):
 
-        # Conversion of variable name to utf-8
-        if name in Form.alt:
-            name = Form.alt[name]
+        name = Form.alt.get(name, name)
 
         # Verification if the variable is available in the current form
         if name in self.form.param_names:
