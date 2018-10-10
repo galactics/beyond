@@ -12,10 +12,17 @@ Each release is linked to a git commit.
 - CCSDS handling of maneuvers
 - Possibility to have tolerant ephems regarding date inputs
 - Entry points for EOP databases registration
+- JPL module now callable on bsp files for details on content
+- Python 3.7 compatibility and tests
+- Library custom errors
 
 ### Changed
 
 - Eop acquisition is done at Date creation, instead of at frame transformation
+
+### Removed
+
+- Station propagation delay (the method was heavy and not entirely correct, if not totally wrong)
 
 ## [v0.5] - 2018-05-01
 
