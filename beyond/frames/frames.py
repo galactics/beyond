@@ -30,11 +30,11 @@ The relations may be circular, thanks to the use of the Node class.
                      ,---.         ,----.
                      |PEF|         |TIRF|
                      `---'         `----'
-                        \            /
+                        \\            /
                     IAU 1980       IAU 2010
            Earth Orientation       Earth Orientation
                   Parameters       Parameters
-                           \      /
+                           \\     /
          ,-----.            ,----.
          |WGS84|--identity--|ITRF|
          `-----'            `----'

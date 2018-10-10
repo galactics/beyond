@@ -33,7 +33,6 @@ class TopocentricFrame(Frame):
         """
 
         from ..orbits.listeners import stations_listeners, Listener
-        from ..orbits import Ephem
 
         listeners = []
         events_classes = tuple()

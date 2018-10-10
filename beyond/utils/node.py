@@ -41,7 +41,7 @@ class Node:
         # B   F
         # | / |
         # C   E
-        #  \ /
+        # \\ /
         #   D
 
         A.path('E')

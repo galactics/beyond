@@ -1,5 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Configuration handler
+
+The configuration is a simple dictionnary. See :ref:`configuration` for
+details.
+"""
 
 
 class Config(dict):

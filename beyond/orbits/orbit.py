@@ -150,7 +150,8 @@ class Orbit(np.ndarray):
         else:
             propagator = "%s (initialised)" % self.propagator.__class__.__name__
 
-        fmt = """Orbit =
+        fmt = """
+Orbit =
   date = {date}
   form = {form}
   frame = {frame}

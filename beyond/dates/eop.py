@@ -53,15 +53,15 @@ class TaiUtc():
         Return:
             tuple:
         """
-        l, n = (None, None), (None, None)
+        past, future = (None, None), (None, None)
 
         for mjd, value in reversed(self.data):
             if mjd <= date:
-                l = (mjd, value)
+                past = (mjd, value)
                 break
-            n = (mjd, value)
+            future = (mjd, value)
 
-        return l, n
+        return past, future
 
 
 class Finals2000A():
@@ -239,7 +239,7 @@ class EopDb:
         return cls._dbs[dbname]
 
     @classmethod
-    def get(cls, mjd: float, dbname: str=None) -> Eop:
+    def get(cls, mjd: float, dbname: str = None) -> Eop:
         """Retrieve Earth Orientation Parameters and timescales differences
         for a given date
 

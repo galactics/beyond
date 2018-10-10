@@ -3,8 +3,6 @@ import numpy as np
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 
-from ..frames.frames import get_frame
-
 
 __all__ = [
     'Speaker', 'Listener', 'stations_listeners', 'StationSignalListener',
