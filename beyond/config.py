@@ -38,5 +38,33 @@ class Config(dict):
 
         return out
 
+    def set(self, *args):
+        """Set a value in the config dictionnary
+
+        The last argument is the value to set
+
+        Example:
+
+        .. code-block:: python
+
+            config.set('aaa', 'bbb', True)
+            print(config)
+            # {
+            #     'aaa': {
+            #         'bbb': True
+            #     }
+            # }
+        """
+
+        # split arguments in keys and value
+        *first_keys, last_key, value = args
+
+        subdict = self
+        for k in first_keys:
+            subdict.setdefault(k, {})
+            subdict = subdict[k]
+
+        subdict[last_key] = value
+
 
 config = Config()
