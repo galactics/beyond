@@ -3,7 +3,7 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
-## [Unreleased]
+## [v0.6] - 2018-10-20
 
 ### Added
 
@@ -15,14 +15,17 @@ Each release is linked to a git commit.
 - JPL module now callable on bsp files for details on content
 - Python 3.7 compatibility and tests
 - Library custom errors
+- Config set method
+- Ephem object deep copy and conversions
 
 ### Changed
 
 - Eop acquisition is done at Date creation, instead of at frame transformation
+- get_body only allows one body selection at a time
 
 ### Removed
 
-- Station propagation delay (the method was heavy and not entirely correct, if not totally wrong)
+- Station propagation delay : The method was heavy and not entirely correct, if not totally wrong
 
 ## [v0.5] - 2018-05-01
 

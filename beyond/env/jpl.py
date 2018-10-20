@@ -51,6 +51,10 @@ These files allows to convert to keplerian elements with correct physical consta
     })
 
 Examples of both .bsp and .tcp files are available in the ``tests/data/jpl`` folder.
+
+To display the content of a .bsp file you can use::
+
+    $ python -m beyond.env.jpl <file>...
 """
 
 import numpy as np

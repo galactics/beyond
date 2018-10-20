@@ -203,6 +203,8 @@ class Ephem(Speaker):
             ephem.iter(start=Date(2017, 1, 1, 8), stop=Date(2017, 1, 1, 16))
         """
 
+        # To allow for a loose control of the dates we have to compute
+        # the real starting date of the iterator
         real_start = None
 
         if start is None:
