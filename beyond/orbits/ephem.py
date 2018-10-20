@@ -262,6 +262,10 @@ class Ephem(Speaker):
                 date += step
 
     def ephemeris(self, *args, **kwargs):
+        """Same as :py:meth:`self.iter() <iter>`
+
+        Implemented to expose the same methods as :py:class:`Orbit`
+        """
         return self.iter(*args, **kwargs)
 
     def ephem(self, *args, **kwargs):
@@ -274,6 +278,17 @@ class Ephem(Speaker):
         """
 
         return self.__class__(self.ephemeris(*args, **kwargs))
+
+    def copy(self, *, form=None, frame=None):
+        """Create a deep copy of the ephemeris, and allow frame and form changing
+        """
+        new = self.ephem()
+        if frame:
+            new.frame = frame
+        if form:
+            new.form = form
+
+        return new
 
     def as_frame(self, name, **kwargs):  # pragma: no cover
         """Register the Ephem object as a frame
