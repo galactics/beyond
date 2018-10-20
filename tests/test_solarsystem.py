@@ -57,17 +57,7 @@ def test_sun():
     #   vz = 0.0
 
 
-def test_multi():
-
-    sun, earth, moon = get_body("Sun", "Earth", "Moon")
-
-    sun_orb = sun.propagate(Date.now())
-    earth_orb = earth.propagate(Date.now())
-    moon_orb = moon.propagate(Date.now())
-
-    assert isinstance(sun_orb.propagator, SunPropagator)
-    assert isinstance(earth_orb.propagator, EarthPropagator)
-    assert isinstance(moon_orb.propagator, MoonPropagator)
+def test_unknown():
 
     with raises(UnknownBodyError):
         get_body("Mars")

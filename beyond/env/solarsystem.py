@@ -10,11 +10,11 @@ from ..utils.units import AU
 from ..propagators.base import AnalyticalPropagator
 
 
-def get_body(*bodies):
+def get_body(name):
     """Retrieve a given body orbits and parameters
 
     Args:
-        bodies (str or list): Object name(s)
+        name (str): Object name
     Return:
         Body:
     """
@@ -28,16 +28,14 @@ def get_body(*bodies):
     result = []
 
     try:
-        for name in bodies:
 
-            body, propag = _bodies[name.lower()]
-            # attach a propagator to the object
-            body.propagate = propag.propagate
-            result.append(body)
+        body, propag = _bodies[name.lower()]
+        # attach a propagator to the object
+        body.propagate = propag.propagate
     except KeyError as e:
         raise UnknownBodyError(e.args[0])
 
-    return result[0] if len(bodies) == 1 else result
+    return body
 
 
 class EarthPropagator(AnalyticalPropagator):
