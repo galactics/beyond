@@ -344,7 +344,7 @@ class Date:
     def strptime(cls, data, format, scale=DEFAULT_SCALE):  # pragma: no cover
         """Convert a string representation of a date to a Date object
         """
-        return Date(datetime.strptime(data, format), scale=scale)
+        return cls(datetime.strptime(data, format), scale=scale)
 
     @classmethod
     def now(cls, scale=DEFAULT_SCALE):
@@ -371,7 +371,7 @@ class Date:
         offset = self.scale.offset(self._mjd, new_scale, self.eop)
         result = self.datetime + timedelta(seconds=offset)
 
-        return Date(result, scale=new_scale)
+        return self.__class__(result, scale=new_scale)
 
     @classmethod
     def _julian_century(cls, jd):
