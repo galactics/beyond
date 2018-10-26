@@ -34,7 +34,7 @@ class TopocentricFrame(Frame):
 
         from ..orbits.listeners import stations_listeners, Listener
 
-        listeners = []
+        listeners = kwargs.get('listeners', [])
         events_classes = tuple()
 
         if events:
