@@ -171,7 +171,7 @@ class Date:
             if isinstance(arg, datetime):
                 # Python datetime.datetime object
                 d, s = self._convert_dt(arg)
-            elif isinstance(arg, self.__class__):
+            elif isinstance(arg, Date):
                 # Date object
                 d = arg.d
                 s = arg.s
@@ -256,7 +256,7 @@ class Date:
             other = timedelta(seconds=-other.total_seconds())
         elif isinstance(other, datetime):
             return self.datetime - other
-        elif isinstance(other, self.__class__):
+        elif isinstance(other, Date):
             return self._datetime - other._datetime
         else:
             raise TypeError("Unknown operation with {} type".format(type(other)))
