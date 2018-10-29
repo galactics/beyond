@@ -113,27 +113,41 @@ class Ephem(Speaker):
         if not self.start <= date <= self.stop:
             raise ValueError("Date '%s' not in range" % date)
 
-        # reseach of the point just after the date we wish to interpolate to
-        for next_i, orb in enumerate(self):  # pragma: no branch
-            if orb.date > date:
+        prev_i = 0
+        ephem = self
+
+        # Binary search of the orbit step just before the desired date
+        while True:
+            l = len(ephem)
+            if l == 1:
                 break
+            k = l // 2
+
+            if date > ephem[k].date:
+                prev_i += k
+                ephem = ephem[k:]
+            else:
+                ephem = ephem[:k]
 
         method = method if method is not None else self.method
         order = order if order is not None else self.order
 
         if method == self.LINEAR:
 
-            y0 = self[next_i - 1]
-            y1 = self[next_i]
+            y0 = self[prev_i]
+            y1 = self[prev_i + 1]
 
             result = y0[:] + (y1[:] - y0[:]) * (date.mjd - y0.date.mjd) / (y1.date.mjd - y0.date.mjd)
 
         elif method == self.LAGRANGE:
 
-            stop = next_i + order
-            start = next_i
+            stop = prev_i + 1 + order // 2 + order % 2
+            start = prev_i - order // 2 + 1
             if stop >= len(self):
                 start -= stop - len(self)
+            elif start < 0:
+                stop -= start
+                start = 0
 
             # selection of the subset of data, of length 'order' around the desired value
             subset = self[start:stop]
@@ -157,6 +171,8 @@ class Ephem(Speaker):
 
         else:
             raise ValueError("Unkown interpolation method", method)
+
+        orb = ephem[0]
 
         return orb.__class__(date, result, orb.form, orb.frame, orb.propagator)
 

@@ -39,15 +39,15 @@ def test_create(ephem, start):
 
 def test_interpolate(ephem):
 
-    orb = ephem.interpolate(ephem.start + timedelta(hours=0.5), method="linear")
+    orb = ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27), method="linear")
 
-    assert list(orb[:3]) == [-1345306.8763218378, 5181620.4629104454, -4088075.609182423]
-    assert list(orb[3:]) == [-5080.8194139542002, -4325.1407112188917, -3821.7458465578138]
+    assert list(orb[:3]) == [-2343119.6282188366, 4140259.6343833795, -4744905.5643210905]
+    assert list(orb[3:]) == [-4568.825145249858, -5572.6341438079435, -2614.704833575209]
 
-    orb = ephem.interpolate(ephem.start + timedelta(hours=0.5), method="lagrange")
+    orb = ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27), method="lagrange")
 
-    assert list(orb[:3]) == [-1345307.6633055285, 5181606.501893268, -4088069.6677857935]
-    assert list(orb[3:]) == [-5080.8129709429313, -4325.1691323453406, -3821.7243475924397]
+    assert list(orb[:3]) == [-2349933.1374301873, 4150754.2288609436, -4757989.96860434]
+    assert list(orb[3:]) == [-4580.715466516539, -5588.283144821399, -2620.9683124126564]
 
     with raises(ValueError):
         # We ask for a value clearly out of range

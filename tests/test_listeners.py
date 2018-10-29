@@ -4,6 +4,11 @@ from pytest import raises
 from beyond.dates import Date, timedelta
 from beyond.orbits.listeners import *
 
+"""Here the reference in term of time is given by the TLE propagation.
+The ephemeris interpolation generate a little time difference, which is
+why we use an 'epsilon'.
+"""
+
 
 def iter_listeners(orb, listeners):
     start = Date(2018, 4, 5, 16, 50)
@@ -20,6 +25,10 @@ def test_light(orbit):
     listeners = [LightListener(), LightListener('penumbra')]
     events = iter_listeners(orbit, listeners)
 
+    # Maybe the difference of date precision between 'exit' and 'entry' while computing from
+    # a Ephem can be explained by the fact that the 'entry' events are further from
+    # a point of the ephemeris than the 'exit' ones.
+
     p = next(events)
     assert abs(p.date - Date(2018, 4, 5, 17, 5, 57, 760757)).total_seconds() <= 8e-6
     assert p.event.info == "Umbra exit"
@@ -29,11 +38,11 @@ def test_light(orbit):
     assert p.event.info == "Penumbra exit"
 
     p = next(events)
-    assert abs(p.date - Date(2018, 4, 5, 18, 2, 37, 568025)).total_seconds() <= 8e-6
+    assert abs(p.date - Date(2018, 4, 5, 18, 2, 37, 568025)).total_seconds() <= 16e-6
     assert p.event.info == "Penumbra entry"
 
     p = next(events)
-    assert abs(p.date - Date(2018, 4, 5, 18, 2, 45, 814490)).total_seconds() <= 60e-6
+    assert abs(p.date - Date(2018, 4, 5, 18, 2, 45, 814490)).total_seconds() <= 16e-6
     assert p.event.info == "Umbra entry"
 
     with raises(StopIteration):
@@ -61,7 +70,7 @@ def test_apside(orbit):
     events = iter_listeners(orbit, ApsideListener())
 
     p = next(events)
-    assert abs(p.date - Date(2018, 4, 5, 16, 58, 54, 546919)).total_seconds() <= 32e-6
+    assert abs(p.date - Date(2018, 4, 5, 16, 58, 54, 546919)).total_seconds() <= 36e-6
     assert p.event.info == "Apoapsis"
 
     p = next(events)
