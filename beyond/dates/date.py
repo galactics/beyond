@@ -185,7 +185,7 @@ class Date:
                     d = int(arg)
                     s = (arg - d) * 86400
             else:
-                raise TypeError("Unknown argument")
+                raise TypeError("Unknown type '{}'".format(type(arg)))
         elif len(args) == 2 and (isinstance(args[0], int) and isinstance(args[1], (int, float))):
             # Julian day and seconds in the day
             d, s = args
@@ -195,7 +195,7 @@ class Date:
             dt = datetime(*args, **kwargs)
             d, s = self._convert_dt(dt)
         else:
-            raise TypeError("Unknown arguments")
+            raise TypeError("Unknown type sequence {}".format(", ".join(str(type(x)) for x in args)))
 
         mjd = d + s / 86400.
 
@@ -247,7 +247,7 @@ class Date:
         if isinstance(other, timedelta):
             days, sec = divmod(other.total_seconds() + self.s, 86400)
         else:
-            raise TypeError("Unknown operation with {} type".format(type(other)))
+            raise TypeError("Unknown operation with {}".format(type(other)))
 
         return self.__class__(self.d + int(days), sec, scale=self.scale)
 
@@ -259,7 +259,7 @@ class Date:
         elif isinstance(other, Date):
             return self._datetime - other._datetime
         else:
-            raise TypeError("Unknown operation with {} type".format(type(other)))
+            raise TypeError("Unknown operation with {}".format(type(other)))
 
         return self.__add__(other)
 
