@@ -3,6 +3,19 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [v0.6.1] - 2018-11-01
+
+### Added
+
+- Visibility allow passing user listeners and merge them with station listeners
+- Better describe when a wrong argument type is provided to ``Date`` constructor
+
+### Changed
+
+- Better ``Date`` subclass handling
+- When interpolating an ``Ephem`` object, the research for the good points is faster
+  due to the use of binary search, particularly when dealing with long ephemeris files
+
 ## [v0.6] - 2018-10-20
 
 ### Added
