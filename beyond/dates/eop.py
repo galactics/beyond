@@ -4,7 +4,7 @@
 """Retrieve and interpolate data for Earth Orientation and timescales conversions
 """
 
-import warnings
+import logging
 from pathlib import Path
 from inspect import isclass
 from pkg_resources import iter_entry_points
@@ -13,6 +13,9 @@ from ..config import config
 from ..errors import EopError, EopWarning, ConfigError
 
 __all__ = ["register", "EopDb", "TaiUtc", "Finals", "Finals2000A"]
+
+
+log = logging.getLogger(__name__)
 
 
 class TaiUtc():
@@ -259,7 +262,7 @@ class EopDb:
                 msg = str(e)
 
             if cls.policy() == cls.WARN:
-                warnings.warn(msg, EopWarning)
+                log.warning(msg, EopWarning)
             elif cls.policy() == cls.ERROR:
                 raise
 
@@ -285,7 +288,7 @@ class EopDb:
 
         if name in cls._dbs:
             msg = "'{}' is already registered for an Eop database. Skipping".format(name)
-            warnings.warn(msg, EopWarning)
+            log.warning(msg, EopWarning)
         else:
             cls._dbs[name] = klass
 

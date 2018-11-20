@@ -35,13 +35,15 @@
     10  69–69   Checksum (modulo 10)                                7
 """
 
+import logging
+import numpy as np
 from string import ascii_uppercase
 from datetime import datetime, timedelta
-import warnings
-import numpy as np
 
 from .orbit import Orbit
 from ..dates.date import Date
+
+log = logging.getLogger(__name__)
 
 
 def _float(text):
@@ -283,7 +285,7 @@ class Tle:
                         if error == "raise":
                             raise
                         else:
-                            warnings.warn(str(e))
+                            log.warning(str(e))
 
                 cache = []
             else:

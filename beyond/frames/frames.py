@@ -41,7 +41,7 @@ The relations may be circular, thanks to the use of the Node class.
 """
 
 import sys
-import warnings
+import logging
 import numpy as np
 
 from ..errors import UnknownFrameError
@@ -56,6 +56,8 @@ IAU1980 = ['TOD', 'MOD']
 OTHER = ['EME2000', 'TEME', 'WGS84', 'PEF']
 
 __all__ = CIO + IAU1980 + OTHER + ['get_frame']
+
+log = logging.getLogger(__name__)
 
 
 class FrameCache(dict):
@@ -101,7 +103,7 @@ class _MetaFrame(type, Node):
         super(type, cls).__init__(name)
 
         if cls.__name__ in dynamic:
-            warnings.warn("A frame with the name '%s' is already registered. Overriding" % cls.__name__)
+            log.warning("A frame with the name '%s' is already registered. Overriding" % cls.__name__)
 
         cls.__module__ = __name__ + ".dynamic"
 
