@@ -3,10 +3,12 @@ import numpy as np
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 
+from ..dates import Date
+
 
 __all__ = [
     'Speaker', 'Listener', 'stations_listeners', 'StationSignalListener',
-    'StationMaxListener', 'StationMaskListener', 'LightListener', 'ApsideListener',
+    'StationMaxListener', 'StationMaskListener', 'LightListener', 'TerminatorListener', 'ApsideListener',
     'NodeListener', 'ZeroDopplerListener'
 ]
 
@@ -207,6 +209,48 @@ class LightListener(Listener):
                         return -1
 
         return 1
+
+
+class TerminatorEvent(Event):
+    pass
+
+
+class TerminatorListener(Listener):
+    """Detect the night/day transition at the surface of the earth, at
+    the zenith
+    """
+
+    event = TerminatorEvent
+
+    _frame_name = "SunFrame"
+
+    def __init__(self):
+        from ..env.solarsystem import get_body
+
+        self.sun = get_body('Sun')
+        self._frame = self.sun.propagate(Date.now()).as_frame(self._frame_name)
+
+    def info(self, orb):
+
+        orb2 = orb.copy(frame=self._frame, form='spherical')
+
+        if orb2.r_dot > 0:
+            msg = "Night Terminator"
+        else:
+            msg = "Day Terminator"
+
+        return TerminatorEvent(self, msg)
+
+    def __call__(self, orb):
+
+        sun_pos = self.sun.propagate(orb.date).copy(frame=orb.frame, form="cartesian")[:3]
+        sat_pos = orb.copy(form="cartesian")[:3]
+
+        sun_norm = np.linalg.norm(sun_pos)
+        sat_norm = np.linalg.norm(sat_pos)
+
+        return (sat_pos @ sun_pos) / (sun_norm * sat_norm)
+
 
 
 class NodeEvent(Event):

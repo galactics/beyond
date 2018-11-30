@@ -97,3 +97,17 @@ def test_station_signal(station, orbit):
     p = next(events)
     assert abs(p.date - Date(2018, 4, 5, 18, 1, 4, 828355)).total_seconds() <= 859e-6
     assert p.event.info == "LOS"
+
+
+def test_terminator(orbit):
+
+    events = iter_listeners(orbit, TerminatorListener())
+
+    p = next(events)
+
+    assert abs(p.date - Date(2018, 4, 5, 17, 11, 13, 908911)).total_seconds() <= 2e-5
+    assert p.event.info == "Day Terminator"
+
+    p = next(events)
+    assert abs(p.date - Date(2018, 4, 5, 17, 57, 33, 123730)).total_seconds() <= 2.5e-5
+    assert p.event.info == "Night Terminator"
