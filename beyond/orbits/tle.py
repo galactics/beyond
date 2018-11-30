@@ -131,7 +131,9 @@ class Tle:
         year += 1900 if year >= 57 else 2000  # This condition works until 2057
         self.cospar_id = "%d-%s" % (year, first[2][2:])
 
-        epoch = datetime(2000 + int(first[3][:2]), 1, 1) + timedelta(days=float(first[3][2:]) - 1)
+        year = int(first[3][:2])
+        year += 1900 if year >= 57 else 2000  # This condition works until 2057
+        epoch = datetime(year, 1, 1) + timedelta(days=float(first[3][2:]) - 1)
         self.epoch = Date(epoch)
         self.ndot = float(first[4])
         self.ndotdot = _float(first[5])
