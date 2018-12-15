@@ -301,7 +301,7 @@ KEPL_C = Form("keplerian_circular", ["a", "ex", "ey", "i", "Ω", "λ"])
     * ey : e * sin(ω)
     * i : inclination
     * Ω : right-ascencion of ascending node
-    * λ : ω + M
+    * λ : mean argument of latitude (ω + M)
 """
 
 KEPL_M = Form("keplerian_mean", ["a", "e", "i", "Ω", "ω", "M"])
