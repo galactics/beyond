@@ -11,8 +11,9 @@ class Maneuver:
         Args:
             date (Date): Date of application of the maneuver
             dv (list): Vector of length 3 describing the velocity increment
-            frame (str): Which frame is used for applying the increment : ``'TNW'``, ``'QSW'`` or
-                ``None``. If ``frame = None`` the same frame as the orbit is used
+            frame (str): Which frame is used for applying the increment : ``'TNW'``,
+                ``'QSW'`` (or its aliases 'RSW' and 'LVLH') or ``None``.
+                If ``frame = None`` the same frame as the orbit is used
         """
 
         if len(dv) != 3:
@@ -20,7 +21,11 @@ class Maneuver:
 
         self.date = date
         self._dv = np.array(dv)
-        self.frame = frame
+        frame = frame.upper()
+        if frame in ("RSW", 'LVLH'):
+            self.frame = "QSW"
+        elif frame in ("QSW", "TNW"):
+            self.frame = frame
 
     def dv(self, orb):
         """Computation of the velocity increment in the reference frame of the orbit

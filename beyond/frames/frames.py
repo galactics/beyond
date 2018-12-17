@@ -302,13 +302,16 @@ def orbit2frame(name, ref_orbit, orientation=None, center=None):
 
     If orientation is ``None``, the new frame will keep the orientation of the
     reference frame of the Orbit and move along with the orbit.
-    Other acceptable values are ``"QSW"`` and ``"TNW"``.
+    Other acceptable values are ``"QSW"`` (and its aliases "LVLH" and "RSW") or ``"TNW"``.
+
     See :py:func:`~beyond.frames.local.to_qsw` and :py:func:`~beyond.frames.local.to_tnw`
     for informations regarding these orientations.
     """
 
     if orientation is None:
         orientation = ref_orbit.frame.orientation
+    elif orientation.upper() in ("RSW", "LVLH"):
+        orientation = "QSW"
     elif orientation.upper() not in ("QSW", "TNW"):
         raise ValueError("Unknown orientation '%s'" % orientation)
 

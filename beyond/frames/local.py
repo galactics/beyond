@@ -42,6 +42,9 @@ def to_qsw(orbit):
     """In the QSW Local Orbital Reference Frame, x is oriented along the position vector,
     z along the angular momentum, and y complete the frame.
 
+    The frame is sometimes also called RSW (where R stands for radial) or LVLH (Local
+    Vertical Local Horizontal).
+
     Args:
         orbit (list): Array of length 6
     Return:
