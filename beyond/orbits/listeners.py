@@ -86,9 +86,9 @@ class Listener(metaclass=ABCMeta):
 
         Args:
             orb (Orbit):
+
         Return:
-            bool: `True` if there is a zero-crossing for the parameter watched
-                by the listener
+            bool: True if there is a zero-crossing for the parameter watched by the listener
         """
 
         return self.prev is not None and np.sign(self(orb)) != np.sign(self(self.prev))
@@ -137,15 +137,16 @@ class LightListener(Listener):
     event = LightEvent
 
     UMBRA = "umbra"
+    """Penumbra <-> Shadow"""
     PENUMBRA = "penumbra"
+    """Light <-> Penumbra"""
 
     def __init__(self, type=UMBRA, frame=None):
         """
         Args:
             type (str): Choose which event to trigger between umbra or penumbra
-            frame (str) : Name of the reference frame from wich to compute
-                If `None` the frame is unchanged from the one given by the
-                extrapolator
+            frame (str) : Name of the reference frame from wich to compute.
+                If ``None`` the frame is unchanged.
         """
         self.type = type
         self.frame = frame
@@ -228,6 +229,9 @@ class TerminatorListener(Listener):
     _frame_name = "SunFrame"
 
     def __init__(self):
+        """
+        """
+
         from ..env.solarsystem import get_body
 
         self.sun = get_body('Sun')
@@ -270,8 +274,7 @@ class NodeListener(Listener):
         """
         Args:
             frame (str) : Name of the reference frame from wich to compute
-                If `None` the frame is unchanged from the one given by the
-                extrapolator
+                If ``None`` the frame is unchanged.
         """
         self.frame = frame
 
@@ -298,8 +301,7 @@ class ApsideListener(Listener):
         """
         Args:
             frame (str) : Name of the reference frame from wich to compute
-                If `None` the frame is unchanged from the one given by the
-                extrapolator
+                If ``None`` the frame is unchanged.
         """
         self.frame = frame
 
@@ -368,6 +370,10 @@ class StationMaskListener(StationSignalListener):
     event = MaskEvent
 
     def __init__(self, station):
+        """
+        Args:
+            station (TopocentricFrame): Station from which to listen to elevation events
+        """
 
         if station.mask is None:
             raise ValueError("No mask defined for this station")
@@ -411,6 +417,10 @@ class StationMaxListener(Listener):
     event = MaxEvent
 
     def __init__(self, station):
+        """
+        Args:
+            station (TopocentricFrame): Station from which to listen to elevation events
+        """
         self.station = station
 
     def info(self, orb):
@@ -461,6 +471,7 @@ class ZeroDopplerListener(Listener):
         return ZeroDopplerEvent(self)
 
     def check(self, orb):
+
         # Override to disable the computation when the object is not in view of the station
         if self.sight and orb.copy(frame=self.frame, form='spherical').phi <= 0:
             return False

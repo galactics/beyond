@@ -60,6 +60,7 @@ seen from a station.
 
 .. automodule:: beyond.orbits.listeners
     :members:
+    :special-members: __init__
 
 Maneuver
 --------
