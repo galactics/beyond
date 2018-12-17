@@ -138,14 +138,17 @@ class LightListener(Listener):
 
     UMBRA = "umbra"
     PENUMBRA = "penumbra"
-    FRAME = "EME2000"
 
-    def __init__(self, type=UMBRA):
+    def __init__(self, type=UMBRA, frame=None):
         """
         Args:
             type (str): Choose which event to trigger between umbra or penumbra
+            frame (str) : Name of the reference frame from wich to compute
+                If `None` the frame is unchanged from the one given by the
+                extrapolator
         """
         self.type = type
+        self.frame = frame
 
     def info(self, orb):
         if self.type == self.UMBRA:
@@ -164,7 +167,7 @@ class LightListener(Listener):
         # This import is not at the top of the file to avoid circular imports
         from ..env.solarsystem import get_body
 
-        orb = orb.copy(form="cartesian", frame=self.FRAME)
+        orb = orb.copy(form="cartesian", frame=self.frame)
 
         sun = get_body("Sun")
 
@@ -263,7 +266,13 @@ class NodeListener(Listener):
 
     event = NodeEvent
 
-    def __init__(self, frame="EME2000"):
+    def __init__(self, frame=None):
+        """
+        Args:
+            frame (str) : Name of the reference frame from wich to compute
+                If `None` the frame is unchanged from the one given by the
+                extrapolator
+        """
         self.frame = frame
 
     def info(self, orb):
@@ -285,7 +294,13 @@ class ApsideListener(Listener):
 
     event = ApsideEvent
 
-    def __init__(self, frame="EME2000"):
+    def __init__(self, frame=None):
+        """
+        Args:
+            frame (str) : Name of the reference frame from wich to compute
+                If `None` the frame is unchanged from the one given by the
+                extrapolator
+        """
         self.frame = frame
 
     def info(self, orb):

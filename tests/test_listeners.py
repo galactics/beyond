@@ -54,11 +54,11 @@ def test_node(orbit):
     events = iter_listeners(orbit, NodeListener())
 
     p = next(events)
-    assert abs(p.date - Date(2018, 4, 5, 17, 34, 1, 330583)).total_seconds() <= 20e-6
+    assert abs(p.date - Date(2018, 4, 5, 17, 33, 59, 488549)).total_seconds() <= 20e-6
     assert p.event.info == "Asc Node"
 
     p = next(events)
-    assert abs(p.date - Date(2018, 4, 5, 18, 20, 17, 235221)).total_seconds() <= 15e-6
+    assert abs(p.date - Date(2018, 4, 5, 18, 20, 15, 389928)).total_seconds() <= 17e-6
     assert p.event.info == "Desc Node"
 
     with raises(StopIteration):
