@@ -35,10 +35,11 @@ class TopocentricFrame(Frame):
         from ..orbits.listeners import stations_listeners, Listener
 
         listeners = kwargs.get('listeners', [])
-        events_classes = tuple()
+        event_classes = tuple()
 
         if events:
             # Handling of the listeners passed in the 'events' kwarg
+            # and merging them with the `listeners` kwarg
             if isinstance(events, Listener):
                 listeners.append(events)
             elif isinstance(events, (list, tuple)):
@@ -47,15 +48,18 @@ class TopocentricFrame(Frame):
             sta_list = stations_listeners(cls)
             listeners.extend(sta_list)
 
-            # Retrieve the list of events associated with the desired listeners
-            events_classes = tuple(listener.event for listener in sta_list)
+            # Only the events present in the `event_classes` list will be yielded
+            # outside of visibility. This list was created in order to force
+            # the yield of AOS and LOS.
+
+            event_classes = tuple(listener.event for listener in sta_list)
 
         for point in orb.iter(start=start, stop=stop, step=step, listeners=listeners, **kwargs):
             point.frame = cls
             point.form = 'spherical'
 
             # Not very clean !
-            if point.phi < 0 and not isinstance(point.event, events_classes):
+            if point.phi < 0 and not isinstance(point.event, event_classes):
                 continue
 
             yield point
