@@ -3,6 +3,12 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## Unreleased
+
+### Added
+
+- Tests for maneuver handling in CCSDS OPM
+
 ## [v0.6.2] - 2018-12-19
 
 ### Added

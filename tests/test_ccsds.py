@@ -4,7 +4,9 @@ from pytest import fixture, raises
 from datetime import timedelta
 
 from beyond.orbits import Tle
+from beyond.orbits.man import Maneuver
 from beyond.utils.ccsds import dumps, loads
+from beyond.dates import Date
 
 
 ref_opm = """CCSDS_OPM_VERS = 2.0
@@ -35,6 +37,27 @@ INCLINATION          =    51.641600 [deg]
 RA_OF_ASC_NODE       =   247.462700 [deg]
 ARG_OF_PERICENTER    =   130.536000 [deg]
 TRUE_ANOMALY         =   324.984745 [deg]"""
+
+ref_man = ref_opm + """
+
+COMMENT  Maneuver 1
+MAN_EPOCH_IGNITION   = 2008-09-20T12:41:09.984493
+MAN_DURATION         = 0.000 [s]
+MAN_DELTA_MASS       = 0.000 [kg]
+MAN_REF_FRAME        = TNW
+MAN_DV_1             = 0.280000 [km/s]
+MAN_DV_2             = 0.000000 [km/s]
+MAN_DV_3             = 0.000000 [km/s]
+
+COMMENT  Maneuver 2
+MAN_EPOCH_IGNITION   = 2008-09-20T13:33:11.374985
+MAN_DURATION         = 0.000 [s]
+MAN_DELTA_MASS       = 0.000 [kg]
+MAN_REF_FRAME        = TNW
+MAN_DV_1             = 0.270000 [km/s]
+MAN_DV_2             = 0.000000 [km/s]
+MAN_DV_3             = 0.000000 [km/s]
+"""
 
 ref_opm_no_units = """CCSDS_OPM_VERS = 2.0
 CREATION_DATE = 2017-06-21T13:20:25
@@ -288,15 +311,19 @@ META_STOP
 
 
 @fixture
-def tle():
-    return Tle("""1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927
+def orb():
+    tle = Tle("""1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927
     2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537""")
 
-
-@fixture
-def orb(tle):
     return tle.orbit()
 
+@fixture
+def orb_man(orb):
+    orb.maneuvers = [
+        Maneuver(Date(2008, 9, 20, 12, 41, 9, 984493), [280, 0, 0], frame="TNW"),
+        Maneuver(Date(2008, 9, 20, 13, 33, 11, 374985), [270, 0, 0], frame="TNW"),
+    ]
+    return orb
 
 @fixture
 def ephem(orb):
@@ -332,6 +359,15 @@ def test_dump_opm(orb):
 
     ref = ref_opm.splitlines()
     txt = dumps(orb).splitlines()
+
+    # the split is here to avoid the creation date line
+    assert txt[0] == ref[0]
+    assert "\n".join(txt[2:]) == "\n".join(ref[2:])
+
+
+def test_dump_opm_man(orb_man):
+    ref = ref_man.splitlines()
+    txt = dumps(orb_man).splitlines()
 
     # the split is here to avoid the creation date line
     assert txt[0] == ref[0]
@@ -393,6 +429,17 @@ def test_load_opm(orb):
     truncated_opm = "\n".join(ref_opm.splitlines()[:15] + ref_opm.splitlines()[16:])
     with raises(ValueError):
         loads(truncated_opm)
+
+
+def test_load_opm_man(orb_man):
+    # With maneuvers
+    opm_man = loads(ref_man)
+    assert len(opm_man.maneuvers) == 2
+
+    for i in range(len(orb_man.maneuvers)):
+        assert opm_man.maneuvers[i].date == orb_man.maneuvers[i].date
+        assert opm_man.maneuvers[i]._dv.tolist() == orb_man.maneuvers[i]._dv.tolist()
+        assert opm_man.maneuvers[i].frame == orb_man.maneuvers[i].frame
 
 
 def test_load_oem(ephem):

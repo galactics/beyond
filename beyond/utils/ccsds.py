@@ -56,13 +56,12 @@ def dumps(data, **kwargs):
     return content
 
 
-def _float(line):
+def _float(value):
     """Conversion of state vector field, with automatic unit handling
     """
-    field = line.partition('=')[-1].strip()
-    if "[" in field:
+    if "[" in value:
         # There is a unit field
-        value, sep, unit = field.partition("[")
+        value, sep, unit = value.partition("[")
         unit = sep + unit
 
         # As defined in the CCSDS Orbital Data Message Blue Book, the unit should
@@ -75,7 +74,6 @@ def _float(line):
         else:
             raise ValueError("Unknown unit for this field", unit)
     else:
-        value = field
         # if no unit is provided, the default is km, and km/s
         multiplier = 1000
 
@@ -181,59 +179,58 @@ def _read_opm(string):
         Orbit:
     """
 
-    name, cospar_id, scale, frame, date, x, y, z, vx, vy, vz = [None] * 11
-
     maneuvers = []
 
+    data = {}
     for line in string.splitlines():
         if not line or line.startswith("COMMENT"):
             continue
-        elif line.startswith("OBJECT_NAME"):
-            name = line.partition("=")[-1].strip()
-        elif line.startswith("OBJECT_ID"):
-            cospar_id = line.partition("=")[-1].strip()
-        elif line.startswith("TIME_SYSTEM"):
-            scale = line.partition("=")[-1].strip()
-        elif line.startswith("REF_FRAME"):
-            frame = line.partition('=')[-1].strip()
-        elif line.startswith("EPOCH"):
-            date = line.partition("=")[-1].strip()
-            date = Date.strptime(date, "%Y-%m-%dT%H:%M:%S.%f", scale=scale)
-        elif line.startswith("X_DOT"):
-            vx = _float(line)
-        elif line.startswith("Y_DOT"):
-            vy = _float(line)
-        elif line.startswith("Z_DOT"):
-            vz = _float(line)
-        elif line.startswith("X"):
-            x = _float(line)
-        elif line.startswith("Y"):
-            y = _float(line)
-        elif line.startswith("Z"):
-            z = _float(line)
-        elif line.startswith("MAN_EPOCH_IGNITION"):
-            man = {}
-            maneuvers.append(man)
-            man_date = line.partition("=")[-1].strip()
-            man['date'] = Date.strptime(man_date, "%Y-%m-%dT%H:%M:%S.%f", scale=scale)
-        elif line.startswith("MAN_DURATION"):
-            man['duration'] = timedelta(seconds=_float(line))
-        elif line.startswith("MAN_REF_FRAME"):
-            man['frame'] = line.partition('=')[-1].strip()
-        elif line.startswith("MAN_DV_"):
-            man.setdefault('dv', []).append(_float(line))
 
-    if None in [scale, frame, x, y, z, vx, vy, vz] or not isinstance(date, Date):
-        raise ValueError("Missing mandatory parameter")
+        key, _, value = line.partition("=")
+
+        key = key.strip()
+        value = value.strip()
+
+        if key.startswith('MAN_'):
+            if key == "MAN_EPOCH_IGNITION":
+                maneuvers.append({})
+                man_idx = len(maneuvers) - 1
+            maneuvers[man_idx][key] = value
+        else:
+            data[key] = value
+
+    try:
+        name = data['OBJECT_NAME']
+        cospar_id = data['OBJECT_ID']
+        scale = data['TIME_SYSTEM']
+        frame = data['REF_FRAME']
+        date = Date.strptime(data['EPOCH'], "%Y-%m-%dT%H:%M:%S.%f", scale=scale)
+        vx = _float(data['X_DOT'])
+        vy = _float(data['Y_DOT'])
+        vz = _float(data['Z_DOT'])
+        x = _float(data['X'])
+        y = _float(data['Y'])
+        z = _float(data['Z'])
+    except KeyError as e:
+        raise ValueError('Missing mandatory parameter')
 
     orb = Orbit(date, [x, y, z, vx, vy, vz], 'cartesian', frame, None)
-
-    for man in maneuvers:
-        if man['duration'].total_seconds() == 0:
-            orb.maneuvers.append(Maneuver(man['date'], man['dv'], frame=man['frame']))
-
     orb.name = name
     orb.cospar_id = cospar_id
+
+    for raw_man in maneuvers:
+
+        man = {}
+        man['date'] = Date.strptime(raw_man['MAN_EPOCH_IGNITION'], "%Y-%m-%dT%H:%M:%S.%f", scale=scale)
+        man['duration'] = timedelta(seconds=_float(raw_man['MAN_DURATION']))
+        man['frame'] = raw_man['MAN_REF_FRAME']
+        man['delta_mass'] = raw_man['MAN_DELTA_MASS']
+
+        for i in range(1, 4):
+            man.setdefault('dv', []).append(_float(raw_man['MAN_DV_{}'.format(i)]))
+
+        if man['duration'].total_seconds() == 0:
+            orb.maneuvers.append(Maneuver(man['date'], man['dv'], frame=man['frame']))
 
     return orb
 
