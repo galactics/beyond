@@ -259,7 +259,6 @@ class TerminatorListener(Listener):
         return (sat_pos @ sun_pos) / (sun_norm * sat_norm)
 
 
-
 class NodeEvent(Event):
     pass
 

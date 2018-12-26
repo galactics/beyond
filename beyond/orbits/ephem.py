@@ -113,18 +113,18 @@ class Ephem(Speaker):
         if not self.start <= date <= self.stop:
             raise ValueError("Date '%s' not in range" % date)
 
-        prev_i = 0
+        prev_idx = 0
         ephem = self
 
         # Binary search of the orbit step just before the desired date
         while True:
-            l = len(ephem)
-            if l == 1:
+            idx = len(ephem)
+            if idx == 1:
                 break
-            k = l // 2
+            k = idx // 2
 
             if date > ephem[k].date:
-                prev_i += k
+                prev_idx += k
                 ephem = ephem[k:]
             else:
                 ephem = ephem[:k]
@@ -134,15 +134,15 @@ class Ephem(Speaker):
 
         if method == self.LINEAR:
 
-            y0 = self[prev_i]
-            y1 = self[prev_i + 1]
+            y0 = self[prev_idx]
+            y1 = self[prev_idx + 1]
 
             result = y0[:] + (y1[:] - y0[:]) * (date.mjd - y0.date.mjd) / (y1.date.mjd - y0.date.mjd)
 
         elif method == self.LAGRANGE:
 
-            stop = prev_i + 1 + order // 2 + order % 2
-            start = prev_i - order // 2 + 1
+            stop = prev_idx + 1 + order // 2 + order % 2
+            start = prev_idx - order // 2 + 1
             if stop >= len(self):
                 start -= stop - len(self)
             elif start < 0:

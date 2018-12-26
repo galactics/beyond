@@ -25,8 +25,6 @@ def get_body(name):
         'earth': (Earth, EarthPropagator)
     }
 
-    result = []
-
     try:
 
         body, propag = _bodies[name.lower()]
