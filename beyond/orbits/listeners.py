@@ -168,20 +168,19 @@ class LightListener(Listener):
         # This import is not at the top of the file to avoid circular imports
         from ..env.solarsystem import get_body
 
-        orb = orb.copy(form="cartesian", frame=self.frame)
-
         sun = get_body("Sun")
+        sun_orb = sun.propagate(orb.date).copy(frame=self.frame)
+        orb = orb.copy(form="cartesian", frame=sun_orb.frame)
 
-        sun_orb = sun.propagate(orb.date)
-        sun_orb.frame = orb.frame
-        x_sun = sun_orb[:3]
+        x_sun = np.array(sun_orb[:3])
         norm_x_sun = np.linalg.norm(x_sun)
 
-        x_sat = orb[:3]
+        x_sat = np.array(orb[:3])
         norm_x_sat = np.linalg.norm(x_sat)
 
-        # This should be the real way to compute alpha_umb and alpha_pen, but the benefit is not
-        # that great, as the angles don't change a lot throughout the year.
+        # This should be the real way to compute alpha_umb and alpha_pen, but the
+        # benefit is not that great, as the angles don't change a lot throughout
+        # the year.
         alpha_umb = np.arcsin((sun.r - orb.frame.center.r) / norm_x_sun)
         alpha_pen = np.arcsin((sun.r - orb.frame.center.r) / norm_x_sun)
 
