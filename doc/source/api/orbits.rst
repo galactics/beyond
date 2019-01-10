@@ -25,11 +25,16 @@ Available forms are
 Orbit
 -----
 
-.. automodule:: beyond.orbits.orbit
+.. autoclass:: beyond.orbits.orbit.Orbit
     :members:
-    :undoc-members:
     :special-members: __new__
     :show-inheritance:
+
+OrbitInfos
+----------
+
+.. autoclass:: beyond.orbits.orbit.OrbitInfos
+    :members:
 
 Ephem
 -----

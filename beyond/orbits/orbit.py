@@ -331,3 +331,77 @@ Orbit =
         see :py:func:`beyond.frames.frames.orbit2frame` for details of the arguments
         """
         return orbit2frame(name, self, **kwargs)
+
+    @property
+    def infos(self):
+        """:py:class:`OrbitInfos` object of ``self``
+        """
+        if not hasattr(self, '_infos'):
+            self._infos = OrbitInfos(self)
+        return self._infos
+
+
+class OrbitInfos:
+    """Compute additionnal informations on an orbit
+    """
+
+    def __init__(self, orb):
+        self.orb = orb
+
+    @property
+    def kep(self):
+        if not hasattr(self, '_kep'):
+            self._kep = self.orb.copy(form='keplerian')
+        return self._kep
+
+    @property
+    def mu(self):
+        return self.orb.frame.center.mu
+
+    @property
+    def energy(self):
+        """Mechanical energy of the orbit
+        """
+        return -self.mu / (2 * self.kep.a)
+
+    @property
+    def period(self):
+        """Period of the orbit as a timedelta
+        """
+        return timedelta(seconds=2 * np.pi * np.sqrt(self.kep.a ** 3 / self.mu))
+
+    @property
+    def apocenter(self):
+        """Radius of the apocenter
+        """
+        return self.kep.a * (1 + self.kep.e)
+
+    @property
+    def pericenter(self):
+        """Radius of the pericenter
+        """
+        return self.kep.a * (1 - self.kep.e)
+
+    @property
+    def ra(self):
+        """Radius of the apocenter
+        """
+        return self.apocenter
+
+    @property
+    def rp(self):
+        """Radius of the pericenter
+        """
+        return self.pericenter
+
+    @property
+    def va(self):
+        """Velocity at apocenter
+        """
+        return np.sqrt(self.mu * (2 / (self.ra) - 1 / self.kep.a))
+
+    @property
+    def vp(self):
+        """Velocity at pericenter
+        """
+        return np.sqrt(self.mu * (2 / (self.rp) - 1 / self.kep.a))

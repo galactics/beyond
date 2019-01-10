@@ -153,16 +153,16 @@ def test_pickle(ref_orbit):
     assert ref_orbit.complements == orb.complements
 
 
-# def test_orbit_properties(ref_orbit):
+def test_orbit_infos(ref_orbit):
 
-#     ref_apoapsis = 7208342.6244268175
-#     ref_periapsis = 7176919.6014731824
+    ref_apocenter = 7208342.6244268175
+    ref_pericenter = 7176919.6014731824
 
-#     assert ref_orbit.apoapsis == ref_apoapsis
-#     assert ref_orbit.periapsis == ref_periapsis
-#     assert ref_orbit.apoapsis > ref_orbit.periapsis
+    assert ref_orbit.infos.apocenter == ref_apocenter
+    assert ref_orbit.infos.pericenter == ref_pericenter
+    assert ref_orbit.infos.apocenter > ref_orbit.infos.pericenter
 
-#     ref_orbit.form = "Cartesian"
-#     assert np.allclose(ref_orbit.apoapsis, ref_apoapsis)
-#     assert np.allclose(ref_orbit.periapsis, ref_periapsis)
-#     assert ref_orbit.apoapsis > ref_orbit.periapsis
+    ref_orbit.form = "Cartesian"
+    assert np.allclose(ref_orbit.infos.apocenter, ref_apocenter)
+    assert np.allclose(ref_orbit.infos.pericenter, ref_pericenter)
+    assert ref_orbit.infos.apocenter > ref_orbit.infos.pericenter
