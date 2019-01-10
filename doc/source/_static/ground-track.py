@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+"""Script showing the position of the ISS at the time of the TLE
+and the ground track for the previous and the next orbit
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -12,15 +16,22 @@ config.update({"eop": {"missing_policy": "pass"}})
 
 # Parsing of TLE
 tle = Tle("""ISS (ZARYA)
-1 25544U 98067A   16086.49419020  .00003976  00000-0  66962-4 0  9998
-2 25544  51.6423 110.4590 0001967   0.7896 153.8407 15.54256299992114""")
+1 25544U 98067A   19004.59354167  .00000715  00000-0  18267-4 0  9995
+2 25544  51.6416  95.0104 0002419 236.2184 323.8248 15.53730729149833""")
 
 # Conversion into `Orbit` object
 orb = tle.orbit()
 
 # Tables containing the positions of the ground track
 latitudes, longitudes = [], []
-for point in orb.ephemeris(Date.now(), timedelta(minutes=120), timedelta(minutes=1)):
+prev_lon, prev_lat = None, None
+
+period = orb.infos.period
+start = orb.date - period
+stop = 2 * period
+step = period / 100
+
+for point in orb.ephemeris(start, stop, step):
 
     # Conversion to earth rotating frame
     point.frame = 'ITRF'
@@ -31,18 +42,47 @@ for point in orb.ephemeris(Date.now(), timedelta(minutes=120), timedelta(minutes
     # Conversion from radians to degrees
     lon, lat = np.degrees(point[1:3])
 
-    latitudes.append(lat)
-    longitudes.append(lon)
+    # Creation of multiple segments in order to not have a ground track
+    # doing impossible paths
+    if prev_lon is None:
+        lons = []
+        lats = []
+        longitudes.append(lons)
+        latitudes.append(lats)
+    elif orb.i < np.pi /2 and (np.sign(prev_lon) == 1 and np.sign(lon) == -1):
+        lons.append(lon + 360)
+        lats.append(lat)
+        lons = [prev_lon - 360]
+        lats = [prev_lat]
+        longitudes.append(lons)
+        latitudes.append(lats)
+    elif orb.i > np.pi/2 and (np.sign(prev_lon) == -1 and np.sign(lon) == 1):
+        lons.append(lon - 360)
+        lats.append(lat)
+        lons = [prev_lon + 360]
+        lats = [prev_lat]
+        longitudes.append(lons)
+        latitudes.append(lats)
+
+    lons.append(lon)
+    lats.append(lat)
+    prev_lon = lon
+    prev_lat = lat
 
 im = plt.imread("earth.png")
 plt.figure(figsize=(15.2, 8.2))
 plt.imshow(im, extent=[-180, 180, -90, 90])
-plt.plot(longitudes, latitudes, 'r.')
+
+for lons, lats in zip(longitudes, latitudes):
+    plt.plot(lons, lats, 'r')
+
+lon, lat = np.degrees(orb.copy(frame='ITRF', form='spherical')[1:3])
+plt.plot([lon], [lat], 'ro')
 
 plt.xlim([-180, 180])
 plt.ylim([-90, 90])
 plt.grid(True, color='w', linestyle=":", alpha=0.4)
 plt.xticks(range(-180, 181, 30))
 plt.yticks(range(-90, 91, 30))
-plt.subplots_adjust(left=0.02, right=0.98, top=0.98, bottom=0.02)
+plt.tight_layout()
 plt.show()
