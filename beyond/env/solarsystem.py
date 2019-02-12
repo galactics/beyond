@@ -19,12 +19,6 @@ def get_body(name):
         Body:
     """
 
-    _bodies = {
-        'moon': (Moon, MoonPropagator),
-        'sun': (Sun, SunPropagator),
-        'earth': (Earth, EarthPropagator)
-    }
-
     try:
 
         body, propag = _bodies[name.lower()]
@@ -171,3 +165,10 @@ class SunPropagator(AnalyticalPropagator):
         ]) * AU
 
         return Orbit(date, pv, 'cartesian', 'MOD', cls())
+
+
+_bodies = {
+    'moon': (Moon, MoonPropagator),
+    'sun': (Sun, SunPropagator),
+    'earth': (Earth, EarthPropagator)
+}

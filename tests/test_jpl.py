@@ -5,7 +5,7 @@ from pathlib import Path
 
 from beyond.errors import UnknownFrameError, UnknownBodyError
 from beyond.config import config
-from beyond.env.jpl import get_body, list_bodies, create_frames
+from beyond.env.jpl import get_orbit, list_bodies, create_frames
 from beyond.dates import Date
 from beyond.orbits import Orbit
 from beyond.utils.units import AU
@@ -25,7 +25,7 @@ def jplfiles():
 
 def test_get(jplfiles):
 
-    mars = get_body('Mars', Date(2018, 1, 14))
+    mars = get_orbit('Mars', Date(2018, 1, 14))
 
     assert isinstance(mars, Orbit)
     assert mars.date.scale.name == "TDB"
@@ -44,11 +44,11 @@ def test_get(jplfiles):
     ])
 
     with raises(UnknownBodyError):
-        get_body('Jupiter', Date(2018, 1, 14))
+        get_orbit('Jupiter', Date(2018, 1, 14))
 
 
 def test_propagate(jplfiles):
-    venus = get_body('VenusBarycenter', Date(2018, 1, 14))
+    venus = get_orbit('VenusBarycenter', Date(2018, 1, 14))
     venus = venus.propagate(Date(2018, 1, 15, 12, 27))
 
     assert abs(32.18435609745404946124835987575 + venus.date._offset) <= np.finfo(float).eps
@@ -62,7 +62,7 @@ def test_propagate(jplfiles):
 
 def test_transform(jplfiles):
 
-    mars = get_body('Mars', Date(2018, 2, 25))
+    mars = get_orbit('Mars', Date(2018, 2, 25))
     mars.frame = "SolarSystemBarycenter"
     mars.form = "keplerian"
 

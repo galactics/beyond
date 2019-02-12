@@ -67,6 +67,7 @@ from ..utils.node import Node
 from ..propagators.base import AnalyticalPropagator
 from ..dates import Date
 from ..constants import Body, G
+from .solarsystem import EarthPropagator
 
 from jplephem.spk import SPK, S_PER_DAY
 from jplephem.names import target_names
@@ -334,7 +335,7 @@ class Pck(dict):
 _propagator_cache = {}
 
 
-def get_body(name, date):
+def get_orbit(name, date):
     """Retriev the orbit of a solar system object
 
     Args:
@@ -368,6 +369,9 @@ def get_body(name, date):
             # Register the Orbit as a frame
             propagator.propagate(date).as_frame(b.name, center=center)
             _propagator_cache[b.name] = propagator
+
+    if Bsp().top not in _propagator_cache:
+        _propagator_cache[Bsp().top.name] = EarthPropagator()
 
     return _propagator_cache[name].propagate(date)
 
@@ -409,13 +413,21 @@ def create_frames(until=None):
     now = Date.now()
 
     if until:
-        get_body(until, now)
+        get_orbit(until, now)
     else:
         for body in list_bodies():
-            get_body(body.name, now)
+            get_orbit(body.name, now)
 
 
-if __name__ == '__main__':
+def get_body(name):
+
+    body = Pck()[name]
+    body.propagate = lambda date: get_orbit(name, date)
+    return body
+
+
+
+if __name__ == '__main__':  # pragma: no cover
 
     import sys
 
