@@ -13,14 +13,14 @@ c = 299792458
 """Speed of light in m.s⁻¹"""
 
 g0 = 9.80665
-"""Standart Earth gravity in m.s⁻²"""
+"""Standard Earth gravity in m.s⁻²"""
 
 G = 6.6740831e-11
 """Gravitational constant in m³.kg⁻¹.s⁻² or N.m².kg⁻²"""
 
 
 class Body:
-    """Generic class for the description of physical caracteristics of celestial body
+    """Generic class for the description of physical characteristics of celestial body
     """
 
     def __init__(self, name, mass, equatorial_radius, *, flattening=1):
@@ -43,7 +43,7 @@ class Body:
             'f': 'flattening',
             chr(956): 'mu',
             'µ': 'mu',
-            'e': 'excentricity',
+            'e': 'eccentricity',
         }
 
         try:
@@ -58,8 +58,8 @@ class Body:
         return self.mass * G
 
     @property
-    def excentricity(self):
-        """Excentricity of the body
+    def eccentricity(self):
+        """Eccentricity of the body
         """
         return sqrt(self.f * 2 - self.f ** 2)
 
@@ -75,7 +75,7 @@ Earth = Body(
     equatorial_radius=6378136.3,
     flattening=1 / 298.257223563
 )
-"""Earth physical caracteristics"""
+"""Earth physical characteristics"""
 
 Moon = Body(
     name="Moon",
@@ -83,7 +83,7 @@ Moon = Body(
     equatorial_radius=1738100,
     flattening=0.0012
 )
-"""Moon physical caracteristics"""
+"""Moon physical characteristics"""
 
 Sun = Body(
     name="Sun",
@@ -91,7 +91,7 @@ Sun = Body(
     equatorial_radius=695700000,
     flattening=9e-6,
 )
-"""Sun physical caracteristics"""
+"""Sun physical characteristics"""
 
 Mars = Body(
     name="Mars",

@@ -141,7 +141,7 @@ class Tle:
 
         self.i = np.deg2rad(float(second[2]))   # inclination
         self.Ω = np.deg2rad(float(second[3]))   # right ascencion of the acending node
-        self.e = _float(second[4])              # excentricity
+        self.e = _float(second[4])              # eccentricity
         self.ω = np.deg2rad(float(second[5]))   # argument of periapsis
         self.M = np.deg2rad(float(second[6]))   # mean anomaly
         self.n = float(second[7][:11]) * 2 * np.pi / 86400.  # mean motion (rev/day converted to s⁻¹)

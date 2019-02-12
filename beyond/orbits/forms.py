@@ -63,7 +63,7 @@ class Form(Node):
         The keplerian form is
 
             * a : semi-major axis
-            * e : excentricity
+            * e : eccentricity
             * i : inclination
             * Ω : right-ascencion of ascending node
             * ω : Arguement of perigee
@@ -285,7 +285,7 @@ TLE = Form("tle", ["i", "Ω", "e", "ω", "M", "n"])
 
     * i : inclination
     * Ω : right-ascencion of ascending node
-    * e : excentricity
+    * e : eccentricity
     * ω : arguement of perigee
     * M : mean anomaly
     * n : mean motion
@@ -313,7 +313,7 @@ KEPL = Form("keplerian", ["a", "e", "i", "Ω", "ω", "ν"])
 """The keplerian form is
 
     * a : semi-major axis
-    * e : excentricity
+    * e : eccentricity
     * i : inclination
     * Ω : right-ascencion of ascending node
     * ω : Arguement of perigee
