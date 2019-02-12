@@ -92,3 +92,10 @@ Sun = Body(
     flattening=9e-6,
 )
 """Sun physical caracteristics"""
+
+Mars = Body(
+    name="Mars",
+    mass=6.4171e23,
+    equatorial_radius=3396200.
+)
+"""Mars physical characteristics"""
