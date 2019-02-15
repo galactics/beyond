@@ -92,7 +92,7 @@ class Kepler(NumericalPropagator):
         y_n_1.date = y_n.date + step
 
         for man in self.orbit.maneuvers:
-            if orb.date < man.date <= orb.date + step:
+            if man.check(orb, step):
                 y_n_1[3:] += man.dv(y_n_1)
 
         return y_n_1

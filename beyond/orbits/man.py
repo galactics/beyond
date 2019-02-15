@@ -18,14 +18,17 @@ class Maneuver:
 
         if len(dv) != 3:
             raise ValueError("dv should be 3 in lenght")
+        if isinstance(frame, str):
+            frame = frame.upper()
+        if frame in ("RSW", 'LVLH', 'QSW'):
+            frame = "QSW"
 
         self.date = date
         self._dv = np.array(dv)
-        frame = frame.upper()
-        if frame in ("RSW", 'LVLH'):
-            self.frame = "QSW"
-        elif frame in ("QSW", "TNW"):
-            self.frame = frame
+        self.frame = frame
+
+    def check(self, orb, step):
+        return orb.date < self.date <= orb.date + step
 
     def dv(self, orb):
         """Computation of the velocity increment in the reference frame of the orbit
