@@ -355,6 +355,12 @@ class OrbitInfos:
         return self._kep
 
     @property
+    def sphe(self):
+        if not hasattr(self, '_sphe'):
+            self._sphe = self.orb.copy(form="spherical")
+        return self._sphe
+
+    @property
     def mu(self):
         return self.orb.frame.center.mu
 
@@ -383,6 +389,10 @@ class OrbitInfos:
         return self.kep.a * (1 - self.kep.e)
 
     @property
+    def r(self):
+        return self.sphe.r
+
+    @property
     def ra(self):
         """Radius of the apocenter
         """
@@ -395,6 +405,10 @@ class OrbitInfos:
         return self.pericenter
 
     @property
+    def v(self):
+        return np.sqrt(self.mu * (2 / self.r - 1/ self.kep.a))
+
+    @property
     def va(self):
         """Velocity at apocenter
         """
@@ -405,3 +419,17 @@ class OrbitInfos:
         """Velocity at pericenter
         """
         return np.sqrt(self.mu * (2 / (self.rp) - 1 / self.kep.a))
+
+    @property
+    def cos_fpa(self):
+        return np.sqrt(self.mu / (self.kep.a * (1 - self.kep.e**2))) * (1+self.kep.e * np.cos(self.kep.nu)) / self.kep.nu
+
+    @property
+    def sin_fpa(self):
+        return np.sqrt(self.mu / (self.kep.a * (1 - self.kep.e**2))) * self.kep.e * np.sin(self.kep.nu) / self.kep.nu
+
+    @property
+    def fpa(self):
+        """Flight path angle
+        """
+        return np.arctan2(self.sin_fpa, self.cos_fpa)

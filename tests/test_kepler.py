@@ -1,15 +1,15 @@
 
 import numpy as np
 
-from pytest import fixture
+from pytest import fixture, raises
 from unittest.mock import patch
 
 from beyond.dates import Date, timedelta
 from beyond.orbits import Tle
 from beyond.propagators.kepler import Kepler
 from beyond.env.solarsystem import get_body
-from beyond.orbits.listeners import LightListener
-from beyond.orbits.man import Maneuver
+from beyond.orbits.listeners import LightListener, NodeListener
+from beyond.orbits.man import Maneuver, DeltaCombined
 
 
 @fixture
@@ -93,8 +93,13 @@ def test_listener(orb):
 
 def test_man(orb):
 
+    print(repr(orb))
     # At the altitude of the ISS, two maneuvers of 28 m/s should result in roughly
     # an increment of 100 km of altitude
+
+    with raises(ValueError):
+        Maneuver(Date(2008, 9, 20, 13, 48, 21, 763091), (28, 0, 0, 0))
+
     man1 = Maneuver(Date(2008, 9, 20, 13, 48, 21, 763091), (28, 0, 0), frame="TNW")
     man2 = Maneuver(Date(2008, 9, 20, 14, 34, 39, 970298), (0, 28, 0), frame="QSW")
     orb.maneuvers = [man1, man2]
@@ -106,7 +111,6 @@ def test_man(orb):
         dates.append(p.date.datetime)
 
     # import matplotlib.pyplot as plt
-
     # plt.plot(dates, altitude)
     # plt.show()
 
@@ -114,3 +118,54 @@ def test_man(orb):
     after = np.mean(altitude[140:])
 
     assert 98000 < after - before < 99000
+
+
+def test_man_delta_a(orb):
+
+    # We try to dupplicate the change in altitude of the previous test
+    man1 = DeltaCombined(Date(2008, 9, 20, 13, 48, 21, 763091), delta_a=50000)
+    man2 = DeltaCombined(Date(2008, 9, 20, 14, 34, 39, 970298), delta_a=50000)
+    orb.maneuvers = [man1, man2]
+
+    altitude = []
+    dates = []
+    for p in orb.iter(stop=timedelta(minutes=300)):
+        altitude.append(p.copy(form='spherical').r - p.frame.center.r)
+        dates.append(p.date.datetime)
+
+    # import matplotlib.pyplot as plt
+    # plt.plot(dates, altitude)
+    # plt.show()
+
+    before = np.mean(altitude[:80])
+    after = np.mean(altitude[140:])
+
+    assert 99000 < after - before < 101000
+
+
+def test_man_delta_i(orb):
+
+    i0 = orb.i
+
+    # Search for the next ascending node
+    for p in orb.iter(stop=timedelta(minutes=200), listeners=NodeListener()):
+        if p.event and p.event.info.startswith("Asc"):
+            man_date = p.date
+            break
+
+    man = DeltaCombined(man_date, delta_angle=np.radians(5))
+    orb.maneuvers = man
+
+    inclination, dates = [], []
+    for p in orb.iter(stop=timedelta(minutes=100)):
+        inclination.append(p.copy(form="keplerian").i)
+        dates.append(p.date.datetime)
+
+    # import matplotlib.pyplot as plt
+    # plt.plot(dates, np.degrees(inclination))
+    # plt.show()
+
+    before = np.degrees(np.mean(inclination[:30]))
+    after = np.degrees(np.mean(inclination[-30:]))
+
+    assert 4.99 < after - before <= 5.01

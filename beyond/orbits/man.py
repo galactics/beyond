@@ -53,3 +53,39 @@ class Maneuver:
 
         # velocity increment in the same reference frame as the orbit
         return mat @ self._dv
+
+
+class DeltaCombined(Maneuver):
+    """Compute directly the desired osculating element changes
+
+    For maximum efficiency:
+        * 'a' should be modified at apoapsis or periapsis, via delta_a
+        * 'i' should be modified at descending or ascending node, via delta_angle
+        * 'Ω' should be modified at argument of latitude +/- 90 deg, via delta_angle
+    """
+
+    def __init__(self, date, *, delta_a=0, delta_angle=0, comment=None):
+        self.date = date
+        self.delta_a = delta_a
+        self.delta_angle = delta_angle
+        self.comment = comment
+
+    def dv(self, orb):
+        delta_v_a = orb.frame.center.mu * self.delta_a / (2 * orb.infos.v * orb.infos.kep.a ** 2)
+
+        v_final = orb.infos.v + delta_v_a
+        delta_v = np.sqrt(orb.infos.v ** 2 + v_final ** 2 - 2 * orb.infos.v * v_final * np.cos(self.delta_angle))
+        delta_v_t = v_final * np.cos(self.delta_angle) - orb.infos.v
+
+        ratio = delta_v_t / delta_v
+        # Due to some floating point operation rounding, this ratio
+        # can be superior to one.
+        if np.isclose(ratio, 1):
+            delta_v_w = 0
+        else:
+            alpha = np.arccos(ratio)
+            delta_v_w = delta_v * np.sin(alpha)
+
+        self._dv = [delta_v_t, 0, delta_v_w]
+
+        return to_tnw(orb).T @ self._dv
