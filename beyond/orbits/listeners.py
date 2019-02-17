@@ -20,6 +20,7 @@ class Speaker(metaclass=ABCMeta):
     """
 
     SPEAKER_MODE = "global"
+    _eps_bisect = timedelta.resolution
 
     def listen(self, orb, listeners):
         """This method allows to loop over the listeners and trigger the :py:meth:`_bisect` method
@@ -55,11 +56,10 @@ class Speaker(metaclass=ABCMeta):
         Return
             Return
         """
-        eps = timedelta.resolution
 
         step = (end.date - begin.date) / 2
 
-        while abs(step) >= eps:
+        while abs(step) >= self._eps_bisect:
             date = begin.date + step
             if self.SPEAKER_MODE == "global":
                 orb = self.propagate(date)
