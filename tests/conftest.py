@@ -1,6 +1,7 @@
 
 from pytest import fixture
 from unittest.mock import patch
+from pathlib import Path
 
 from beyond.config import config
 from beyond.dates.eop import Eop
@@ -60,3 +61,14 @@ def orbit(request, common_env):
             get_body('Earth')
         )
         return orb
+
+
+@fixture
+def jplfiles():
+    config['env'] = {
+        'jpl': [
+            str(Path(__file__).parent / "data" / "jpl" / "de403_2000-2020.bsp"),
+            str(Path(__file__).parent / "data" / "jpl" / "pck00010.tpc"),
+            str(Path(__file__).parent / "data" / "jpl" / "gm_de431.tpc"),
+        ]
+    }

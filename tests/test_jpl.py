@@ -1,7 +1,6 @@
 
 import numpy as np
 from pytest import fixture, raises
-from pathlib import Path
 
 from beyond.errors import UnknownFrameError, UnknownBodyError
 from beyond.config import config
@@ -10,17 +9,6 @@ from beyond.dates import Date
 from beyond.orbits import Orbit
 from beyond.utils.units import AU
 from beyond.frames import get_frame
-
-
-@fixture
-def jplfiles():
-    config['env'] = {
-        'jpl': [
-            str(Path(__file__).parent / "data" / "jpl" / "de403_2000-2020.bsp"),
-            str(Path(__file__).parent / "data" / "jpl" / "pck00010.tpc"),
-            str(Path(__file__).parent / "data" / "jpl" / "gm_de431.tpc"),
-        ]
-    }
 
 
 def test_get(jplfiles):
