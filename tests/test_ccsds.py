@@ -320,8 +320,8 @@ def orb():
 @fixture
 def orb_man(orb):
     orb.maneuvers = [
-        Maneuver(Date(2008, 9, 20, 12, 41, 9, 984493), [280, 0, 0], frame="TNW"),
-        Maneuver(Date(2008, 9, 20, 13, 33, 11, 374985), [270, 0, 0], frame="TNW"),
+        Maneuver(Date(2008, 9, 20, 12, 41, 9, 984493), [280, 0, 0], frame="TNW", comment="Maneuver 1"),
+        Maneuver(Date(2008, 9, 20, 13, 33, 11, 374985), [270, 0, 0], frame="TNW", comment="Maneuver 2"),
     ]
     return orb
 
@@ -433,13 +433,14 @@ def test_load_opm(orb):
 
 def test_load_opm_man(orb_man):
     # With maneuvers
-    opm_man = loads(ref_man)
-    assert len(opm_man.maneuvers) == 2
+    ref_opm_man = loads(ref_man)
+    assert len(ref_opm_man.maneuvers) == 2
 
-    for i in range(len(orb_man.maneuvers)):
-        assert opm_man.maneuvers[i].date == orb_man.maneuvers[i].date
-        assert opm_man.maneuvers[i]._dv.tolist() == orb_man.maneuvers[i]._dv.tolist()
-        assert opm_man.maneuvers[i].frame == orb_man.maneuvers[i].frame
+    for i, man in enumerate(orb_man.maneuvers):
+        assert ref_opm_man.maneuvers[i].date == man.date
+        assert ref_opm_man.maneuvers[i]._dv.tolist() == man._dv.tolist()
+        assert ref_opm_man.maneuvers[i].frame == man.frame
+        assert ref_opm_man.maneuvers[i].comment == man.comment
 
 
 def test_load_oem(ephem):

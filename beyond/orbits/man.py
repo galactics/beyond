@@ -6,7 +6,7 @@ from ..frames.local import to_qsw, to_tnw
 
 class Maneuver:
 
-    def __init__(self, date, dv, frame=None):
+    def __init__(self, date, dv, frame=None, comment=None):
         """
         Args:
             date (Date): Date of application of the maneuver
@@ -14,6 +14,8 @@ class Maneuver:
             frame (str): Which frame is used for applying the increment : ``'TNW'``,
                 ``'QSW'`` (or its aliases 'RSW' and 'LVLH') or ``None``.
                 If ``frame = None`` the same frame as the orbit is used
+            comment (str): Free text to give context on a given maneuver
+                ('apogee maneuver', 'inclination correction')
         """
 
         if len(dv) != 3:
@@ -26,6 +28,7 @@ class Maneuver:
         self.date = date
         self._dv = np.array(dv)
         self.frame = frame
+        self.comment = comment
 
     def check(self, orb, step):
         return orb.date < self.date <= orb.date + step

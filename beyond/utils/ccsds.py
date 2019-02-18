@@ -182,8 +182,12 @@ def _read_opm(string):
     maneuvers = []
 
     data = {}
-    for line in string.splitlines():
-        if not line or line.startswith("COMMENT"):
+    comments = {}
+    for i, line in enumerate(string.splitlines()):
+        if not line:
+            continue
+        if line.startswith("COMMENT"):
+            comments[i] = line.split("COMMENT")[-1].strip()
             continue
 
         key, _, value = line.partition("=")
@@ -195,6 +199,8 @@ def _read_opm(string):
             if key == "MAN_EPOCH_IGNITION":
                 maneuvers.append({})
                 man_idx = len(maneuvers) - 1
+                if i - 1 in comments:
+                    maneuvers[man_idx]["comment"] = comments[i-1]
             maneuvers[man_idx][key] = value
         else:
             data[key] = value
@@ -225,12 +231,13 @@ def _read_opm(string):
         man['duration'] = timedelta(seconds=_float(raw_man['MAN_DURATION']))
         man['frame'] = raw_man['MAN_REF_FRAME']
         man['delta_mass'] = raw_man['MAN_DELTA_MASS']
+        man['comment'] = raw_man.get('comment')
 
         for i in range(1, 4):
             man.setdefault('dv', []).append(_float(raw_man['MAN_DV_{}'.format(i)]))
 
         if man['duration'].total_seconds() == 0:
-            orb.maneuvers.append(Maneuver(man['date'], man['dv'], frame=man['frame']))
+            orb.maneuvers.append(Maneuver(man['date'], man['dv'], frame=man['frame'], comment=man['comment']))
 
     return orb
 
@@ -344,8 +351,9 @@ TRUE_ANOMALY         = {angles[3]: 12.6f} [deg]
 
     if cart.maneuvers:
         for i, man in enumerate(cart.maneuvers):
+            comment = man.comment if man.comment is not None else "Maneuver {}".format(i+1)
             text += """
-COMMENT  Maneuver {i}
+COMMENT  {comment}
 MAN_EPOCH_IGNITION   = {man.date:%Y-%m-%dT%H:%M:%S.%f}
 MAN_DURATION         = 0.000 [s]
 MAN_DELTA_MASS       = 0.000 [kg]
@@ -353,6 +361,6 @@ MAN_REF_FRAME        = {man.frame}
 MAN_DV_1             = {dv[0]:.6f} [km/s]
 MAN_DV_2             = {dv[1]:.6f} [km/s]
 MAN_DV_3             = {dv[2]:.6f} [km/s]
-""".format(i=i + 1, man=man, dv=man._dv / 1000.)
+""".format(i=i + 1, man=man, dv=man._dv / 1000., comment=comment)
 
     return header + meta + text
