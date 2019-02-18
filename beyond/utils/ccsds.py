@@ -200,7 +200,7 @@ def _read_opm(string):
                 maneuvers.append({})
                 man_idx = len(maneuvers) - 1
                 if i - 1 in comments:
-                    maneuvers[man_idx]["comment"] = comments[i-1]
+                    maneuvers[man_idx]["comment"] = comments[i - 1]
             maneuvers[man_idx][key] = value
         else:
             data[key] = value
@@ -351,7 +351,7 @@ TRUE_ANOMALY         = {angles[3]: 12.6f} [deg]
 
     if cart.maneuvers:
         for i, man in enumerate(cart.maneuvers):
-            comment = man.comment if man.comment is not None else "Maneuver {}".format(i+1)
+            comment = man.comment if man.comment is not None else "Maneuver {}".format(i + 1)
             text += """
 COMMENT  {comment}
 MAN_EPOCH_IGNITION   = {man.date:%Y-%m-%dT%H:%M:%S.%f}

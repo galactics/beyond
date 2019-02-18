@@ -12,6 +12,7 @@ __all__ = ['Kepler', 'SOIPropagator']
 
 log = logging.getLogger(__name__)
 
+
 class Kepler(NumericalPropagator):
     """Keplerian motion numerical propagator
 

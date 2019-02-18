@@ -406,7 +406,7 @@ class OrbitInfos:
 
     @property
     def v(self):
-        return np.sqrt(self.mu * (2 / self.r - 1/ self.kep.a))
+        return np.sqrt(self.mu * (2 / self.r - 1 / self.kep.a))
 
     @property
     def va(self):
@@ -422,7 +422,7 @@ class OrbitInfos:
 
     @property
     def cos_fpa(self):
-        return np.sqrt(self.mu / (self.kep.a * (1 - self.kep.e**2))) * (1+self.kep.e * np.cos(self.kep.nu)) / self.kep.nu
+        return np.sqrt(self.mu / (self.kep.a * (1 - self.kep.e**2))) * (1 + self.kep.e * np.cos(self.kep.nu)) / self.kep.nu
 
     @property
     def sin_fpa(self):
