@@ -25,7 +25,7 @@ class Form(Node):
         'nu': "ν",
         'theta_dot': 'θ_dot',
         'phi_dot': 'φ_dot',
-        'lambda': 'λ',
+        'aol': 'u',
     }
 
     def __init__(self, name, param_names):
@@ -204,28 +204,28 @@ class Form(Node):
         return x
 
     @classmethod
-    def _keplerian_circular_to_keplerian_mean(cls, coord, center):
+    def _keplerian_circular_to_keplerian(cls, coord, center):
         """Conversion from Keplerian near-circular elements to Mean Keplerian
         """
-        a, ex, ey, i, Ω, λ = coord
+        a, ex, ey, i, Ω, u = coord
 
         e = sqrt(ex ** 2 + ey ** 2)
         ω = arctan2(ey / e, ex / e)
-        M = λ - ω
+        ν = u - ω
 
-        return np.array([a, e, i, Ω, ω, M], dtype=float)
+        return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
     @classmethod
-    def _keplerian_mean_to_keplerian_circular(cls, coord, center):
+    def _keplerian_to_keplerian_circular(cls, coord, center):
         """Conversion from Mean Keplerian to Keplerian near-circular elements
         """
-        a, e, i, Ω, ω, M = coord
+        a, e, i, Ω, ω, ν = coord
 
         ex = e * cos(ω)
         ey = e * sin(ω)
-        λ = ω + M
+        u = ω + ν
 
-        return np.array([a, ex, ey, i, Ω, λ], dtype=float)
+        return np.array([a, ex, ey, i, Ω, u], dtype=float)
 
     @classmethod
     def _tle_to_keplerian_mean(cls, coord, center):
@@ -338,7 +338,7 @@ CART = Form("cartesian", ["x", "y", "z", "vx", "vy", "vz"])
 
 
 SPHE + CART + KEPL + KEPL_M + TLE
-KEPL_M + KEPL_C
+KEPL + KEPL_C
 
 
 _cache = {

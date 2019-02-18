@@ -107,12 +107,6 @@ def test_kepl_m(ref_kepl_m):
         5.51044450e+00, 1.17890602e+00, 3.04376883e+00
     ])
 
-    kepc = KEPL_M(ref_kepl_m, KEPL_C)
-    assert np.allclose(kepc, [
-        7.19263111e+06, 8.34297391e-04, 2.01878863e-03,
-        1.71926101e+00, 5.51044450e+00, 4.22224746e+00
-    ])
-
     tle = KEPL_M(ref_kepl_m, TLE)
     assert np.allclose(tle, [
         1.71926101e+00, 5.51044450e+00, 2.18439000e-03,
@@ -160,6 +154,12 @@ def test_kepl(ref_kepl):
         5.05386814e+03, -4.20539932e+03, -3.45695948e+03
     ])
 
+    kepc = KEPL(ref_kepl, KEPL_C)
+    assert np.allclose(kepc, [
+        7.19263111e+06, 8.34297391e-04, 2.01878863e-03,
+        1.71926101e+00, 5.51044450e+00, 4.22267485e+00
+    ])
+
     # Hyperbolic case
     ref_kepl_h = ref_kepl.copy()
     ref_kepl_h[1] = 1.2
@@ -194,8 +194,8 @@ def test_sphe(ref_sphe):
 
 
 def test_kepl_c(ref_kepl_c):
-    keplm = KEPL_C(ref_kepl_c, KEPL_M)
-    assert np.allclose(keplm, [
+    kepl = KEPL_C(ref_kepl_c, KEPL)
+    assert np.allclose(kepl, [
         7.19263111e+06, 2.18439000e-03, 1.71926101e+00,
         5.51044450e+00, 1.17890602e+00, 3.04334144e+00
     ])
