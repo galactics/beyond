@@ -124,7 +124,7 @@ class Kepler(NumericalPropagator):
             for date in Date.range(orb.date + self.step, start, self.step):
                 orb = self._method(orb, self.step)
 
-            # Compute the orbit at the real begining of the requested range
+            # Compute the orbit at the real beginning of the requested range
             orb = self._method(orb, start - orb.date)
 
         for date in Date.range(start, stop, step):

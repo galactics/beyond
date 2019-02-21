@@ -12,13 +12,13 @@ from ..frames.frames import orbit2frame
 class Ephem(Speaker):
     """This class represents a range of orbits
 
-    It provides several useful interfaces in order to compute throught them
+    It provides several useful interfaces in order to compute through them
 
     Example:
 
     .. code-block:: python
 
-        ephem = orb.ephem(Date.now(), timedeltat(hours=6), timedelta(minutes=2))
+        ephem = orb.ephem(Date.now(), timedelta(hours=6), timedelta(minutes=2))
         ephem.frame = 'ITRF'
         ephem.form = 'spherical'
         latitudes = ephem[:,1]

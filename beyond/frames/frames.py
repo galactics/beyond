@@ -12,9 +12,9 @@ The relations may be circular, thanks to the use of the Node class.
                    |EME2000|..bias..|GCRF|
                    `-------'        `----'
                        |              |
-                   Precesion          |
+                   Precession         |
                        |              |
-                     ,---.        Prececion
+                     ,---.        Precession
                      |MOD|            +
                      `---'         Nutation
                        |     + model corrections
@@ -61,7 +61,7 @@ log = logging.getLogger(__name__)
 
 
 class FrameCache(dict):
-    """This class is here to emulate module behaviour for dynamically
+    """This class is here to emulate module behavior for dynamically
     created frames.
 
     It's useful when pickle is involved (e.g. multiprocessing)
@@ -73,8 +73,8 @@ class FrameCache(dict):
 
 
 dynamic = FrameCache()
-"""This dictionnary contains all the frames. Those defined here, and those created on the fly
-by the developper.
+"""This dictionary contains all the frames. Those defined here, and those created on the fly
+by the developer.
 """
 
 sys.modules[__name__ + ".dynamic"] = dynamic
@@ -95,7 +95,7 @@ def get_frame(frame):
 
 
 class _MetaFrame(type, Node):
-    """This MetaClass is here to join the behaviours of ``type`` and ``Node``
+    """This MetaClass is here to join the behaviors of ``type`` and ``Node``
     """
 
     def __init__(cls, name, bases, dct):
@@ -343,7 +343,7 @@ def orbit2frame(name, ref_orbit, orientation=None, center=None):
     # define the name of the method of conversion
     mtd = '_to_%s' % ref_orbit.frame.__name__
 
-    # dictionnary which defines attributes of the created class
+    # dictionary which defines attributes of the created class
     dct = {
         mtd: _to_parent_frame,
         "orientation": orientation,

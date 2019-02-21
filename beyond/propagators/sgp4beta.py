@@ -58,7 +58,7 @@ class Sgp4Beta:
     """This class is a simplistic implementation of SGP4 model. It doesn't
     implement SDP4 model at the moment.
 
-    It is highly under-optimised, and serves only the purpose of testing.
+    It is highly under-optimized, and serves only the purpose of testing.
     """
 
     MODEL = WGS72
@@ -160,7 +160,7 @@ class Sgp4Beta:
         r_e = self.gravity.r_e
         k_e = self.gravity.k_e
 
-        # retrieve initialised variables
+        # retrieve initialized variables
         _i = self._init
         n0 = _i.n0
 

@@ -82,7 +82,7 @@ class Listener(metaclass=ABCMeta):
     prev = None
 
     def check(self, orb):
-        """Method that check whether or not the listener is trigered
+        """Method that check whether or not the listener is triggered
 
         Args:
             orb (Orbit):
@@ -131,7 +131,7 @@ class LightListener(Listener):
 
     .. image:: /_static/light.svg
 
-    Angles in this image are over-exagerated
+    Angles in this image are over-exaggerated
     """
 
     event = LightEvent
@@ -145,7 +145,7 @@ class LightListener(Listener):
         """
         Args:
             type (str): Choose which event to trigger between umbra or penumbra
-            frame (str) : Name of the reference frame from wich to compute.
+            frame (str) : Name of the reference frame from which to compute.
                 If ``None`` the frame is unchanged.
         """
         self.type = type
@@ -271,7 +271,7 @@ class NodeListener(Listener):
     def __init__(self, frame=None):
         """
         Args:
-            frame (str) : Name of the reference frame from wich to compute
+            frame (str) : Name of the reference frame from which to compute
                 If ``None`` the frame is unchanged.
         """
         self.frame = frame
@@ -298,7 +298,7 @@ class ApsideListener(Listener):
     def __init__(self, frame=None):
         """
         Args:
-            frame (str) : Name of the reference frame from wich to compute
+            frame (str) : Name of the reference frame from which to compute
                 If ``None`` the frame is unchanged.
         """
         self.frame = frame

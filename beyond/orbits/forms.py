@@ -36,7 +36,7 @@ class Form(Node):
         return self.name
 
     def __call__(self, orbit, new_form):
-        """Gives the result of the transformation without inplace modifications
+        """Gives the result of the transformation without in-place modifications
 
         Args:
             orbit (Orbit):
@@ -58,15 +58,15 @@ class Form(Node):
 
     @classmethod
     def _cartesian_to_keplerian(cls, coord, center):
-        """Convertion from cartesian (position and velocity) to keplerian
+        """Conversion from cartesian (position and velocity) to keplerian
 
         The keplerian form is
 
             * a : semi-major axis
             * e : eccentricity
             * i : inclination
-            * Ω : right-ascencion of ascending node
-            * ω : Arguement of perigee
+            * Ω : right-ascension of ascending node
+            * ω : Argument of perigee
             * ν : True anomaly
         """
 
@@ -81,7 +81,7 @@ class Form(Node):
         e = sqrt(1 - h_norm ** 2 / (a * center.µ))   # eccentricity
         p = a * (1 - e ** 2)
         i = arccos(h[2] / h_norm)               # inclination
-        Ω = arctan2(h[0], -h[1]) % (2 * np.pi)  # right ascencion of the ascending node
+        Ω = arctan2(h[0], -h[1]) % (2 * np.pi)  # right ascension of the ascending node
 
         ω_ν = arctan2(r[2] / sin(i), r[0] * cos(Ω) + r[1] * sin(Ω))
         ν = arctan2(sqrt(p / center.µ) * np.dot(v, r), p - r_norm) % (2 * np.pi)
@@ -144,7 +144,7 @@ class Form(Node):
 
     @classmethod
     def _m_to_e(cls, e, M):
-        """Conversion from Mean Anomaly to Excentric anomaly
+        """Conversion from Mean Anomaly to Eccentric anomaly
 
         Procedures for solving Kepler's Equation, A. W. Odell and  R. H. Gooding,
         Celestial Mechanics 38 (1986) 307-334
@@ -229,7 +229,7 @@ class Form(Node):
 
     @classmethod
     def _tle_to_keplerian_mean(cls, coord, center):
-        """Convertion from the TLE standard format to the Mean Keplerian
+        """Conversion from the TLE standard format to the Mean Keplerian
 
         see :py:class:`Tle` for more information.
         """
@@ -284,9 +284,9 @@ TLE = Form("tle", ["i", "Ω", "e", "ω", "M", "n"])
 """TLE special form
 
     * i : inclination
-    * Ω : right-ascencion of ascending node
+    * Ω : right-ascension of ascending node
     * e : eccentricity
-    * ω : arguement of perigee
+    * ω : argument of perigee
     * M : mean anomaly
     * n : mean motion
 
@@ -300,7 +300,7 @@ KEPL_C = Form("keplerian_circular", ["a", "ex", "ey", "i", "Ω", "λ"])
     * ex : e * cos(ω)
     * ey : e * sin(ω)
     * i : inclination
-    * Ω : right-ascencion of ascending node
+    * Ω : right-ascension of ascending node
     * λ : mean argument of latitude (ω + M)
 """
 
@@ -315,8 +315,8 @@ KEPL = Form("keplerian", ["a", "e", "i", "Ω", "ω", "ν"])
     * a : semi-major axis
     * e : eccentricity
     * i : inclination
-    * Ω : right-ascencion of ascending node
-    * ω : Arguement of perigee
+    * Ω : right-ascension of ascending node
+    * ω : Argument of perigee
     * ν : True anomaly
 
 see `wikipedia <https://en.wikipedia.org/wiki/Orbital_elements>`__ for details

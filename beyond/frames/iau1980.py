@@ -56,7 +56,7 @@ def earth_orientation(date):  # pragma: no cover
 
 
 def _precesion(date):
-    """Precesion in degrees
+    """Precession in degrees
     """
 
     t = date.change_scale('TT').julian_century
@@ -70,7 +70,7 @@ def _precesion(date):
 
 
 def precesion(date):  # pragma: no cover
-    """Precesion as a rotation matrix
+    """Precession as a rotation matrix
     """
     zeta, theta, z = np.deg2rad(_precesion(date))
     return rot3(zeta) @ rot2(-theta) @ rot3(z)
@@ -170,7 +170,7 @@ def equinox(date, eop_correction=True, terms=106, kinematic=True):
 
         equin += 0.00264 * np.sin(np.deg2rad(om_m)) + 6.3e-5 * np.sin(np.deg2rad(2 * om_m))
 
-    # print("esquinox = {}\n".format(equin / 3600))
+    # print("equinox = {}\n".format(equin / 3600))
     return equin / 3600.
 
 

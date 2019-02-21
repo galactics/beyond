@@ -19,7 +19,7 @@ class Sgp4(AnalyticalPropagator):
 
     @orbit.setter
     def orbit(self, orbit):
-        """Initialise the propagator
+        """Initialize the propagator
 
         Args:
             orbit (Orbit)
@@ -37,7 +37,7 @@ class Sgp4(AnalyticalPropagator):
         self.tle = twoline2rv(line1, line2, wgs72)
 
     def propagate(self, date):
-        """Propagate the initialised orbit
+        """Propagate the initialized orbit
 
         Args:
             date (Date or datetime.timedelta)

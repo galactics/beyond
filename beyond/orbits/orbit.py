@@ -250,7 +250,7 @@ Orbit =
         """:py:class:`~beyond.propagators.base.Propagator`: Propagator of the orbit.
 
         if set as a string (e.g. ``"Sgp4"``) will be automatically converted to the corresponding
-        propagator class and instanciated without arguments.
+        propagator class and instantiated without arguments.
         """
         return self._propagator
 
@@ -342,7 +342,7 @@ Orbit =
 
 
 class OrbitInfos:
-    """Compute additionnal informations on an orbit
+    """Compute additional informations on an orbit
     """
 
     def __init__(self, orb):

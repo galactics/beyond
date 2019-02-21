@@ -3,17 +3,17 @@
 Configuration
 =============
 
-The configuration of the library is handled via a dictionnary.
+The configuration of the library is handled via a dictionary.
 It is accessible via::
 
     from beyond.config import config
     print(config)
 
-In order to dynamically modify values of the dictionnary, it is preferable
+In order to dynamically modify values of the dictionary, it is preferable
 to use the :py:meth:`~Config.update` method.
 
-The configuration dictionnary contains a few fields usefull for the library
-behaviour. A description of the fields is provided :ref:`here <beyondconf>`.
+The configuration dictionary contains a few fields useful for the library
+behavior. A description of the fields is provided :ref:`here <beyondconf>`.
 
 .. _beyondconf:
 
@@ -25,8 +25,8 @@ eop
 .. _eop-missing-policy:
 
 missing_policy
-    Define the behaviour of the library when encountering a missing value in the
-    environment data. Current vailable behaviour are:
+    Define the behavior of the library when encountering a missing value in the
+    environment data. Current variable behavior are:
 
         * ``pass`` - Use zero as a value
         * ``warning`` - Same as ``extrapolate`` but issue a warning
@@ -40,7 +40,7 @@ missing_policy
 dbname
     Define the database used by the library in order to retrieve model
     corrections and time-scales differences. See :py:mod:`~beyond.dates.eop`.
-    If omited, the default database will be
+    If omitted, the default database will be
     :py:data:`~beyond.dates.eop.EopDb.DEFAULT_DBNAME`
 
 env

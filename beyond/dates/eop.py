@@ -351,7 +351,7 @@ class SimpleEopDatabase():
     without caching nor interpolation.
 
     In order to use these files, you have to provide the directory containing them as a config
-    variable. Optionnally, you can provide the type of data you want to extract from finals files
+    variable. Optionally, you can provide the type of data you want to extract from finals files
     ('all', 'data' or 'daily').
 
     .. code-block:: python

@@ -208,7 +208,7 @@ def _xys(date):
 
 
 def precesion_nutation(date):
-    """Precesion/nutation joint rotation matrix for the IAU2010 model
+    """Precession/nutation joint rotation matrix for the IAU2010 model
     """
 
     X, Y, s = _xys(date)

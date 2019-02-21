@@ -120,7 +120,7 @@ class Date:
     The constructor can take:
 
         * the same arguments as the standard library's datetime object (year, month, day, hour,
-          minute, second, micronsecond)
+          minute, second, microsecond)
         * MJD as :py:class:`float`
         * MJD as :py:class:`int` for days and :py:class:`float` for seconds
         * a :py:class:`Date` or :py:class:`datetime` object
@@ -136,7 +136,7 @@ class Date:
             Date(2016, 11, 17, 19, 16, 40, scale="TAI")
             Date(57709.804455)  # MJD
             Date(57709, 69540.752649)
-            Date(datetime(2016, 11, 17, 19, 16, 40))  # builtin datetime object
+            Date(datetime(2016, 11, 17, 19, 16, 40))  # built-in datetime object
             Date.now()
 
     Date objects interact with :py:class:`timedelta` as datetime do.
@@ -321,7 +321,7 @@ class Date:
 
     @property
     def datetime(self):
-        """Convertion of the Date object into a ``datetime.datetime``
+        """Conversion of the Date object into a ``datetime.datetime``
 
         The resulting object is a timezone-naive instance with the same scale
         as the originating Date object.
@@ -332,7 +332,7 @@ class Date:
 
     @property
     def _datetime(self):
-        """Convertion of the Date object into a :py:class:`datetime.datetime`.
+        """Conversion of the Date object into a :py:class:`datetime.datetime`.
 
         The resulting object is a timezone-naive instance in the REF_SCALE time-scale
         """
@@ -352,7 +352,7 @@ class Date:
         Args:
             scale (str)
         Return:
-            Date: Current time in the choosen scale
+            Date: Current time in the chosen scale
         """
         return cls(datetime.utcnow()).change_scale(scale)
 
@@ -424,7 +424,7 @@ class Date:
             step (timedelta):
         Keyword Args:
             inclusive (bool): If ``False``, the stopping date is not included.
-                This is the same behaviour as the builtin :py:func:`range`.
+                This is the same behavior as the built-in :py:func:`range`.
         Yield:
             Date:
         """

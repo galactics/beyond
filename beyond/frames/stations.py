@@ -75,12 +75,12 @@ class TopocentricFrame(Frame):
 
     @classmethod
     def _geodetic_to_cartesian(cls, lat, lon, alt):
-        """Conversion from latitude, longitue and altitude coordinates to
+        """Conversion from latitude, longitude and altitude coordinates to
         cartesian with respect to an ellipsoid
 
         Args:
             lat (float): Latitude in radians
-            lon (float): Longitue in radians
+            lon (float): Longitude in radians
             alt (float): Altitude to sea level in meters
 
         Return:
@@ -138,8 +138,8 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N', mask=No
         parent_frame (Frame): Planetocentric rotating frame of reference of
             coordinates.
         orientation (str or float): Heading of the station
-            Acceptables values are 'N', 'S', 'E', 'W' or any angle in radians
-        mask: (2D array of float): First dimension is azimut counterclockwise strictly increasing.
+            Acceptable values are 'N', 'S', 'E', 'W' or any angle in radians
+        mask: (2D array of float): First dimension is azimuth counterclockwise strictly increasing.
             Second dimension is elevation. Both in radians
 
     Return:

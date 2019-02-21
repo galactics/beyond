@@ -76,7 +76,7 @@ __all__ = ['get_body', 'list_bodies', 'create_frames']
 
 
 class Target(Node):
-    """Class representing the relations between the differents segments
+    """Class representing the relations between the different segments
     of .bsp files
 
     It helps dynamically build the Frames objects
@@ -181,7 +181,7 @@ class Bsp:
             target (Target):
             date (Date):
         Return:
-            numpy.array: lenght-6 array position and velocity (in m and m/s) of the
+            numpy.array: length-6 array position and velocity (in m and m/s) of the
                 target, with respect to the center
         """
 
@@ -233,7 +233,7 @@ class Pck(dict):
 
         self.clear()
 
-        # Parsing of mutliple files provided in the configuration variable
+        # Parsing of multiple files provided in the configuration variable
         for filepath in config['env']['jpl']:
 
             filepath = Path(filepath)
@@ -253,7 +253,7 @@ class Pck(dict):
             try:
                 for i, line in enumerate(lines):
 
-                    # Seek the begining of a data block
+                    # Seek the beginning of a data block
                     if line.strip() == "\\begindata":
                         datablock = True
                         continue
@@ -275,8 +275,8 @@ class Pck(dict):
                         # if not, use the ID as name
                         name = target_names.get(int(body_id), body_id).title().strip()
 
-                        # If already existing, check out the dictionnary describing the body
-                        # caracteristics
+                        # If already existing, check out the dictionary describing the body
+                        # characteristics
                         body_dict = self.setdefault(name, {})
 
                         # Extraction of interesting data
@@ -336,7 +336,7 @@ _propagator_cache = {}
 
 
 def get_orbit(name, date):
-    """Retriev the orbit of a solar system object
+    """Retrieve the orbit of a solar system object
 
     Args:
         name (str): The name of the body desired. For exact nomenclature, see
@@ -387,7 +387,7 @@ def list_bodies():
 
 
 def create_frames(until=None):
-    """Create frames availables in the JPL files
+    """Create frames available in the JPL files
 
     Args:
         until (str): Name of the body you want to create the frame of, and all frames in between.

@@ -1,6 +1,6 @@
 """Configuration handler
 
-The configuration is a simple dictionnary. See :ref:`configuration` for
+The configuration is a simple dictionary. See :ref:`configuration` for
 details.
 """
 
@@ -14,7 +14,7 @@ class Config(dict):
             from space.config import config
 
             print(config['env']['eop_missing_policy'])
-            print(config.get('env', 'non-existant-field', fallback=25))
+            print(config.get('env', 'non-existent-field', fallback=25))
 
     """
     _instance = None
@@ -39,7 +39,7 @@ class Config(dict):
         return out
 
     def set(self, *args):
-        """Set a value in the config dictionnary
+        """Set a value in the config dictionary
 
         The last argument is the value to set
 

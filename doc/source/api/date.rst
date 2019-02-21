@@ -78,7 +78,7 @@ path to this database in the following fashion:
     )
 
 This way, the class ``MyDatabase`` will always be available to the beyond
-library, and will be instanciated if needed (i.e. if the :ref:`dbname config
+library, and will be instantiated if needed (i.e. if the :ref:`dbname config
 variable <eop-dbname>` is set to "*my_personnal_db*").
 
 Internals

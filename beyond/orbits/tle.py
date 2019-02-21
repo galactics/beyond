@@ -140,7 +140,7 @@ class Tle:
         self.bstar = _float(first[6])
 
         self.i = np.deg2rad(float(second[2]))   # inclination
-        self.Ω = np.deg2rad(float(second[3]))   # right ascencion of the acending node
+        self.Ω = np.deg2rad(float(second[3]))   # right ascension of the ascending node
         self.e = _float(second[4])              # eccentricity
         self.ω = np.deg2rad(float(second[5]))   # argument of periapsis
         self.M = np.deg2rad(float(second[6]))   # mean anomaly
@@ -291,7 +291,7 @@ class Tle:
 
                 cache = []
             else:
-                # In the 3LE format, the first line (numbered 0, or unumbered) contains the name
+                # In the 3LE format, the first line (numbered 0, or unnumbered) contains the name
                 # of the satellite
                 # In the TLE format, this line doesn't exists.
                 cache = [line]

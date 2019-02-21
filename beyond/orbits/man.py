@@ -19,7 +19,7 @@ class Maneuver:
         """
 
         if len(dv) != 3:
-            raise ValueError("dv should be 3 in lenght")
+            raise ValueError("dv should be 3 in length")
         if isinstance(frame, str):
             frame = frame.upper()
         if frame in ("RSW", 'LVLH', 'QSW'):

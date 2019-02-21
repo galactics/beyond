@@ -6,7 +6,7 @@
 Beyond
 ======
 
-Beyond is a library allowing developpers to handle orbits and space
+Beyond is a library allowing developers to handle orbits and space
 observations with ease.
 
 .. toctree::

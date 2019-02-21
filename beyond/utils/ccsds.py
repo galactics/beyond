@@ -1,6 +1,6 @@
 """This module provides ways to handle the CCSDS Orbit Data Message formats
 
-It is based ond the CCSDS ODM Blue Book from Nov. 2009 (502.0-B-2)
+It is based on the CCSDS ODM Blue Book from Nov. 2009 (502.0-B-2)
 """
 
 import numpy as np

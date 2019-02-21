@@ -76,14 +76,14 @@ Each release is linked to a git commit.
 
 - The CCSDS API now mimicks the json (load, loads, dump, dumps)
 - Frames translation now directly with vectors
-- Node harmonisation, only one implementation used
+- Node harmonization, only one implementation used
 - Stations handling has a proper module
 - MIT license
 
 ## [v0.4] - 2017-12-10
 
 ### Added
-- Config get() method to implement default behaviour in case of missing parameter
+- Config get() method to implement default behavior in case of missing parameter
 - Documentation of orbital forms (cartesian, keplerian, etc.)
 - TDB timescale
 - Tle now keep any keyword argument passed in a kwargs attribute
@@ -93,7 +93,7 @@ Each release is linked to a git commit.
 
 ### Removed
 - The config variable does not depend on a specific file anymore (previously ConfigParser, then TOML)
-  but is a dictionnary
+  but is a dictionary
 
 ### Changed
 - replacement of incorrect 'pole_motion' functions and variables names for
@@ -110,7 +110,7 @@ Each release is linked to a git commit.
 - Listeners for events computation (AOS, LOS, umbra, etc.)
 - CCSDS Orbit Data Message reading and writing
 - Multi TLE parser (#18)
-- frames now declare a central body, with some caracteristics (#20)
+- frames now declare a central body, with some characteristics (#20)
 
 ### Changed
 - Spherical parameters orders (now r, theta, phi)
@@ -142,4 +142,4 @@ Change the name of the library to beyond (formerly space-api)
 
 ## [v0.1] - 2016-05-22
 
-Initial release with basic functionnalities
+Initial release with basic functionalities
