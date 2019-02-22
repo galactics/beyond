@@ -29,7 +29,7 @@ missing_policy
     environment data. Current variable behavior are:
 
         * ``pass`` - Use zero as a value
-        * ``warning`` - Same as ``extrapolate`` but issue a warning
+        * ``warning`` - Same as ``pass``, and issues a warning
         * ``error`` - Raise an exception
 
     If this variable is not set, the library will use

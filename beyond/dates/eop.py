@@ -262,7 +262,7 @@ class EopDb:
                 msg = str(e)
 
             if cls.policy() == cls.WARN:
-                log.warning(msg, EopWarning)
+                log.warning(msg)
             elif cls.policy() == cls.ERROR:
                 raise
 
@@ -288,7 +288,7 @@ class EopDb:
 
         if name in cls._dbs:
             msg = "'{}' is already registered for an Eop database. Skipping".format(name)
-            log.warning(msg, EopWarning)
+            log.warning(msg)
         else:
             cls._dbs[name] = klass
 
