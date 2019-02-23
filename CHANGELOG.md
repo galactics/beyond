@@ -3,11 +3,23 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
-## Unreleased
+## [v0.6.3] - 2019-02-23
 
 ### Added
 
 - Tests for maneuver handling in CCSDS OPM
+- OrbitInfos class for rapid orbit additional informations (velocity, perapside radius, etc.)
+- Maneuvers have a optional 'comment' field, allowing to give more information
+- Declare a maneuver as a increment of keplerian elements with DeltaCombined
+- SOIPropagator for rapid extrapolation through multiple Sphere of Influence
+
+### Changed
+
+- `jpl.get_body()` now returns a Body instance and not an Orbit
+- Maneuvers now check themselves for application
+- The time resolution of a speaker/listener can be modified per class/instances
+- 'lambda' and 'λ' are replaced by the argument of latitude u = ω + ν in the Keplerian Circular form
+- A big pass over all comments and documentation regarding English
 
 ## [v0.6.2] - 2018-12-19
 
