@@ -148,6 +148,9 @@ class Bsp:
 
             segments.extend(SPK.open(str(filepath)).segments)
 
+        if not segments:
+            raise JplError("No segment loaded")
+
         # list of available segments
         self.segments = dict(((s.center, s.target), s) for s in segments)
 
