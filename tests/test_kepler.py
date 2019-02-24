@@ -30,7 +30,9 @@ def orb():
     return orb
 
 
-def test_propagate(orb):
+def test_propagate_rk4(orb):
+
+    orb.propagator.method = Kepler.RK4
 
     assert orb.date == Date(2008, 9, 20, 12, 25, 40, 104192)
 
@@ -44,11 +46,16 @@ def test_propagate(orb):
     assert orb3.date == Date(2008, 9, 20, 14, 38, 57, 104192)
     assert orb2.propagator.orbit is not None
     assert orb3.propagator.orbit is None
+
+    assert np.allclose(
+        orb3,
+        [-3.32227102e+06,  2.71760944e+06, -5.18854876e+06, -3.72026533e+03, -6.64188815e+03, -1.10191470e+03]
+    )
 
 
 def test_propagate_euler(orb):
 
-    orb.propagator.method = "euler"
+    orb.propagator.method = Kepler.EULER
 
     assert orb.date == Date(2008, 9, 20, 12, 25, 40, 104192)
 
@@ -62,6 +69,34 @@ def test_propagate_euler(orb):
     assert orb3.date == Date(2008, 9, 20, 14, 38, 57, 104192)
     assert orb2.propagator.orbit is not None
     assert orb3.propagator.orbit is None
+
+    assert np.allclose(
+        np.array(orb3),
+        [1.31798055e+06, -1.03274291e+07,  6.55473124e+06,  3.65036569e+03, 2.74331087e+03,  2.91576212e+03]
+    )
+
+
+def test_propagate_dopri(orb):
+
+    orb.propagator.method = Kepler.DOPRI
+
+    assert orb.date == Date(2008, 9, 20, 12, 25, 40, 104192)
+
+    orb2 = orb.propagate(orb.date + timedelta(minutes=121, seconds=12))
+
+    assert orb2.date == Date(2008, 9, 20, 14, 26, 52, 104192)
+    assert orb2.propagator.orbit is None  # brand new propagator
+
+    orb3 = orb2.propagate(timedelta(minutes=12, seconds=5))
+
+    assert orb3.date == Date(2008, 9, 20, 14, 38, 57, 104192)
+    assert orb2.propagator.orbit is not None
+    assert orb3.propagator.orbit is None
+
+    assert np.allclose(
+        np.array(orb3),
+        [-3.32225199e+06,  2.71765285e+06, -5.18854771e+06, -3.72028909e+03, -6.64186005e+03, -1.10195602e+03]
+    )
 
 
 def test_iter(orb):
@@ -85,7 +120,7 @@ def test_iter(orb):
 
 def test_listener(orb):
 
-    with patch('beyond.propagators.kepler.Kepler._method', wraps=orb.propagator._method) as mock:
+    with patch('beyond.propagators.kepler.Kepler._make_step', wraps=orb.propagator._make_step) as mock:
         data = []
         for p in orb.iter(start=Date(2008, 9, 20, 13), stop=timedelta(minutes=90), listeners=LightListener()):
             data.append(p)
