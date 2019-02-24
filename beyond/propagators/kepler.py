@@ -156,13 +156,19 @@ class SOIPropagator(Kepler):
         'Neptune': SOI(84758736000, 'Neptune')
     }
 
-    def __init__(self, central_step, alt_step, central, alt, method="rk4", frame="EME2000"):
+    def __init__(self, central_step, alt_step, central, alt, method=Kepler.RK4, frame=None):
         """
         Args:
-            central_step (timedelta): Step to use in computation when only the central body is taken into account
-            alt_step (timedelta): Step to use in computations under the influence of an alternate body
+            central_step (timedelta): Step to use in computation when only the
+                central body is taken into account
+            alt_step (timedelta): Step to use in computations under the
+                influence of an alternate body
             central (Body): Central body
             alt (list of Body): Objects to potentially use
+            method (str): Method of extrapolation (see :py:class:`Kepler`)
+            frame (str): Frame of the resulting extrapolation. If None, the
+                result will change frame depending on the sphere of influence
+                it is in
         """
 
         self.alt_step = alt_step
@@ -170,7 +176,7 @@ class SOIPropagator(Kepler):
         self.central = central
         self.alt = alt if isinstance(alt, (list, tuple)) else [alt]
         self.method = method
-        self.frame = frame
+        self.out_frame = frame
         self.active = central.name
 
     @property
@@ -184,7 +190,7 @@ class SOIPropagator(Kepler):
         self._orbit = orbit.copy(form="cartesian", frame=self.frame)
 
     def copy(self):
-        return self.__class__(self.central_step, self.alt_step, self.central, self.alt, self.frame)
+        return self.__class__(self.central_step, self.alt_step, self.central, self.alt, method=self.method, frame=self.out_frame)
 
     def _soi(self, orb):
         """Evaluate the need for SOI transition, by comparing the radial distance
@@ -230,12 +236,12 @@ class SOIPropagator(Kepler):
 
             current = soi
 
-            # At each step of the computation, evalute the need of SOI transition.
+            # At each step of the computation, evaluate the need of SOI transition.
             # If needed, stop the iteration, change the parameters of the
             # propagation (frame, step, central body), then start it again from the
             # last point
             for orb in super()._iter(start, stop, self.step, **kwargs):
-                yield orb.copy(frame=self.frame)
+                yield orb.copy(frame=self.out_frame)
                 soi = self._soi(orb)
                 if soi != current:
                     break
