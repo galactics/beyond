@@ -5,6 +5,7 @@
 """
 
 import numpy as np
+from textwrap import indent
 
 from ..constants import c
 from ..dates import timedelta
@@ -101,10 +102,15 @@ class Orbit(np.ndarray):
         Override :py:meth:`numpy.ndarray.copy()` to include additional
         fields
         """
+
+        new_compl = {}
+        for k, v in self.complements.items():
+            new_compl[k] = v.copy() if hasattr(v, 'copy') else v
+
         new_obj = self.__class__(
             self.date, self.base.copy(), self.form,
             self.frame, self.propagator.copy() if self.propagator is not None else None,
-            **self.complements
+            **new_compl
         )
         if frame and frame != self.frame:
             new_obj.frame = frame
@@ -156,13 +162,20 @@ Orbit =
   form = {form}
   frame = {frame}
   propag = {propag}
-  coord =\n{coord}""".format(
+  coord =\n{coord}\n""".format(
             date=self.date,
             coord=coord_str,
             form=self.form,
             frame=self.frame,
             propag=propagator
         )
+
+        # Add man to the repr if there is some
+        if self.maneuvers:
+            fmt += "  maneuvers =\n"
+            for man in self.maneuvers:
+                fmt += indent(repr(man), " " * 4)
+
         return fmt
 
     @property

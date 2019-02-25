@@ -8,8 +8,8 @@ from ..dates import Date
 
 __all__ = [
     'Speaker', 'Listener', 'stations_listeners', 'StationSignalListener',
-    'StationMaxListener', 'StationMaskListener', 'LightListener', 'TerminatorListener', 'ApsideListener',
-    'NodeListener', 'ZeroDopplerListener'
+    'StationMaxListener', 'StationMaskListener', 'LightListener',
+    'TerminatorListener', 'ApsideListener', 'NodeListener', 'ZeroDopplerListener'
 ]
 
 

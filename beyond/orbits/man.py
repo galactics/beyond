@@ -30,6 +30,17 @@ class Maneuver:
         self.frame = frame
         self.comment = comment
 
+    def __repr__(self):
+        txt = "Man =\n  date = {}\n".format(self.date)
+        if self.frame:
+            txt += "  frame = {}\n".format(self.frame)
+        if self.comment:
+            txt += "  comment = {}\n".format(self.comment)
+        txt += "  dv = \n"
+        for i, x in enumerate("xyz"):
+            txt += "    {} = {:0.2g}\n".format(x, self._dv[i])
+        return txt
+
     def check(self, orb, step):
         return orb.date < self.date <= orb.date + step
 
@@ -69,6 +80,16 @@ class DeltaCombined(Maneuver):
         self.delta_a = delta_a
         self.delta_angle = delta_angle
         self.comment = comment
+
+    def __repr__(self):
+        txt = "Man =\n  date = {}\n".format(self.date)
+        if self.delta_a:
+            txt += "  delta_a = {}\n".format(self.delta_a)
+        if self.delta_angle:
+            txt += "  delta_angle = {}\n".format(self.delta_angle)
+        if self.comment:
+            txt += "  comment = {}\n".format(self.comment)
+        return txt
 
     def dv(self, orb):
         delta_v_a = orb.frame.center.mu * self.delta_a / (2 * orb.infos.v * orb.infos.kep.a ** 2)

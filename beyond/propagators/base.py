@@ -112,7 +112,7 @@ class AnalyticalPropagator(Propagator):
 
 
 class NumericalPropagator(Propagator):
-    """Base class for numerical propagators (i.e. Cowell)
+    """Base class for numerical propagators (e.g. Cowell)
     """
 
     def propagate(self, date):
