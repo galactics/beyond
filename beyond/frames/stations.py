@@ -15,8 +15,13 @@ class TopocentricFrame(Frame):
     def visibility(cls, orb, **kwargs):
         """Visibility from a topocentric frame
 
+        see :py:meth:`Propagator.iter() <beyond.propagators.base.Propagator.iter>`
+        for description of arguments handling.
+
         Args:
             orb (Orbit): Orbit to compute visibility from the station with
+
+        Keyword Args:
             start (Date): starting date of the visibility search
             stop (Date or datetime.timedelta) end of the visibility search
             step (datetime.timedelta): step of the computation
@@ -29,7 +34,7 @@ class TopocentricFrame(Frame):
 
         Yield:
             Orbit: In-visibility point of the orbit. This Orbit is already
-            in the frame of the station and in spherical form.
+                in the frame of the station and in spherical form.
         """
 
         from ..orbits.listeners import stations_listeners, Listener

@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from pytest import fixture, raises
+from pytest import fixture, raises, mark
 from unittest.mock import patch
 
 import beyond.utils.ccsds as ccsds
@@ -116,6 +116,25 @@ def test_iter(orb):
     assert data[0].date == data2[0].date
     assert all(data[0] == data2[0])
     assert data[0] is not data2[0]
+
+
+@mark.skip(reason="Too much changes to make to numerical propagators")
+def test_iter_on_dates(orb):
+    # Generate a free step ephemeris
+    start = orb.date
+    stop1 = start + timedelta(hours=3)
+    step1 = timedelta(seconds=10)
+    stop2 = stop1 + timedelta(hours=3)
+    step2 = timedelta(seconds=120)
+
+    dates = list(Date.range(start, stop1, step1)) + list(Date.range(stop1, stop2, step2, inclusive=True))
+
+    ephem = orb.ephem(dates=dates)
+
+    assert ephem.start == start
+    assert ephem.stop == stop2
+    assert ephem[1].date - ephem[0].date == step1
+    assert ephem[-1].date - ephem[-2].date == step2
 
 
 def test_listener(orb):

@@ -181,23 +181,39 @@ class Ephem(Speaker):
         """
         return self.interpolate(date)
 
-    def iter(self, *, start=None, stop=None, step=None, strict=True, **kwargs):
+    def iter(self, *, dates=None, start=None, stop=None, step=None, strict=True, **kwargs):
         """Ephemeris generator based on the data of this one, but with different dates
 
-        If an argument is set to ``None`` it will keep the same property as the generating ephemeris
-
         Keyword Arguments:
+            dates (list of :py:class:`~beyond.dates.date.Date`): Dates from which iterate over
             start (Date or None): Date of the first point
             stop (Date, timedelta or None): Date of the last point
             step (timedelta or None): Step to use during the computation. Use the same step as
                 `self` if `None`
+            listeners (list of:py:class:`~beyond.orbits.listeners.Listener`):
             strict (bool): If True, the method will return a ValueError if ``start`` or ``stop`` is
                 not in the range of the ephemeris. If False, it will take the closest point in each
                 case.
         Yield:
             :py:class:`Orbit`:
 
-        Examples:
+        There is two ways to use the iter() method.
+
+        If *dates* is defined, it should be an iterable of dates. This could be
+        a generator as per :py:meth:`Date.range <beyond.dates.date.Date.range>`, or a list.
+
+        .. code-block:: python
+
+            # Create two successive ranges of dates, with different steps
+            dates = list(Date.range(Date(2019, 3, 23), Date(2019, 3, 24), timedelta(minutes=3)))
+            dates.extend(Date.range(Date(2019, 3, 24), Date(2019, 3, 25), timedelta(minutes=10), inclusive=True))
+            ephem.iter(dates=dates)
+
+        The alternative, is the use of *start*, *stop* and *step* keyword arguments
+        which work exactly as :code:`Date.range(start, stop, step, inclusive=True)`
+
+        If one of *start*, *stop* or *step* arguments is set to ``None`` it will keep
+        the same property as the generating ephemeris.
 
         .. code-block:: python
 
@@ -222,55 +238,10 @@ class Ephem(Speaker):
         # To allow for a loose control of the dates we have to compute
         # the real starting date of the iterator
 
-        real_start = None
-
-        if start is None:
-            start = self.start
-        elif start < self.start:
-            if strict:
-                raise ValueError("Start date not in range")
-            else:
-                real_start = self.start
-
-        if stop is None:
-            stop = self.stop
-        else:
-            if isinstance(stop, timedelta):
-                stop = start + stop
-            if stop > self.stop:
-                if strict:
-                    raise ValueError("Stop date not in range")
-                else:
-                    stop = self.stop
-
-        if real_start is not None:
-            start = real_start
-
         listeners = kwargs.get('listeners', [])
 
-        if step is None:
-
-            # The step stays the same as the original ephemeris
-            for orb in self:
-
-                if orb.date < start:
-                    continue
-
-                if orb.date > stop:
-                    break
-
-                # Listeners
-                for listen_orb in self.listen(orb, listeners):
-                    yield listen_orb
-
-                # yield a copy of the recorded orbit to avoid later modification
-                # which could have dire consequences
-                yield orb.copy()
-        else:
-            # create as ephemeris with a different step than the original
-            date = start
-            while date <= stop:
-
+        if dates:
+            for date in dates:
                 orb = self.propagate(date)
 
                 # Listeners
@@ -278,7 +249,62 @@ class Ephem(Speaker):
                     yield listen_orb
 
                 yield orb
-                date += step
+        else:
+            real_start = None
+
+            if start is None:
+                start = self.start
+            elif start < self.start:
+                if strict:
+                    raise ValueError("Start date not in range")
+                else:
+                    real_start = self.start
+
+            if stop is None:
+                stop = self.stop
+            else:
+                if isinstance(stop, timedelta):
+                    stop = start + stop
+                if stop > self.stop:
+                    if strict:
+                        raise ValueError("Stop date not in range")
+                    else:
+                        stop = self.stop
+
+            if real_start is not None:
+                start = real_start
+
+            if step is None:
+
+                # The step stays the same as the original ephemeris
+                for orb in self:
+
+                    if orb.date < start:
+                        continue
+
+                    if orb.date > stop:
+                        break
+
+                    # Listeners
+                    for listen_orb in self.listen(orb, listeners):
+                        yield listen_orb
+
+                    # yield a copy of the recorded orbit to avoid later modification
+                    # which could have dire consequences
+                    yield orb.copy()
+            else:
+                # create as ephemeris with a different step than the original
+                date = start
+                while date <= stop:
+
+                    orb = self.propagate(date)
+
+                    # Listeners
+                    for listen_orb in self.listen(orb, listeners):
+                        yield listen_orb
+
+                    yield orb
+                    date += step
 
     def ephemeris(self, *args, **kwargs):
         """Same as :py:meth:`self.iter() <iter>`

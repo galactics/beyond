@@ -107,6 +107,26 @@ def test_subephem(ref_orb, ephem, start):
     assert len(subephem) == (subephem.stop - subephem.start) // step + 1
 
 
+def test_iter_dates(ephem):
+
+    # Generate a free step ephemeris
+    start = ephem.start
+    stop1 = start + (ephem.stop - ephem.start) / 2
+    step1 = timedelta(seconds=60)
+    stop2 = ephem.stop
+    step2 = timedelta(seconds=120)
+
+    dates = list(Date.range(start, stop1, step1)) + list(Date.range(stop1, stop2, step2, inclusive=True))
+
+    subephem = ephem.ephem(dates=dates)
+
+    assert subephem.start == ephem.start
+    assert subephem.stop == ephem.stop
+
+    assert subephem[1].date - subephem[0].date == step1
+    assert subephem[-1].date - subephem[-2].date == step2
+
+
 def test_getitem(ephem):
 
     # Evolution of the Z component
