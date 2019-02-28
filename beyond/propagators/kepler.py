@@ -141,7 +141,11 @@ class Kepler(NumericalPropagator):
 
         return y_n_1
 
-    def _iter(self, start, stop, step, **kwargs):
+    def _iter(self, **kwargs):
+
+        start = kwargs.get('start', self.orbit.date)
+        stop = kwargs.get('stop')
+        step = kwargs.get('step', self.step)
 
         orb = self.orbit
 
@@ -260,7 +264,7 @@ class SOIPropagator(Kepler):
             self.active = body.name
             self.frame = soi.frame
 
-    def _iter(self, start, stop, step, **kwargs):
+    def _iter(self, start=None, stop=None, step=None, **kwargs):
 
         orb = self.orbit
         soi = self._soi(orb)
@@ -273,7 +277,7 @@ class SOIPropagator(Kepler):
             # If needed, stop the iteration, change the parameters of the
             # propagation (frame, step, central body), then start it again from the
             # last point
-            for orb in super()._iter(start, stop, self.step, **kwargs):
+            for orb in super()._iter(start=start, stop=stop, step=self.step, **kwargs):
                 yield orb.copy(frame=self.out_frame)
                 soi = self._soi(orb)
                 if soi != current:

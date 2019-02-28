@@ -54,7 +54,7 @@ def orbit(request, common_env):
         stop = timedelta(hours=6)
         step = timedelta(seconds=15)
 
-        return orb.ephem(start, stop, step)
+        return orb.ephem(start=start, stop=stop, step=step)
     elif request.param == "kepler":
         orb.propagator = Kepler(
             timedelta(seconds=60),

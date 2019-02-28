@@ -327,12 +327,12 @@ def orb_man(orb):
 
 @fixture
 def ephem(orb):
-    return orb.ephem(orb.date, timedelta(minutes=120), timedelta(minutes=3))
+    return orb.ephem(start=orb.date, stop=timedelta(minutes=120), step=timedelta(minutes=3))
 
 
 @fixture
 def ephem2(orb):
-    return orb.ephem(orb.date, timedelta(hours=5), timedelta(minutes=5))
+    return orb.ephem(start=orb.date, stop=timedelta(hours=5), step=timedelta(minutes=5))
 
 
 def assert_orbit(ref, orb):

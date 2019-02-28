@@ -291,15 +291,15 @@ Orbit =
 
         return self.propagator.propagate(date)
 
-    def iter(self, *args, **kwargs):
+    def iter(self, **kwargs):
         """see :py:meth:`Propagator.iter() <beyond.propagators.base.Propagator.iter>`
         """
         if self.propagator.orbit is not self:
             self.propagator.orbit = self
 
-        return self.propagator.iter(*args, **kwargs)
+        return self.propagator.iter(**kwargs)
 
-    def ephemeris(self, start, stop, step, **kwargs):
+    def ephemeris(self, **kwargs):
         """Generator giving the propagation of the orbit at different dates
 
         Args:
@@ -310,10 +310,10 @@ Orbit =
             Orbit
         """
 
-        for orb in self.iter(start=start, stop=stop, step=step, inclusive=True, **kwargs):
+        for orb in self.iter(inclusive=True, **kwargs):
             yield orb
 
-    def ephem(self, start, stop, step, **kwargs):
+    def ephem(self, **kwargs):
         """Tabulation of Orbit at a given step and on a given date range
 
         Args:
@@ -323,7 +323,7 @@ Orbit =
         Return:
             Ephem:
         """
-        return Ephem(self.ephemeris(start, stop, step, **kwargs))
+        return Ephem(self.ephemeris(**kwargs))
 
     def as_frame(self, name, **kwargs):  # pragma: no cover
         """Register the orbit as frame.

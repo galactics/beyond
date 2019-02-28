@@ -1,6 +1,7 @@
 
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
+from collections.abc import Iterable
 
 from ..dates import Date
 from ..orbits.listeners import Speaker
@@ -13,7 +14,7 @@ class Propagator(Speaker, metaclass=ABCMeta):
     orbit = None
 
     @abstractmethod
-    def _iter(self, star, stop, step, **kwargs):
+    def _iter(self, **kwargs):
         pass
 
     @abstractmethod
@@ -29,10 +30,10 @@ class Propagator(Speaker, metaclass=ABCMeta):
     def copy(self):
         return self.__class__()
 
-    def iter(self, start=None, stop=None, step=None, **kwargs):
+    def iter(self, **kwargs):
         """Compute a range of orbits between two dates
 
-        Args:
+        Keyword Arguments:
             start (Date)
             stop (Date or timedelta)
             step (timedelta)
@@ -48,20 +49,24 @@ class Propagator(Speaker, metaclass=ABCMeta):
             propag.iter(start=start, stop=stop, step=step)
         """
 
-        if stop is None:
+        start = kwargs.setdefault('start', self.orbit.date)
+        stop = kwargs.get('stop')
+        step = kwargs.setdefault('step', getattr(self, 'step', None))
+
+        if 'stop' is None:
             raise ValueError("The end of the propagation should be defined")
 
         start = self.orbit.date if start is None else start
         step = self.step if step is None else step
 
-        if isinstance(stop, timedelta):
-            stop = start + stop
-        if start > stop and step.total_seconds() > 0:
-            step = -step
+        if isinstance(kwargs['stop'], timedelta):
+            kwargs['stop'] = start + kwargs['stop']
+        if start > kwargs['stop'] and step.total_seconds() > 0:
+            kwargs['step'] = -step
 
         listeners = kwargs.pop('listeners', [])
 
-        for orb in self._iter(start, stop, step, **kwargs):
+        for orb in self._iter(**kwargs):
             for listen_orb in self.listen(orb, listeners):
                 yield listen_orb
             yield orb
@@ -71,8 +76,13 @@ class AnalyticalPropagator(Propagator):
     """Base class for analytical propagators (SGP4, Eckstein-Heschler, etc.)
     """
 
-    def _iter(self, start, stop, step, **kwargs):
-        for date in Date.range(start, stop, step, kwargs.get('inclusive')):
+    def _iter(self, **kwargs):
+
+        start = kwargs.get('start')
+        stop = kwargs.get('stop')
+        step = kwargs.get('step')
+
+        for date in Date.range(start, stop, step, inclusive=True):
             yield self.propagate(date)
 
 

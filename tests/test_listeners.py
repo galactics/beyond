@@ -15,7 +15,7 @@ def iter_listeners(orb, listeners):
     stop = timedelta(minutes=100)
     step = timedelta(minutes=3)
 
-    for orb in orb.iter(start, stop, step, listeners=listeners):
+    for orb in orb.iter(start=start, stop=stop, step=step, listeners=listeners):
         if orb.event:
             yield orb
 

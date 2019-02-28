@@ -12,7 +12,7 @@ class TopocentricFrame(Frame):
     _rotation_before_translation = True
 
     @classmethod
-    def visibility(cls, orb, start=None, stop=None, step=None, events=False, **kwargs):
+    def visibility(cls, orb, **kwargs):
         """Visibility from a topocentric frame
 
         Args:
@@ -34,7 +34,8 @@ class TopocentricFrame(Frame):
 
         from ..orbits.listeners import stations_listeners, Listener
 
-        listeners = kwargs.get('listeners', [])
+        listeners = kwargs.setdefault('listeners', [])
+        events = kwargs.pop('events', None)
         event_classes = tuple()
 
         if events:
@@ -54,7 +55,7 @@ class TopocentricFrame(Frame):
 
             event_classes = tuple(listener.event for listener in sta_list)
 
-        for point in orb.iter(start=start, stop=stop, step=step, listeners=listeners, **kwargs):
+        for point in orb.iter(**kwargs):
             point.frame = cls
             point.form = 'spherical'
 

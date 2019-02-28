@@ -25,7 +25,7 @@ def ref_orb():
 
 @fixture
 def ephem(ref_orb, start):
-    return ref_orb.ephem(start, stop, step)
+    return ref_orb.ephem(start=start, stop=stop, step=step)
 
 
 def test_create(ephem, start):
@@ -62,7 +62,7 @@ def test_subephem(ref_orb, ephem, start):
     assert subephem.stop == ephem.stop
 
     # resampling of the ephem
-    subephem = ref_orb.ephem(start, stop, timedelta(minutes=1))
+    subephem = ref_orb.ephem(start=start, stop=stop, step=timedelta(minutes=1))
     assert subephem.start == ephem.start
     assert subephem.stop == ephem.stop
     assert len(subephem) == stop // timedelta(minutes=1) + 1

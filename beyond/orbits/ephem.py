@@ -181,7 +181,7 @@ class Ephem(Speaker):
         """
         return self.interpolate(date)
 
-    def iter(self, start=None, stop=None, step=None, strict=True, **kwargs):
+    def iter(self, *, start=None, stop=None, step=None, strict=True, **kwargs):
         """Ephemeris generator based on the data of this one, but with different dates
 
         If an argument is set to ``None`` it will keep the same property as the generating ephemeris
@@ -221,6 +221,7 @@ class Ephem(Speaker):
 
         # To allow for a loose control of the dates we have to compute
         # the real starting date of the iterator
+
         real_start = None
 
         if start is None:

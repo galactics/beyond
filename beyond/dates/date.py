@@ -415,7 +415,7 @@ class Date:
         return self.d + self.s / 86400.
 
     @classmethod
-    def range(cls, start, stop, step, inclusive=False):
+    def range(cls, start=None, stop=None, step=None, inclusive=False):
         """Generator of a date range
 
         Args:
