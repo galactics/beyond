@@ -101,6 +101,14 @@ def test_operations():
     with raises(TypeError):
         t2 = t1 - 2.5
 
+    # Test if Date is hashable
+    d = {
+        t1: "test",
+        t2: "test2"
+    }
+    t1bis = t1.change_scale('UT1')
+    assert d[t1bis] == "test"
+
 
 def test_change_scale():
 

@@ -292,6 +292,9 @@ class Date:
         else:
             return str(self)
 
+    def __hash__(self):
+        return hash((self._d, self._s))
+
     @classmethod
     def _convert_dt(cls, dt):
         if dt.tzinfo is None:
