@@ -135,8 +135,8 @@ class Tle:
         year += 1900 if year >= 57 else 2000  # This condition works until 2057
         epoch = datetime(year, 1, 1) + timedelta(days=float(first[3][2:]) - 1)
         self.epoch = Date(epoch)
-        self.ndot = float(first[4])
-        self.ndotdot = _float(first[5])
+        self.ndot = float(first[4]) * 2
+        self.ndotdot = _float(first[5]) * 6
         self.bstar = _float(first[6])
 
         self.i = np.deg2rad(float(second[2]))   # inclination
@@ -234,8 +234,8 @@ class Tle:
             cospar_id=cospar_id,
             date=date,
             day=int("{:%j}".format(date)) + date.hour / 24. + date.minute / 1440 + date.second / 86400 + date.microsecond / 86400000000.,
-            ndot="{: 0.8f}".format(orbit.complements['ndot']).replace("0.", "."),
-            ndotdot=_unfloat(orbit.complements['ndotdot']),
+            ndot="{: 0.8f}".format(orbit.complements['ndot'] / 2).replace("0.", "."),
+            ndotdot=_unfloat(orbit.complements['ndotdot'] / 6),
             bstar=_unfloat(orbit.complements['bstar']),
         )
         line2 = "2 {norad_id} {i:8.4f} {Ω:8.4f} {e} {ω:8.4f} {M:8.4f} {n:11.8f}99999".format(

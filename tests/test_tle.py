@@ -20,7 +20,7 @@ def test_read():
     assert tle.norad_id == 25544
     assert tle.cospar_id == "1998-067A"
     assert tle.epoch == Date(2008, 9, 20, 12, 25, 40, 104192)
-    assert tle.ndot == -2.182e-5
+    assert tle.ndot == -2.182e-5 * 2
     assert tle.ndotdot == 0.
     assert tle.bstar == -0.11606e-4
     assert tle.i == np.deg2rad(51.6416)
