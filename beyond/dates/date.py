@@ -3,7 +3,7 @@
 """Date module
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from numpy import sin, radians
 
 from ..errors import DateError, UnknownScaleError
@@ -457,3 +457,33 @@ class Date:
         while getattr(date, oper)(stop):
             yield date
             date += step
+
+
+# This part is here to allow matplotlib to display Date objects directly
+# in the plot, without any other conversion by the developer
+# If matplotlib is importable, then a converter class is registered
+# for converting all Date objects on the fly
+try:
+    import matplotlib.dates as mdates
+    import matplotlib.units as munits
+except ImportError:  # pragma: no cover
+    pass
+else:  # pragma: no cover
+
+    class DateConverter(mdates.DateConverter):
+
+        @staticmethod
+        def convert(values, unit, axis):
+            try:
+                iter(values)
+            except TypeError:
+                if isinstance(values, (datetime, date)):
+                    values = mdates.date2num(values)
+                else:
+                    values = mdates.date2num(values.datetime)
+            else:
+                values = [mdates.date2num(v.datetime) for v in values]
+
+            return values
+
+    munits.registry.setdefault(Date, DateConverter())

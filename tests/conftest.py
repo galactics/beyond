@@ -1,5 +1,4 @@
-
-from pytest import fixture
+from pytest import fixture, mark
 from unittest.mock import patch
 from pathlib import Path
 
@@ -72,3 +71,17 @@ def jplfiles():
             str(Path(__file__).parent / "data" / "jpl" / "gm_de431.tpc"),
         ]
     }
+
+
+# Specific for dynamically skipping the test if matplotlib is not present
+# as it is not a dependency of the library, but merely a convenience
+def _skip_if_no_mpl():
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        return True
+    else:
+        return False
+
+
+skip_if_no_mpl = mark.skipif(_skip_if_no_mpl(), reason="Missing matplotlib dependency")
