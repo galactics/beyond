@@ -15,6 +15,7 @@ from .ephem import Ephem
 from ..frames.frames import get_frame, orbit2frame
 from ..propagators import get_propagator
 from .man import Maneuver
+from .cov import Cov
 
 
 class Orbit(np.ndarray):
@@ -170,6 +171,10 @@ Orbit =
             propag=propagator
         )
 
+        # Add covariance to the repr
+        if self.cov.any():
+            fmt += indent(repr(self.cov), " " * 2)
+
         # Add man to the repr if there is some
         if self.maneuvers:
             fmt += "  maneuvers =\n"
@@ -202,6 +207,16 @@ Orbit =
     @maneuvers.deleter
     def maneuvers(self):
         del self.complements['maneuvers']
+
+    @property
+    def cov(self):
+        """:py:class:`~beyond.orbits.cov.Cov`: 6x6 Matrix
+        """
+        return self.complements.get('cov', Cov(self, np.zeros((6, 6))))
+
+    @cov.setter
+    def cov(self, value):
+        self.complements['cov'] = Cov(self, value)
 
     @property
     def form(self):

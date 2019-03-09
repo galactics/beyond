@@ -73,3 +73,10 @@ Maneuver
 .. autoclass:: beyond.orbits.man.Maneuver
     :members:
     :special-members: __init__
+
+Cov
+---
+
+.. autoclass:: beyond.orbits.cov.Cov
+    :members:
+    :special-members: __new__

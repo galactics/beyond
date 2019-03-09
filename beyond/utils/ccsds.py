@@ -150,8 +150,9 @@ def _read_oem(string):
         date, *state_vector = line.split()
         date = Date.strptime(date, "%Y-%m-%dT%H:%M:%S.%f", scale=ephem['scale'])
 
-        # Conversion from km to m and from km/s to m/s
-        state_vector = np.array([float(x) for x in state_vector]) * 1000
+        # Conversion from km to m, from km/s to m/s
+        # and discard acceleration if present
+        state_vector = np.array([float(x) for x in state_vector[:6]]) * 1000
 
         ephem['orbits'].append(Orbit(date, state_vector, 'cartesian', ephem['frame'], None))
 
@@ -238,6 +239,24 @@ def _read_opm(string):
 
         if man['duration'].total_seconds() == 0:
             orb.maneuvers.append(Maneuver(man['date'], man['dv'], frame=man['frame'], comment=man['comment']))
+
+    if 'CX_X' in data:
+
+        frame = data.get('COV_REF_FRAME', orb.cov.PARENT_FRAME)
+        if frame in ('RSW', 'RTN'):
+            frame = "QSW"
+
+        values = [
+            [data['CX_X'],     data['CY_X'],     data['CZ_X'],     data['CX_DOT_X'],     data['CY_DOT_X'],     data['CZ_DOT_X']],
+            [data['CY_X'],     data['CY_Y'],     data['CZ_Y'],     data['CX_DOT_Y'],     data['CY_DOT_Y'],     data['CZ_DOT_Y']],
+            [data['CZ_X'],     data['CZ_Y'],     data['CZ_Z'],     data['CX_DOT_Z'],     data['CY_DOT_Z'],     data['CZ_DOT_Z']],
+            [data['CX_DOT_X'], data['CX_DOT_Y'], data['CX_DOT_Z'], data['CX_DOT_X_DOT'], data['CY_DOT_X_DOT'], data['CZ_DOT_X_DOT']],
+            [data['CY_DOT_X'], data['CY_DOT_Y'], data['CY_DOT_Z'], data['CY_DOT_X_DOT'], data['CY_DOT_Y_DOT'], data['CZ_DOT_Y_DOT']],
+            [data['CZ_DOT_X'], data['CZ_DOT_Y'], data['CZ_DOT_Z'], data['CZ_DOT_X_DOT'], data['CZ_DOT_Y_DOT'], data['CZ_DOT_Z_DOT']]
+        ]
+
+        orb.cov = np.array(values).astype(np.float) * 1e6
+        orb.cov._frame = frame
 
     return orb
 
@@ -348,6 +367,25 @@ RA_OF_ASC_NODE       = {angles[1]: 12.6f} [deg]
 ARG_OF_PERICENTER    = {angles[2]: 12.6f} [deg]
 TRUE_ANOMALY         = {angles[3]: 12.6f} [deg]
 """.format(cartesian=cart / 1000, kep_a=kep.a / 1000, kep_e=kep.e, angles=np.degrees(kep[2:]))
+
+    # Covariance handling
+    if cart.cov.any():
+        text += "\nCOMMENT  COVARIANCE\n"
+        if cart.cov.frame != cart.cov.PARENT_FRAME:
+            frame = cart.cov.frame
+            if frame == "QSW":
+                frame = "RSW"
+            text += "COV_REF_FRAME        = {frame}\n".format(frame=frame)
+
+        l = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
+        for i, a in enumerate(l):
+            for j, b in enumerate(l[:i+1]):
+                txt = "{a}_{b}".format(a=a, b=b)
+
+                text += "C{txt:<19} = {v: 0.16e}\n".format(
+                    txt=txt,
+                    v=cart.cov[i, j] / 1e6,
+                )
 
     if cart.maneuvers:
         for i, man in enumerate(cart.maneuvers):
