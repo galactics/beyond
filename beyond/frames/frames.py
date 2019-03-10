@@ -99,10 +99,13 @@ class _MetaFrame(type, Node):
     """
 
     def __init__(cls, name, bases, dct):
+
+        bypass = dct.pop('bypass', False)
+
         super(_MetaFrame, cls).__init__(name, bases, dct)
         super(type, cls).__init__(name)
 
-        if cls.__name__ in dynamic:
+        if not bypass and cls.__name__ in dynamic:
             log.warning("A frame with the name '%s' is already registered. Overriding" % cls.__name__)
 
         cls.__module__ = __name__ + ".dynamic"
@@ -290,13 +293,15 @@ class GCRF(Frame):
     orientation = "GCRF"
 
 
-def orbit2frame(name, ref_orbit, orientation=None, center=None):
+def orbit2frame(name, ref_orbit, orientation=None, center=None, bypass=False):
     """Create a frame based on a Orbit or Ephem object.
 
     Args:
         name (str): Name to give the created frame
         ref_orbit (Orbit or Ephem):
         orientation (str): Orientation of the created frame
+        bypass (bool): By-pass the warning when creating a frame with an already
+            taken name
     Return:
         Frame:
 
@@ -347,7 +352,8 @@ def orbit2frame(name, ref_orbit, orientation=None, center=None):
     dct = {
         mtd: _to_parent_frame,
         "orientation": orientation,
-        "center": center
+        "center": center,
+        "bypass": bypass,
     }
 
     # Creation of the class
