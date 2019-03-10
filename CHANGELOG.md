@@ -3,6 +3,23 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [v0.6.4] - 2019-03-17
+
+### Added
+
+- SoI : Possibility to force the frame of SoI propagator
+- Date are now hashable and directly usable for plotting in matplotlib
+- Propagators' iter() method accept Date iterable (allows to iter over variable step-sizes)
+- Basic handling of covariance matrices
+- Possibility to bypass the warning when creating a frame with a name already taken
+- Tests on documentation examples
+
+### Modified
+
+- Kepler Propagator : Refactoring to allow any kind of numerical propagator
+- Tle ndot and ndotdot parsing correction
+- Change of default EOP policy to 'pass'. No more warning about missing data
+
 ## [v0.6.3] - 2019-02-23
 
 ### Added
