@@ -1,20 +1,36 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pytest import raises
+import logging
+from pytest import raises, fixture
 import numpy as np
 
 from beyond.dates.date import Date
 from beyond.orbits.tle import Tle
 
-ref = """0 ISS (ZARYA)
+ref = [
+    """0 ISS (ZARYA)
 1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927
-2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537"""
+2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537""",
+    """UNKNOWN
+1 81014U          19071.50347758  .00025823  00000-0  22146-2 0  9998
+2 81014  51.3262 117.7468 2910898 126.0686 264.6106  9.45290855184707"""
+]
 
 
-def test_read():
+@fixture
+def tle_txt():
+    return ref[0]
 
-    tle = Tle(ref)
+
+@fixture(params=range(len(ref)))
+def both(request):
+    return ref[request.param]
+
+
+def test_read(tle_txt):
+
+    tle = Tle(tle_txt)
 
     assert tle.name == "ISS (ZARYA)"
     assert tle.norad_id == 25544
@@ -30,32 +46,32 @@ def test_read():
     assert tle.M == np.deg2rad(325.0288)
     assert tle.n == 15.72125391 * 2 * np.pi / 86400.
 
-    tle = Tle(ref.splitlines()[1:])
+    tle = Tle(tle_txt.splitlines()[1:])
 
     assert tle.name == ""
 
     with raises(ValueError):
-        ref2 = ref[:-1] + "8"
+        ref2 = tle_txt[:-1] + "8"
         Tle(ref2)
 
-    orbs = list(Tle.from_string("# comment\n" + ref))
+    orbs = list(Tle.from_string("# comment\n" + tle_txt))
     assert len(orbs) == 1
     assert (orbs[0].orbit() == tle.orbit()).all()
 
-    tle3 = Tle("Name\n" + "\n".join(ref.splitlines()[1:]))
+    tle3 = Tle("Name\n" + "\n".join(tle_txt.splitlines()[1:]))
     assert (tle3.orbit() == tle.orbit()).all()
 
     with raises(ValueError) as eee:
-        l = ref.splitlines()
+        l = tle_txt.splitlines()
         l[1] = "3" + l[1][1:]
         Tle("\n".join(l))
 
     assert str(eee.value) == "Line number check failed"
 
 
-def test_convert_to_orbit():
+def test_convert_to_orbit(tle_txt):
 
-    tle = Tle(ref)
+    tle = Tle(tle_txt)
     orb = tle.orbit()
 
     assert repr(orb.frame) == "<Frame 'TEME'>"
@@ -69,15 +85,16 @@ def test_convert_to_orbit():
     assert orb['n'] == 15.72125391 * 2 * np.pi / 86400.
 
 
-def test_to_and_from():
+def test_to_and_from(both):
 
-    tle = Tle(ref)
+    tle = Tle(both)
     orb = tle.orbit()
 
     tle2 = Tle.from_orbit(orb, name=tle.name, norad_id=tle.norad_id, cospar_id=tle.cospar_id)
     tle3 = Tle.from_orbit(orb, name=tle.name, norad_id=tle.norad_id)
 
-    assert tle3.cospar_id == "2000-001A"
+    assert tle2.cospar_id == tle.cospar_id
+    assert tle3.cospar_id == ""
 
     tle, tle2 = tle.text.splitlines(), tle2.text.splitlines()
     for i in range(2):
@@ -85,3 +102,27 @@ def test_to_and_from():
         # we can't have any information about the element set number. And because of that, the
         # checksum is also different
         assert tle[i][:63] == tle2[i][:63]
+
+
+def test_generator(caplog):
+
+    text = "\n".join(ref) + "\n1   \n2   "
+
+    with raises(ValueError):
+        for tle in Tle.from_string(text, error="raise"):
+            continue
+
+    for tle in Tle.from_string(text):
+        continue
+
+    assert len(caplog.records) == 1
+    assert caplog.record_tuples == [
+        ('beyond.orbits.tle', logging.WARNING, "invalid literal for int() with base 10: '  '")
+    ]
+
+    caplog.clear()
+
+    for tle in Tle.from_string(text, error="ignore"):
+        continue
+
+    assert len(caplog.records) == 0

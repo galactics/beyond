@@ -62,6 +62,9 @@ def _float(text):
     >>> _float('+45871-4')
     4.5871e-05
     """
+
+    text = text.strip()
+
     if text[0] in ('-', '+'):
         text = "%s.%s" % (text[0], text[1:])
     else:
@@ -109,6 +112,8 @@ class Tle:
             text (str):
         """
 
+        # Replace split by parsing by string index
+
         if isinstance(text, str):
             text = text.splitlines()
 
@@ -119,32 +124,34 @@ class Tle:
                 self.name = self.name[2:]
 
         self._check_validity(text)
+        self.text = "\n".join(text)
 
-        first, second = text[0].split(), text[1].split()
+        first, second = text[0], text[1]
 
-        self.text = "\n".join((text[0].strip(), text[1].strip()))
+        self.norad_id = int(first[2:7])
+        self.classification = first[7]
 
-        self.norad_id = int(first[1][:-1])
-        self.classification = first[1][-1]
+        if first[9:17].strip():
+            year = int(first[9:11])
+            year += 1900 if year >= 57 else 2000  # This condition works until 2057
+            self.cospar_id = "%d-%s" % (year, first[11:17].strip())
+        else:
+            self.cospar_id = ""
 
-        year = int(first[2][:2])
+        year = int(first[18:20])
         year += 1900 if year >= 57 else 2000  # This condition works until 2057
-        self.cospar_id = "%d-%s" % (year, first[2][2:])
-
-        year = int(first[3][:2])
-        year += 1900 if year >= 57 else 2000  # This condition works until 2057
-        epoch = datetime(year, 1, 1) + timedelta(days=float(first[3][2:]) - 1)
+        epoch = datetime(year, 1, 1) + timedelta(days=float(first[20:32]) - 1)
         self.epoch = Date(epoch)
-        self.ndot = float(first[4]) * 2
-        self.ndotdot = _float(first[5]) * 6
-        self.bstar = _float(first[6])
+        self.ndot = float(first[33:43]) * 2
+        self.ndotdot = _float(first[44:52]) * 6
+        self.bstar = _float(first[53:61])
 
-        self.i = np.deg2rad(float(second[2]))   # inclination
-        self.Ω = np.deg2rad(float(second[3]))   # right ascension of the ascending node
-        self.e = _float(second[4])              # eccentricity
-        self.ω = np.deg2rad(float(second[5]))   # argument of periapsis
-        self.M = np.deg2rad(float(second[6]))   # mean anomaly
-        self.n = float(second[7][:11]) * 2 * np.pi / 86400.  # mean motion (rev/day converted to s⁻¹)
+        self.i = np.deg2rad(float(second[8:16]))    # inclination
+        self.Ω = np.deg2rad(float(second[17:25]))   # right ascension of the ascending node
+        self.e = _float(second[26:33])              # eccentricity
+        self.ω = np.deg2rad(float(second[34:42]))   # argument of periapsis
+        self.M = np.deg2rad(float(second[43:51]))   # mean anomaly
+        self.n = float(second[52:63]) * 2 * np.pi / 86400.  # mean motion (rev/day converted to rad/s)
 
         # To store additional data (such as source, date of creation, etc.)
         self.kwargs = kwargs
@@ -222,7 +229,7 @@ class Tle:
             y, _, i = cospar_id.partition('-')
             cospar_id = y[2:] + i
         else:
-            cospar_id = "00001A"
+            cospar_id = ""
 
         orbit = orbit.copy(form='TLE', frame='TEME')
 
