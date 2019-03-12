@@ -1,3 +1,4 @@
+import numpy as np
 from pytest import fixture, mark
 from unittest.mock import patch
 from pathlib import Path
@@ -9,6 +10,9 @@ from beyond.orbits import Tle
 from beyond.propagators.kepler import Kepler
 from beyond.dates import Date, timedelta
 from beyond.env.solarsystem import get_body
+
+
+np.set_printoptions(linewidth=200)
 
 
 @fixture(autouse=True, scope="session")

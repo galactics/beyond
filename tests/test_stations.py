@@ -3,12 +3,12 @@
 import numpy as np
 from numpy.testing import assert_almost_equal
 
-from pytest import fixture
+from pytest import fixture, raises
 
 from beyond.dates import Date, timedelta
 from beyond.orbits import Orbit
 from beyond.orbits.tle import Tle
-from beyond.orbits.listeners import SignalEvent, MaxEvent, MaskEvent
+from beyond.orbits.listeners import SignalEvent, MaxEvent, MaskEvent, stations_listeners
 
 
 def assert_vector(ref, pv, precision=(4, 6)):
@@ -109,3 +109,26 @@ def test_station_visibility(orbit, station):
     assert abs(points[-1].phi) < 1e-5
     assert points[-1].event.station == station
     assert (points[-1].date - Date(2018, 4, 5, 21, 15, 25, 169655)).total_seconds() <= 1e-5
+
+
+def test_station_no_mask(orbit, station):
+
+    station.mask = np.array([
+        [1.97222205, 2.11184839, 2.53072742, 2.74016693, 3.00196631,
+         3.42084533, 3.71755131, 4.15388362, 4.71238898, 6.28318531],
+        [0.35255651, 0.34906585, 0.27401669, 0.18675023, 0.28099801,
+         0.16580628, 0.12915436, 0.03490659, 0.62831853, 1.3962634]])
+
+    listeners = stations_listeners(station)
+    station.mask = None
+
+    points = station.visibility(
+        orbit,
+        start=Date(2018, 4, 5, 21),
+        stop=timedelta(minutes=30),
+        step=timedelta(seconds=30),
+        events=listeners,
+    )
+
+    with raises(ValueError):
+        points = list(points)

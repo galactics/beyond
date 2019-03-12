@@ -30,7 +30,7 @@ class Maneuver:
         self.frame = frame
         self.comment = comment
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         txt = "Man =\n  date = {}\n".format(self.date)
         if self.frame:
             txt += "  frame = {}\n".format(self.frame)
@@ -81,7 +81,7 @@ class DeltaCombined(Maneuver):
         self.delta_angle = delta_angle
         self.comment = comment
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         txt = "Man =\n  date = {}\n".format(self.date)
         if self.delta_a:
             txt += "  delta_a = {}\n".format(self.delta_a)

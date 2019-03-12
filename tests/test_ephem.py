@@ -53,6 +53,9 @@ def test_interpolate(ephem):
         # We ask for a value clearly out of range
         ephem.propagate(ephem.start + timedelta(days=2))
 
+    with raises(ValueError):
+        ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27), method='dummy')
+
 
 def test_subephem(ref_orb, ephem, start):
 
@@ -107,7 +110,7 @@ def test_subephem(ref_orb, ephem, start):
     assert len(subephem) == (subephem.stop - subephem.start) // step + 1
 
 
-def test_iter_dates(ephem):
+def test_iter_on_dates(ephem):
 
     # Generate a free step ephemeris
     start = ephem.start

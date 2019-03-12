@@ -311,7 +311,7 @@ class ApsideListener(Listener):
         return orb.r_dot
 
 
-class SignalEvent(Event):
+class SignalEvent(Event):  # pragma: no cover
 
     def __str__(self):
         return "{} {} {}".format(
@@ -372,10 +372,6 @@ class StationMaskListener(StationSignalListener):
         Args:
             station (TopocentricFrame): Station from which to listen to elevation events
         """
-
-        if station.mask is None:
-            raise ValueError("No mask defined for this station")
-
         self.station = station
 
     def info(self, orb):

@@ -109,6 +109,9 @@ class TopocentricFrame(Frame):
         """Linear interpolation between two points of the mask
         """
 
+        if cls.mask is None:
+            raise ValueError("No mask defined for the station {}".format(cls.name))
+
         azim %= 2 * np.pi
 
         if azim in cls.mask[0, :]:

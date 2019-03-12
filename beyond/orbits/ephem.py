@@ -80,20 +80,20 @@ class Ephem(Speaker):
         return self._orbits[0].frame
 
     @frame.setter
-    def frame(self, frame):
+    def frame(self, frame):  # pragma: no cover
         """Change the frames of all points
         """
         for orb in self:
             orb.frame = frame
 
     @property
-    def form(self):
+    def form(self):  # pragma: no cover
         """Get the form of the first point
         """
         return self._orbits[0].form
 
     @form.setter
-    def form(self, form):
+    def form(self, form):  # pragma: no cover
         """Change the form of all points
         """
         for orb in self:
@@ -324,7 +324,7 @@ class Ephem(Speaker):
 
         return self.__class__(self.ephemeris(*args, **kwargs))
 
-    def copy(self, *, form=None, frame=None):
+    def copy(self, *, form=None, frame=None):  # pragma: no cover
         """Create a deep copy of the ephemeris, and allow frame and form changing
         """
         new = self.ephem()
