@@ -195,7 +195,7 @@ class EopDb:
     WARN = "warning"
     ERROR = "error"
 
-    MIS_DEFAULT = ERROR
+    MIS_DEFAULT = PASS
     """Default behaviour in case of missing value"""
 
     @classmethod

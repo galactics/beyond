@@ -4,10 +4,7 @@ from beyond.dates import Date, timedelta
 from beyond.orbits import Tle
 from beyond.frames import create_station
 from beyond.orbits.listeners import stations_listeners, NodeListener, ApsideListener, LightListener
-from beyond.config import config
 
-# Bypass the need of Earth Orientation Parameters data
-config.update({"eop": {"missing_policy": "pass"}})
 
 tle = Tle("""ISS (ZARYA)
 1 25544U 98067A   17153.89608442  .00001425  00000-0  28940-4 0  9997

@@ -8,8 +8,6 @@ from beyond.orbits import Tle
 from beyond.frames import create_station
 from beyond.config import config
 
-# Bypass the need of Earth Orientation Parameters data
-config.update({"eop": {"missing_policy": "pass"}})
 
 tle = Tle("""ISS (ZARYA)
 1 25544U 98067A   16086.49419020  .00003976  00000-0  66962-4 0  9998

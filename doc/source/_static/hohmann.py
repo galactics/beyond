@@ -15,9 +15,7 @@ from beyond.propagators.kepler import Kepler
 from beyond.env.solarsystem import get_body
 from beyond.orbits.man import Maneuver
 from beyond.orbits.listeners import ApsideListener
-from beyond.config import config
 
-config.update({"eop": {"missing_policy": "pass"}})
 
 orb = Tle("""ISS (ZARYA)
 1 25544U 98067A   18124.55610684  .00001524  00000-0  30197-4 0  9997

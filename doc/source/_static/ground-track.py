@@ -6,13 +6,11 @@ and the ground track for the previous and the next orbit
 
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 
-from beyond.config import config
 from beyond.orbits import Tle
 from beyond.dates import Date, timedelta
 
-# Bypass the need of Earth Orientation Parameters data
-config.update({"eop": {"missing_policy": "pass"}})
 
 # Parsing of TLE
 tle = Tle("""ISS (ZARYA)
@@ -69,7 +67,9 @@ for point in orb.ephemeris(start, stop, step):
     prev_lon = lon
     prev_lat = lat
 
-im = plt.imread("earth.png")
+img = Path(__file__).parent / "earth.png"
+
+im = plt.imread(str(img))
 plt.figure(figsize=(15.2, 8.2))
 plt.imshow(im, extent=[-180, 180, -90, 90])
 

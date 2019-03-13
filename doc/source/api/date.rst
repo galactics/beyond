@@ -89,5 +89,6 @@ In order to access different databases with the same interface, beyond uses the
 It is this class that handle registered databases, and select the activated one.
 
 .. autoclass:: beyond.dates.eop.EopDb
+    :members:
 
 .. autofunction:: beyond.dates.eop.register
