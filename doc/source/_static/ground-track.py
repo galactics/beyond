@@ -4,6 +4,7 @@
 and the ground track for the previous and the next orbit
 """
 
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -29,7 +30,7 @@ start = orb.date - period
 stop = 2 * period
 step = period / 100
 
-for point in orb.ephemeris(start, stop, step):
+for point in orb.ephemeris(start=start, stop=stop, step=step):
 
     # Conversion to earth rotating frame
     point.frame = 'ITRF'
@@ -85,4 +86,6 @@ plt.grid(True, color='w', linestyle=":", alpha=0.4)
 plt.xticks(range(-180, 181, 30))
 plt.yticks(range(-90, 91, 30))
 plt.tight_layout()
-plt.show()
+
+if "no-display" not in sys.argv:
+    plt.show()

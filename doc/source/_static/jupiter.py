@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from beyond.dates import Date
-from beyond.env.jpl import get_body
+from beyond.env.jpl import get_orbit
 from beyond.frames import create_station
 from beyond.config import config
 
@@ -14,7 +14,7 @@ from beyond.config import config
 config.update({
     "env": {
         "jpl": [
-            "/path/to/jup310.bsp"
+            "/home/jules/.space/jpl/jup310.bsp"
         ]
     }
 })
@@ -26,11 +26,11 @@ date = Date.now()
 station = create_station('TLS', (43.428889, 1.497778, 178.0))
 
 # Retrieve Jupiter and its moons state-vectors
-jupiter = get_body('Jupiter', date)
-io = get_body('Io', date)
-europa = get_body('Europa', date)
-ganymede = get_body('Ganymede', date)
-callisto = get_body('Callisto', date)
+jupiter = get_orbit('Jupiter', date)
+io = get_orbit('Io', date)
+europa = get_orbit('Europa', date)
+ganymede = get_orbit('Ganymede', date)
+callisto = get_orbit('Callisto', date)
 
 # Convert them to the observer frame
 jupiter.frame = station

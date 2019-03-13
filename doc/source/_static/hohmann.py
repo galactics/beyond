@@ -5,6 +5,7 @@ The orbit we are starting with is a Tle of the ISS. The amplitude of the maneuve
 exagerated regarding the ISS's capability, but has the convenience to be particularly visual.
 """
 
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -79,5 +80,5 @@ x, y, z = zip(perigee[:3], apogee[:3])
 plt.plot(data[:, 0], data[:, 1], data[:, 2])
 plt.plot(x, y, z, 'ro')
 
-
-plt.show()
+if "no-display" not in sys.argv:
+    plt.show()

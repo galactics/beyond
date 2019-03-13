@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -50,4 +51,5 @@ ax.set_yticks(range(0, 90, 20))
 ax.set_yticklabels(map(str, range(90, 0, -20)))
 ax.set_rmax(90)
 
-plt.show()
+if "no-display" not in sys.argv:
+    plt.show()
