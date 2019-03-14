@@ -1,6 +1,6 @@
-"""This module provides ways to handle the CCSDS Orbit Data Message formats
+"""This module provides ways to handle the CCSDS formats
 
-It is based on the CCSDS ODM Blue Book from Nov. 2009 (502.0-B-2)
+It is based on the `CCSDS standard <https://public.ccsds.org/Publications/BlueBooks.aspx>`__
 """
 
 import numpy as np
@@ -14,13 +14,24 @@ __all__ = ['load', 'loads', 'dump', "dumps"]
 
 
 def load(fp):  # pragma: no cover
-    """Read a file
+    """Read CCSDS format from a file descriptor, and provide the beyond class
+    corresponding; Orbit or list of Orbit if it's an OPM, Ephem if it's an
+    OEM.
+
+    Args:
+        fp: file descriptor of a CCSDS file
+    Return:
+        Orbit or Ephem
+    Raise:
+        ValueError: when the text is not a recognizable CCSDS format
     """
     return loads(fp.read())
 
 
 def loads(text):
-    """
+    """Read CCSDS from a string, and provide the beyond class corresponding;
+    Orbit or list of Orbit if it's an OPM, Ephem if it's an OEM.
+
     Args:
         text (str):
     Return:
@@ -38,13 +49,24 @@ def loads(text):
 
 
 def dump(data, fp, **kwargs):  # pragma: no cover
-    """Write a file
+    """Write a CCSDS file depending on the type of data, this could be an OPM
+    file (Orbit or list of Orbit) or an OEM file (Ephem).
+
+    Args:
+        data (Orbit, list of Orbit, or Ephem)
+        fp (file descriptor)
+    Keyword Arguments:
+        name (str): Name of the object
+        cospar_id (str): International designator of the object
+        originator (str): Originator of the CCSDS file
     """
     fp.write(dumps(data, **kwargs))
 
 
 def dumps(data, **kwargs):
     """Create a string CCSDS representation of the object
+
+    Same arguments and behaviour as :py:func:`dump`
     """
     if isinstance(data, Ephem) or (isinstance(data, Iterable) and all(isinstance(x, Ephem) for x in data)):
         content = _dump_oem(data, **kwargs)
@@ -174,6 +196,7 @@ def _read_oem(string):
 
 def _read_opm(string):
     """Read of OPM string
+
     Args:
         string (str): Text containing the OPM
     Return:
