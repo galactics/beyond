@@ -253,7 +253,7 @@ def _read_opm(string):
         man = {}
         man['date'] = Date.strptime(raw_man['MAN_EPOCH_IGNITION'], "%Y-%m-%dT%H:%M:%S.%f", scale=scale)
         man['duration'] = timedelta(seconds=_float(raw_man['MAN_DURATION']))
-        man['frame'] = raw_man['MAN_REF_FRAME']
+        man['frame'] = raw_man['MAN_REF_FRAME'] if raw_man['MAN_REF_FRAME'] != frame else None
         man['delta_mass'] = raw_man['MAN_DELTA_MASS']
         man['comment'] = raw_man.get('comment')
 
@@ -413,15 +413,16 @@ TRUE_ANOMALY         = {angles[3]: 12.6f} [deg]
     if cart.maneuvers:
         for i, man in enumerate(cart.maneuvers):
             comment = man.comment if man.comment is not None else "Maneuver {}".format(i + 1)
+            frame = cart.frame if man.frame is None else man.frame
             text += """
 COMMENT  {comment}
 MAN_EPOCH_IGNITION   = {man.date:%Y-%m-%dT%H:%M:%S.%f}
 MAN_DURATION         = 0.000 [s]
 MAN_DELTA_MASS       = 0.000 [kg]
-MAN_REF_FRAME        = {man.frame}
+MAN_REF_FRAME        = {frame}
 MAN_DV_1             = {dv[0]:.6f} [km/s]
 MAN_DV_2             = {dv[1]:.6f} [km/s]
 MAN_DV_3             = {dv[2]:.6f} [km/s]
-""".format(i=i + 1, man=man, dv=man._dv / 1000., comment=comment)
+""".format(i=i + 1, man=man, dv=man._dv / 1000., frame=frame, comment=comment)
 
     return header + meta + text
