@@ -40,12 +40,12 @@ def loads(text):
         ValueError: when the text is not a recognizable CCSDS format
     """
     if text.startswith("CCSDS_OEM_VERS"):
-        content = _read_oem(text)
+        func = _read_oem
     elif text.startswith("CCSDS_OPM_VERS"):
-        content = _read_opm(text)
+        func = _read_opm
     else:
         raise ValueError("Unknown CCSDS type")
-    return content
+    return func(text)
 
 
 def dump(data, fp, **kwargs):  # pragma: no cover
@@ -110,83 +110,56 @@ def _read_oem(string):
         Ephem:
     """
 
-    ephem_dicts = []
-    data_block = False
+    ephems = []
+    required = ('REF_FRAME', 'CENTER_NAME', 'TIME_SYSTEM', 'OBJECT_ID', 'OBJECT_NAME')
 
+    mode = None
     for line in string.splitlines():
 
         if not line or line.startswith("COMMENT"):  # pragma: no cover
             continue
-
         elif line.startswith("META_START"):
-            orbits = []
-            ephem = {
-                'orbits': orbits,
-                'name': None,
-                'cospar_id': None,
-                'method': None,
-                'order': None,
-                'frame': None,
-                'center': None,
-                'scale': None
-            }
-            ephem_dicts.append(ephem)
-            data_block = False
+            mode = "meta"
+            ephem = {'orbits': []}
+            ephems.append(ephem)
+        elif line.startswith("META_STOP"):
+            mode = "data"
 
-        elif line.startswith("OBJECT_NAME"):
-            ephem['name'] = line.partition("=")[-1].strip()
+            # Check for required fields
+            for k in required:
+                if k not in ephem:
+                    raise ValueError("Missing field '{}'".format(k))
 
-        elif line.startswith("OBJECT_ID"):
-            ephem['cospar_id'] = line.partition("=")[-1].strip()
+            # Conversion to be compliant with beyond.env.jpl dynamic reference
+            # frames naming convention.
+            if ephem['CENTER_NAME'].lower() != "earth":
+                ephem['REF_FRAME'] = ephem['CENTER_NAME'].title().replace(" ", "")
+        elif mode == "meta":
+            key, _, value = line.partition("=")
+            ephem[key.strip()] = value.strip()
+        elif mode == "data":
+            date, *state_vector = line.split()
+            date = Date.strptime(date, "%Y-%m-%dT%H:%M:%S.%f", scale=ephem['TIME_SYSTEM'])
 
-        elif line.startswith("TIME_SYSTEM"):
-            ephem['scale'] = line.partition("=")[-1].strip()
+            # Conversion from km to m, from km/s to m/s
+            # and discard acceleration if present
+            state_vector = np.array([float(x) for x in state_vector[:6]]) * 1000
 
-        elif line.startswith("REF_FRAME"):
-            ephem['frame'] = line.partition('=')[-1].strip()
+            ephem['orbits'].append(Orbit(date, state_vector, 'cartesian', ephem['REF_FRAME'], None))
 
-        elif line.startswith("CENTER_NAME"):
-            ephem['center'] = line.partition('=')[-1].strip()
-
-        elif line.startswith('INTERPOLATION_DEGREE'):
-            ephem['order'] = int(line.partition("=")[-1].strip()) + 1
-
-        elif line.startswith('INTERPOLATION'):
-            ephem['method'] = line.partition("=")[-1].strip().lower()
-
-        elif line.startswith('META_STOP'):
-            if None in (ephem['frame'], ephem['center'], ephem['scale']):
-                raise ValueError("Missing field")
-
-            data_block = True
-
-            if ephem['center'].lower() != "earth":
-                ephem['frame'] = ephem['center'].title().replace(" ", "")
-
-            continue
-
-        if not data_block:
-            continue
-
-        # From now on, each non-empty line is a state vector
-        date, *state_vector = line.split()
-        date = Date.strptime(date, "%Y-%m-%dT%H:%M:%S.%f", scale=ephem['scale'])
-
-        # Conversion from km to m, from km/s to m/s
-        # and discard acceleration if present
-        state_vector = np.array([float(x) for x in state_vector[:6]]) * 1000
-
-        ephem['orbits'].append(Orbit(date, state_vector, 'cartesian', ephem['frame'], None))
-
-    ephems = []
-    for ephem_dict in ephem_dicts:
+    for i, ephem_dict in enumerate(ephems):
         if not ephem_dict['orbits']:
             raise ValueError("Empty ephemeris")
-        ephem = Ephem(ephem_dict['orbits'], method=ephem_dict['method'], order=ephem_dict['order'])
 
-        ephem.name = ephem_dict['name']
-        ephem.cospar_id = ephem_dict['cospar_id']
-        ephems.append(ephem)
+        # In case there is no recommendation for interpolation
+        # default to a Lagrange 8th order
+        method = ephem_dict.get('INTERPOLATION', 'Lagrange').lower()
+        order = int(ephem_dict.get('INTERPOLATION_DEGREE', 7)) + 1
+        ephem = Ephem(ephem_dict['orbits'], method=method, order=order)
+
+        ephem.name = ephem_dict['OBJECT_NAME']
+        ephem.cospar_id = ephem_dict['OBJECT_ID']
+        ephems[i] = ephem
 
     if len(ephems) == 1:
         return ephems[0]
@@ -289,7 +262,6 @@ def _dump_header(data, ccsds_type, version="1.0", **kwargs):
     return """CCSDS_{type}_VERS = {version}
 CREATION_DATE = {creation_date:%Y-%m-%dT%H:%M:%S}
 ORIGINATOR = {originator}
-
 """     .format(
         type=ccsds_type.upper(),
         creation_date=Date.now(),
@@ -320,6 +292,8 @@ def _dump_oem(data, **kwargs):
     if isinstance(data, Ephem):
         data = [data]
 
+    header = _dump_header(data, "OEM", version="2.0", **kwargs)
+
     content = []
     for i, data in enumerate(data):
 
@@ -328,8 +302,6 @@ def _dump_oem(data, **kwargs):
         interp = data.method.upper()
         if data.method != data.LINEAR:
             interp += "\nINTERPOLATION_DEGREE = {}".format(data.order - 1)
-
-        header = _dump_header(data, "OEM", version="2.0", **kwargs) if i == 0 else ""
 
         meta = _dump_meta(data, **kwargs)
         meta += """TIME_SYSTEM          = {orb.start.scale.name}
@@ -355,9 +327,9 @@ META_STOP
                 fmt=" 10f"
             ))
 
-        content.append(header + meta + "\n".join(text))
+        content.append(meta + "\n".join(text))
 
-    return "\n\n".join(content)
+    return header + "\n" + "\n\n\n".join(content)
 
 
 def _dump_opm(data, **kwargs):
@@ -425,4 +397,4 @@ MAN_DV_2             = {dv[1]:.6f} [km/s]
 MAN_DV_3             = {dv[2]:.6f} [km/s]
 """.format(i=i + 1, man=man, dv=man._dv / 1000., frame=frame, comment=comment)
 
-    return header + meta + text
+    return header + "\n" + meta + text
