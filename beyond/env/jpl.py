@@ -72,7 +72,7 @@ from .solarsystem import EarthPropagator
 from jplephem.spk import SPK, S_PER_DAY
 from jplephem.names import target_names
 
-__all__ = ['get_body', 'list_bodies', 'create_frames']
+__all__ = ['get_body', 'get_orbit', 'list_bodies', 'create_frames']
 
 
 class Target(Node):
@@ -423,6 +423,13 @@ def create_frames(until=None):
 
 
 def get_body(name):
+    """Retrieve the Body structure of a JPL .bsp file object
+
+    Args:
+        name (str)
+    Return:
+        :py:class:`~beyond.constants.Body`
+    """
 
     body = Pck()[name]
     body.propagate = lambda date: get_orbit(name, date)
