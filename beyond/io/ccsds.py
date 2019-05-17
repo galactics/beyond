@@ -6,9 +6,12 @@ It is based on the `CCSDS standard <https://public.ccsds.org/Publications/BlueBo
 import numpy as np
 from collections.abc import Iterable
 
+from ..utils import units
 from ..dates import Date, timedelta
 from ..orbits import Orbit, Ephem
 from ..orbits.man import Maneuver
+from ..utils.measures import Measure, Range, Doppler, Azimut, Elevation, MeasureSet
+
 
 __all__ = ['load', 'loads', 'dump', "dumps"]
 
@@ -16,7 +19,7 @@ __all__ = ['load', 'loads', 'dump', "dumps"]
 def load(fp):  # pragma: no cover
     """Read CCSDS format from a file descriptor, and provide the beyond class
     corresponding; Orbit or list of Orbit if it's an OPM, Ephem if it's an
-    OEM.
+    OEM, MeasureSet if it's a TDM.
 
     Args:
         fp: file descriptor of a CCSDS file
@@ -30,7 +33,8 @@ def load(fp):  # pragma: no cover
 
 def loads(text):
     """Read CCSDS from a string, and provide the beyond class corresponding;
-    Orbit or list of Orbit if it's an OPM, Ephem if it's an OEM.
+    Orbit or list of Orbit if it's an OPM, Ephem if it's an OEM, MeasureSet
+    if it's a TDM.
 
     Args:
         text (str):
@@ -43,6 +47,8 @@ def loads(text):
         func = _read_oem
     elif text.startswith("CCSDS_OPM_VERS"):
         func = _read_opm
+    elif text.startswith("CCSDS_TDM_VERS"):
+        func = _read_tdm
     else:
         raise ValueError("Unknown CCSDS type")
     return func(text)
@@ -50,10 +56,11 @@ def loads(text):
 
 def dump(data, fp, **kwargs):  # pragma: no cover
     """Write a CCSDS file depending on the type of data, this could be an OPM
-    file (Orbit or list of Orbit) or an OEM file (Ephem).
+    file (Orbit or list of Orbit), an OEM file (Ephem), or a TDM file
+    (MeasureSet).
 
     Args:
-        data (Orbit, list of Orbit, or Ephem)
+        data (Orbit, list of Orbit, Ephem, or MeasureSet)
         fp (file descriptor)
     Keyword Arguments:
         name (str): Name of the object
@@ -72,6 +79,8 @@ def dumps(data, **kwargs):
         content = _dump_oem(data, **kwargs)
     elif isinstance(data, Orbit):
         content = _dump_opm(data, **kwargs)
+    elif isinstance(data, Iterable) and all(isinstance(x, Measure) for x in data):
+        content = _dump_tdm(data, **kwargs)
     else:
         raise TypeError("Unknown object type")
 
@@ -90,14 +99,14 @@ def _float(value):
         # be the same as defined in table 3-3 which are for km and km/s for position and
         # velocity respectively. Thus, there should be no other conversion to make
         if unit in ("[km]", "[km/s]"):
-            multiplier = 1000
+            multiplier = units.km
         elif unit == "[s]":
             multiplier = 1
         else:
             raise ValueError("Unknown unit for this field", unit)
     else:
         # if no unit is provided, the default is km, and km/s
-        multiplier = 1000
+        multiplier = units.km
 
     return float(value) * multiplier
 
@@ -143,7 +152,7 @@ def _read_oem(string):
 
             # Conversion from km to m, from km/s to m/s
             # and discard acceleration if present
-            state_vector = np.array([float(x) for x in state_vector[:6]]) * 1000
+            state_vector = np.array([float(x) for x in state_vector[:6]]) * units.km
 
             ephem['orbits'].append(Orbit(date, state_vector, 'cartesian', ephem['REF_FRAME'], None))
 
@@ -257,6 +266,60 @@ def _read_opm(string):
     return orb
 
 
+def _read_tdm(string):
+    """Read CCSDS TDM format and convert it to a MeasureSet
+    """
+
+    mode = "meta"
+    meta = {}
+    data = MeasureSet()
+    for i, line in enumerate(string.splitlines()):
+
+        if not line or line.startswith("COMMENT"):
+            continue
+        elif line.startswith("DATA_START"):
+            participants = [v for k, v in sorted(meta.items()) if k.startswith("PARTICIPANT_")]
+            path_txt = meta['PATH']
+            path = [participants[int(p) - 1] for p in path_txt.split(",")]
+            scale = meta['TIME_SYSTEM']
+            mode = 'data'
+            continue
+        elif line.startswith('DATA_STOP'):
+            mode = 'meta'
+            continue
+
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip()
+
+        if mode == "meta":
+            meta[key] = value
+        elif mode == 'data':
+            date, value = value.split()
+            date = Date.strptime(date.strip(), "%Y-%m-%dT%H:%M:%S.%f", scale=scale)
+            value = float(value)
+
+            if key == "RANGE":
+                if meta['RANGE_UNITS'] == "km":
+                    obj = Range(path, date, value * units.km)
+                elif meta['RANGE_UNITS'] == "s":
+                    obj = Range(path, date, value * c * units.km)
+            elif key == "ANGLE_1":
+                if meta['ANGLE_TYPE'] == "AZEL":
+                    obj = Azimut(path, date, np.radians(-value))
+                else:
+                    raise TypeError("Unknown angle type")
+            elif key == "ANGLE_2":
+                if meta['ANGLE_TYPE'] == "AZEL":
+                    obj = Elevation(path, date, np.radians(value))
+                else:
+                    raise TypeError("Unknown angle type")
+
+            data.append(obj)
+
+    return data
+
+
 def _dump_header(data, ccsds_type, version="1.0", **kwargs):
 
     return """CCSDS_{type}_VERS = {version}
@@ -270,7 +333,7 @@ ORIGINATOR = {originator}
     )
 
 
-def _dump_meta(data, **kwargs):
+def _dump_meta_odm(data, **kwargs):
 
     meta = """META_START
 OBJECT_NAME          = {name}
@@ -303,7 +366,7 @@ def _dump_oem(data, **kwargs):
         if data.method != data.LINEAR:
             interp += "\nINTERPOLATION_DEGREE = {}".format(data.order - 1)
 
-        meta = _dump_meta(data, **kwargs)
+        meta = _dump_meta_odm(data, **kwargs)
         meta += """TIME_SYSTEM          = {orb.start.scale.name}
 START_TIME           = {orb.start:%Y-%m-%dT%H:%M:%S.%f}
 STOP_TIME            = {orb.stop:%Y-%m-%dT%H:%M:%S.%f}
@@ -323,7 +386,7 @@ META_STOP
         for orb in data:
             text.append("{date:%Y-%m-%dT%H:%M:%S.%f} {orb[0]:{fmt}} {orb[1]:{fmt}} {orb[2]:{fmt}} {orb[3]:{fmt}} {orb[4]:{fmt}} {orb[5]:{fmt}}".format(
                 date=orb.date,
-                orb=orb.base / 1000,
+                orb=orb.base / units.km,
                 fmt=" 10f"
             ))
 
@@ -339,7 +402,7 @@ def _dump_opm(data, **kwargs):
 
     header = _dump_header(data, "OPM", version="2.0", **kwargs)
 
-    meta = _dump_meta(data, **kwargs)
+    meta = _dump_meta_odm(data, **kwargs)
     meta += """TIME_SYSTEM          = {orb.date.scale.name}
 META_STOP
 
@@ -361,7 +424,7 @@ INCLINATION          = {angles[0]: 12.6f} [deg]
 RA_OF_ASC_NODE       = {angles[1]: 12.6f} [deg]
 ARG_OF_PERICENTER    = {angles[2]: 12.6f} [deg]
 TRUE_ANOMALY         = {angles[3]: 12.6f} [deg]
-""".format(cartesian=cart / 1000, kep_a=kep.a / 1000, kep_e=kep.e, angles=np.degrees(kep[2:]))
+""".format(cartesian=cart / units.km, kep_a=kep.a / units.km, kep_e=kep.e, angles=np.degrees(kep[2:]))
 
     # Covariance handling
     if cart.cov.any():
@@ -395,6 +458,107 @@ MAN_REF_FRAME        = {frame}
 MAN_DV_1             = {dv[0]:.6f} [km/s]
 MAN_DV_2             = {dv[1]:.6f} [km/s]
 MAN_DV_3             = {dv[2]:.6f} [km/s]
-""".format(i=i + 1, man=man, dv=man._dv / 1000., frame=frame, comment=comment)
+""".format(i=i + 1, man=man, dv=man._dv / units.km, frame=frame, comment=comment)
 
     return header + "\n" + meta + text
+
+
+def _dump_tdm(data, **kwargs):
+
+    header = _dump_header(data, "TDM", **kwargs)
+    date_fmt="%Y-%m-%dT%H:%M:%S.%f"
+
+    filtered = ((path, data.filter(path=path)) for path in data.paths)
+
+    text = ""
+    for path, measure_set in filtered:
+
+        meta = {
+            'TIME_SYSTEM': measure_set.start.scale.name,
+            'START_TIME': measure_set.start.strftime(date_fmt),
+            'STOP_TIME': measure_set.stop.strftime(date_fmt),
+        }
+
+        i = 0
+        parts = {}
+        for p in path:
+            if p in parts:
+                continue
+            else:
+                i += 1
+            parts[p] = i
+            meta["PARTICIPANT_{}".format(i)] = p
+
+        meta['MODE'] = "SEQUENTIAL"
+        meta['PATH'] = ",".join([str(parts[p]) for p in path])
+
+        if Range in measure_set.types:
+            meta['RANGE_UNITS'] = "km"
+        if Azimut in measure_set.types:
+            meta['ANGLE_TYPE'] = "AZEL"
+
+        txt = ['META_START']
+
+        for k, v in meta.items():
+            txt.append('{:20} = {}'.format(k, v))
+
+        txt.append('META_STOP')
+        txt.append('')
+        txt.append('DATA_START')
+
+        for m in measure_set:
+
+            if isinstance(m, Doppler):
+                name = "DOPPLER_INSTANTANEOUS"
+                value_fmt = "16.6f"
+                value = m.value
+            elif isinstance(m, Range):
+                name = "RANGE"
+                value_fmt = "16.6f"
+                value = m.value / units.km
+            elif isinstance(m, Azimut):
+                name = "ANGLE_1"
+                value_fmt = "12.2f"
+                value = -np.degrees(m.value) % 360
+            elif isinstance(m, Elevation):
+                name = "ANGLE_2"
+                value_fmt = "12.2f"
+                value = np.degrees(m.value)
+
+            txt.append("{name:20} = {date:{date_fmt}} {value:{value_fmt}}".format(
+                name=name,
+                date=m.date,
+                date_fmt=date_fmt,
+                value=value,
+                value_fmt=value_fmt,
+            ))
+
+        txt.append('DATA_STOP')
+        txt.append('')
+
+        text += "\n".join(txt)
+
+    return header + "\n" + text
+
+
+if __name__ == "__main__":
+
+    from space.config import config
+
+    config.load()
+
+    now = Date.now()
+    now2 = Date.now() + timedelta(1)
+
+    mes = [
+        Doppler("sat AUS".split(), now, 2222),
+        Range("sat AUS".split(), now - timedelta(0, 3), 6300000.),
+        Azimut("sat AUS".split(), now, 2),
+        Elevation("sat AUS".split(), now, 1),
+        Doppler("HBK sat HBK".split(), now2, 2222),
+        Range("HBK sat HBK".split(), now2 - timedelta(0, 3), 6300000.),
+        Azimut("HBK sat HBK".split(), now2, 2),
+        Elevation("HBK sat HBK".split(), now2, 1)
+    ]
+
+    print(dumps(mes))
