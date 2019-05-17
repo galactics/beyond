@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from beyond.orbits import Tle
+from beyond.io.tle import Tle
 from beyond.dates import timedelta
 from beyond.propagators.kepler import Kepler
 from beyond.env.solarsystem import get_body

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from beyond.dates import Date, timedelta
-from beyond.orbits import Tle
+from beyond.io.tle import Tle
 from beyond.frames import create_station
 from beyond.orbits.listeners import stations_listeners, NodeListener, ApsideListener, LightListener
 

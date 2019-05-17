@@ -2,7 +2,7 @@
 from datetime import timedelta
 
 from beyond.dates import Date
-from beyond.orbits import Tle
+from beyond.io.tle import Tle
 
 from pytest import raises, fixture
 

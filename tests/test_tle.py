@@ -6,7 +6,7 @@ from pytest import raises, fixture
 import numpy as np
 
 from beyond.dates.date import Date
-from beyond.orbits.tle import Tle
+from beyond.io.tle import Tle
 
 ref = [
     """0 ISS (ZARYA)
@@ -117,7 +117,7 @@ def test_generator(caplog):
 
     assert len(caplog.records) == 1
     assert caplog.record_tuples == [
-        ('beyond.orbits.tle', logging.WARNING, "invalid literal for int() with base 10: '  '")
+        ('beyond.io.tle', logging.WARNING, "invalid literal for int() with base 10: '  '")
     ]
 
     caplog.clear()

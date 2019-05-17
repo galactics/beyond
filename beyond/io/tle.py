@@ -40,7 +40,7 @@ import numpy as np
 from string import ascii_uppercase
 from datetime import datetime, timedelta
 
-from .orbit import Orbit
+from ..orbits import Orbit
 from ..dates.date import Date
 
 log = logging.getLogger(__name__)

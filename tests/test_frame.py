@@ -12,7 +12,7 @@ from beyond.errors import UnknownFrameError
 from beyond.dates import Date
 from beyond.dates.eop import Eop
 from beyond.orbits.orbit import Orbit
-from beyond.orbits.tle import Tle
+from beyond.io.tle import Tle
 from beyond.frames.frames import *
 
 

@@ -9,7 +9,7 @@ from pickle import loads, dumps
 from beyond.errors import UnknownFormError, OrbitError
 from beyond.constants import Earth
 from beyond.dates.date import Date
-from beyond.orbits.tle import Tle
+from beyond.io.tle import Tle
 from beyond.orbits.orbit import Orbit
 from beyond.orbits.forms import Form, CART, KEPL_M, KEPL, TLE
 

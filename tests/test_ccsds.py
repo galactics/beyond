@@ -3,9 +3,9 @@ from pytest import fixture, raises
 
 from datetime import timedelta
 
-from beyond.orbits import Tle
 from beyond.orbits.man import Maneuver
-from beyond.utils.ccsds import dumps, loads
+from beyond.io.tle import Tle
+from beyond.io.ccsds import dumps, loads
 from beyond.dates import Date
 
 

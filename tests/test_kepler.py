@@ -4,9 +4,9 @@ import numpy as np
 from pytest import fixture, raises, mark
 from unittest.mock import patch
 
-import beyond.utils.ccsds as ccsds
+import beyond.io.ccsds as ccsds
 from beyond.dates import Date, timedelta
-from beyond.orbits import Tle
+from beyond.io.tle import Tle
 from beyond.propagators.kepler import Kepler, SOIPropagator
 from beyond.env.solarsystem import get_body
 from beyond.orbits.listeners import LightListener, NodeListener

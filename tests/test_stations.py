@@ -7,7 +7,7 @@ from pytest import fixture, raises
 
 from beyond.dates import Date, timedelta
 from beyond.orbits import Orbit
-from beyond.orbits.tle import Tle
+from beyond.io.tle import Tle
 from beyond.orbits.listeners import SignalEvent, MaxEvent, MaskEvent, stations_listeners
 
 

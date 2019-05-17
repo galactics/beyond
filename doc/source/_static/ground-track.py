@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from beyond.orbits import Tle
+from beyond.io.tle import Tle
 from beyond.dates import Date, timedelta
 
 

@@ -2,7 +2,7 @@
 from datetime import timedelta
 
 from .base import AnalyticalPropagator
-from ..orbits import Tle
+from ..io.tle import Tle
 
 from sgp4.earth_gravity import wgs72
 from sgp4.io import twoline2rv
