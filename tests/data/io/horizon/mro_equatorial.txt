@@ -1,0 +1,203 @@
+*******************************************************************************
+ Revised: May 17, 2019    Mars Reconnaisance Orbiter (MRO)  / (Sun)         -74
+                            http://marsprogram.jpl.nasa.gov/mro/
+
+ NOTE (2014-Jun-10):
+  C/2013 A1 (Siding Spring) will have its closest approach to Mars on Oct 19, 
+  2014 at a distance of about 135,000 km. 
+  
+  Location of predicted MRO minimum risk from comet particles 
+  (occultation mid-point):
+
+   Latitude: 7.6083 deg
+   Time:     19-OCT-2014 20:08:07.182392952 ET (CSS CA + 98 min)
+
+ MISSION LAUNCH DATE:                                        MARS ARRIVAL DATE:
+  Aug 12, 2005 11:43 UTC (it's up and away)                  March 10, 2006
+
+  Notes:  Aug 10, 2005: Original launch was scrubbed (gyros)
+          Aug 11, 2005: Second attemped was launch scrubbed (fueling sensors)
+
+ LAUNCH VEHICLE:
+  Atlas V two-stage. Separation from Centaur: 2005-Aug-12 12:40:51.68 UTC
+
+ BACKGROUND:
+  MRO aerobraked for 6 months from the post-insertion 35 hour orbit, saving 
+  450 kg of fuel. Primary science phase starts in November of 2006 and 
+  nominally operates for 2 Earth years from a 112 minute, near circular polar 
+  orbit. 
+
+ SPACECRAFT PHYSICAL PROPERTIES:
+  Height=  6.5 m                          Solar panels =   20 m^2
+  Width = 13.6 m (tip-to-tip)             launch weight= 2180 kg
+
+ SPACECRAFT TRAJECTORY: 
+  Trajectory starts after Centaur launch stage separation (cruise phase).
+  Trajectory after 2019-May-16 is PREDICTION.
+
+  Trajectory files (from MRO Nav., JPL)      Start (TDB)         End (TDB) 
+  --------------------------------------  -----------------  -----------------
+  mro_cruise                              2005-Aug-12 12:42  2006-Mar-10 22:06
+  mro_ab                                  2006-Mar-10 22:06  2006-Sep-12 06:40
+  misc reconstruction (mro_psp1-50)       2006-Sep-12 06:40  2019-Apr-01 01:01
+  mro_psp_rec                             2019-Apr-01 01:01  2019-May-12 23:55
+  mro_psp                                 2019-May-12 23:55  2019-Jul-15 07:55
+*******************************************************************************
+ 
+ 
+*******************************************************************************
+Ephemeris / WWW_USER Fri May 31 15:31:25 2019 Pasadena, USA      / Horizons    
+*******************************************************************************
+Target body name: Mars Reconnaissance Orbiter (spacecraft) (-74) {source: MRO_MERGED}
+Center body name: Earth (399)                     {source: DE431mx}
+Center-site name: BODY CENTER
+*******************************************************************************
+Start time      : A.D. 2019-Apr-29 00:00:00.0000 TDB
+Stop  time      : A.D. 2019-May-29 00:00:00.0000 TDB
+Step-size       : 1440 minutes
+*******************************************************************************
+Center geodetic : 0.00000000,0.00000000,0.0000000 {E-lon(deg),Lat(deg),Alt(km)}
+Center cylindric: 0.00000000,0.00000000,0.0000000 {E-lon(deg),Dxy(km),Dz(km)}
+Center radii    : 6378.1 x 6378.1 x 6356.8 km     {Equator, meridian, pole}    
+Output units    : AU-D                                                         
+Output type     : GEOMETRIC cartesian states
+Output format   : 2 (position and velocity)
+Reference frame : ICRF/J2000.0                                                 
+Coordinate systm: Earth Mean Equator and Equinox of Reference Epoch            
+*******************************************************************************
+JDTDB
+   X     Y     Z
+   VX    VY    VZ
+*******************************************************************************
+$$SOE
+2458602.500000000 = A.D. 2019-Apr-29 00:00:00.0000 TDB 
+ X = 4.388963132956324E-01 Y = 1.984947985693193E+00 Z = 9.055784286386616E-01
+ VX=-2.241088352918559E-02 VY= 9.942573700208656E-03 VZ= 3.367959276141598E-03
+2458603.500000000 = A.D. 2019-Apr-30 00:00:00.0000 TDB 
+ X = 4.153267661314216E-01 Y = 1.995437946026735E+00 Z = 9.104552021744748E-01
+ VX=-2.411603318849467E-02 VY= 1.095741573136158E-02 VZ= 2.960993235340723E-03
+2458604.500000000 = A.D. 2019-May-01 00:00:00.0000 TDB 
+ X = 3.915741147361830E-01 Y = 2.005643671095032E+00 Z = 9.152024480108945E-01
+ VX=-2.535990530786347E-02 VY= 1.132098293377946E-02 VZ= 4.384613445326904E-03
+2458605.500000000 = A.D. 2019-May-02 00:00:00.0000 TDB 
+ X = 3.676286308449137E-01 Y = 2.015575632433726E+00 Z = 9.198040489395805E-01
+ VX=-2.513471185267841E-02 VY= 1.044340065689963E-02 VZ= 6.054081971525583E-03
+2458606.500000000 = A.D. 2019-May-03 00:00:00.0000 TDB 
+ X = 3.434768027245662E-01 Y = 2.025243629313533E+00 Z = 9.242673392358739E-01
+ VX=-2.385054112940472E-02 VY= 8.944770846164027E-03 VZ= 6.262843129160251E-03
+2458607.500000000 = A.D. 2019-May-04 00:00:00.0000 TDB 
+ X = 3.191177591574816E-01 Y = 2.034644611338086E+00 Z = 9.286140848978222E-01
+ VX=-2.291273884606317E-02 VY= 8.023727215521399E-03 VZ= 4.645207631540059E-03
+2458608.500000000 = A.D. 2019-May-05 00:00:00.0000 TDB 
+ X = 2.945689628018965E-01 Y = 2.043762217066633E+00 Z = 9.328586691157796E-01
+ VX=-2.348603083298312E-02 VY= 8.347209237410487E-03 VZ= 2.658470811982830E-03
+2458609.500000000 = A.D. 2019-May-06 00:00:00.0000 TDB 
+ X = 2.698541317316421E-01 Y = 2.052579870747740E+00 Z = 9.369914741941588E-01
+ VX=-2.520670415012072E-02 VY= 9.282568116702725E-03 VZ= 2.205449544527619E-03
+2458610.500000000 = A.D. 2019-May-07 00:00:00.0000 TDB 
+ X = 2.449832997999035E-01 Y = 2.061095019812692E+00 Z = 9.409868461468683E-01
+ VX=-2.650377665537186E-02 VY= 9.561806992354437E-03 VZ= 3.586786250630809E-03
+2458611.500000000 = A.D. 2019-May-08 00:00:00.0000 TDB 
+ X = 2.199474839749150E-01 Y = 2.069318195534045E+00 Z = 9.448285942310497E-01
+ VX=-2.629544424575910E-02 VY= 8.660315008588666E-03 VZ= 5.254165805332183E-03
+2458612.500000000 = A.D. 2019-May-09 00:00:00.0000 TDB 
+ X = 1.947330956202120E-01 Y = 2.077258896625507E+00 Z = 9.485236735493175E-01
+ VX=-2.494926409899923E-02 VY= 7.199778804093614E-03 VZ= 5.498410014430043E-03
+2458613.500000000 = A.D. 2019-May-10 00:00:00.0000 TDB 
+ X = 1.693389700038046E-01 Y = 2.084914287318822E+00 Z = 9.520938459723329E-01
+ VX=-2.389952788992821E-02 VY= 6.327553601478317E-03 VZ= 3.908241815728510E-03
+2458614.500000000 = A.D. 2019-May-11 00:00:00.0000 TDB 
+ X = 1.437830317088688E-01 Y = 2.092269049623776E+00 Z = 9.555542307227276E-01
+ VX=-2.439863193503871E-02 VY= 6.649258407310604E-03 VZ= 1.905173528859806E-03
+2458615.500000000 = A.D. 2019-May-12 00:00:00.0000 TDB 
+ X = 1.180903981427836E-01 Y = 2.099308265822389E+00 Z = 9.588960185529211E-01
+ VX=-2.612742271507581E-02 VY= 7.513054303829400E-03 VZ= 1.407129222506278E-03
+2458616.500000000 = A.D. 2019-May-13 00:00:00.0000 TDB 
+ X = 9.227222451775022E-02 Y = 2.106030953801128E+00 Z = 9.620940601816997E-01
+ VX=-2.747090744894067E-02 VY= 7.705223481003177E-03 VZ= 2.747854481479527E-03
+2458617.500000000 = A.D. 2019-May-14 00:00:00.0000 TDB 
+ X = 6.631973403493351E-02 Y = 2.112448222622152E+00 Z = 9.651323317371643E-01
+ VX=-2.727319325170299E-02 VY= 6.773590120594489E-03 VZ= 4.412422167896044E-03
+2458618.500000000 = A.D. 2019-May-15 00:00:00.0000 TDB 
+ X = 4.021856007698414E-02 Y = 2.118569558721635E+00 Z = 9.680176339705041E-01
+ VX=-2.586282184665519E-02 VY= 5.355925403926562E-03 VZ= 4.687659941726661E-03
+2458619.500000000 = A.D. 2019-May-16 00:00:00.0000 TDB 
+ X = 1.396652106099347E-02 Y = 2.124392280873254E+00 Z = 9.707718788979280E-01
+ VX=-2.470698966581981E-02 VY= 4.548274085651280E-03 VZ= 3.122509777266454E-03
+2458620.500000000 = A.D. 2019-May-17 00:00:00.0000 TDB 
+ X =-1.241865255945753E-02 Y = 2.129901968537405E+00 Z = 9.734108592540381E-01
+ VX=-2.514360477466561E-02 VY= 4.878576690342903E-03 VZ= 1.112570093558328E-03
+2458621.500000000 = A.D. 2019-May-18 00:00:00.0000 TDB 
+ X =-3.891137566894345E-02 Y = 2.135085297226027E+00 Z = 9.759263629762175E-01
+ VX=-2.687389965947126E-02 VY= 5.666366236418557E-03 VZ= 5.769782290785169E-04
+2458622.500000000 = A.D. 2019-May-19 00:00:00.0000 TDB 
+ X =-6.550025707728450E-02 Y = 2.139942412476551E+00 Z = 9.782939360795631E-01
+ VX=-2.825770499116265E-02 VY= 5.772930051831814E-03 VZ= 1.870314621096545E-03
+2458623.500000000 = A.D. 2019-May-20 00:00:00.0000 TDB 
+ X =-9.219428967735421E-02 Y = 2.144484229310187E+00 Z = 9.804975008712533E-01
+ VX=-2.807644086364654E-02 VY= 4.821499508074634E-03 VZ= 3.530135424304119E-03
+2458624.500000000 = A.D. 2019-May-21 00:00:00.0000 TDB 
+ X =-1.190087663208419E-01 Y = 2.148719398015875E+00 Z = 9.825432515884546E-01
+ VX=-2.661204168406931E-02 VY= 3.453160211706673E-03 VZ= 3.848424667380004E-03
+2458625.500000000 = A.D. 2019-May-22 00:00:00.0000 TDB 
+ X =-1.459469451126496E-01 Y = 2.152644712399857E+00 Z = 9.844528208673657E-01
+ VX=-2.535462036935765E-02 VY= 2.706514290491708E-03 VZ= 2.327067646065268E-03
+2458626.500000000 = A.D. 2019-May-23 00:00:00.0000 TDB 
+ X =-1.729912712929842E-01 Y = 2.156246023483563E+00 Z = 9.862423452580349E-01
+ VX=-2.571051340260704E-02 VY= 3.035555148301818E-03 VZ= 3.145150496236858E-04
+2458627.500000000 = A.D. 2019-May-24 00:00:00.0000 TDB 
+ X =-2.001155375790684E-01 Y = 2.159510961504801E+00 Z = 9.879043532143341E-01
+ VX=-2.743067964672880E-02 VY= 3.751310389778053E-03 VZ=-2.853988061366109E-04
+2458628.500000000 = A.D. 2019-May-25 00:00:00.0000 TDB 
+ X =-2.273072425851752E-01 Y = 2.162440143678557E+00 Z = 9.894149101354393E-01
+ VX=-2.886458484104753E-02 VY= 3.782984033377283E-03 VZ= 9.448651454697015E-04
+2458629.500000000 = A.D. 2019-May-26 00:00:00.0000 TDB 
+ X =-2.545747352521888E-01 Y = 2.165044077495511E+00 Z = 9.907574639869401E-01
+ VX=-2.871487474997803E-02 VY= 2.811980969719673E-03 VZ= 2.605874901588621E-03
+2458630.500000000 = A.D. 2019-May-27 00:00:00.0000 TDB 
+ X =-2.819336470331458E-01 Y = 2.167330718629802E+00 Z = 9.919373344764933E-01
+ VX=-2.720562133658497E-02 VY= 1.485562574973155E-03 VZ= 2.981978683289822E-03
+2458631.500000000 = A.D. 2019-May-28 00:00:00.0000 TDB 
+ X =-3.093878328449629E-01 Y = 2.169296462592659E+00 Z = 9.929758737739868E-01
+ VX=-2.584113137663152E-02 VY= 7.959677879805821E-04 VZ= 1.515692340056229E-03
+2458632.500000000 = A.D. 2019-May-29 00:00:00.0000 TDB 
+ X =-3.369195736938957E-01 Y = 2.170927574393561E+00 Z = 9.938897226019580E-01
+ VX=-2.610402990600289E-02 VY= 1.130232577249427E-03 VZ=-5.028304887339651E-04
+$$EOE
+*******************************************************************************
+Coordinate system description:
+
+  NOTE:
+   The ICRF is quasar-based; the EME description below is given as a dynamical
+   explanation of the previous system to which the ICRF was closely aligned.
+
+  ICRF ("Earth Mean Equator and Equinox of Reference Epoch")
+
+    Reference epoch: J2000.0
+    XY-plane: plane of the Earth's mean equator at the reference epoch
+    X-axis  : out along ascending node of instantaneous plane of the Earth's
+              orbit and the Earth's mean equator at the reference epoch
+    Z-axis  : along the Earth mean north pole at the reference epoch
+
+  Symbol meaning [1 au= 149597870.700 km, 1 day= 86400.0 s]:
+
+    JDTDB    Julian Day Number, Barycentric Dynamical Time
+      X      X-component of position vector (au)                               
+      Y      Y-component of position vector (au)                               
+      Z      Z-component of position vector (au)                               
+      VX     X-component of velocity vector (au/day)                           
+      VY     Y-component of velocity vector (au/day)                           
+      VZ     Z-component of velocity vector (au/day)                           
+
+Geometric states/elements have no aberrations applied.
+
+ Computations by ...
+     Solar System Dynamics Group, Horizons On-Line Ephemeris System
+     4800 Oak Grove Drive, Jet Propulsion Laboratory
+     Pasadena, CA  91109   USA
+     Information: http://ssd.jpl.nasa.gov/
+     Connect    : telnet://ssd.jpl.nasa.gov:6775  (via browser)
+                  http://ssd.jpl.nasa.gov/?horizons
+                  telnet ssd.jpl.nasa.gov 6775    (via command-line)
+     Author     : Jon.D.Giorgini@jpl.nasa.gov
+*******************************************************************************

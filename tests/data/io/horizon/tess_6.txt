@@ -1,0 +1,217 @@
+*******************************************************************************
+ Revised: May 17, 2019              TESS / (Earth)                          -95
+                        https://tess.gsfc.nasa.gov/index.html 
+                   http://spaceflight101.com/tess/tess-orbit-design/ 
+
+ BACKGROUND:
+  The NASA Transitting Exoplanet Survey Satellite (TESS) mission is to 
+  detect exoplanets transiting nearby bright stars, targets for followup 
+  characterization with large ground telescopes such as the Hubble Space 
+  Telescope and the future James Webb Space Telescope.
+
+  Launched        : 2018-Apr-18 22:51 UTC
+  Launch vehicle  : Falcon 9 Block 4
+  Launch site     : SLC-40, Cape Canaveral
+  Payload mass    : 362 kg
+  Ascent duration : 49 minutes, then TESS deployment
+
+  TESS is designed to:
+   - Monitor 200,000 nearby stars for planets
+   - Detect and characterize Earth and Super-Earth size planets
+   - Cover 400X larger sky area than Kepler
+   - Span stellar spectral types of F5 to M5
+
+  Transiting exoplanets allow determination of the following: 
+   - Fundamental properties: 
+       mass, radius, orbit
+   - Dynamics: 
+       planet-planet interactions, mutual inclinations, moons, tides
+   - Atmospheric composition & structure: 
+       transmission spectrum, emission spectrum, 
+
+ MISSION OVERVIEW:
+  All-sky, two year photometric exoplanet discovery mission.
+  TESS will tile the sky with 26 observation sectors:
+
+   - At least 27 days staring at each 24 deg. x 96 deg. sector
+   - Brightest 100,000 stars at 1-minute cadence
+   - Full frame images with 30-minute cadence
+   - Map Northern hemisphere in first year
+   - Map Southern hemisphere in second year
+   - Sectors overlap at ecliptic poles for sensitivity to smaller 
+      and longer period planets in JWST Continuous Viewing Zone (CVZ)
+
+  TESS observes from unique High Earth Orbit (HEO):
+   - Unobstructed view for continuous observation
+   - Two 13.7 day orbits per observation sector
+   - Stable 2:1 resonance with Moon's orbit (P/2)
+   - Thermally stable, low-radiation
+
+ SPACECRAFT: 
+  Designed for photometric stability. Heritage Orbital LEOStar-2 spacecraft bus:
+   - 3-axis stabilized pointing, with <= 3 arcsecong performance
+   - Two-headed star tracker; 4 wheel zero-momentum system
+   - 400W single-axis articulating solar array
+   - Passive thermal control
+   - Mono-propellant propulsion system
+   - Ka-band 100 Mbps science downlink 
+   - Hexagonal 3.9 x 1.2 x 1.5 meter dimensions when fully deployed
+   - Two 1.1 x 0.89 m solar panels
+
+ SCIENCE INSTRUMENT: 
+  Four wide field-of-view CCD cameras. Each of the four cameras has:
+   - 24 deg. x 24 deg. Field-of-View
+   - 100 mm effective pupil diameter
+   - Lens assembly with 7 optical elements
+   - Athermal design
+   - 600nm - 1000nm bandpass
+   - 16.8 Megapixel, low-noise, low-power, MIT Lincoln Lab CCID-80 detector
+
+ Trajectory:
+  A SpaceX Falcon 9 launched the 362-kilogram TESS spacecraft into a 
+  Suprasynchronous Transfer Orbit of 200 by 270,000 kilometers at an 
+  inclination of 28.5 degrees. 
+
+  The operational orbit chosen for TESS is a highly eccentric, 2:1 lunar 
+  resonance orbit of 108,400 by 376,300 kilometers at an inclination of 
+  37 degrees, timed so that the spacecraft reaches apogee with the moon at 
+  a phasing of 90 degrees. 
+
+  11 maneuvering engine burns, 3.5 phasing loops, and a lunar flyby will
+  be used during the first 60 days to go from the inital transfer orbit to
+  the operational orbit.
+
+  Post-launch trajectory (starts after launch ascent, L+00:49 min.).
+  Concatenated trajectory solutions:
+
+  Trajectory name                           Start (TDB)          Stop (TDB)
+  ------------------------------------   -----------------   -----------------
+  095_548day_20180418_02.V0.1            2018-Apr-18 23:37   2018-Apr-19 10:16
+  095_35day_2018****_01.V0.*             2018-Apr-19 10:16   2018-Dec-17 09:00
+  095_548day_201812*_01.V0.*             2018-Dec-24 14:16   2019-Jan-13 14:10
+  095_35day_2019****_01.V0.*             2019-Jan-13 14:10   2019-May-14 18:00
+  095_548day_20190516_01.V0.1            2019-May-14 18:00   2020-Nov-12 17:00
+*******************************************************************************
+ 
+ 
+*******************************************************************************
+Ephemeris / WWW_USER Thu May 30 16:34:16 2019 Pasadena, USA      / Horizons    
+*******************************************************************************
+Target body name: TESS (spacecraft) (-95)         {source: TESS_merged}
+Center body name: Earth (399)                     {source: TESS_merged}
+Center-site name: BODY CENTER
+*******************************************************************************
+Start time      : A.D. 2019-Apr-29 00:00:00.0000 TDB
+Stop  time      : A.D. 2019-May-29 00:00:00.0000 TDB
+Step-size       : 1440 minutes
+*******************************************************************************
+Center geodetic : 0.00000000,0.00000000,0.0000000 {E-lon(deg),Lat(deg),Alt(km)}
+Center cylindric: 0.00000000,0.00000000,0.0000000 {E-lon(deg),Dxy(km),Dz(km)}
+Center radii    : 6378.1 x 6378.1 x 6356.8 km     {Equator, meridian, pole}    
+Output units    : AU-D                                                         
+Output type     : GEOMETRIC cartesian states
+Output format   : 6 (LT, range, and range-rate)
+Reference frame : ICRF/J2000.0                                                 
+Coordinate systm: Earth Mean Equator and Equinox of Reference Epoch            
+*******************************************************************************
+JDTDB
+   LT    RG    RR
+*******************************************************************************
+$$SOE
+2458602.500000000 = A.D. 2019-Apr-29 00:00:00.0000 TDB 
+ LT= 1.507494566695816E-05 RG= 2.610145930089601E-03 RR= 7.139886191141730E-05
+2458603.500000000 = A.D. 2019-Apr-30 00:00:00.0000 TDB 
+ LT= 1.526624531263302E-05 RG= 2.643268436970687E-03 RR=-5.006034898057454E-06
+2458604.500000000 = A.D. 2019-May-01 00:00:00.0000 TDB 
+ LT= 1.501609949351942E-05 RG= 2.599957031005267E-03 RR=-8.193905689701790E-05
+2458605.500000000 = A.D. 2019-May-02 00:00:00.0000 TDB 
+ LT= 1.431317566967486E-05 RG= 2.478249543727727E-03 RR=-1.623075449236271E-04
+2458606.500000000 = A.D. 2019-May-03 00:00:00.0000 TDB 
+ LT= 1.312828098692644E-05 RG= 2.273091389125591E-03 RR=-2.494534501181058E-04
+2458607.500000000 = A.D. 2019-May-04 00:00:00.0000 TDB 
+ LT= 1.141104862307273E-05 RG= 1.975761822269824E-03 RR=-3.473230904932006E-04
+2458608.500000000 = A.D. 2019-May-05 00:00:00.0000 TDB 
+ LT= 9.091342556934890E-06 RG= 1.574117167536181E-03 RR=-4.575128716548791E-04
+2458609.500000000 = A.D. 2019-May-06 00:00:00.0000 TDB 
+ LT= 6.165506634815880E-06 RG= 1.067524381535787E-03 RR=-5.374257019328605E-04
+2458610.500000000 = A.D. 2019-May-07 00:00:00.0000 TDB 
+ LT= 3.934076765016515E-06 RG= 6.811642763910482E-04 RR=-2.216922325319758E-05
+2458611.500000000 = A.D. 2019-May-08 00:00:00.0000 TDB 
+ LT= 6.040199667324261E-06 RG= 1.045828152677928E-03 RR= 5.351043738197777E-04
+2458612.500000000 = A.D. 2019-May-09 00:00:00.0000 TDB 
+ LT= 8.976297998185583E-06 RG= 1.554197819670362E-03 RR= 4.612510434561675E-04
+2458613.500000000 = A.D. 2019-May-10 00:00:00.0000 TDB 
+ LT= 1.132240967342633E-05 RG= 1.960414463892668E-03 RR= 3.526361186112581E-04
+2458614.500000000 = A.D. 2019-May-11 00:00:00.0000 TDB 
+ LT= 1.307416107712664E-05 RG= 2.263720817222942E-03 RR= 2.560669137287786E-04
+2458615.500000000 = A.D. 2019-May-12 00:00:00.0000 TDB 
+ LT= 1.430057090468919E-05 RG= 2.476067096324338E-03 RR= 1.700319304049052E-04
+2458616.500000000 = A.D. 2019-May-13 00:00:00.0000 TDB 
+ LT= 1.505052325266318E-05 RG= 2.605917320137479E-03 RR= 9.047543558463380E-05
+2458617.500000000 = A.D. 2019-May-14 00:00:00.0000 TDB 
+ LT= 1.535134571835317E-05 RG= 2.658003115459531E-03 RR= 1.393920609945915E-05
+2458618.500000000 = A.D. 2019-May-15 00:00:00.0000 TDB 
+ LT= 1.521150421667141E-05 RG= 2.633790310018229E-03 RR=-6.261105328348303E-05
+2458619.500000000 = A.D. 2019-May-16 00:00:00.0000 TDB 
+ LT= 1.462227891863955E-05 RG= 2.531769112228133E-03 RR=-1.422127006500636E-04
+2458620.500000000 = A.D. 2019-May-17 00:00:00.0000 TDB 
+ LT= 1.355611594189730E-05 RG= 2.347168715249222E-03 RR=-2.284409484521534E-04
+2458621.500000000 = A.D. 2019-May-18 00:00:00.0000 TDB 
+ LT= 1.196186862071314E-05 RG= 2.071133348430898E-03 RR=-3.259757920207764E-04
+2458622.500000000 = A.D. 2019-May-19 00:00:00.0000 TDB 
+ LT= 9.758442944884437E-06 RG= 1.689622019164548E-03 RR=-4.400870779198276E-04
+2458623.500000000 = A.D. 2019-May-20 00:00:00.0000 TDB 
+ LT= 6.862050596059602E-06 RG= 1.188127229846792E-03 RR=-5.579812871152143E-04
+2458624.500000000 = A.D. 2019-May-21 00:00:00.0000 TDB 
+ LT= 3.891073704009335E-06 RG= 6.737185271890922E-04 RR=-2.908460385622429E-04
+2458625.500000000 = A.D. 2019-May-22 00:00:00.0000 TDB 
+ LT= 5.318228242691647E-06 RG= 9.208226755586158E-04 RR= 5.602904886460438E-04
+2458626.500000000 = A.D. 2019-May-23 00:00:00.0000 TDB 
+ LT= 8.481226118853746E-06 RG= 1.468478780976105E-03 RR= 5.001072468675186E-04
+2458627.500000000 = A.D. 2019-May-24 00:00:00.0000 TDB 
+ LT= 1.102209762922781E-05 RG= 1.908417045312265E-03 RR= 3.819183859036284E-04
+2458628.500000000 = A.D. 2019-May-25 00:00:00.0000 TDB 
+ LT= 1.292669633495682E-05 RG= 2.238188088607548E-03 RR= 2.803951908178059E-04
+2458629.500000000 = A.D. 2019-May-26 00:00:00.0000 TDB 
+ LT= 1.428726304349695E-05 RG= 2.473762911586528E-03 RR= 1.925476380045468E-04
+2458630.500000000 = A.D. 2019-May-27 00:00:00.0000 TDB 
+ LT= 1.516673766136178E-05 RG= 2.626039221243053E-03 RR= 1.130166014435346E-04
+2458631.500000000 = A.D. 2019-May-28 00:00:00.0000 TDB 
+ LT= 1.560085573947315E-05 RG= 2.701204436414893E-03 RR= 3.773896558032693E-05
+2458632.500000000 = A.D. 2019-May-29 00:00:00.0000 TDB 
+ LT= 1.560466951747888E-05 RG= 2.701864771606795E-03 RR=-3.648645512358428E-05
+$$EOE
+*******************************************************************************
+Coordinate system description:
+
+  NOTE:
+   The ICRF is quasar-based; the EME description below is given as a dynamical
+   explanation of the previous system to which the ICRF was closely aligned.
+
+  ICRF ("Earth Mean Equator and Equinox of Reference Epoch")
+
+    Reference epoch: J2000.0
+    XY-plane: plane of the Earth's mean equator at the reference epoch
+    X-axis  : out along ascending node of instantaneous plane of the Earth's
+              orbit and the Earth's mean equator at the reference epoch
+    Z-axis  : along the Earth mean north pole at the reference epoch
+
+  Symbol meaning [1 au= 149597870.700 km, 1 day= 86400.0 s]:
+
+    JDTDB    Julian Day Number, Barycentric Dynamical Time
+      LT     One-way down-leg Newtonian light-time (day)                       
+      RG     Range; distance from coordinate center (au)                       
+      RR     Range-rate; radial velocity wrt coord. center (au/day)            
+
+Geometric states/elements have no aberrations applied.
+
+ Computations by ...
+     Solar System Dynamics Group, Horizons On-Line Ephemeris System
+     4800 Oak Grove Drive, Jet Propulsion Laboratory
+     Pasadena, CA  91109   USA
+     Information: http://ssd.jpl.nasa.gov/
+     Connect    : telnet://ssd.jpl.nasa.gov:6775  (via browser)
+                  http://ssd.jpl.nasa.gov/?horizons
+                  telnet ssd.jpl.nasa.gov 6775    (via command-line)
+     Author     : Jon.D.Giorgini@jpl.nasa.gov
+*******************************************************************************

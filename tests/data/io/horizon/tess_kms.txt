@@ -1,0 +1,252 @@
+*******************************************************************************
+ Revised: May 17, 2019              TESS / (Earth)                          -95
+                        https://tess.gsfc.nasa.gov/index.html 
+                   http://spaceflight101.com/tess/tess-orbit-design/ 
+
+ BACKGROUND:
+  The NASA Transitting Exoplanet Survey Satellite (TESS) mission is to 
+  detect exoplanets transiting nearby bright stars, targets for followup 
+  characterization with large ground telescopes such as the Hubble Space 
+  Telescope and the future James Webb Space Telescope.
+
+  Launched        : 2018-Apr-18 22:51 UTC
+  Launch vehicle  : Falcon 9 Block 4
+  Launch site     : SLC-40, Cape Canaveral
+  Payload mass    : 362 kg
+  Ascent duration : 49 minutes, then TESS deployment
+
+  TESS is designed to:
+   - Monitor 200,000 nearby stars for planets
+   - Detect and characterize Earth and Super-Earth size planets
+   - Cover 400X larger sky area than Kepler
+   - Span stellar spectral types of F5 to M5
+
+  Transiting exoplanets allow determination of the following: 
+   - Fundamental properties: 
+       mass, radius, orbit
+   - Dynamics: 
+       planet-planet interactions, mutual inclinations, moons, tides
+   - Atmospheric composition & structure: 
+       transmission spectrum, emission spectrum, 
+
+ MISSION OVERVIEW:
+  All-sky, two year photometric exoplanet discovery mission.
+  TESS will tile the sky with 26 observation sectors:
+
+   - At least 27 days staring at each 24 deg. x 96 deg. sector
+   - Brightest 100,000 stars at 1-minute cadence
+   - Full frame images with 30-minute cadence
+   - Map Northern hemisphere in first year
+   - Map Southern hemisphere in second year
+   - Sectors overlap at ecliptic poles for sensitivity to smaller 
+      and longer period planets in JWST Continuous Viewing Zone (CVZ)
+
+  TESS observes from unique High Earth Orbit (HEO):
+   - Unobstructed view for continuous observation
+   - Two 13.7 day orbits per observation sector
+   - Stable 2:1 resonance with Moon's orbit (P/2)
+   - Thermally stable, low-radiation
+
+ SPACECRAFT: 
+  Designed for photometric stability. Heritage Orbital LEOStar-2 spacecraft bus:
+   - 3-axis stabilized pointing, with <= 3 arcsecong performance
+   - Two-headed star tracker; 4 wheel zero-momentum system
+   - 400W single-axis articulating solar array
+   - Passive thermal control
+   - Mono-propellant propulsion system
+   - Ka-band 100 Mbps science downlink 
+   - Hexagonal 3.9 x 1.2 x 1.5 meter dimensions when fully deployed
+   - Two 1.1 x 0.89 m solar panels
+
+ SCIENCE INSTRUMENT: 
+  Four wide field-of-view CCD cameras. Each of the four cameras has:
+   - 24 deg. x 24 deg. Field-of-View
+   - 100 mm effective pupil diameter
+   - Lens assembly with 7 optical elements
+   - Athermal design
+   - 600nm - 1000nm bandpass
+   - 16.8 Megapixel, low-noise, low-power, MIT Lincoln Lab CCID-80 detector
+
+ Trajectory:
+  A SpaceX Falcon 9 launched the 362-kilogram TESS spacecraft into a 
+  Suprasynchronous Transfer Orbit of 200 by 270,000 kilometers at an 
+  inclination of 28.5 degrees. 
+
+  The operational orbit chosen for TESS is a highly eccentric, 2:1 lunar 
+  resonance orbit of 108,400 by 376,300 kilometers at an inclination of 
+  37 degrees, timed so that the spacecraft reaches apogee with the moon at 
+  a phasing of 90 degrees. 
+
+  11 maneuvering engine burns, 3.5 phasing loops, and a lunar flyby will
+  be used during the first 60 days to go from the inital transfer orbit to
+  the operational orbit.
+
+  Post-launch trajectory (starts after launch ascent, L+00:49 min.).
+  Concatenated trajectory solutions:
+
+  Trajectory name                           Start (TDB)          Stop (TDB)
+  ------------------------------------   -----------------   -----------------
+  095_548day_20180418_02.V0.1            2018-Apr-18 23:37   2018-Apr-19 10:16
+  095_35day_2018****_01.V0.*             2018-Apr-19 10:16   2018-Dec-17 09:00
+  095_548day_201812*_01.V0.*             2018-Dec-24 14:16   2019-Jan-13 14:10
+  095_35day_2019****_01.V0.*             2019-Jan-13 14:10   2019-May-14 18:00
+  095_548day_20190516_01.V0.1            2019-May-14 18:00   2020-Nov-12 17:00
+*******************************************************************************
+ 
+ 
+*******************************************************************************
+Ephemeris / WWW_USER Fri May 31 16:11:14 2019 Pasadena, USA      / Horizons    
+*******************************************************************************
+Target body name: TESS (spacecraft) (-95)         {source: TESS_merged}
+Center body name: Earth (399)                     {source: TESS_merged}
+Center-site name: BODY CENTER
+*******************************************************************************
+Start time      : A.D. 2019-Apr-29 00:00:00.0000 TDB
+Stop  time      : A.D. 2019-May-29 00:00:00.0000 TDB
+Step-size       : 1440 minutes
+*******************************************************************************
+Center geodetic : 0.00000000,0.00000000,0.0000000 {E-lon(deg),Lat(deg),Alt(km)}
+Center cylindric: 0.00000000,0.00000000,0.0000000 {E-lon(deg),Dxy(km),Dz(km)}
+Center radii    : 6378.1 x 6378.1 x 6356.8 km     {Equator, meridian, pole}    
+Output units    : KM-S                                                         
+Output type     : GEOMETRIC cartesian states
+Output format   : 2 (position and velocity)
+Reference frame : ICRF/J2000.0                                                 
+Coordinate systm: Earth Mean Equator and Equinox of Reference Epoch            
+*******************************************************************************
+JDTDB
+   X     Y     Z
+   VX    VY    VZ
+*******************************************************************************
+$$SOE
+2458602.500000000 = A.D. 2019-Apr-29 00:00:00.0000 TDB 
+ X =-1.627204151380856E+04 Y = 3.892798366046017E+05 Z = 2.578809297289335E+04
+ VX=-6.009338891424089E-01 VY= 1.147145255022683E-01 VZ=-2.389750197740471E-01
+2458603.500000000 = A.D. 2019-Apr-30 00:00:00.0000 TDB 
+ X =-6.738026744297994E+04 Y = 3.896157489291324E+05 Z = 4.716030681048087E+03
+ VX=-5.774978114384006E-01 VY=-1.056825193780211E-01 VZ=-2.467841664566942E-01
+2458604.500000000 = A.D. 2019-May-01 00:00:00.0000 TDB 
+ X =-1.152550534523888E+05 Y = 3.711119665489077E+05 Z =-1.651530961201305E+04
+ VX=-5.257727750480806E-01 VY=-3.227792473493196E-01 VZ=-2.426646340092723E-01
+2458605.500000000 = A.D. 2019-May-02 00:00:00.0000 TDB 
+ X =-1.572770857758398E+05 Y = 3.337000786919033E+05 Z =-3.683689987438323E+04
+ VX=-4.405394913162572E-01 VY=-5.447195568324836E-01 VZ=-2.252481138383274E-01
+2458606.500000000 = A.D. 2019-May-03 00:00:00.0000 TDB 
+ X =-1.900162952217576E+05 Y = 2.766080030163175E+05 Z =-5.491422630085922E+04
+ VX=-3.073725147323370E-01 VY=-7.797327380242206E-01 VZ=-1.894046980883600E-01
+2458607.500000000 = A.D. 2019-May-04 00:00:00.0000 TDB 
+ X =-2.080809497191386E+05 Y = 1.983616267748632E+05 Z =-6.867654164595260E+04
+ VX=-9.248763187645208E-02 VY=-1.035354397475997E+00 VZ=-1.220419745298545E-01
+2458608.500000000 = A.D. 2019-May-05 00:00:00.0000 TDB 
+ X =-2.012695016225661E+05 Y = 9.720979370619118E+04 Z =-7.412037163679006E+04
+ VX= 2.915947868440407E-01 VY=-1.305360811685997E+00 VZ= 1.294329530550423E-02
+2458609.500000000 = A.D. 2019-May-06 00:00:00.0000 TDB 
+ X =-1.455418366234138E+05 Y =-2.392641740384176E+04 Z =-6.122900069118722E+04
+ VX= 1.113959316135875E+00 VY=-1.430281108317757E+00 VZ= 3.380551985779635E-01
+2458610.500000000 = A.D. 2019-May-07 00:00:00.0000 TDB 
+ X = 1.050655235608261E+04 Y =-1.012819411723554E+05 Z =-3.916449385221909E+03
+ VX= 2.294247481328310E+00 VY= 2.397237809542961E-01 VZ= 9.540289667794691E-01
+2458611.500000000 = A.D. 2019-May-08 00:00:00.0000 TDB 
+ X = 1.443690037931343E+05 Y = 9.352443939563729E+03 Z = 5.956401390582363E+04
+ VX= 7.189810046592888E-01 VY= 1.673413477012756E+00 VZ= 4.282254657978518E-01
+2458612.500000000 = A.D. 2019-May-09 00:00:00.0000 TDB 
+ X = 1.663179043766102E+05 Y = 1.418413234805730E+05 Z = 7.923270749637671E+04
+ VX=-7.382748665118165E-02 VY= 1.351202497102315E+00 VZ= 7.962818852903066E-02
+2458613.500000000 = A.D. 2019-May-10 00:00:00.0000 TDB 
+ X = 1.448649804438310E+05 Y = 2.425429785825966E+05 Z = 7.871835900058190E+04
+ VX=-3.807531792170423E-01 VY= 9.895825602090061E-01 VZ=-7.359224303470117E-02
+2458614.500000000 = A.D. 2019-May-11 00:00:00.0000 TDB 
+ X = 1.051582984114420E+05 Y = 3.145274983803232E+05 Z = 6.853121218281573E+04
+ VX=-5.209218985962104E-01 VY= 6.852059918168504E-01 VZ=-1.545425485970063E-01
+2458615.500000000 = A.D. 2019-May-12 00:00:00.0000 TDB 
+ X = 5.702912417151478E+04 Y = 3.621439343420416E+05 Z = 5.297406772422536E+04
+ VX=-5.838593969167755E-01 VY= 4.225410097088471E-01 VZ=-2.014682432200454E-01
+2458616.500000000 = A.D. 2019-May-13 00:00:00.0000 TDB 
+ X = 5.546658352821014E+03 Y = 3.882899824497237E+05 Z = 3.427976102700337E+04
+ VX=-6.017270417703822E-01 VY= 1.860558342575579E-01 VZ=-2.285889700219009E-01
+2458617.500000000 = A.D. 2019-May-14 00:00:00.0000 TDB 
+ X =-4.603086101115138E+04 Y = 3.947146292675315E+05 Z = 1.387139771055336E+04
+ VX=-5.873502990560869E-01 VY=-3.568609437445248E-02 VZ=-2.417582247989016E-01
+2458618.500000000 = A.D. 2019-May-15 00:00:00.0000 TDB 
+ X =-9.513510848798559E+04 Y = 3.822846291816133E+05 Z =-7.155294924879442E+03
+ VX=-5.445571294242136E-01 VY=-2.517999242919879E-01 VZ=-2.430134856561157E-01
+2458619.500000000 = A.D. 2019-May-16 00:00:00.0000 TDB 
+ X =-1.392437768598780E+05 Y = 3.511265161496747E+05 Z =-2.776388845370197E+04
+ VX=-4.707290073139139E-01 VY=-4.706040721397582E-01 VZ=-2.317611959261708E-01
+2458620.500000000 = A.D. 2019-May-17 00:00:00.0000 TDB 
+ X =-1.752930827574111E+05 Y = 3.006341378616990E+05 Z =-4.674120059386238E+04
+ VX=-3.553311552474939E-01 VY=-7.009181783245765E-01 VZ=-2.042702840004378E-01
+2458621.500000000 = A.D. 2019-May-18 00:00:00.0000 TDB 
+ X =-1.987345595710455E+05 Y = 2.293893194057110E+05 Z =-6.232309036201976E+04
+ VX=-1.724433895701656E-01 VY=-9.526857631626566E-01 VZ=-1.506562716713303E-01
+2458622.500000000 = A.D. 2019-May-19 00:00:00.0000 TDB 
+ X =-2.013283085584375E+05 Y = 1.351805303113993E+05 Z =-7.129308155146027E+04
+ VX= 1.448974457335614E-01 VY=-1.232173064865544E+00 VZ=-4.395637210674287E-02
+2458623.500000000 = A.D. 2019-May-20 00:00:00.0000 TDB 
+ X =-1.641672551853844E+05 Y = 1.705904395608340E+04 Z =-6.595507855523996E+04
+ VX= 8.090077990286277E-01 VY=-1.475867771430023E+00 VZ= 2.081725484706134E-01
+2458624.500000000 = A.D. 2019-May-21 00:00:00.0000 TDB 
+ X =-3.480232017037460E+04 Y =-9.198812187478207E+04 Z =-2.202213687542063E+04
+ VX= 2.286815437165503E+00 VY=-5.274498198427884E-01 VZ= 8.939923904904442E-01
+2458625.500000000 = A.D. 2019-May-22 00:00:00.0000 TDB 
+ X = 1.273861506829115E+05 Y =-1.051630369012146E+04 Z = 5.136239591573802E+04
+ VX= 9.717823579701265E-01 VY= 1.714918010250531E+00 VZ= 5.428069915172059E-01
+2458626.500000000 = A.D. 2019-May-23 00:00:00.0000 TDB 
+ X = 1.610591829293729E+05 Y = 1.281158496501902E+05 Z = 7.685142618022927E+04
+ VX=-3.806360611567462E-03 VY= 1.418623369507999E+00 VZ= 1.182807942353100E-01
+2458627.500000000 = A.D. 2019-May-24 00:00:00.0000 TDB 
+ X = 1.438920046963901E+05 Y = 2.336614065510457E+05 Z = 7.877122103516306E+04
+ VX=-3.432739416597330E-01 VY= 1.036932819088751E+00 VZ=-5.212510890073035E-02
+2458628.500000000 = A.D. 2019-May-25 00:00:00.0000 TDB 
+ X = 1.070163341365472E+05 Y = 3.094039787962709E+05 Z = 7.018965085094112E+04
+ VX=-4.914941732854958E-01 VY= 7.266697592697584E-01 VZ=-1.379142652666734E-01
+2458629.500000000 = A.D. 2019-May-26 00:00:00.0000 TDB 
+ X = 6.122736346217540E+04 Y = 3.606493628339710E+05 Z = 5.598931509318374E+04
+ VX=-5.590942440092741E-01 VY= 4.659561993123171E-01 VZ=-1.864316918222025E-01
+2458630.500000000 = A.D. 2019-May-27 00:00:00.0000 TDB 
+ X = 1.165697289820763E+04 Y = 3.907792702083883E+05 Z = 3.855777394253822E+04
+ VX=-5.825705388091876E-01 VY= 2.352534042632109E-01 VZ=-2.144044448937136E-01
+2458631.500000000 = A.D. 2019-May-28 00:00:00.0000 TDB 
+ X =-3.858004587608163E+04 Y = 4.017839069348063E+05 Z = 1.932827391054744E+04
+ VX=-5.758735466602866E-01 VY= 2.142828932756335E-02 VZ=-2.287772627530285E-01
+2458632.500000000 = A.D. 2019-May-29 00:00:00.0000 TDB 
+ X =-8.712044742189972E+04 Y = 3.946919566813953E+05 Z =-6.659129981731527E+02
+ VX=-5.435254117650391E-01 VY=-1.850599941376265E-01 VZ=-2.323426014964194E-01
+$$EOE
+*******************************************************************************
+Coordinate system description:
+
+  NOTE:
+   The ICRF is quasar-based; the EME description below is given as a dynamical
+   explanation of the previous system to which the ICRF was closely aligned.
+
+  ICRF ("Earth Mean Equator and Equinox of Reference Epoch")
+
+    Reference epoch: J2000.0
+    XY-plane: plane of the Earth's mean equator at the reference epoch
+    X-axis  : out along ascending node of instantaneous plane of the Earth's
+              orbit and the Earth's mean equator at the reference epoch
+    Z-axis  : along the Earth mean north pole at the reference epoch
+
+  Symbol meaning:
+
+    JDTDB    Julian Day Number, Barycentric Dynamical Time
+      X      X-component of position vector (km)                               
+      Y      Y-component of position vector (km)                               
+      Z      Z-component of position vector (km)                               
+      VX     X-component of velocity vector (km/sec)                           
+      VY     Y-component of velocity vector (km/sec)                           
+      VZ     Z-component of velocity vector (km/sec)                           
+
+Geometric states/elements have no aberrations applied.
+
+ Computations by ...
+     Solar System Dynamics Group, Horizons On-Line Ephemeris System
+     4800 Oak Grove Drive, Jet Propulsion Laboratory
+     Pasadena, CA  91109   USA
+     Information: http://ssd.jpl.nasa.gov/
+     Connect    : telnet://ssd.jpl.nasa.gov:6775  (via browser)
+                  http://ssd.jpl.nasa.gov/?horizons
+                  telnet ssd.jpl.nasa.gov 6775    (via command-line)
+     Author     : Jon.D.Giorgini@jpl.nasa.gov
+*******************************************************************************

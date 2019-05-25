@@ -1,5 +1,5 @@
-I/O formats
-===========
+I/O
+===
 
 .. _tle:
 
@@ -18,4 +18,10 @@ CCSDS
 -----
 
 .. automodule:: beyond.io.ccsds
+    :members:
+
+Horizon ephemeris
+-----------------
+
+.. automodule:: beyond.io.horizon
     :members:

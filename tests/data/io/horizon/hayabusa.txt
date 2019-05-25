@@ -1,0 +1,81 @@
+*******************************************************************************
+ Revised: Jan 04, 2019       Hayabusa 2 Spacecraft / (Sun)                  -37
+                   http://b612.jspec.jaxa.jp/hayabusa2/e/index_e.html
+
+ BACKGROUND
+  Hayabusa 2 is an asteroid sample return mission designed and operated by
+  the Japanese space agency (JAXA). It was launched December 03, 2014 @ 04:22 
+  UTC from the Tanegashima LA-Y site (Japan) using a H-IIA launch vehicle.
+
+  After arrival at the target asteroid, 162173 Ryugu (1999 JU3), a separate 
+  copper projectile will impact the surface at 2 km/s and create an 
+  approximately 1-meter diameter crater, exposing the sub-surface material 
+  which will then be sampled and returned to Earth.
+
+ MISSION TIMELINE
+  Launch     : December 03, 2014 @ 04:22 UTC
+  Earth flyby: 2015-Dec-3 @ 10:08 UTC, 
+               9520 km from Earth center
+               189.847 deg. East, 18.691 deg. North (~1000 km W of Hawaii)
+            
+        Dec 03  04:46   Phase angle < 120 degrees
+                09:17   Phase angle <  90 degrees
+                09:39   Most northerly, DEC = +70 degrees
+                09:58   Enter Earth's shadow
+                10:08   Closest approach over mid-Pacific
+                10:13   Crosses equatorial declination heading south
+                10:19   Exit Earth's shadow
+                10:57   Phase angle >  90 degrees
+                14:47   Phase angle > 120 degrees, DEC ~ -60 deg
+
+  Arrives    : June  27, 2018
+  Departs    : December, 2019 (18 month survey)
+  Returns    : December, 2020
+ 
+ SPACECRAFT
+  Mass: 590 kg (1300 lb)
+  Dimensions: 2 x 1.6 x 1.25 meters ( 6.6 x 5.2 x 4.1 ft) 
+  Ka-band communication
+
+ INSTRUMENTS
+  Lander: 
+   * Mobile Asteroid Surface Scout (MASCOT, Germany & France)   
+   * Carries infrared spectrometer, magnetometer, radiometer, camera.
+   * Can lift-off and reposition
+  Impactor: 
+   * Small Carry-on Impactor (SCI); a small drop-off explosively formed 
+     penetrator, consisting of a 2.5 kilogram (5.5 lb) copper projectile 
+     and a 4.5 kilogram (10 lb) shaped charge composed of plasticized HMX.
+  Camera
+   * Deployable camera (DCAM3). Deployed to observe SCI explosion and impact.
+
+ SPACECRAFT TRAJECTORY: 
+  Fit to data through 2018-Dec-26, nominal prediction thereafter.
+
+  File name                         Begins                  Ends 
+  --------------------------------- ------------------  -----------------------
+  trj_141203-150120_ICV1c.bsp_V0.1  2014-Dec-03 inject  2014-Dec-05 
+  hyb2_141205_150210_dsn_v1.V0.1    2014-Dec-05         2014-Dec-09
+  hyb2_spk_141209_180605_dsn_v1     2014-Dec-09         2015-Jul-02
+  201[5-8]*-201[5-9]*-HYB2.OEM.V0.* 2015-Jul-02         2019-Apr-05 (w/predict)
+*******************************************************************************
+ 
+No ephemeris for target "Hayabusa 2 (spacecraft)" after A.D. 2019-APR-05 00:00:00.0000 TDB
+
+!$$SOF
+COMMAND = -37
+CENTER = 500
+MAKE_EPHEM = YES
+TABLE_TYPE = VECTORS
+START_TIME = "2019-04-21 00:00"
+STOP_TIME = "2019-04-23 00:00"
+STEP_SIZE = "2 m"
+OUT_UNITS = KM-S
+REF_PLANE = FRAME
+REF_SYSTEM = J2000
+VECT_CORR = NONE
+VEC_LABELS = NO
+VEC_DELTA_T = NO
+CSV_FORMAT = NO
+OBJ_DATA = YES
+VEC_TABLE = 2
