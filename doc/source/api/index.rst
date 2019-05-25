@@ -9,6 +9,7 @@ Beyond modules
     date
     env
     frames
+    io
     orbits
     propagators
     utils
