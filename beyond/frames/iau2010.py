@@ -4,6 +4,7 @@
 from pathlib import Path
 
 import numpy as np
+from math import sin, cos
 
 from ..utils.matrix import rot1, rot2, rot3
 from ..utils.memoize import memoize
@@ -12,43 +13,45 @@ __all__ = ['sideral', 'precesion_nutation', 'earth_orientation', 'rate']
 
 
 @memoize
-def _tab(element):
+def _tab():
     """Extraction and caching of IAU2000 nutation coefficients
     """
 
-    elements = {
-        'x': 'tab5.2a.txt',
-        'y': 'tab5.2b.txt',
-        's': 'tab5.2d.txt'
-    }
+    elements = [
+        'tab5.2a.txt',  # x
+        'tab5.2b.txt',  # y
+        'tab5.2d.txt'   # s
+    ]
 
-    if element.lower() not in elements.keys():
-        raise ValueError('Unknown element \'%s\'' % element)
+    out = []
+    for element in elements:
 
-    filepath = Path(__file__).parent / "data" / elements[element.lower()]
+        filepath = Path(__file__).parent / "data" / element
 
-    total = []
-    with filepath.open() as fhd:
+        total = []
+        with filepath.open() as fhd:
 
-        for line in fhd.read().splitlines():
+            for line in fhd.read().splitlines():
 
-            line = line.strip()
+                line = line.strip()
 
-            if line.startswith("#") or not line.strip():
-                continue
+                if line.startswith("#") or not line.strip():
+                    continue
 
-            if line.startswith('j = '):
-                result = []
-                total.append(result)
-                continue
+                if line.startswith('j = '):
+                    result = []
+                    total.append(result)
+                    continue
 
-            # The first field is only an index
-            fields = line.split()[1:]
-            fields[:2] = [float(x) for x in fields[:2]]
-            fields[2:] = [int(x) for x in fields[2:]]
-            result.append(fields)
+                # The first field is only an index
+                fields = line.split()[1:]
+                fields[:2] = [float(x) for x in fields[:2]]
+                fields[2:] = [int(x) for x in fields[2:]]
+                result.append(fields)
 
-    return total
+        out.append(total)
+
+    return out
 
 
 def _earth_orientation(date):
@@ -145,7 +148,7 @@ def _xysxy2(date):
     """
 
     planets = _planets(date)
-    x_tab, y_tab, s_tab = _tab('X'), _tab('Y'), _tab('s')
+    x_tab, y_tab, s_tab = _tab()
 
     ttt = date.change_scale('TT').julian_century
 
@@ -162,20 +165,17 @@ def _xysxy2(date):
     for j in range(5):
 
         _x, _y, _s = 0, 0, 0
-        for i in range(len(x_tab[j])):
-            Axs, Axc, *p_coefs = x_tab[j][i]
+        for Axs, Axc, *p_coefs in x_tab[j]:
             ax_p = np.dot(p_coefs, planets)
-            _x += Axs * np.sin(ax_p) + Axc * np.cos(ax_p)
+            _x += Axs * sin(ax_p) + Axc * cos(ax_p)
 
-        for i in range(len(y_tab[j])):
-            Ays, Ayc, *p_coefs = y_tab[j][i]
+        for Ays, Ayc, *p_coefs in y_tab[j]:
             ay_p = np.dot(p_coefs, planets)
-            _y += Ays * np.sin(ay_p) + Ayc * np.cos(ay_p)
+            _y += Ays * sin(ay_p) + Ayc * cos(ay_p)
 
-        for i in range(len(s_tab[j])):
-            Ass, Asc, *p_coefs = s_tab[j][i]
+        for Ass, Asc, *p_coefs in s_tab[j]:
             as_p = np.dot(p_coefs, planets)
-            _s += Ass * np.sin(as_p) + Asc * np.cos(as_p)
+            _s += Ass * sin(as_p) + Asc * cos(as_p)
 
         X += _x * ttt ** j
         Y += _y * ttt ** j

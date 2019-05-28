@@ -6,6 +6,7 @@
 from pathlib import Path
 
 import numpy as np
+from math import sin, cos, radians
 
 from ..utils.matrix import rot1, rot2, rot3
 from ..utils.memoize import memoize
@@ -132,12 +133,12 @@ def _nutation(date, eop_correction=True, terms=106):
     delta_eps = 0.
     for integers, reals in _tab(terms):
         a1, a2, a3, a4, a5 = integers
-        # Conversion from 0.1 mas to mas
-        A, B, C, D = np.array(list(reals)) / 36000000.
+        A, B, C, D = reals
+
         a_p = a1 * m_m + a2 * m_s + a3 * u_m_m + a4 * d_s + a5 * om_m
-        # a_p %= 360.
-        delta_psi += (A + B * ttt) * np.sin(np.deg2rad(a_p))
-        delta_eps += (C + D * ttt) * np.cos(np.deg2rad(a_p))
+
+        delta_psi += (A + B * ttt) * sin(radians(a_p)) / 36000000.
+        delta_eps += (C + D * ttt) * cos(radians(a_p)) / 36000000.
 
     if eop_correction:
         delta_eps += date.eop.deps / 3600000.
