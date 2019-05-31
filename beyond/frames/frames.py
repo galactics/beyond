@@ -8,9 +8,9 @@ The relations may be circular, thanks to the use of the Node class.
 
 .. code-block:: text
 
-                   ,-------.        ,----.
-                   |EME2000|..bias..|GCRF|
-                   `-------'        `----'
+    ,---.          ,-------.        ,----.
+    |G50|---bias---|EME2000|..bias..|GCRF|
+    `---'          `-------'        `----'
                        |              |
                    Precession         |
                        |              |
@@ -53,7 +53,7 @@ from .local import to_qsw, to_tnw
 
 CIO = ['ITRF', 'TIRF', 'CIRF', 'GCRF']
 IAU1980 = ['TOD', 'MOD']
-OTHER = ['EME2000', 'TEME', 'WGS84', 'PEF']
+OTHER = ['EME2000', 'TEME', 'WGS84', 'PEF', 'G50']
 
 __all__ = CIO + IAU1980 + OTHER + ['get_frame']
 
@@ -293,6 +293,23 @@ class GCRF(Frame):
     orientation = "GCRF"
 
 
+class G50(Frame):
+    """Gamma50 Reference Frame
+    """
+
+    orientation = "G50"
+
+    def _to_EME2000(self):
+
+        m = [
+            [0.9999256794956877, -0.0111814832204662, -0.0048590038153592],
+            [0.0111814832391717,  0.9999374848933135, -0.0000271625947142],
+            [0.0048590037723143, -0.0000271702937440,  0.9999881946023742]
+        ]
+
+        return self._convert(m, m), np.zeros(6)
+
+
 def orbit2frame(name, ref_orbit, orientation=None, center=None, bypass=False):
     """Create a frame based on a Orbit or Ephem object.
 
@@ -368,3 +385,4 @@ WGS84 + ITRF + PEF + TOD + MOD + EME2000
 TOD + TEME
 # EME2000 + GCRF
 ITRF + TIRF + CIRF + GCRF
+EME2000 + G50

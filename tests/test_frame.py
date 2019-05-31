@@ -70,6 +70,10 @@ cirf_ref = np.array([5100018.4047, 6122786.3648, 6380344.5327,
 gcrf_ref = np.array([5102508.9528, 6123011.3991, 6378136.9338,
                      -4743.220161, 790.536495, 5533.755724])
 
+
+g50_ref = np.array([5201586.1179, 6065401.818 , 6353101.5731,
+                    -4707.139168,   843.373056,  5556.716711])
+
 # This is the real value from Vallado for GCRF reference values
 # But the values used in these tests are only 1cm away
 # gcrf_ref = np.array([5102508.959, 6123011.403, 6378136.925,
@@ -140,6 +144,16 @@ def test_unit_iau2010(ref_orbit, model_correction):
     # Back to CIRF
     cirf = GCRF(date, gcrf).transform('CIRF')
     assert_vector(cirf_ref, cirf)
+
+
+def test_unit_g50(ref_orbit, model_correction):
+
+    g50 = EME2000(ref_orbit.date, eme_ref).transform('G50')
+    assert_vector(g50_ref, g50)
+
+    # back to EME2000
+    eme = G50(ref_orbit.date, g50).transform('EME2000')
+    assert_vector(eme_ref, eme)
 
 
 def test_global_change(ref_orbit, model_correction):

@@ -43,6 +43,15 @@ IAU1980 based Frames
 .. autoclass:: beyond.frames.frames.TEME
     :members:
 
+Others
+------
+
+.. autoclass:: beyond.frames.frames.G50
+    :members:
+
+.. autoclass:: beyond.frames.frames.WGS84
+    :members:
+
 Local Orbital Reference Frame
 -----------------------------
 
