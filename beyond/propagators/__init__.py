@@ -15,6 +15,7 @@ def get_propagator(name):
 
     from .sgp4 import Sgp4
     from .sgp4beta import Sgp4Beta
+    from .kepler import Kepler
 
     scope = locals().copy()
     scope.update(globals())
