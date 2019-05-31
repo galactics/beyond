@@ -16,7 +16,7 @@ class _Unknown(BeyondError):
 
     @property
     def type(self):
-        return self.__class__.__name__.lstrip("Unknown").rstrip("Error").lower()
+        return self.__class__.__name__[7:-5].lower()
 
     def __str__(self):
         return "Unknown {} '{}'".format(self.type, self.name)
