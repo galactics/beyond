@@ -3,6 +3,18 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [v0.6.5] - 2019-06-10
+
+### Added
+
+- Kepler propagator in `get_propagator()` scope
+- Gamma50 frame
+- Horizon format ephemeris parser
+
+### Modified
+
+- TLE and CCSDS formats regrouped under the `beyond.io` subpackage
+
 ## [v0.6.4] - 2019-03-17
 
 ### Added
