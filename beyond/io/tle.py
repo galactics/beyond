@@ -154,6 +154,7 @@ class Tle:
         self.ndot = float(first[33:43]) * 2
         self.ndotdot = _float(first[44:52]) * 6
         self.bstar = _float(first[53:61])
+        self.element_nb = int(first[65:68])
         self.revolutions = int(second[63:68])
         self.type = int(first[62:63])
 

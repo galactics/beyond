@@ -2,360 +2,93 @@
 from pytest import fixture, raises
 
 from datetime import timedelta
+from pathlib import Path
 
 from beyond.orbits.man import ImpulsiveMan, ContinuousMan
 from beyond.io.tle import Tle
 from beyond.io.ccsds import dumps, loads, CcsdsParseError
-from beyond.dates import Date
+from beyond.dates import Date, timedelta
+from beyond.propagators.kepler import Kepler
+from beyond.env.solarsystem import get_body
 
 
-ref_opm = """CCSDS_OPM_VERS = 2.0
-CREATION_DATE = 2017-06-21T13:20:25
-ORIGINATOR = N/A
+folder = Path(__file__).parent / "data" / "io" / "ccsds"
 
-META_START
-OBJECT_NAME          = N/A
-OBJECT_ID            = N/A
-CENTER_NAME          = EARTH
-REF_FRAME            = TEME
-TIME_SYSTEM          = UTC
-META_STOP
-
-COMMENT  State Vector
-EPOCH                = 2008-09-20T12:25:40.104192
-X                    =  4086.147180 [km]
-Y                    =  -994.936814 [km]
-Z                    =  5250.678791 [km]
-X_DOT                =     2.511071 [km/s]
-Y_DOT                =     7.255240 [km/s]
-Z_DOT                =    -0.583165 [km/s]
-
-COMMENT  Keplerian elements
-SEMI_MAJOR_AXIS      =  6730.963463 [km]
-ECCENTRICITY         =     0.000670
-INCLINATION          =    51.641600 [deg]
-RA_OF_ASC_NODE       =   247.462700 [deg]
-ARG_OF_PERICENTER    =   130.536000 [deg]
-TRUE_ANOMALY         =   324.984745 [deg]"""
-
-ref_man = ref_opm + """
-
-COMMENT  Maneuver 1
-MAN_EPOCH_IGNITION   = 2008-09-20T12:41:09.984493
-MAN_DURATION         = 0.000 [s]
-MAN_DELTA_MASS       = 0.000 [kg]
-MAN_REF_FRAME        = TNW
-MAN_DV_1             = 0.280000 [km/s]
-MAN_DV_2             = 0.000000 [km/s]
-MAN_DV_3             = 0.000000 [km/s]
-
-COMMENT  Maneuver 2
-MAN_EPOCH_IGNITION   = 2008-09-20T13:33:11.374985
-MAN_DURATION         = 0.000 [s]
-MAN_DELTA_MASS       = 0.000 [kg]
-MAN_REF_FRAME        = TNW
-MAN_DV_1             = 0.270000 [km/s]
-MAN_DV_2             = 0.000000 [km/s]
-MAN_DV_3             = 0.000000 [km/s]
-"""
-
-ref_opm_no_units = """CCSDS_OPM_VERS = 2.0
-CREATION_DATE = 2017-06-21T13:20:25
-ORIGINATOR = N/A
-
-META_START
-OBJECT_NAME          = N/A
-OBJECT_ID            = N/A
-CENTER_NAME          = EARTH
-REF_FRAME            = TEME
-TIME_SYSTEM          = UTC
-META_STOP
-
-COMMENT  State Vector
-EPOCH                = 2008-09-20T12:25:40.104192
-X                    =  4086.147180
-Y                    =  -994.936814
-Z                    =  5250.678791
-X_DOT                =     2.511071
-Y_DOT                =     7.255240
-Z_DOT                =    -0.583165
-
-COMMENT  Keplerian elements
-SEMI_MAJOR_AXIS      =  6730.963463
-ECCENTRICITY         =     0.000670
-INCLINATION          =    51.641600
-RA_OF_ASC_NODE       =   247.462700
-ARG_OF_PERICENTER    =   130.536000
-TRUE_ANOMALY         =   324.984745"""
-
-ref_opm_strange_units = """CCSDS_OPM_VERS = 2.0
-CREATION_DATE = 2017-06-21T13:20:25
-ORIGINATOR = N/A
-
-META_START
-OBJECT_NAME          = N/A
-OBJECT_ID            = N/A
-CENTER_NAME          = EARTH
-REF_FRAME            = TEME
-TIME_SYSTEM          = UTC
-META_STOP
-
-COMMENT  State Vector
-EPOCH                = 2008-09-20T12:25:40.104192
-X                    =  3459023.611 [m]
-Y                    =  5617725.542 [m]
-Z                    =  1316222.323 [m]
-X_DOT                =    -3535.844 [m/s]
-Y_DOT                =     3550.405 [m/s]
-Z_DOT                =    -5846.067 [m/s]
-
-COMMENT  Keplerian elements
-SEMI_MAJOR_AXIS      =  6730.963463 [km]
-ECCENTRICITY         =     0.000670
-INCLINATION          =    51.641600 [deg]
-RA_OF_ASC_NODE       =   247.462700 [deg]
-ARG_OF_PERICENTER    =   130.536000 [deg]
-TRUE_ANOMALY         =    35.015255 [deg]"""
-
-ref_oem = """CCSDS_OEM_VERS = 2.0
-CREATION_DATE = 2017-06-21T13:21:32
-ORIGINATOR = N/A
-
-META_START
-OBJECT_NAME          = N/A
-OBJECT_ID            = N/A
-CENTER_NAME          = EARTH
-REF_FRAME            = TEME
-TIME_SYSTEM          = UTC
-START_TIME           = 2008-09-20T12:25:40.104192
-STOP_TIME            = 2008-09-20T14:25:40.104192
-INTERPOLATION        = LAGRANGE
-INTERPOLATION_DEGREE = 7
-META_STOP
-
-2008-09-20T12:25:40.104192  4083.902464 -993.632000  5243.603665   2.512837   7.259889  -0.583779
-2008-09-20T12:28:40.104192  4446.682604  324.930081  5028.090339   1.503730   7.338981  -1.802406
-2008-09-20T12:31:40.104192  4621.397102  1629.746327  4599.304773   0.430591   7.107649  -2.945072
-2008-09-20T12:34:40.104192  4600.571929  2865.602021  3975.349794  -0.661242   6.575412  -3.963237
-2008-09-20T12:37:40.104192  4385.008276  3980.156563  3182.633358  -1.725479   5.764603  -4.813497
-2008-09-20T12:40:40.104192  3983.777724  4926.185054  2254.768787  -2.716851   4.709550  -5.459500
-2008-09-20T12:43:40.104192  3413.859123  5663.620893  1231.150896  -3.593103   3.455190  -5.873621
-2008-09-20T12:46:40.104192  2699.420566  6161.301305  155.260192  -4.316915   2.055142  -6.038263
-2008-09-20T12:49:40.104192  1870.774288  6398.318451 -927.224362  -4.857602   0.569297  -5.946690
-2008-09-20T12:52:40.104192  963.051607  6364.905826 -1970.414096  -5.192495  -0.938921  -5.603303
-2008-09-20T12:55:40.104192  14.667968  6062.814340 -2930.196340  -5.307898  -2.405451  -5.023347
-2008-09-20T12:58:40.104192 -934.343798  5505.168129 -3766.120395  -5.199568  -3.768445  -4.232079
-2008-09-20T13:01:40.104192 -1844.042731  4715.823893 -4443.090519  -4.872732  -4.970910  -3.263499
-2008-09-20T13:04:40.104192 -2676.252828  3728.286282 -4932.798923  -4.341683  -5.962994  -2.158749
-2008-09-20T13:07:40.104192 -3396.132523  2584.245378 -5214.851625  -3.629021  -6.703870  -0.964302
-2008-09-20T13:10:40.104192 -3973.581416  1331.815891 -5277.556509  -2.764640  -7.163190   0.269951
-2008-09-20T13:13:40.104192 -4384.445296  23.550466 -5118.363252  -1.784496  -7.322132   1.492652
-2008-09-20T13:16:40.104192 -4611.485054 -1285.699209 -4743.950862  -0.729228  -7.174063   2.652940
-2008-09-20T13:19:40.104192 -4645.083540 -2541.010297 -4169.963408   0.357384  -6.724831   3.702386
-2008-09-20T13:22:40.104192 -4483.663382 -3689.630755 -3420.399045   1.430078  -5.992658   4.596909
-2008-09-20T13:25:40.104192 -4133.794212 -4683.164832 -2526.661729   2.443897  -5.007591   5.298597
-2008-09-20T13:28:40.104192 -3609.971567 -5479.615268 -1526.297610   3.356046  -3.810467   5.777381
-2008-09-20T13:31:40.104192 -2934.059087 -6045.194803 -461.449620   4.127752  -2.451365   6.012455
-2008-09-20T13:34:40.104192 -2134.404723 -6355.810710  622.909564   4.726019  -0.987549   5.993323
-2008-09-20T13:37:40.104192 -1244.659051 -6398.142795  1680.893769   5.125155   0.518989   5.720383
-2008-09-20T13:40:40.104192 -302.347805 -6170.249938  2667.675635   5.307970   2.004277   5.204973
-2008-09-20T13:43:40.104192  652.736161 -5681.669803  3541.421025   5.266551   3.405222   4.468880
-2008-09-20T13:46:40.104192  1580.238051 -4953.007966  4265.085772   5.002582   4.662392   3.543335
-2008-09-20T13:49:40.104192  2440.962450 -4015.045319  4807.993735   4.527208   5.722567   2.467599
-2008-09-20T13:52:40.104192  3198.534420 -2907.413304  5147.130765   3.860491   6.540956   1.287226
-2008-09-20T13:55:40.104192  3820.927739 -1676.908758  5268.104550   3.030513   7.082997   0.052125
-2008-09-20T13:58:40.104192  4281.806286 -375.522033  5165.743308   2.072196   7.325730  -1.185510
-2008-09-20T14:01:40.104192  4561.629818  941.740139  4844.316363   1.025879   7.258727  -2.373326
-2008-09-20T14:04:40.104192  4648.486474  2219.161521  4317.369815  -0.064305   6.884566  -3.460952
-2008-09-20T14:07:40.104192  4538.616206  3402.663700  3607.179446  -1.152223   6.218831  -4.402107
-2008-09-20T14:10:40.104192  4236.598734  4442.108641  2743.832051  -2.191672   5.289589  -5.156603
-2008-09-20T14:13:40.104192  3755.186698  5293.456116  1763.962307  -3.138383   4.136309  -5.692163
-2008-09-20T14:16:40.104192  3114.777867  5920.677848  709.186816  -3.952004   2.808215  -5.985926
-2008-09-20T14:19:40.104192  2342.541924  6297.324902 -375.694970  -4.597935   1.362119  -6.025530
-2008-09-20T14:22:40.104192  1471.237347  6407.666741 -1444.650659  -5.048908  -0.140158  -5.809680
-2008-09-20T14:25:40.104192  537.778438  6247.339803 -2452.414417  -5.286183  -1.634621  -5.348147"""
+def get_ref(name):
+    return folder.joinpath(name).read_text()
 
 
-ref_double_oem = """CCSDS_OEM_VERS = 2.0
-CREATION_DATE = 2017-12-27T20:02:56
-ORIGINATOR = N/A
-
-META_START
-OBJECT_NAME          = N/A
-OBJECT_ID            = N/A
-CENTER_NAME          = EARTH
-REF_FRAME            = TEME
-TIME_SYSTEM          = UTC
-START_TIME           = 2008-09-20T12:25:40.104192
-STOP_TIME            = 2008-09-20T14:25:40.104192
-INTERPOLATION        = LAGRANGE
-INTERPOLATION_DEGREE = 7
-META_STOP
-
-2008-09-20T12:25:40.104192  4083.902464 -993.632000  5243.603665   2.512837   7.259889  -0.583779
-2008-09-20T12:28:40.104192  4446.682604  324.930081  5028.090339   1.503730   7.338981  -1.802406
-2008-09-20T12:31:40.104192  4621.397102  1629.746327  4599.304773   0.430591   7.107649  -2.945072
-2008-09-20T12:34:40.104192  4600.571929  2865.602021  3975.349794  -0.661242   6.575412  -3.963237
-2008-09-20T12:37:40.104192  4385.008276  3980.156563  3182.633358  -1.725479   5.764603  -4.813497
-2008-09-20T12:40:40.104192  3983.777724  4926.185054  2254.768787  -2.716851   4.709550  -5.459500
-2008-09-20T12:43:40.104192  3413.859123  5663.620893  1231.150896  -3.593103   3.455190  -5.873621
-2008-09-20T12:46:40.104192  2699.420566  6161.301305  155.260192  -4.316915   2.055142  -6.038263
-2008-09-20T12:49:40.104192  1870.774288  6398.318451 -927.224362  -4.857602   0.569297  -5.946690
-2008-09-20T12:52:40.104192  963.051607  6364.905826 -1970.414096  -5.192495  -0.938921  -5.603303
-2008-09-20T12:55:40.104192  14.667968  6062.814340 -2930.196340  -5.307898  -2.405451  -5.023347
-2008-09-20T12:58:40.104192 -934.343798  5505.168129 -3766.120395  -5.199568  -3.768445  -4.232079
-2008-09-20T13:01:40.104192 -1844.042731  4715.823893 -4443.090519  -4.872732  -4.970910  -3.263499
-2008-09-20T13:04:40.104192 -2676.252828  3728.286282 -4932.798923  -4.341683  -5.962994  -2.158749
-2008-09-20T13:07:40.104192 -3396.132523  2584.245378 -5214.851625  -3.629021  -6.703870  -0.964302
-2008-09-20T13:10:40.104192 -3973.581416  1331.815891 -5277.556509  -2.764640  -7.163190   0.269951
-2008-09-20T13:13:40.104192 -4384.445296  23.550466 -5118.363252  -1.784496  -7.322132   1.492652
-2008-09-20T13:16:40.104192 -4611.485054 -1285.699209 -4743.950862  -0.729228  -7.174063   2.652940
-2008-09-20T13:19:40.104192 -4645.083540 -2541.010297 -4169.963408   0.357384  -6.724831   3.702386
-2008-09-20T13:22:40.104192 -4483.663382 -3689.630755 -3420.399045   1.430078  -5.992658   4.596909
-2008-09-20T13:25:40.104192 -4133.794212 -4683.164832 -2526.661729   2.443897  -5.007591   5.298597
-2008-09-20T13:28:40.104192 -3609.971567 -5479.615268 -1526.297610   3.356046  -3.810467   5.777381
-2008-09-20T13:31:40.104192 -2934.059087 -6045.194803 -461.449620   4.127752  -2.451365   6.012455
-2008-09-20T13:34:40.104192 -2134.404723 -6355.810710  622.909564   4.726019  -0.987549   5.993323
-2008-09-20T13:37:40.104192 -1244.659051 -6398.142795  1680.893769   5.125155   0.518989   5.720383
-2008-09-20T13:40:40.104192 -302.347805 -6170.249938  2667.675635   5.307970   2.004277   5.204973
-2008-09-20T13:43:40.104192  652.736161 -5681.669803  3541.421025   5.266551   3.405222   4.468880
-2008-09-20T13:46:40.104192  1580.238051 -4953.007966  4265.085772   5.002582   4.662392   3.543335
-2008-09-20T13:49:40.104192  2440.962450 -4015.045319  4807.993735   4.527208   5.722567   2.467599
-2008-09-20T13:52:40.104192  3198.534420 -2907.413304  5147.130765   3.860491   6.540956   1.287226
-2008-09-20T13:55:40.104192  3820.927739 -1676.908758  5268.104550   3.030513   7.082997   0.052125
-2008-09-20T13:58:40.104192  4281.806286 -375.522033  5165.743308   2.072196   7.325730  -1.185510
-2008-09-20T14:01:40.104192  4561.629818  941.740139  4844.316363   1.025879   7.258727  -2.373326
-2008-09-20T14:04:40.104192  4648.486474  2219.161521  4317.369815  -0.064305   6.884566  -3.460952
-2008-09-20T14:07:40.104192  4538.616206  3402.663700  3607.179446  -1.152223   6.218831  -4.402107
-2008-09-20T14:10:40.104192  4236.598734  4442.108641  2743.832051  -2.191672   5.289589  -5.156603
-2008-09-20T14:13:40.104192  3755.186698  5293.456116  1763.962307  -3.138383   4.136309  -5.692163
-2008-09-20T14:16:40.104192  3114.777867  5920.677848  709.186816  -3.952004   2.808215  -5.985926
-2008-09-20T14:19:40.104192  2342.541924  6297.324902 -375.694970  -4.597935   1.362119  -6.025530
-2008-09-20T14:22:40.104192  1471.237347  6407.666741 -1444.650659  -5.048908  -0.140158  -5.809680
-2008-09-20T14:25:40.104192  537.778438  6247.339803 -2452.414417  -5.286183  -1.634621  -5.348147
-
-
-META_START
-OBJECT_NAME          = N/A
-OBJECT_ID            = N/A
-CENTER_NAME          = EARTH
-REF_FRAME            = TEME
-TIME_SYSTEM          = UTC
-START_TIME           = 2008-09-20T12:25:40.104192
-STOP_TIME            = 2008-09-20T17:25:40.104192
-INTERPOLATION        = LAGRANGE
-INTERPOLATION_DEGREE = 7
-META_STOP
-
-2008-09-20T12:25:40.104192  4083.902464 -993.632000  5243.603665   2.512837   7.259889  -0.583779
-2008-09-20T12:30:40.104192  4584.684905  1199.780102  4764.992327   0.792658   7.218932  -2.575706
-2008-09-20T12:35:40.104192  4550.075225  3253.056142  3728.338205  -1.021330   6.334636  -4.267271
-2008-09-20T12:40:40.104192  3983.777724  4926.185054  2254.768787  -2.716851   4.709550  -5.459500
-2008-09-20T12:45:40.104192  2951.866337  6023.560789  516.902443  -4.094630   2.534415  -6.011747
-2008-09-20T12:50:40.104192  1575.141084  6417.380009 -1281.554215  -4.992967   0.065865  -5.859672
-2008-09-20T12:55:40.104192  14.667968  6062.814340 -2930.196340  -5.307898  -2.405451  -5.023347
-2008-09-20T13:00:40.104192 -1547.588380  5002.798714 -4236.996080  -5.005253  -4.591171  -3.603649
-2008-09-20T13:05:40.104192 -2930.290388  3362.066463 -5050.651514  -4.122971  -6.239590  -1.768154
-2008-09-20T13:10:40.104192 -3973.581416  1331.815891 -5277.556509  -2.764640  -7.163190   0.269951
-2008-09-20T13:15:40.104192 -4556.986380 -852.586795 -4891.881774  -1.086676  -7.257428   2.276173
-2008-09-20T13:20:40.104192 -4612.788067 -2938.238256 -3938.207881   0.718740  -6.510963   4.019790
-2008-09-20T13:25:40.104192 -4133.794212 -4683.164832 -2526.661729   2.443897  -5.007591   5.298597
-2008-09-20T13:30:40.104192 -3174.633875 -5884.021032 -820.825370   3.888295  -2.918984   5.962045
-2008-09-20T13:35:40.104192 -1846.044626 -6400.063894  980.756113   4.882224  -0.486971   5.930207
-2008-09-20T13:40:40.104192 -302.347805 -6170.249938  2667.675635   5.307970   2.004277   5.204973
-2008-09-20T13:45:40.104192  1276.597274 -5220.867585  4042.579875   5.114802   4.262749   3.870624
-2008-09-20T13:50:40.104192  2706.632631 -3662.505407  4944.576102   4.324997   6.024160   2.083373
-2008-09-20T13:55:40.104192  3820.927739 -1676.908758  5268.104550   3.030513   7.082997   0.052125
-2008-09-20T14:00:40.104192  4489.371914  504.339233  4975.149628   1.381764   7.315587  -1.986097
-2008-09-20T14:05:40.104192  4633.666973  2626.676294  4099.664329  -0.429495   6.693914  -3.793073
-2008-09-20T14:10:40.104192  4236.598734  4442.108641  2743.832051  -2.191672   5.289589  -5.156603
-2008-09-20T14:15:40.104192  3344.364214  5738.351052  1066.380629  -3.697858   3.266959  -5.915859
-2008-09-20T14:20:40.104192  2061.362263  6364.147872 -736.053541  -4.771031   0.864458  -5.981705
-2008-09-20T14:25:40.104192  537.778438  6247.339803 -2452.414417  -5.286183  -1.634621  -5.348147
-2008-09-20T14:30:40.104192 -1048.497426  5403.071932 -3882.469115  -5.185362  -3.937671  -4.092337
-2008-09-20T14:35:40.104192 -2513.062834  3931.172787 -4860.324226  -4.483189  -5.778337  -2.363390
-2008-09-20T14:40:40.104192 -3686.411591  2003.590210 -5273.261661  -3.263042  -6.946515  -0.363000
-2008-09-20T14:45:40.104192 -4433.055302 -155.943953 -5074.028763  -1.666029  -7.309929   1.678211
-2008-09-20T14:50:40.104192 -4666.563562 -2297.401592 -4285.776747   0.124854  -6.827011   3.525699
-2008-09-20T14:55:40.104192 -4359.312174 -4172.573395 -2999.483983   1.904032  -5.551521   4.965937
-2008-09-20T15:00:40.104192 -3546.002435 -5563.278288 -1364.027860   3.465447  -3.628389   5.830255
-2008-09-20T15:05:40.104192 -2320.265555 -6306.837313  430.484414   4.626239  -1.279412   6.015441
-2008-09-20T15:10:40.104192 -824.255761 -6315.657399  2174.657538   5.249237   1.221550   5.497700
-2008-09-20T15:15:40.104192  767.847305 -5588.066457  3664.511202   5.260407   3.581462   4.336657
-2008-09-20T15:20:40.104192  2270.385336 -4208.690768  4725.699404   4.657991   5.523940   2.668155
-2008-09-20T15:25:40.104192  3508.084174 -2338.383928  5234.048215   3.512148   6.822175   0.687363
-2008-09-20T15:30:40.104192  4336.487280 -195.271482  5129.973312   1.956073   7.324719  -1.374528
-2008-09-20T15:35:40.104192  4658.694623  1970.608106  4425.362168   0.170607   6.972278  -3.276752
-2008-09-20T15:40:40.104192  4436.723149  3906.276458  3202.346731  -1.636016   5.804911  -4.796292
-2008-09-20T15:45:40.104192  3696.226988  5385.401638  1603.994236  -3.251960   3.958739  -5.754084
-2008-09-20T15:50:40.104192  2523.770601  6235.185772 -182.364296  -4.487214   1.651060  -6.037293
-2008-09-20T15:55:40.104192  1056.636475  6357.050432 -1947.424137  -5.197258  -0.845812  -5.613854
-2008-09-20T16:00:40.104192 -533.688540  5738.156066 -3484.982917  -5.300846  -3.238669  -4.536116
-2008-09-20T16:05:40.104192 -2062.054747  4452.207421 -4616.341533  -4.788756  -5.249611  -2.932876
-2008-09-20T16:10:40.104192 -3351.343221  2649.875246 -5210.831067  -3.722852  -6.648206  -0.992089
-2008-09-20T16:15:40.104192 -4252.618159  540.685058 -5200.240254  -2.227134  -7.275832   1.061857
-2008-09-20T16:20:40.104192 -4661.705511 -1631.072736 -4586.046794  -0.473256  -7.061243   2.992947
-2008-09-20T16:25:40.104192 -4530.829964 -3613.850659 -3439.141950   1.337763  -6.027825   4.578592
-2008-09-20T16:30:40.104192 -3874.294179 -5177.274132 -1892.119778   2.996862  -4.292380   5.633963
-2008-09-20T16:35:40.104192 -2767.402722 -6138.788940 -124.566526   4.310415  -2.054196   6.033902
-2008-09-20T16:40:40.104192 -1338.285026 -6385.431414  1657.482784   5.123587   0.426514   5.729315
-2008-09-20T16:45:40.104192  246.824428 -5887.682583  3245.724225   5.339921   2.859355   4.754486
-2008-09-20T16:50:40.104192  1803.139786 -4703.246511  4454.309945   4.933467   4.959243   3.223276
-2008-09-20T16:55:40.104192  3149.125833 -2970.204654  5141.819617   3.951506   6.480762   1.314896
-2008-09-20T17:00:40.104192  4127.731472 -890.671280  5227.752724   2.508258   7.246470  -0.747798
-2008-09-20T17:05:40.104192  4624.598910  1292.785072  4701.815993   0.771385   7.166622  -2.724081
-2008-09-20T17:10:40.104192  4581.386398  3325.237367  3625.208510  -1.056842   6.249476  -4.382609
-2008-09-20T17:15:40.104192  4002.805780  4969.093033  2123.754529  -2.762405   4.601489  -5.528209
-2008-09-20T17:20:40.104192  2956.388893  6032.185796  373.359440  -4.144811   2.416204  -6.025740
-2008-09-20T17:25:40.104192  1564.654029  6390.767451 -1420.810194  -5.041867  -0.048499  -5.817413"""
+ref_opm = get_ref("opm.kvn")
+ref_omm = get_ref("omm.kvn")
+ref_opm_strange_units = get_ref("opm_strange_units.kvn")
+ref_man = get_ref("impulsive_man.kvn")
+ref_opm_no_units = get_ref("opm_no_unit.kvn")
+ref_oem = get_ref("oem.kvn")
+ref_double_oem = get_ref("oem_double.kvn")
+ref_tle_bluebook = get_ref("bluebook.tle")
+ref_omm_bluebook = get_ref("bluebook_omm.kvn")
 
 
 @fixture
-def orb():
+def omm():
     tle = Tle("""1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927
 2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537""")
 
     return tle.orbit()
 
+
 @fixture
-def orb_man(orb):
-    orb = orb.copy()
-    orb.maneuvers = [
+def opm(omm):
+    return omm.copy(form='cartesian')
+
+
+@fixture
+def opm_man(opm):
+    opm = opm.copy()
+    opm.propagator = Kepler(get_body('Earth'), timedelta(seconds=60))
+    opm.maneuvers = [
         ImpulsiveMan(Date(2008, 9, 20, 12, 41, 9, 984493), [280, 0, 0], frame="TNW", comment="Maneuver 1"),
-        ImpulsiveMan(Date(2008, 9, 20, 13, 33, 11, 374985), [270, 0, 0], frame="TNW", comment="Maneuver 2"),
+        ImpulsiveMan(Date(2008, 9, 20, 13, 33, 11, 374985), [270, 0, 0], frame="TNW"),
     ]
-    return orb
+    return opm
+
 
 @fixture
-def orb_continuous_man(orb):
-    orb = orb.copy()
-    orb.maneuvers = [
+def opm_continuous_man(opm):
+    opm = opm.copy()
+    opm.propagator = Kepler(get_body('Earth'), timedelta(seconds=60))
+    opm.maneuvers = [
         ContinuousMan(Date(2008, 9, 20, 12, 41, 9, 984493), timedelta(minutes=3), [280, 0, 0], frame="TNW", comment="Maneuver 1"),
-        ContinuousMan(Date(2008, 9, 20, 13, 33, 11, 374985), timedelta(minutes=3), [270, 0, 0], frame="TNW", comment="Maneuver 2"),
+        ContinuousMan(Date(2008, 9, 20, 13, 33, 11, 374985), timedelta(minutes=3), [270, 0, 0], frame="TNW"),
     ]
-    return orb
-
-@fixture
-def ephem(orb):
-    return orb.ephem(start=orb.date, stop=timedelta(minutes=120), step=timedelta(minutes=3))
+    return opm
 
 
 @fixture
-def ephem2(orb):
-    return orb.ephem(start=orb.date, stop=timedelta(hours=5), step=timedelta(minutes=5))
+def ephem(opm):
+    return opm.ephem(start=opm.date, stop=timedelta(minutes=120), step=timedelta(minutes=3))
 
 
-def assert_orbit(ref, orb):
+@fixture
+def ephem2(opm):
+    return opm.ephem(start=opm.date, stop=timedelta(hours=5), step=timedelta(minutes=5))
+
+
+def assert_orbit(ref, orb, form='cartesian'):
+
+    ref.form = form
+    orb.form = form
+
     assert ref.frame == orb.frame
     assert ref.date == orb.date
 
     # Precision down to millimeter due to the truncature when writing the CCSDS OPM
-    assert abs(ref.x - orb.x) < 1e-3
-    assert abs(ref.y - orb.y) < 1e-3
-    assert abs(ref.z - orb.z) < 1e-3
-    assert abs(ref.vx - orb.vx) < 1e-3
-    assert abs(ref.vy - orb.vy) < 1e-3
-    assert abs(ref.vz - orb.vz) < 1e-3
+    assert abs(ref[0] - orb[0]) < 1e-3
+    assert abs(ref[1] - orb[1]) < 1e-3
+    assert abs(ref[2] - orb[2]) < 1e-3
+    assert abs(ref[3] - orb[3]) < 1e-3
+    assert abs(ref[4] - orb[4]) < 1e-3
+    assert abs(ref[5] - orb[5]) < 1e-3
 
 
 def test_dummy():
@@ -365,32 +98,67 @@ def test_dummy():
         loads("dummy text")
 
 
-def test_dump_opm(orb):
+def test_dump_opm(opm):
+
+    opm.propagator = Kepler(get_body("Earth"), timedelta(seconds=60))
 
     ref = ref_opm.splitlines()
-    txt = dumps(orb).splitlines()
+    txt = dumps(opm).splitlines()
 
     # the split is here to avoid the creation date line
     assert txt[0] == ref[0]
     assert "\n".join(txt[2:]) == "\n".join(ref[2:])
 
 
-def test_dump_opm_man(orb_man, orb_continuous_man):
+def test_dump_omm(omm):
+    ref = ref_omm.splitlines()
+    txt = dumps(omm).splitlines()
+
+    # the split is here to avoid the creation date line
+    assert txt[0] == ref[0]
+    assert "\n".join(txt[2:]) == "\n".join(ref[2:])
+
+
+def test_omm_dump_bluebook():
+    """Example from the CCSDS Blue Book (4-1 and 4-2)
+    """
+
+    tle = Tle(ref_tle_bluebook)
+    omm = tle.orbit()
+    omm.name = tle.name
+    omm.norad_id = tle.norad_id
+    omm.cospar_id = tle.cospar_id
+
+    # assert tle.epoch == Date(2007, 5, 4, 10, 34, 41, 426400)
+
+    omm = dumps(omm).splitlines()
+    ref_bluebook = ref_omm_bluebook.splitlines()
+
+    assert omm[0] == ref_bluebook[0]
+    for i in range(4, len(ref_bluebook)):
+        assert omm[i] == ref_bluebook[i]
+
+
+def test_dump_opm_man_impulsive(opm_man):
+
     ref = ref_man.splitlines()
-    txt = dumps(orb_man).splitlines()
+    txt = dumps(opm_man).splitlines()
 
     # the split is here to avoid the creation date line
     assert txt[0] == ref[0]
     assert "\n".join(txt[2:]) == "\n".join(ref[2:])
 
-    txt = dumps(orb_continuous_man).splitlines()
+
+def test_dump_opm_man_continuous(opm_continuous_man):
+    ref = ref_man.splitlines()
+    txt = dumps(opm_continuous_man).splitlines()
     # the split is here to avoid the creation date line
     assert txt[0] == ref[0]
     assert "\n".join(txt[2:31]) == "\n".join(ref[2:31])
     assert txt[31] == "MAN_DURATION         = 180.000 [s]"
-    assert "\n".join(txt[32:40]) == "\n".join(ref[32:40])
-    assert txt[40] == "MAN_DURATION         = 180.000 [s]"
-    assert "\n".join(txt[41]) == "\n".join(ref[41])
+    assert "\n".join(txt[32:39]) == "\n".join(ref[32:39])
+    assert txt[39] == "MAN_DURATION         = 180.000 [s]"
+    assert "\n".join(txt[40]) == "\n".join(ref[40])
 
 
 def test_dump_oem(ephem):
@@ -430,15 +198,13 @@ INTERPOLATION        = LINEAR
 META_STOP"""
 
 
-def test_load_opm(orb):
+def test_load_opm(opm):
 
-    orb.form = "cartesian"
+    opm2 = loads(ref_opm)
+    assert_orbit(opm, opm2)
 
-    orb2 = loads(ref_opm)
-    assert_orbit(orb, orb2)
-
-    orb3 = loads(ref_opm_no_units)
-    assert_orbit(orb, orb3)
+    opm3 = loads(ref_opm_no_units)
+    assert_orbit(opm, opm3)
 
     # Dummy units, that aren't specified as valid
     with raises(CcsdsParseError):
@@ -450,33 +216,54 @@ def test_load_opm(orb):
         loads(truncated_opm)
 
 
-def test_load_opm_man(orb_man, orb_continuous_man):
-    # With maneuvers
+def test_load_opm_man_impulsive(opm_man):
+
     ref_opm_man = loads(ref_man)
     assert len(ref_opm_man.maneuvers) == 2
 
-    for i, man in enumerate(orb_man.maneuvers):
+    for i, man in enumerate(opm_man.maneuvers):
         assert ref_opm_man.maneuvers[i].date == man.date
         assert ref_opm_man.maneuvers[i]._dv.tolist() == man._dv.tolist()
         assert ref_opm_man.maneuvers[i].frame == man.frame
         assert ref_opm_man.maneuvers[i].comment == man.comment
 
+
+def test_load_opm_man_continuous(opm_continuous_man):
+
+    ref_opm_man = loads(ref_man)
     # Tweak the reference to convert impulsive maneuvers into continuous ones
     ref_continuous_man = ref_man.splitlines()
     ref_continuous_man[31] = "MAN_DURATION         = 180.000 [s]"
-    ref_continuous_man[40] = "MAN_DURATION         = 180.000 [s]"
+    ref_continuous_man[39] = "MAN_DURATION         = 180.000 [s]"
     ref_continuous_man = "\n".join(ref_continuous_man)
 
     ref_opm_continuous_man = loads(ref_continuous_man)
 
     assert len(ref_opm_continuous_man.maneuvers) == 2
 
-    for i, man in enumerate(orb_continuous_man.maneuvers):
+    for i, man in enumerate(opm_continuous_man.maneuvers):
         assert ref_opm_continuous_man.maneuvers[i].date == man.date
         assert ref_opm_continuous_man.maneuvers[i].duration == man.duration
         assert ref_opm_continuous_man.maneuvers[i]._dv.tolist() == man._dv.tolist()
         assert ref_opm_continuous_man.maneuvers[i].frame == man.frame
         assert ref_opm_continuous_man.maneuvers[i].comment == man.comment
+
+
+def test_load_omm(omm):
+    omm2 = loads(ref_omm)
+    assert_orbit(omm, omm2, 'TLE')
+
+    # omm3 = loads(ref_omm_no_units)
+    # assert_orbit(omm, omm3)
+
+    # # Dummy units, that aren't specified as valid
+    # with raises(CcsdsParseError):
+    #     loads(ref_omm_strange_units)
+
+    # # One mandatory line is missing
+    # truncated_omm = "\n".join(ref_omm.splitlines()[:15] + ref_omm.splitlines()[16:])
+    # with raises(CcsdsParseError):
+    #     loads(truncated_omm)    
 
 
 def test_load_oem(ephem):
@@ -489,8 +276,8 @@ def test_load_oem(ephem):
     assert ephem2.method == ephem2.LAGRANGE
     assert ephem2.order == 8
 
-    for orb, orb2 in zip(ephem, ephem2):
-        assert_orbit(orb, orb2)
+    for opm, opm2 in zip(ephem, ephem2):
+        assert_orbit(opm, opm2)
 
     with raises(CcsdsParseError):
         loads("\n".join(ref_oem.splitlines()[:15]))
