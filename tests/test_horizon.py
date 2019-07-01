@@ -25,10 +25,10 @@ def test_load():
             # Type 5 has no position
             assert_almost_equal(ephem[0,:3], [0, 0, 0])
 
-    with raises(ValueError) as e:
+    with raises(ValueError) as excinfo:
         ephem = load(folder.joinpath("tess_6.txt".format(idx)).open())
 
-    assert str(e).endswith("Unknown format : '6 (LT, range, and range-rate)'")
+    assert str(excinfo.value).endswith("Unknown format : '6 (LT, range, and range-rate)'")
 
 
 def test_nolabel():
