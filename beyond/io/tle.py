@@ -145,6 +145,8 @@ class Tle:
         self.ndot = float(first[33:43]) * 2
         self.ndotdot = _float(first[44:52]) * 6
         self.bstar = _float(first[53:61])
+        self.revolutions = int(second[63:68])
+        self.type = int(first[62:63])
 
         self.i = np.deg2rad(float(second[8:16]))    # inclination
         self.Ω = np.deg2rad(float(second[17:25]))   # right ascension of the ascending node
@@ -206,7 +208,7 @@ class Tle:
             'bstar': self.bstar,
             'ndot': self.ndot,
             'ndotdot': self.ndotdot,
-            'tle': self.text
+            'tle': self
         }
         return Orbit(self.epoch, self.to_list(), "TLE", "TEME", 'Sgp4', **data)
 
