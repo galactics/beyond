@@ -4,7 +4,7 @@ from pathlib import Path
 from numpy.testing import assert_almost_equal
 
 from beyond.dates import Date
-from beyond.io.horizon import load
+from beyond.io.horizon import load, HorizonParseError
 
 folder = Path(__file__).parent / "data" / "io" / "horizon"
 
@@ -25,7 +25,7 @@ def test_load():
             # Type 5 has no position
             assert_almost_equal(ephem[0,:3], [0, 0, 0])
 
-    with raises(ValueError) as excinfo:
+    with raises(HorizonParseError) as excinfo:
         ephem = load(folder.joinpath("tess_6.txt".format(idx)).open())
 
     assert str(excinfo.value).endswith("Unknown format : '6 (LT, range, and range-rate)'")
@@ -76,5 +76,5 @@ def test_ecliptic():
 
 def test_no_data():
 
-    with raises(ValueError):
+    with raises(HorizonParseError):
         ephem = load(folder.joinpath("hayabusa.txt").open())

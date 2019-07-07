@@ -5,7 +5,7 @@ from datetime import timedelta
 
 from beyond.orbits.man import Maneuver
 from beyond.io.tle import Tle
-from beyond.io.ccsds import dumps, loads
+from beyond.io.ccsds import dumps, loads, CcsdsParseError
 from beyond.dates import Date
 
 
@@ -351,7 +351,7 @@ def assert_orbit(ref, orb):
 def test_dummy():
     with raises(TypeError):
         dumps(None)
-    with raises(ValueError):
+    with raises(CcsdsParseError):
         loads("dummy text")
 
 
@@ -422,12 +422,12 @@ def test_load_opm(orb):
     assert_orbit(orb, orb3)
 
     # Dummy units, that aren't specified as valid
-    with raises(ValueError):
+    with raises(CcsdsParseError):
         loads(ref_opm_strange_units)
 
     # One mandatory line is missing
     truncated_opm = "\n".join(ref_opm.splitlines()[:15] + ref_opm.splitlines()[16:])
-    with raises(ValueError):
+    with raises(CcsdsParseError):
         loads(truncated_opm)
 
 
@@ -456,10 +456,10 @@ def test_load_oem(ephem):
     for orb, orb2 in zip(ephem, ephem2):
         assert_orbit(orb, orb2)
 
-    with raises(ValueError):
+    with raises(CcsdsParseError):
         loads("\n".join(ref_oem.splitlines()[:15]))
 
-    with raises(ValueError):
+    with raises(CcsdsParseError):
         loads("\n".join(ref_oem.splitlines()[:8] + ref_oem.splitlines()[9:]))
 
 

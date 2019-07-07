@@ -11,9 +11,13 @@ from ..dates import Date, timedelta
 from ..orbits import Orbit, Ephem
 from ..orbits.man import Maneuver
 from ..utils.measures import Measure, Range, Doppler, Azimut, Elevation, MeasureSet
-
+from ..errors import ParseError
 
 __all__ = ['load', 'loads', 'dump', "dumps"]
+
+
+class CcsdsParseError(ParseError):
+    pass
 
 
 def load(fp):  # pragma: no cover
@@ -26,7 +30,7 @@ def load(fp):  # pragma: no cover
     Return:
         Orbit or Ephem
     Raise:
-        ValueError: when the text is not a recognizable CCSDS format
+        CcsdsParseError: when the text is not a recognizable CCSDS format
     """
     return loads(fp.read())
 
@@ -41,7 +45,7 @@ def loads(text):
     Return:
         Orbit or Ephem
     Raise:
-        ValueError: when the text is not a recognizable CCSDS format
+        CcsdsParseError: when the text is not a recognizable CCSDS format
     """
     if text.startswith("CCSDS_OEM_VERS"):
         func = _read_oem
@@ -50,7 +54,7 @@ def loads(text):
     elif text.startswith("CCSDS_TDM_VERS"):
         func = _read_tdm
     else:
-        raise ValueError("Unknown CCSDS type")
+        raise CcsdsParseError("Unknown CCSDS type")
     return func(text)
 
 
@@ -87,7 +91,7 @@ def dumps(data, **kwargs):
     return content
 
 
-def _float(value):
+def _float(name, value):
     """Conversion of state vector field, with automatic unit handling
     """
     if "[" in value:
@@ -103,7 +107,7 @@ def _float(value):
         elif unit == "[s]":
             multiplier = 1
         else:
-            raise ValueError("Unknown unit for this field", unit)
+            raise CcsdsParseError("Unknown unit '{}' for the field {}".format(unit, name))
     else:
         # if no unit is provided, the default is km, and km/s
         multiplier = units.km
@@ -137,7 +141,7 @@ def _read_oem(string):
             # Check for required fields
             for k in required:
                 if k not in ephem:
-                    raise ValueError("Missing field '{}'".format(k))
+                    raise CcsdsParseError("Missing field '{}'".format(k))
 
             # Conversion to be compliant with beyond.env.jpl dynamic reference
             # frames naming convention.
@@ -158,7 +162,7 @@ def _read_oem(string):
 
     for i, ephem_dict in enumerate(ephems):
         if not ephem_dict['orbits']:
-            raise ValueError("Empty ephemeris")
+            raise CcsdsParseError("Empty ephemeris")
 
         # In case there is no recommendation for interpolation
         # default to a Lagrange 8th order
@@ -217,14 +221,14 @@ def _read_opm(string):
         scale = data['TIME_SYSTEM']
         frame = data['REF_FRAME']
         date = Date.strptime(data['EPOCH'], "%Y-%m-%dT%H:%M:%S.%f", scale=scale)
-        vx = _float(data['X_DOT'])
-        vy = _float(data['Y_DOT'])
-        vz = _float(data['Z_DOT'])
-        x = _float(data['X'])
-        y = _float(data['Y'])
-        z = _float(data['Z'])
+        vx = _float('X_DOT', data['X_DOT'])
+        vy = _float('Y_DOT', data['Y_DOT'])
+        vz = _float('Z_DOT', data['Z_DOT'])
+        x = _float('X', data['X'])
+        y = _float('Y', data['Y'])
+        z = _float('Z', data['Z'])
     except KeyError as e:
-        raise ValueError('Missing mandatory parameter')
+        raise CcsdsParseError('Missing mandatory parameter')
 
     orb = Orbit(date, [x, y, z, vx, vy, vz], 'cartesian', frame, None)
     orb.name = name
@@ -234,13 +238,14 @@ def _read_opm(string):
 
         man = {}
         man['date'] = Date.strptime(raw_man['MAN_EPOCH_IGNITION'], "%Y-%m-%dT%H:%M:%S.%f", scale=scale)
-        man['duration'] = timedelta(seconds=_float(raw_man['MAN_DURATION']))
+        man['duration'] = timedelta(seconds=_float('MAN_DURATION', raw_man['MAN_DURATION']))
         man['frame'] = raw_man['MAN_REF_FRAME'] if raw_man['MAN_REF_FRAME'] != frame else None
         man['delta_mass'] = raw_man['MAN_DELTA_MASS']
         man['comment'] = raw_man.get('comment')
 
         for i in range(1, 4):
-            man.setdefault('dv', []).append(_float(raw_man['MAN_DV_{}'.format(i)]))
+            f_name = 'MAN_DV_{}'.format(i)
+            man.setdefault('dv', []).append(_float(f_name, raw_man[f_name]))
 
         if man['duration'].total_seconds() == 0:
             orb.maneuvers.append(Maneuver(man['date'], man['dv'], frame=man['frame'], comment=man['comment']))
@@ -308,12 +313,12 @@ def _read_tdm(string):
                 if meta['ANGLE_TYPE'] == "AZEL":
                     obj = Azimut(path, date, np.radians(-value))
                 else:
-                    raise TypeError("Unknown angle type")
+                    raise CcsdsParseError("Unknown angle type")
             elif key == "ANGLE_2":
                 if meta['ANGLE_TYPE'] == "AZEL":
                     obj = Elevation(path, date, np.radians(value))
                 else:
-                    raise TypeError("Unknown angle type")
+                    raise CcsdsParseError("Unknown angle type")
 
             data.append(obj)
 

@@ -84,3 +84,7 @@ class EopError(BeyondError):
 
 class EopWarning(Warning):
     pass
+
+
+class ParseError(ValueError):
+    pass

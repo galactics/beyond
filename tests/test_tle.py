@@ -6,7 +6,7 @@ from pytest import raises, fixture
 import numpy as np
 
 from beyond.dates.date import Date
-from beyond.io.tle import Tle
+from beyond.io.tle import Tle, TleParseError
 
 ref = [
     """0 ISS (ZARYA)
@@ -50,7 +50,7 @@ def test_read(tle_txt):
 
     assert tle.name == ""
 
-    with raises(ValueError):
+    with raises(TleParseError):
         ref2 = tle_txt[:-1] + "8"
         Tle(ref2)
 
@@ -61,7 +61,7 @@ def test_read(tle_txt):
     tle3 = Tle("Name\n" + "\n".join(tle_txt.splitlines()[1:]))
     assert (tle3.orbit() == tle.orbit()).all()
 
-    with raises(ValueError) as eee:
+    with raises(TleParseError) as eee:
         l = tle_txt.splitlines()
         l[1] = "3" + l[1][1:]
         Tle("\n".join(l))
@@ -108,7 +108,7 @@ def test_generator(caplog):
 
     text = "\n".join(ref) + "\n1   \n2   "
 
-    with raises(ValueError):
+    with raises(TleParseError):
         for tle in Tle.from_string(text, error="raise"):
             continue
 

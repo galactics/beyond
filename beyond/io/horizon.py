@@ -8,6 +8,11 @@ from ..orbits import Orbit, Ephem
 from ..dates import Date
 from ..utils import units, matrix
 from ..frames.iau1980 import _nutation
+from ..errors import ParseError
+
+
+class HorizonParseError(ParseError):
+    pass
 
 
 def load(fp):
@@ -18,7 +23,7 @@ def load(fp):
     Return:
         Ephem
     Raises:
-        ValueError: The file is not a recognizable Horizon format
+        HorizonParseError: The file is not a recognizable Horizon format
     """
 
     return loads(fp.read())
@@ -32,7 +37,7 @@ def loads(text):
     Return:
         Ephem
     Raises:
-        ValueError: The text is not a recognizable Horizon format
+        HorizonParseError: The text is not a recognizable Horizon format
     """
 
     frames = {
@@ -57,7 +62,7 @@ def loads(text):
         for line in lines:
             if line.startswith("No ephemeris for target"):
                 break
-        raise ValueError(line)
+        raise HorizonParseError(line)
 
     ephem_start = lines.index("$$SOE") + 1
     ephem_stop = lines.index("$$EOE")
@@ -89,15 +94,15 @@ def loads(text):
 
     _type = header["Output type"]
     if _type != "GEOMETRIC cartesian states":
-        raise ValueError("Unknown output type")
+        raise HorizonParseError("Unknown output type")
 
     _format = header["Output format"]
     if _format not in formats:
-        raise ValueError("Unknown format : '{}'".format(_format))
+        raise HorizonParseError("Unknown format : '{}'".format(_format))
 
     frame = header["Reference frame"]
     if frame not in frames:
-        raise ValueError("Unknown frame")
+        raise HorizonParseError("Unknown frame")
     frame = frames[frame.strip()]
 
     coord = header["Coordinate systm"]
@@ -107,7 +112,7 @@ def loads(text):
         coord = "ecliptic"
     else:
         # Should handle the equator of each body
-        raise ValueError("Unknown coordinate system")
+        raise HorizonParseError("Unknown coordinate system")
 
     line_desc = formats[_format]
 

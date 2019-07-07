@@ -42,8 +42,13 @@ from datetime import datetime, timedelta
 
 from ..orbits import Orbit
 from ..dates.date import Date
+from ..errors import ParseError
 
 log = logging.getLogger(__name__)
+
+
+class TleParseError(ParseError):
+    pass
 
 
 def _float(text):
@@ -168,16 +173,16 @@ class Tle:
         Args:
             text (tuple of str)
         Raise:
-            ValueError
+            TleParseError
         """
 
         if not text[0].lstrip().startswith('1 ') or not text[1].lstrip().startswith('2 '):
-            raise ValueError("Line number check failed")
+            raise TleParseError("Line number check failed")
 
         for line in text:
             line = line.strip()
             if str(cls._checksum(line)) != line[-1]:
-                raise ValueError("Checksum validation failed")
+                raise TleParseError("Checksum validation failed")
 
     @classmethod
     def _checksum(cls, line):
@@ -294,7 +299,7 @@ class Tle:
                 except ValueError as e:
                     if error in ('raise', 'warn'):
                         if error == "raise":
-                            raise
+                            raise TleParseError(str(e))
                         else:
                             log.warning(str(e))
 
