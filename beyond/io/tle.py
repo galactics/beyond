@@ -70,14 +70,18 @@ def _float(text):
 
     text = text.strip()
 
-    if text[0] in ('-', '+'):
+    if text[0] in ("-", "+"):
         text = "%s.%s" % (text[0], text[1:])
     else:
         text = "+.%s" % text
 
     if "+" in text[1:] or "-" in text[1:]:
-        value, exp_sign, expo = text.rpartition('+') if '+' in text[1:] else text.rpartition('-')
-        v = float('{value}e{exp_sign}{expo}'.format(value=value, exp_sign=exp_sign, expo=expo))
+        value, exp_sign, expo = (
+            text.rpartition("+") if "+" in text[1:] else text.rpartition("-")
+        )
+        v = float(
+            "{value}e{exp_sign}{expo}".format(value=value, exp_sign=exp_sign, expo=expo)
+        )
     else:
         v = float(text)
 
@@ -97,12 +101,12 @@ def _unfloat(flt, precision=5):
     '45871-4'
     """
 
-    if flt == 0.:
+    if flt == 0.0:
         return "{}-0".format("0" * precision)
 
-    num, _, exp = "{:.{}e}".format(flt, precision - 1).partition('e')
+    num, _, exp = "{:.{}e}".format(flt, precision - 1).partition("e")
     exp = int(exp)
-    num = num.replace('.', '')
+    num = num.replace(".", "")
 
     return "%s%d" % (num, exp + 1)
 
@@ -125,7 +129,7 @@ class Tle:
         self.name = ""
         if len(text) == 3:
             self.name = text.pop(0).strip()
-            if self.name.startswith('0 '):
+            if self.name.startswith("0 "):
                 self.name = self.name[2:]
 
         self._check_validity(text)
@@ -153,12 +157,16 @@ class Tle:
         self.revolutions = int(second[63:68])
         self.type = int(first[62:63])
 
-        self.i = np.deg2rad(float(second[8:16]))    # inclination
-        self.Ω = np.deg2rad(float(second[17:25]))   # right ascension of the ascending node
-        self.e = _float(second[26:33])              # eccentricity
-        self.ω = np.deg2rad(float(second[34:42]))   # argument of periapsis
-        self.M = np.deg2rad(float(second[43:51]))   # mean anomaly
-        self.n = float(second[52:63]) * 2 * np.pi / 86400.  # mean motion (rev/day converted to rad/s)
+        self.i = np.deg2rad(float(second[8:16]))  # inclination
+        self.Ω = np.deg2rad(
+            float(second[17:25])
+        )  # right ascension of the ascending node
+        self.e = _float(second[26:33])  # eccentricity
+        self.ω = np.deg2rad(float(second[34:42]))  # argument of periapsis
+        self.M = np.deg2rad(float(second[43:51]))  # mean anomaly
+        self.n = (
+            float(second[52:63]) * 2 * np.pi / 86400.0
+        )  # mean motion (rev/day converted to rad/s)
 
         # To store additional data (such as source, date of creation, etc.)
         self.kwargs = kwargs
@@ -176,7 +184,9 @@ class Tle:
             TleParseError
         """
 
-        if not text[0].lstrip().startswith('1 ') or not text[1].lstrip().startswith('2 '):
+        if not text[0].lstrip().startswith("1 ") or not text[1].lstrip().startswith(
+            "2 "
+        ):
             raise TleParseError("Line number check failed")
 
         for line in text:
@@ -210,12 +220,12 @@ class Tle:
             ~beyond.orbits.orbit.Orbit:
         """
         data = {
-            'bstar': self.bstar,
-            'ndot': self.ndot,
-            'ndotdot': self.ndotdot,
-            'tle': self
+            "bstar": self.bstar,
+            "ndot": self.ndot,
+            "ndotdot": self.ndotdot,
+            "tle": self,
         }
-        return Orbit(self.epoch, self.to_list(), "TLE", "TEME", 'Sgp4', **data)
+        return Orbit(self.epoch, self.to_list(), "TLE", "TEME", "Sgp4", **data)
 
     @classmethod
     def from_orbit(cls, orbit, name=None, norad_id=None, cospar_id=None):
@@ -233,12 +243,12 @@ class Tle:
         norad_id = norad_id if norad_id is not None else "99999"
 
         if cospar_id is not None:
-            y, _, i = cospar_id.partition('-')
+            y, _, i = cospar_id.partition("-")
             cospar_id = y[2:] + i
         else:
             cospar_id = ""
 
-        orbit = orbit.copy(form='TLE', frame='TEME')
+        orbit = orbit.copy(form="TLE", frame="TEME")
 
         date = orbit.date.datetime
         i, Ω, e, ω, M, n = orbit
@@ -247,10 +257,14 @@ class Tle:
             norad_id=norad_id,
             cospar_id=cospar_id,
             date=date,
-            day=int("{:%j}".format(date)) + date.hour / 24. + date.minute / 1440 + date.second / 86400 + date.microsecond / 86400000000.,
-            ndot="{: 0.8f}".format(orbit.complements['ndot'] / 2).replace("0.", "."),
-            ndotdot=_unfloat(orbit.complements['ndotdot'] / 6),
-            bstar=_unfloat(orbit.complements['bstar']),
+            day=int("{:%j}".format(date))
+            + date.hour / 24.0
+            + date.minute / 1440
+            + date.second / 86400
+            + date.microsecond / 86400000000.0,
+            ndot="{: 0.8f}".format(orbit.complements["ndot"] / 2).replace("0.", "."),
+            ndotdot=_unfloat(orbit.complements["ndotdot"] / 6),
+            bstar=_unfloat(orbit.complements["bstar"]),
         )
         line2 = "2 {norad_id} {i:8.4f} {Ω:8.4f} {e} {ω:8.4f} {M:8.4f} {n:11.8f}99999".format(
             norad_id=norad_id,
@@ -259,7 +273,7 @@ class Tle:
             e="{:.7f}".format(e)[2:],
             ω=np.degrees(ω),
             M=np.degrees(M),
-            n=n * 86400 / (2 * np.pi)
+            n=n * 86400 / (2 * np.pi),
         )
 
         line1 += str(cls._checksum(line1))
@@ -290,14 +304,14 @@ class Tle:
             # The startswith conditions include a blank space in order to not take into account
             # lines containing only a COSPAR ID, which happens when an object is detected but the
             # JSpOc doesn't know what is the source yet.
-            if line.startswith('1 '):
+            if line.startswith("1 "):
                 cache.append(line)
-            elif line.startswith('2 '):
+            elif line.startswith("2 "):
                 cache.append(line)
                 try:
                     yield cls("\n".join(cache))
                 except ValueError as e:
-                    if error in ('raise', 'warn'):
+                    if error in ("raise", "warn"):
                         if error == "raise":
                             raise TleParseError(str(e))
                         else:

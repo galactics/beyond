@@ -1,4 +1,3 @@
-
 import numpy as np
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
@@ -7,9 +6,17 @@ from ..dates import Date
 
 
 __all__ = [
-    'Speaker', 'Listener', 'stations_listeners', 'StationSignalListener',
-    'StationMaxListener', 'StationMaskListener', 'LightListener',
-    'TerminatorListener', 'ApsideListener', 'NodeListener', 'ZeroDopplerListener'
+    "Speaker",
+    "Listener",
+    "stations_listeners",
+    "StationSignalListener",
+    "StationMaxListener",
+    "StationMaskListener",
+    "LightListener",
+    "TerminatorListener",
+    "ApsideListener",
+    "NodeListener",
+    "ZeroDopplerListener",
 ]
 
 
@@ -109,7 +116,6 @@ class Listener(metaclass=ABCMeta):
 
 
 class Event:
-
     def __init__(self, listener, info):
         self.listener = listener
         self.info = info
@@ -155,7 +161,9 @@ class LightListener(Listener):
         if self.type == self.UMBRA:
             return LightEvent(self, "Umbra entry" if self(orb) <= 0 else "Umbra exit")
         else:
-            return LightEvent(self, "Penumbra entry" if self(orb) <= 0 else "Penumbra exit")
+            return LightEvent(
+                self, "Penumbra entry" if self(orb) <= 0 else "Penumbra exit"
+            )
 
     def __call__(self, orb):
         """
@@ -233,12 +241,12 @@ class TerminatorListener(Listener):
 
         from ..env.solarsystem import get_body
 
-        self.sun = get_body('Sun')
+        self.sun = get_body("Sun")
         self._frame = self.sun.propagate(Date.now()).as_frame(self._frame_name)
 
     def info(self, orb):
 
-        orb2 = orb.copy(frame=self._frame, form='spherical')
+        orb2 = orb.copy(frame=self._frame, form="spherical")
 
         if orb2.r_dot > 0:
             msg = "Night Terminator"
@@ -249,7 +257,9 @@ class TerminatorListener(Listener):
 
     def __call__(self, orb):
 
-        sun_pos = self.sun.propagate(orb.date).copy(frame=orb.frame, form="cartesian")[:3]
+        sun_pos = self.sun.propagate(orb.date).copy(frame=orb.frame, form="cartesian")[
+            :3
+        ]
         sat_pos = orb.copy(form="cartesian")[:3]
 
         sun_norm = np.linalg.norm(sun_pos)
@@ -281,7 +291,7 @@ class NodeListener(Listener):
         return NodeEvent(self, "Desc Node" if orb.phi_dot < 0 else "Asc Node")
 
     def __call__(self, orb):
-        orb = orb.copy(form='spherical', frame=self.frame)
+        orb = orb.copy(form="spherical", frame=self.frame)
         return orb.phi
 
 
@@ -304,21 +314,18 @@ class ApsideListener(Listener):
         self.frame = frame
 
     def info(self, orb):
-        return ApsideEvent(self, "Periapsis" if self(orb) > self(self.prev) else "Apoapsis")
+        return ApsideEvent(
+            self, "Periapsis" if self(orb) > self(self.prev) else "Apoapsis"
+        )
 
     def __call__(self, orb):
-        orb = orb.copy(form='spherical', frame=self.frame)
+        orb = orb.copy(form="spherical", frame=self.frame)
         return orb.r_dot
 
 
 class SignalEvent(Event):  # pragma: no cover
-
     def __str__(self):
-        return "{} {} {}".format(
-            self.info,
-            self.elev,
-            self.station
-        )
+        return "{} {} {}".format(self.info, self.elev, self.station)
 
     @property
     def elev(self):
@@ -345,16 +352,15 @@ class StationSignalListener(Listener):
         self.elev = elev
 
     def info(self, orb):
-        orb = orb.copy(frame=self.station, form='spherical')
+        orb = orb.copy(frame=self.station, form="spherical")
         return self.event(self, "AOS" if orb.phi_dot > 0 else "LOS")
 
     def __call__(self, orb):
-        orb = orb.copy(form='spherical', frame=self.station)
+        orb = orb.copy(form="spherical", frame=self.station)
         return orb.phi - self.elev
 
 
 class MaskEvent(SignalEvent):
-
     @property
     def elev(self):
         return "Mask"
@@ -380,19 +386,18 @@ class StationMaskListener(StationSignalListener):
     def check(self, orb):
         # Override to disable the computation when the object is not
         # in view of the station
-        orb2 = orb.copy(frame=self.station, form='spherical')
+        orb2 = orb.copy(frame=self.station, form="spherical")
         if orb2.phi <= 0:
             return False
         else:
             return super().check(orb)
 
     def __call__(self, orb):
-        orb = orb.copy(form='spherical', frame=self.station)
+        orb = orb.copy(form="spherical", frame=self.station)
         return orb.phi - self.station.get_mask(orb.theta)
 
 
 class MaxEvent(Event):  # pragma: no cover
-
     def __init__(self, listener):
         super().__init__(listener, "MAX")
 
@@ -423,19 +428,18 @@ class StationMaxListener(Listener):
     def check(self, orb):
         # Override to disable the computation when the object is not
         # in view of the station
-        orb2 = orb.copy(frame=self.station, form='spherical')
+        orb2 = orb.copy(frame=self.station, form="spherical")
         if orb2.phi <= 0 or orb2.phi_dot > 0:
             return False
         else:
             return super().check(orb)
 
     def __call__(self, orb):
-        orb = orb.copy(form='spherical', frame=self.station)
+        orb = orb.copy(form="spherical", frame=self.station)
         return orb.phi_dot
 
 
 class ZeroDopplerEvent(Event):  # pragma: no cover
-
     def __init__(self, listener):
         super().__init__(listener, "Zero Doppler")
 
@@ -467,13 +471,13 @@ class ZeroDopplerListener(Listener):
     def check(self, orb):
 
         # Override to disable the computation when the object is not in view of the station
-        if self.sight and orb.copy(frame=self.frame, form='spherical').phi <= 0:
+        if self.sight and orb.copy(frame=self.frame, form="spherical").phi <= 0:
             return False
         else:
             return super().check(orb)
 
     def __call__(self, orb):
-        return orb.copy(frame=self.frame, form='spherical').r_dot
+        return orb.copy(frame=self.frame, form="spherical").r_dot
 
 
 def stations_listeners(stations):

@@ -40,17 +40,19 @@ def loads(text):
         HorizonParseError: The text is not a recognizable Horizon format
     """
 
-    frames = {
-        "ICRF/J2000.0": "EME2000",
-        "FK4/B1950.0": "G50"
-    }
+    frames = {"ICRF/J2000.0": "EME2000", "FK4/B1950.0": "G50"}
 
     formats = {
-        "1 (position only)": ('date', 'pos'),
-        "2 (position and velocity)": ('date', 'pos', 'vel'),
-        "3 (position, velocity, LT, range, range-rate)": ('date', 'pos', 'vel', 'dummy'),
-        "4 (position, LT, range, and range-rate)": ('date', 'pos', 'dummy'),
-        "5 (velocity only)": ('date', 'vel'),
+        "1 (position only)": ("date", "pos"),
+        "2 (position and velocity)": ("date", "pos", "vel"),
+        "3 (position, velocity, LT, range, range-rate)": (
+            "date",
+            "pos",
+            "vel",
+            "dummy",
+        ),
+        "4 (position, LT, range, and range-rate)": ("date", "pos", "dummy"),
+        "5 (velocity only)": ("date", "vel"),
     }
 
     lines = text.splitlines()
@@ -119,7 +121,7 @@ def loads(text):
     # Data parsing
     orbs = []
     for i in range(ephem_start, ephem_stop, len(line_desc)):
-        date, *data = lines[i:i + len(line_desc)]
+        date, *data = lines[i : i + len(line_desc)]
 
         *date, scale = date.split()[3:]
         date = Date.strptime(" ".join(date), "%Y-%b-%d %H:%M:%S.%f", scale=scale)
@@ -142,9 +144,9 @@ def loads(text):
             else:
                 line = line.split()
 
-            if desc == 'pos':
+            if desc == "pos":
                 vector[:3] = rotation @ [float(x) * pos_unit for x in line]
-            elif desc == 'vel':
+            elif desc == "vel":
                 vector[3:] = rotation @ [float(x) * vel_unit for x in line]
 
         orbs.append(Orbit(date, vector, "cartesian", frame, None))

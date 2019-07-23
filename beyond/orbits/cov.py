@@ -30,7 +30,7 @@ class Cov(np.ndarray):
         return obj
 
     def __repr__(self):  # pragma: no cover
-        cols = "x,y,z,vx,vy,vz".split(',')
+        cols = "x,y,z,vx,vy,vz".split(",")
 
         txt = "Cov =\n"
         if self.frame is not self.PARENT_FRAME:
@@ -86,7 +86,7 @@ class Cov(np.ndarray):
             m2 = to_qsw(self.orb)
         else:
             m2 = np.identity(3)
-        
+
         m = m2 @ m1
         M = Frame._convert(m, m)
 

@@ -1,4 +1,3 @@
-
 from datetime import timedelta
 
 from .base import AnalyticalPropagator
@@ -15,7 +14,7 @@ class Sgp4(AnalyticalPropagator):
 
     @property
     def orbit(self):
-        return self._orbit if hasattr(self, '_orbit') else None
+        return self._orbit if hasattr(self, "_orbit") else None
 
     @orbit.setter
     def orbit(self, orbit):
@@ -58,8 +57,8 @@ class Sgp4(AnalyticalPropagator):
         return self.orbit.__class__(
             date,
             result,
-            'cartesian',
-            'TEME',
+            "cartesian",
+            "TEME",
             self.__class__(),
             **self.orbit.complements
         )

@@ -17,6 +17,7 @@ class Config(dict):
             print(config.get('env', 'non-existent-field', fallback=25))
 
     """
+
     _instance = None
 
     def get(self, *keys, fallback=None):

@@ -98,7 +98,10 @@ class Node:
                 # check if the node actually at hand (name) is not already
                 # integrated in the self.routes or if it already is, if the
                 # path is shorter
-                if name in self.routes.keys() and self.routes[name].steps <= route.steps:
+                if (
+                    name in self.routes.keys()
+                    and self.routes[name].steps <= route.steps
+                ):
                     continue
 
                 self.routes[name] = Route(node, route.steps + 1)

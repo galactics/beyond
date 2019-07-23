@@ -4,6 +4,7 @@
 
 class BeyondError(Exception):
     """Generic error"""
+
     pass
 
 
@@ -25,24 +26,28 @@ class _Unknown(BeyondError):
 class UnknownBodyError(_Unknown):
     """Unknown Body (Earth, Moon, Sun, etc.)
     """
+
     pass
 
 
 class UnknownFrameError(_Unknown):
     """Unknown frame (ITRF, EME2000, etc.)
     """
+
     pass
 
 
 class UnknownFormError(_Unknown):
     """Unknown form (keplerian, cartesian)
     """
+
     pass
 
 
 class UnknownPropagatorError(_Unknown):
     """Unknown propagator (sgp4, kepler)
     """
+
     pass
 
 
@@ -59,6 +64,7 @@ class JplError(BeyondError):
 
     allows to fallback to other data
     """
+
     pass
 
 
@@ -73,12 +79,14 @@ class DateError(BeyondError):
 class UnknownScaleError(_Unknown):
     """Unknown scale (UTC, TAI, UT1, GPS, etc.)
     """
+
     pass
 
 
 class EopError(BeyondError):
     """Eart Orientation Parameters error (lack of data)
     """
+
     pass
 
 

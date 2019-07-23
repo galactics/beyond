@@ -18,7 +18,7 @@ __all__ = ["register", "EopDb", "TaiUtc", "Finals", "Finals2000A"]
 log = logging.getLogger(__name__)
 
 
-class TaiUtc():
+class TaiUtc:
     """File listing all leap seconds throught history
 
     This file can be retrieved `here <http://maia.usno.navy.mil/ser7/tai-utc.dat>`__.
@@ -39,9 +39,7 @@ class TaiUtc():
             line = line.split()
             mjd = int(float(line[4]) - 2400000.5)
             value = float(line[6])
-            self.data.append(
-                (mjd, value)
-            )
+            self.data.append((mjd, value))
 
     def __getitem__(self, date):
         for mjd, value in reversed(self.data):
@@ -67,7 +65,7 @@ class TaiUtc():
         return past, future
 
 
-class Finals2000A():
+class Finals2000A:
     """History of Earth orientation correction for IAU2000 model
 
     Three files are available `here <http://maia.usno.navy.mil/ser7/>`__ for this model:
@@ -80,7 +78,7 @@ class Finals2000A():
     informations about the content of these files.
     """
 
-    deltas = ('dx', 'dy')
+    deltas = ("dx", "dy")
 
     def __init__(self, path):
 
@@ -97,16 +95,16 @@ class Finals2000A():
 
             try:
                 self.data[mjd] = {
-                    'mjd': mjd,
+                    "mjd": mjd,
                     # 'flag': line[16],
-                    'x': float(line[18:27]),
+                    "x": float(line[18:27]),
                     d1: None,
                     # 'Xerror': float(line[27:36]),
-                    'y': float(line[37:46]),
+                    "y": float(line[37:46]),
                     d2: None,
                     # 'Yerror': float(line[46:55]),
-                    'lod': None,
-                    'ut1_utc': float(line[58:68])
+                    "lod": None,
+                    "ut1_utc": float(line[58:68]),
                 }
             except ValueError:
                 # Common values (X, Y, UT1-UTC) are not available anymore
@@ -118,17 +116,14 @@ class Finals2000A():
                 except ValueError:
                     # dX and dY are not available for this date, so we take
                     # the last value available
-                    self.data[mjd][d1] = \
-                        self.data[mjd - 1][d1]
-                    self.data[mjd][d2] = \
-                        self.data[mjd - 1][d2]
+                    self.data[mjd][d1] = self.data[mjd - 1][d1]
+                    self.data[mjd][d2] = self.data[mjd - 1][d2]
                     pass
                 try:
-                    self.data[mjd]['lod'] = float(line[79:86])
+                    self.data[mjd]["lod"] = float(line[79:86])
                 except ValueError:
                     # LOD is not available for this date so we take the last value available
-                    self.data[mjd]['lod'] = \
-                        self.data[mjd - 1]['lod']
+                    self.data[mjd]["lod"] = self.data[mjd - 1]["lod"]
                     pass
 
     def __getitem__(self, key):
@@ -153,7 +148,8 @@ class Finals(Finals2000A):
     See the associated `readme <http://maia.usno.navy.mil/ser7/readme.finals>`__ for more
     informations about the content of these files.
     """
-    deltas = ('dpsi', 'deps')
+
+    deltas = ("dpsi", "deps")
 
 
 class Eop:
@@ -161,20 +157,19 @@ class Eop:
     """
 
     def __init__(self, **kwargs):
-        self.x = kwargs['x']
-        self.y = kwargs['y']
-        self.dx = kwargs['dx']
-        self.dy = kwargs['dy']
-        self.deps = kwargs['deps']
-        self.dpsi = kwargs['dpsi']
-        self.lod = kwargs['lod']
-        self.ut1_utc = kwargs['ut1_utc']
-        self.tai_utc = kwargs['tai_utc']
+        self.x = kwargs["x"]
+        self.y = kwargs["y"]
+        self.dx = kwargs["dx"]
+        self.dy = kwargs["dy"]
+        self.deps = kwargs["deps"]
+        self.dpsi = kwargs["dpsi"]
+        self.lod = kwargs["lod"]
+        self.ut1_utc = kwargs["ut1_utc"]
+        self.tai_utc = kwargs["tai_utc"]
 
     def __repr__(self):
         return "{name}(x={x}, y={y}, dx={dx}, dy={dy}, deps={deps}, dpsi={dpsi}, lod={lod}, ut1_utc={ut1_utc}, tai_utc={tai_utc})".format(
-            name=self.__class__.__name__,
-            **self.__dict__
+            name=self.__class__.__name__, **self.__dict__
         )
 
 
@@ -201,9 +196,9 @@ class EopDb:
     @classmethod
     def _load_entry_points(cls):
 
-        if not hasattr(cls, '_entry_points_loaded'):
+        if not hasattr(cls, "_entry_points_loaded"):
             # Loading external DB, via entry points
-            for entry in iter_entry_points('beyond.eopdb'):
+            for entry in iter_entry_points("beyond.eopdb"):
                 EopDb.register(entry.load(), entry.name)
             cls._entry_points_loaded = True
 
@@ -220,7 +215,7 @@ class EopDb:
 
         cls._load_entry_points()
 
-        dbname = dbname or config.get('eop', 'dbname', fallback=cls.DEFAULT_DBNAME)
+        dbname = dbname or config.get("eop", "dbname", fallback=cls.DEFAULT_DBNAME)
 
         if dbname not in cls._dbs.keys():
             raise EopError("Unknown database '%s'" % dbname)
@@ -266,7 +261,9 @@ class EopDb:
             elif cls.policy() == cls.ERROR:
                 raise
 
-            value = Eop(x=0, y=0, dx=0, dy=0, deps=0, dpsi=0, lod=0, ut1_utc=0, tai_utc=0)
+            value = Eop(
+                x=0, y=0, dx=0, dy=0, deps=0, dpsi=0, lod=0, ut1_utc=0, tai_utc=0
+            )
 
         return value
 
@@ -287,7 +284,9 @@ class EopDb:
         """
 
         if name in cls._dbs:
-            msg = "'{}' is already registered for an Eop database. Skipping".format(name)
+            msg = "'{}' is already registered for an Eop database. Skipping".format(
+                name
+            )
             log.warning(msg)
         else:
             cls._dbs[name] = klass
@@ -344,7 +343,7 @@ def register(name=EopDb.DEFAULT_DBNAME):
 
 
 @register
-class SimpleEopDatabase():
+class SimpleEopDatabase:
     """Simple implementation of database
 
     Uses ``tai-utc.dat``, ``finals.all`` and ``finals2000A.all`` files directly
@@ -366,12 +365,12 @@ class SimpleEopDatabase():
     """
 
     def __init__(self):
-        path = Path(config.get('eop', 'folder', fallback=Path.cwd()))
-        type = config.get('eop', 'type', fallback="all")
+        path = Path(config.get("eop", "folder", fallback=Path.cwd()))
+        type = config.get("eop", "type", fallback="all")
 
         # Data reading
-        f = Finals(path / ('finals.%s' % type))
-        f2 = Finals2000A(path / ('finals2000A.%s' % type))
+        f = Finals(path / ("finals.%s" % type))
+        f2 = Finals2000A(path / ("finals2000A.%s" % type))
         t = TaiUtc(path / "tai-utc.dat")
 
         # Extracting data from finals files

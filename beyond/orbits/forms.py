@@ -18,14 +18,14 @@ class Form(Node):
     """
 
     alt = {
-        'theta': 'θ',
-        'phi': 'φ',
-        'Omega': "Ω",
-        'omega': 'ω',
-        'nu': "ν",
-        'theta_dot': 'θ_dot',
-        'phi_dot': 'φ_dot',
-        'aol': 'u',
+        "theta": "θ",
+        "phi": "φ",
+        "Omega": "Ω",
+        "omega": "ω",
+        "nu": "ν",
+        "theta_dot": "θ_dot",
+        "phi_dot": "φ_dot",
+        "aol": "u",
     }
 
     def __init__(self, name, param_names):
@@ -52,7 +52,9 @@ class Form(Node):
         if new_form != orbit.form.name:
             for a, b in self.steps(new_form):
 
-                coord = getattr(self, "_{}_to_{}".format(a.name.lower(), b.name.lower()))(coord, orbit.frame.center)
+                coord = getattr(
+                    self, "_{}_to_{}".format(a.name.lower(), b.name.lower())
+                )(coord, orbit.frame.center)
 
         return coord
 
@@ -71,21 +73,21 @@ class Form(Node):
         """
 
         r, v = coord[:3], coord[3:]
-        h = np.cross(r, v)                      # angular momentum vector
+        h = np.cross(r, v)  # angular momentum vector
         h_norm = np.linalg.norm(h)
         r_norm = np.linalg.norm(r)
         v_norm = np.linalg.norm(v)
 
-        K = v_norm ** 2 / 2 - center.µ / r_norm      # specific energy
-        a = - center.µ / (2 * K)                     # semi-major axis
-        e = sqrt(1 - h_norm ** 2 / (a * center.µ))   # eccentricity
+        K = v_norm ** 2 / 2 - center.µ / r_norm  # specific energy
+        a = -center.µ / (2 * K)  # semi-major axis
+        e = sqrt(1 - h_norm ** 2 / (a * center.µ))  # eccentricity
         p = a * (1 - e ** 2)
-        i = arccos(h[2] / h_norm)               # inclination
+        i = arccos(h[2] / h_norm)  # inclination
         Ω = arctan2(h[0], -h[1]) % (2 * np.pi)  # right ascension of the ascending node
 
         ω_ν = arctan2(r[2] / sin(i), r[0] * cos(Ω) + r[1] * sin(Ω))
         ν = arctan2(sqrt(p / center.µ) * np.dot(v, r), p - r_norm) % (2 * np.pi)
-        ω = (ω_ν - ν) % (2 * np.pi)             # argument of the perigee
+        ω = (ω_ν - ν) % (2 * np.pi)  # argument of the perigee
 
         return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
@@ -102,8 +104,12 @@ class Form(Node):
         x = r * (cos(Ω) * cos(ω + ν) - sin(Ω) * sin(ω + ν) * cos(i))
         y = r * (sin(Ω) * cos(ω + ν) + cos(Ω) * sin(ω + ν) * cos(i))
         z = r * sin(i) * sin(ω + ν)
-        vx = x * h * e / (r * p) * sin(ν) - h / r * (cos(Ω) * sin(ω + ν) + sin(Ω) * cos(ω + ν) * cos(i))
-        vy = y * h * e / (r * p) * sin(ν) - h / r * (sin(Ω) * sin(ω + ν) - cos(Ω) * cos(ω + ν) * cos(i))
+        vx = x * h * e / (r * p) * sin(ν) - h / r * (
+            cos(Ω) * sin(ω + ν) + sin(Ω) * cos(ω + ν) * cos(i)
+        )
+        vy = y * h * e / (r * p) * sin(ν) - h / r * (
+            sin(Ω) * sin(ω + ν) - cos(Ω) * cos(ω + ν) * cos(i)
+        )
         vz = z * h * e / (r * p) * sin(ν) + h / r * sin(i) * cos(ω + ν)
 
         return np.array([x, y, z, vx, vy, vz], dtype=float)
@@ -136,7 +142,7 @@ class Form(Node):
         a, e, i, Ω, ω, M = coord
         E = cls._m_to_e(e, M)
         cos_ν = (cos(E) - e) / (1 - e * cos(E))
-        sin_ν = (sin(E) * sqrt(1 - e**2)) / (1 - e * cos(E))
+        sin_ν = (sin(E) * sqrt(1 - e ** 2)) / (1 - e * cos(E))
 
         ν = arctan2(sin_ν, cos_ν) % (np.pi * 2)
 
@@ -198,7 +204,7 @@ class Form(Node):
         x0 = np.nan
         while x != x0:
             d += 2
-            term *= - E ** 2 / (d * (d + 1))
+            term *= -E ** 2 / (d * (d + 1))
             x0 = x
             x = x - term
         return x
@@ -259,7 +265,9 @@ class Form(Node):
         theta = arctan2(y, x)
 
         r_dot = (x * vx + y * vy + z * vz) / r
-        phi_dot = (vz * (x ** 2 + y ** 2) - z * (x * vx + y * vy)) / (r ** 2 * sqrt(x ** 2 + y ** 2))
+        phi_dot = (vz * (x ** 2 + y ** 2) - z * (x * vx + y * vy)) / (
+            r ** 2 * sqrt(x ** 2 + y ** 2)
+        )
         theta_dot = (x * vy - y * vx) / (x ** 2 + y ** 2)
 
         return np.array([r, theta, phi, r_dot, theta_dot, phi_dot], dtype=float)
@@ -343,11 +351,11 @@ KEPL + KEPL_C
 
 _cache = {
     "tle": TLE,
-    'keplerian_circular': KEPL_C,
-    'keplerian_mean': KEPL_M,
-    'keplerian': KEPL,
-    'spherical': SPHE,
-    'cartesian': CART
+    "keplerian_circular": KEPL_C,
+    "keplerian_mean": KEPL_M,
+    "keplerian": KEPL,
+    "spherical": SPHE,
+    "cartesian": CART,
 }
 
 

@@ -41,7 +41,9 @@ class Orbit(np.ndarray):
         if isinstance(frame, str):
             frame = get_frame(frame)
 
-        obj = np.ndarray.__new__(cls, (6,), buffer=np.array([float(x) for x in coord]), dtype=float)
+        obj = np.ndarray.__new__(
+            cls, (6,), buffer=np.array([float(x) for x in coord]), dtype=float
+        )
         obj.date = date
         obj._form = form
         obj._frame = frame
@@ -69,12 +71,12 @@ class Orbit(np.ndarray):
         reconstruct, clsinfo, state = super().__reduce__()
 
         new_state = {
-            'basestate': state,
-            'date': self.date,
-            '_form': self._form,
-            '_frame': self._frame,
-            '_propagator': self._propagator,
-            'complements': self.complements,
+            "basestate": state,
+            "date": self.date,
+            "_form": self._form,
+            "_frame": self._frame,
+            "_propagator": self._propagator,
+            "complements": self.complements,
         }
 
         return reconstruct, clsinfo, new_state
@@ -84,12 +86,12 @@ class Orbit(np.ndarray):
 
         see http://stackoverflow.com/questions/26598109
         """
-        super().__setstate__(state['basestate'])
-        self.date = state['date']
-        self._form = state['_form']
-        self._frame = state['_frame']
-        self._propagator = state['_propagator']
-        self.complements = state['complements']
+        super().__setstate__(state["basestate"])
+        self.date = state["date"]
+        self._form = state["_form"]
+        self._frame = state["_frame"]
+        self._propagator = state["_propagator"]
+        self.complements = state["complements"]
 
     def copy(self, *, frame=None, form=None):
         """Provide a new instance of the same point in space-time
@@ -106,11 +108,14 @@ class Orbit(np.ndarray):
 
         new_compl = {}
         for k, v in self.complements.items():
-            new_compl[k] = v.copy() if hasattr(v, 'copy') else v
+            new_compl[k] = v.copy() if hasattr(v, "copy") else v
 
         new_obj = self.__class__(
-            self.date, self.base.copy(), self.form,
-            self.frame, self.propagator.copy() if self.propagator is not None else None,
+            self.date,
+            self.base.copy(),
+            self.form,
+            self.frame,
+            self.propagator.copy() if self.propagator is not None else None,
             **new_compl
         )
         if frame and frame != self.frame:
@@ -130,7 +135,9 @@ class Orbit(np.ndarray):
         elif name in self.complements.keys():
             res = self.complements[name]
         else:
-            raise AttributeError("'{}' object has no attribute {!r}".format(self.__class__, name))
+            raise AttributeError(
+                "'{}' object has no attribute {!r}".format(self.__class__, name)
+            )
 
         return res
 
@@ -145,8 +152,11 @@ class Orbit(np.ndarray):
                 raise KeyError(str(err))
 
     def __repr__(self):  # pragma: no cover
-        coord_str = '\n'.join(
-            ["    %s = %s" % (name, arg) for name, arg in zip(self.form.param_names, self)]
+        coord_str = "\n".join(
+            [
+                "    %s = %s" % (name, arg)
+                for name, arg in zip(self.form.param_names, self)
+            ]
         )
 
         if self.propagator is None:
@@ -168,7 +178,7 @@ Orbit =
             coord=coord_str,
             form=self.form,
             frame=self.frame,
-            propag=propagator
+            propag=propagator,
         )
 
         # Add covariance to the repr
@@ -189,11 +199,11 @@ Orbit =
         propagator. Not all propagators can handle maneuvers. Check their respective documentations
         for more details.
         """
-        mans = self.complements.setdefault('maneuvers', [])
+        mans = self.complements.setdefault("maneuvers", [])
 
         if isinstance(mans, Maneuver):
             mans = [mans]
-            self.complements['maneuvers'] = mans
+            self.complements["maneuvers"] = mans
 
         return mans
 
@@ -202,21 +212,21 @@ Orbit =
         if isinstance(mans, Maneuver):
             mans = [mans]
 
-        self.complements['maneuvers'] = mans
+        self.complements["maneuvers"] = mans
 
     @maneuvers.deleter
     def maneuvers(self):
-        del self.complements['maneuvers']
+        del self.complements["maneuvers"]
 
     @property
     def cov(self):
         """:py:class:`~beyond.orbits.cov.Cov`: 6x6 Matrix
         """
-        return self.complements.get('cov', Cov(self, np.zeros((6, 6))))
+        return self.complements.get("cov", Cov(self, np.zeros((6, 6))))
 
     @cov.setter
     def cov(self, value):
-        self.complements['cov'] = Cov(self, value)
+        self.complements["cov"] = Cov(self, value)
 
     @property
     def form(self):
@@ -265,7 +275,7 @@ Orbit =
             new_frame = get_frame(new_frame)
 
         if new_frame != self.frame:
-            self.form = 'cartesian'
+            self.form = "cartesian"
             try:
                 new_coord = self.frame(self.date, self).transform(new_frame.name)
                 self.base.setfield(new_coord, dtype=float)
@@ -295,7 +305,7 @@ Orbit =
         """:py:class:`~datetime.timedelta`: Light propagation delay from the point
         in space described by ``self`` to the center of the reference frame
         """
-        return timedelta(seconds=self.copy(form='spherical').r / c)
+        return timedelta(seconds=self.copy(form="spherical").r / c)
 
     @property
     def delayed_date(self):
@@ -364,7 +374,7 @@ Orbit =
     def infos(self):
         """:py:class:`OrbitInfos` object of ``self``
         """
-        if not hasattr(self, '_infos'):
+        if not hasattr(self, "_infos"):
             self._infos = OrbitInfos(self)
         return self._infos
 
@@ -378,13 +388,13 @@ class OrbitInfos:
 
     @property
     def kep(self):
-        if not hasattr(self, '_kep'):
-            self._kep = self.orb.copy(form='keplerian')
+        if not hasattr(self, "_kep"):
+            self._kep = self.orb.copy(form="keplerian")
         return self._kep
 
     @property
     def sphe(self):
-        if not hasattr(self, '_sphe'):
+        if not hasattr(self, "_sphe"):
             self._sphe = self.orb.copy(form="spherical")
         return self._sphe
 
@@ -450,11 +460,20 @@ class OrbitInfos:
 
     @property
     def cos_fpa(self):
-        return np.sqrt(self.mu / (self.kep.a * (1 - self.kep.e**2))) * (1 + self.kep.e * np.cos(self.kep.nu)) / self.kep.nu
+        return (
+            np.sqrt(self.mu / (self.kep.a * (1 - self.kep.e ** 2)))
+            * (1 + self.kep.e * np.cos(self.kep.nu))
+            / self.kep.nu
+        )
 
     @property
     def sin_fpa(self):
-        return np.sqrt(self.mu / (self.kep.a * (1 - self.kep.e**2))) * self.kep.e * np.sin(self.kep.nu) / self.kep.nu
+        return (
+            np.sqrt(self.mu / (self.kep.a * (1 - self.kep.e ** 2)))
+            * self.kep.e
+            * np.sin(self.kep.nu)
+            / self.kep.nu
+        )
 
     @property
     def fpa(self):

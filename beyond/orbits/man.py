@@ -1,11 +1,9 @@
-
 import numpy as np
 
 from ..frames.local import to_qsw, to_tnw
 
 
 class Maneuver:
-
     def __init__(self, date, dv, frame=None, comment=None):
         """
         Args:
@@ -22,7 +20,7 @@ class Maneuver:
             raise ValueError("dv should be 3 in length")
         if isinstance(frame, str):
             frame = frame.upper()
-        if frame in ("RSW", 'LVLH', 'QSW'):
+        if frame in ("RSW", "LVLH", "QSW"):
             frame = "QSW"
 
         self.date = date
@@ -92,10 +90,18 @@ class DeltaCombined(Maneuver):
         return txt
 
     def dv(self, orb):
-        delta_v_a = orb.frame.center.mu * self.delta_a / (2 * orb.infos.v * orb.infos.kep.a ** 2)
+        delta_v_a = (
+            orb.frame.center.mu
+            * self.delta_a
+            / (2 * orb.infos.v * orb.infos.kep.a ** 2)
+        )
 
         v_final = orb.infos.v + delta_v_a
-        delta_v = np.sqrt(orb.infos.v ** 2 + v_final ** 2 - 2 * orb.infos.v * v_final * np.cos(self.delta_angle))
+        delta_v = np.sqrt(
+            orb.infos.v ** 2
+            + v_final ** 2
+            - 2 * orb.infos.v * v_final * np.cos(self.delta_angle)
+        )
         delta_v_t = v_final * np.cos(self.delta_angle) - orb.infos.v
 
         ratio = delta_v_t / delta_v

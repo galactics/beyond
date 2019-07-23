@@ -39,8 +39,8 @@ class TopocentricFrame(Frame):
 
         from ..orbits.listeners import stations_listeners, Listener
 
-        listeners = kwargs.setdefault('listeners', [])
-        events = kwargs.pop('events', None)
+        listeners = kwargs.setdefault("listeners", [])
+        events = kwargs.pop("events", None)
         event_classes = tuple()
 
         if events:
@@ -62,7 +62,7 @@ class TopocentricFrame(Frame):
 
         for point in orb.iter(**kwargs):
             point.frame = cls
-            point.form = 'spherical'
+            point.form = "spherical"
 
             # Not very clean !
             if point.phi < 0 and not isinstance(point.event, event_classes):
@@ -74,7 +74,7 @@ class TopocentricFrame(Frame):
         """Conversion from Topocentric Frame to parent frame
         """
         lat, lon, _ = self.latlonalt
-        m = rot3(-lon) @ rot2(lat - np.pi / 2.) @ rot3(self.heading)
+        m = rot3(-lon) @ rot2(lat - np.pi / 2.0) @ rot3(self.heading)
         offset = np.zeros(6)
         offset[:3] = self.coordinates
         return self._convert(m, m), offset
@@ -98,11 +98,9 @@ class TopocentricFrame(Frame):
         r_k = (S + alt) * np.sin(lat)
 
         norm = np.sqrt(r_d ** 2 + r_k ** 2)
-        return norm * np.array([
-            np.cos(lat) * np.cos(lon),
-            np.cos(lat) * np.sin(lon),
-            np.sin(lat)
-        ])
+        return norm * np.array(
+            [np.cos(lat) * np.cos(lon), np.cos(lat) * np.sin(lon), np.sin(lat)]
+        )
 
     @classmethod
     def get_mask(cls, azim):
@@ -132,7 +130,7 @@ class TopocentricFrame(Frame):
         return y0 + (y1 - y0) * (azim - x0) / (x1 - x0)
 
 
-def create_station(name, latlonalt, parent_frame=WGS84, orientation='N', mask=None):
+def create_station(name, latlonalt, parent_frame=WGS84, orientation="N", mask=None):
     """Create a ground station instance
 
     Args:
@@ -156,7 +154,7 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N', mask=No
     """
 
     if isinstance(orientation, str):
-        orient = {'N': np.pi, 'S': 0., 'E': np.pi / 2., 'W': 3 * np.pi / 2.}
+        orient = {"N": np.pi, "S": 0.0, "E": np.pi / 2.0, "W": 3 * np.pi / 2.0}
         heading = orient[orientation]
     else:
         heading = orientation
@@ -165,15 +163,15 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation='N', mask=No
     latlonalt[:2] = np.radians(latlonalt[:2])
     coordinates = TopocentricFrame._geodetic_to_cartesian(*latlonalt)
 
-    mtd = '_to_%s' % parent_frame.__name__
+    mtd = "_to_%s" % parent_frame.__name__
     dct = {
         mtd: TopocentricFrame._to_parent_frame,
-        'latlonalt': latlonalt,
-        'coordinates': coordinates,
-        'parent_frame': parent_frame,
-        'heading': heading,
-        'orientation': orientation,
-        'mask': np.array(mask) if mask else None,
+        "latlonalt": latlonalt,
+        "coordinates": coordinates,
+        "parent_frame": parent_frame,
+        "heading": heading,
+        "orientation": orientation,
+        "mask": np.array(mask) if mask else None,
     }
     cls = _MetaFrame(name, (TopocentricFrame,), dct)
     cls + parent_frame

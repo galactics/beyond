@@ -1,4 +1,3 @@
-
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 from collections.abc import Iterable
@@ -68,23 +67,23 @@ class Propagator(Speaker, metaclass=ABCMeta):
             propag.iter(start=start, stop=stop, step=step)
         """
 
-        if 'dates' not in kwargs:
-            start = kwargs.setdefault('start', self.orbit.date)
-            stop = kwargs.get('stop')
-            step = kwargs.setdefault('step', getattr(self, 'step', None))
+        if "dates" not in kwargs:
+            start = kwargs.setdefault("start", self.orbit.date)
+            stop = kwargs.get("stop")
+            step = kwargs.setdefault("step", getattr(self, "step", None))
 
-            if 'stop' is None:
+            if "stop" is None:
                 raise ValueError("The end of the propagation should be defined")
 
             start = self.orbit.date if start is None else start
             step = self.step if step is None else step
 
-            if isinstance(kwargs['stop'], timedelta):
-                kwargs['stop'] = start + kwargs['stop']
-            if start > kwargs['stop'] and step.total_seconds() > 0:
-                kwargs['step'] = -step
+            if isinstance(kwargs["stop"], timedelta):
+                kwargs["stop"] = start + kwargs["stop"]
+            if start > kwargs["stop"] and step.total_seconds() > 0:
+                kwargs["step"] = -step
 
-        listeners = kwargs.pop('listeners', [])
+        listeners = kwargs.pop("listeners", [])
 
         for orb in self._iter(**kwargs):
             for listen_orb in self.listen(orb, listeners):
@@ -98,10 +97,10 @@ class AnalyticalPropagator(Propagator):
 
     def _iter(self, **kwargs):
 
-        start = kwargs.get('start')
-        stop = kwargs.get('stop')
-        step = kwargs.get('step')
-        dates = kwargs.get('dates')
+        start = kwargs.get("start")
+        stop = kwargs.get("stop")
+        step = kwargs.get("step")
+        dates = kwargs.get("dates")
 
         if dates:
             for date in dates:

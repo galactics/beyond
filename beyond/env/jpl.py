@@ -72,7 +72,7 @@ from .solarsystem import EarthPropagator
 from jplephem.spk import SPK, S_PER_DAY
 from jplephem.names import target_names
 
-__all__ = ['get_body', 'get_orbit', 'list_bodies', 'create_frames']
+__all__ = ["get_body", "get_orbit", "list_bodies", "create_frames"]
 
 
 class Target(Node):
@@ -83,7 +83,7 @@ class Target(Node):
     """
 
     def __init__(self, name, index):
-        super().__init__(name.title().replace(' ', ''))
+        super().__init__(name.title().replace(" ", ""))
         self.full_name = name
         self.index = index
 
@@ -98,7 +98,7 @@ class GenericBspPropagator(AnalyticalPropagator):
     def propagate(cls, date):
 
         frame_name = cls.src.name
-        if frame_name == 'Earth':
+        if frame_name == "Earth":
             frame_name = cls.BASE_FRAME
 
         date = date.change_scale("TDB")
@@ -108,7 +108,7 @@ class GenericBspPropagator(AnalyticalPropagator):
             Bsp().get(cls.src, cls.dst, date),
             form="cartesian",
             frame=frame_name,
-            propagator=cls()
+            propagator=cls(),
         )
 
 
@@ -133,7 +133,7 @@ class Bsp:
         """
         segments = []
 
-        files = config.get('env', 'jpl', fallback=[])
+        files = config.get("env", "jpl", fallback=[])
 
         if not files:
             raise JplConfigError("No JPL file defined")
@@ -160,8 +160,8 @@ class Bsp:
 
         for center_id, target_id in self.segments.keys():
 
-            center_name = target_names.get(center_id, 'Unknown')
-            target_name = target_names.get(target_id, 'Unknown')
+            center_name = target_names.get(center_id, "Unknown")
+            target_name = target_names.get(target_id, "Unknown")
 
             # Retrieval of the Target object representing the center if it exists
             # or creation of said object if it doesn't.
@@ -189,13 +189,17 @@ class Bsp:
         """
 
         if (center.index, target.index) in self.segments:
-            pos, vel = self.segments[center.index, target.index].compute_and_differentiate(date.jd)
+            pos, vel = self.segments[
+                center.index, target.index
+            ].compute_and_differentiate(date.jd)
             sign = 1
         else:
             # When we wish to get a segment that is not available in the files (such as
             # EarthBarycenter with respect to the Moon, for example), we take the segment
             # representing the inverse vector if available and reverse it
-            pos, vel = self.segments[target.index, center.index].compute_and_differentiate(date.jd)
+            pos, vel = self.segments[
+                target.index, center.index
+            ].compute_and_differentiate(date.jd)
             sign = -1
 
         # In some cases, the pos vector contains both position and velocity
@@ -218,7 +222,7 @@ class Pck(dict):
     def __new__(cls, *args, **kwargs):
 
         # Caching mechanism
-        if not hasattr(cls, '_instance'):
+        if not hasattr(cls, "_instance"):
             cls._instance = super().__new__(cls, *args, **kwargs)
             cls._instance.parse()
 
@@ -237,7 +241,7 @@ class Pck(dict):
         self.clear()
 
         # Parsing of multiple files provided in the configuration variable
-        for filepath in config['env']['jpl']:
+        for filepath in config["env"]["jpl"]:
 
             filepath = Path(filepath)
 
@@ -267,11 +271,11 @@ class Pck(dict):
                         continue
 
                     # Variable extraction
-                    if datablock and line.strip().lower().startswith('body'):
+                    if datablock and line.strip().lower().startswith("body"):
 
                         # retrieval of body ID, parameter name and value
-                        line = line.strip().lower().lstrip('body')
-                        body_id, _, param = line.partition('_')
+                        line = line.strip().lower().lstrip("body")
+                        body_id, _, param = line.partition("_")
                         key, _, value = param.partition("=")
 
                         # If possible, retrieval of the name of the body
@@ -287,7 +291,7 @@ class Pck(dict):
 
                         # List of value scattered on multiple lines
                         if not value.endswith(")"):
-                            for next_line in lines[i + 1:]:
+                            for next_line in lines[i + 1 :]:
                                 value += " " + next_line.strip()
                                 if next_line.strip().endswith(")"):
                                     break
@@ -314,23 +318,20 @@ class Pck(dict):
 
         # Shape
         if "RADII" in obj:
-            radii = obj['RADII'][0] * 1000.
-            flattening = 1 - (obj['RADII'][2] / obj['RADII'][0])
+            radii = obj["RADII"][0] * 1000.0
+            flattening = 1 - (obj["RADII"][2] / obj["RADII"][0])
         else:
             radii = 0
             flattening = 0
 
         # mass
-        if 'GM' in obj:
-            mass = obj['GM'][0] * 1e9 / G
+        if "GM" in obj:
+            mass = obj["GM"][0] * 1e9 / G
         else:
             mass = 0
 
         return Body(
-            name=name.title(),
-            mass=mass,
-            equatorial_radius=radii,
-            flattening=flattening
+            name=name.title(), mass=mass, equatorial_radius=radii, flattening=flattening
         )
 
 
@@ -362,7 +363,7 @@ def get_orbit(name, date):
             propagator = type(
                 "%sBspPropagator" % b.name,
                 (GenericBspPropagator,),
-                {'src': a, 'dst': b}
+                {"src": a, "dst": b},
             )
 
             # Retrieve informations for the central body. If unavailable, create a virtual body with
@@ -436,15 +437,11 @@ def get_body(name):
     return body
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
 
     import sys
 
-    config.update({
-        'eop': {
-            'missing_policy': "pass"
-        }
-    })
+    config.update({"eop": {"missing_policy": "pass"}})
 
     for file in sys.argv[1:]:
         print(file)
@@ -456,8 +453,9 @@ if __name__ == '__main__':  # pragma: no cover
 
             center = target_names[segment.center]
             target = target_names[segment.target]
-            print("from {start:{fmt}} to {end:{fmt}} : {center} -> {target}".format(
-                start=start, end=end, center=center, target=target,
-                fmt="%Y-%m-%d"
-            ))
+            print(
+                "from {start:{fmt}} to {end:{fmt}} : {center} -> {target}".format(
+                    start=start, end=end, center=center, target=target, fmt="%Y-%m-%d"
+                )
+            )
         print()

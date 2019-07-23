@@ -38,12 +38,12 @@ class Body:
 
     def __getattr__(self, name):
         attrs = {
-            'm': 'mass',
-            'r': 'equatorial_radius',
-            'f': 'flattening',
-            chr(956): 'mu',
-            'µ': 'mu',
-            'e': 'eccentricity',
+            "m": "mass",
+            "r": "equatorial_radius",
+            "f": "flattening",
+            chr(956): "mu",
+            "µ": "mu",
+            "e": "eccentricity",
         }
 
         try:
@@ -73,29 +73,15 @@ Earth = Body(
     name="Earth",
     mass=5.97237e24,
     equatorial_radius=6378136.3,
-    flattening=1 / 298.257223563
+    flattening=1 / 298.257223563,
 )
 """Earth physical characteristics"""
 
-Moon = Body(
-    name="Moon",
-    mass=7.342e22,
-    equatorial_radius=1738100,
-    flattening=0.0012
-)
+Moon = Body(name="Moon", mass=7.342e22, equatorial_radius=1738100, flattening=0.0012)
 """Moon physical characteristics"""
 
-Sun = Body(
-    name="Sun",
-    mass=1.98855e30,
-    equatorial_radius=695700000,
-    flattening=9e-6,
-)
+Sun = Body(name="Sun", mass=1.98855e30, equatorial_radius=695700000, flattening=9e-6)
 """Sun physical characteristics"""
 
-Mars = Body(
-    name="Mars",
-    mass=6.4171e23,
-    equatorial_radius=3396200.
-)
+Mars = Body(name="Mars", mass=6.4171e23, equatorial_radius=3396200.0)
 """Mars physical characteristics"""

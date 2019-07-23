@@ -7,7 +7,7 @@ from .base import NumericalPropagator
 from ..dates import Date, timedelta
 
 
-__all__ = ['Kepler', 'SOIPropagator']
+__all__ = ["Kepler", "SOIPropagator"]
 
 
 log = logging.getLogger(__name__)
@@ -22,44 +22,45 @@ class Kepler(NumericalPropagator):
     for details.
     """
 
-    RK4 = 'rk4'
-    EULER = 'euler'
-    DOPRI = 'dopri'
+    RK4 = "rk4"
+    EULER = "euler"
+    DOPRI = "dopri"
     FRAME = "EME2000"
 
     SPEAKER_MODE = "iterative"
 
     # Butcher tableau of the different methods available
     BUTCHER = {
-        EULER: {
-            "a": array([]),
-            "b": array([1]),
-            "c": array([0])
-        },
+        EULER: {"a": array([]), "b": array([1]), "c": array([0])},
         RK4: {
-            "a": [
-                [],
-                array([1/2]),
-                array([0, 1/2]),
-                array([0, 0, 1])
-            ],
-            "b" : array([1/6, 1/3, 1/3, 1/6]),
-            "c" : array([0, 1/2, 1/2, 1]),
+            "a": [[], array([1 / 2]), array([0, 1 / 2]), array([0, 0, 1])],
+            "b": array([1 / 6, 1 / 3, 1 / 3, 1 / 6]),
+            "c": array([0, 1 / 2, 1 / 2, 1]),
         },
         DOPRI: {
             "a": [
-                    [],
-                    array([1/5]),
-                    array([3/40, 9/40]),
-                    array([44/45, -56/15, 32/9]),
-                    array([19372/6561, -25360/2187, 64448/6561, -212/729]),
-                    array([9017/3168, -355/33, 46732/5247, 49/176, -5103/18656]),
-                    array([35/384, 0, 500/1113, 125/192, -2187/6784, 11/84])
-                ],
-            'b': array([35/384, 0, 500/1113, 125/192, -2187/6784, 11/84, 0 ]),
-            'b_star': array([5179/57600, 0, 7571/16695, 393/640, -92097/339200, 187/2100, 1/40]),
-            'c': array([0, 1/5, 3/10, 4/5, 8/9, 1, 1]),
-        }
+                [],
+                array([1 / 5]),
+                array([3 / 40, 9 / 40]),
+                array([44 / 45, -56 / 15, 32 / 9]),
+                array([19372 / 6561, -25360 / 2187, 64448 / 6561, -212 / 729]),
+                array([9017 / 3168, -355 / 33, 46732 / 5247, 49 / 176, -5103 / 18656]),
+                array([35 / 384, 0, 500 / 1113, 125 / 192, -2187 / 6784, 11 / 84]),
+            ],
+            "b": array([35 / 384, 0, 500 / 1113, 125 / 192, -2187 / 6784, 11 / 84, 0]),
+            "b_star": array(
+                [
+                    5179 / 57600,
+                    0,
+                    7571 / 16695,
+                    393 / 640,
+                    -92097 / 339200,
+                    187 / 2100,
+                    1 / 40,
+                ]
+            ),
+            "c": array([0, 1 / 5, 3 / 10, 4 / 5, 8 / 9, 1, 1]),
+        },
     }
 
     def __init__(self, step, bodies, *, method=RK4, frame=FRAME):
@@ -78,15 +79,12 @@ class Kepler(NumericalPropagator):
 
     def copy(self):
         return self.__class__(
-            self.step,
-            self.bodies,
-            method=self.method,
-            frame=self.frame
+            self.step, self.bodies, method=self.method, frame=self.frame
         )
 
     @property
     def orbit(self):
-        return self._orbit if hasattr(self, '_orbit') else None
+        return self._orbit if hasattr(self, "_orbit") else None
 
     @orbit.setter
     def orbit(self, orbit):
@@ -118,7 +116,7 @@ class Kepler(NumericalPropagator):
         """
 
         method = self.BUTCHER[self.method]
-        a, b, c = method['a'], method['b'], method['c']
+        a, b, c = method["a"], method["b"], method["c"]
 
         y_n = orb.copy()
         ks = [self._newton(y_n, timedelta(0))]
@@ -143,9 +141,9 @@ class Kepler(NumericalPropagator):
 
     def _iter(self, **kwargs):
 
-        start = kwargs.get('start', self.orbit.date)
-        stop = kwargs.get('stop')
-        step = kwargs.get('step', self.step)
+        start = kwargs.get("start", self.orbit.date)
+        stop = kwargs.get("stop")
+        step = kwargs.get("step", self.step)
 
         orb = self.orbit
 
@@ -166,7 +164,7 @@ class Kepler(NumericalPropagator):
         yield self._make_step(orb, stop - orb.date)
 
 
-SOI = namedtuple('SOI', 'radius frame')
+SOI = namedtuple("SOI", "radius frame")
 
 
 class SOIPropagator(Kepler):
@@ -175,18 +173,20 @@ class SOIPropagator(Kepler):
     """
 
     SOI = {
-        'Mercury': SOI(112408000, 'Mercury'),
-        'Venus': SOI(616270000, 'Venus'),
-        'Earth': SOI(924642000, 'EME2000'),
-        'Moon': SOI(66168000, 'Moon'),
-        'Mars': SOI(577223000, 'Mars'),
-        'Jupiter': SOI(48219667000, 'Jupiter'),
-        'Saturn': SOI(54800713000, 'Saturn'),
-        'Uranus': SOI(51839589000, 'Uranus'),
-        'Neptune': SOI(84758736000, 'Neptune')
+        "Mercury": SOI(112408000, "Mercury"),
+        "Venus": SOI(616270000, "Venus"),
+        "Earth": SOI(924642000, "EME2000"),
+        "Moon": SOI(66168000, "Moon"),
+        "Mars": SOI(577223000, "Mars"),
+        "Jupiter": SOI(48219667000, "Jupiter"),
+        "Saturn": SOI(54800713000, "Saturn"),
+        "Uranus": SOI(51839589000, "Uranus"),
+        "Neptune": SOI(84758736000, "Neptune"),
     }
 
-    def __init__(self, central_step, alt_step, central, alt, *, method=Kepler.RK4, frame=None):
+    def __init__(
+        self, central_step, alt_step, central, alt, *, method=Kepler.RK4, frame=None
+    ):
         """
         Args:
             central_step (timedelta): Step to use in computation when only the
@@ -211,7 +211,7 @@ class SOIPropagator(Kepler):
 
     @property
     def orbit(self):
-        return self._orbit if hasattr(self, '_orbit') else None
+        return self._orbit if hasattr(self, "_orbit") else None
 
     @orbit.setter
     def orbit(self, orbit):
@@ -226,7 +226,7 @@ class SOIPropagator(Kepler):
             self.central,
             self.alt,
             method=self.method,
-            frame=self.out_frame
+            frame=self.out_frame,
         )
 
     def _soi(self, orb):
@@ -238,7 +238,7 @@ class SOIPropagator(Kepler):
 
         for body in self.alt:
             soi = self.SOI[body.name]
-            sph = orb.copy(frame=soi.frame, form='spherical')
+            sph = orb.copy(frame=soi.frame, form="spherical")
             if sph.r < soi.radius:
                 active = body
                 break

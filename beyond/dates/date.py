@@ -10,7 +10,7 @@ from ..errors import DateError, UnknownScaleError
 from .eop import EopDb
 from ..utils.node import Node
 
-__all__ = ['Date', 'timedelta']
+__all__ = ["Date", "timedelta"]
 
 
 class Timescale(Node):
@@ -41,7 +41,7 @@ class Timescale(Node):
     def _scale_tai_minus_gps(self, mjd, eop):
         """Definition of International Atomic Time relatively to GPS time
         """
-        return 19.
+        return 19.0
 
     def _scale_tdb_minus_tt(self, mjd, eop):
         """Definition of the Barycentric Dynamic Time scale relatively to Terrestrial Time
@@ -49,7 +49,7 @@ class Timescale(Node):
         jd = mjd + Date.JD_MJD
         jj = Date._julian_century(jd)
         m = radians(357.5277233 + 35999.05034 * jj)
-        delta_lambda = radians(246.11 + 0.90251792 * (jd - 2451545.))
+        delta_lambda = radians(246.11 + 0.90251792 * (jd - 2451545.0))
         return 0.001657 * sin(m) + 0.000022 * sin(delta_lambda)
 
     def offset(self, mjd, new_scale, eop):
@@ -80,25 +80,18 @@ class Timescale(Node):
         return delta
 
 
-UT1 = Timescale('UT1')  # Universal Time
-GPS = Timescale('GPS')  # GPS Time
-TDB = Timescale('TDB')  # Barycentric Dynamical Time
-UTC = Timescale('UTC')  # Coordinated Universal Time
-TAI = Timescale('TAI')  # International Atomic Time
-TT = Timescale('TT')    # Terrestrial Time
+UT1 = Timescale("UT1")  # Universal Time
+GPS = Timescale("GPS")  # GPS Time
+TDB = Timescale("TDB")  # Barycentric Dynamical Time
+UTC = Timescale("UTC")  # Coordinated Universal Time
+TAI = Timescale("TAI")  # International Atomic Time
+TT = Timescale("TT")  # Terrestrial Time
 
 GPS + TAI + UTC + UT1
 TDB + TT + TAI
 
 
-_cache = {
-    "UT1": UT1,
-    "GPS": GPS,
-    "TDB": TDB,
-    "UTC": UTC,
-    "TAI": TAI,
-    "TT": TT,
-}
+_cache = {"UT1": UT1, "GPS": GPS, "TDB": TDB, "UTC": UTC, "TAI": TAI, "TT": TT}
 
 
 def get_scale(name):
@@ -155,7 +148,7 @@ class Date:
     JD_MJD = 2400000.5
     """Offset between JD and MJD"""
 
-    REF_SCALE = 'TAI'
+    REF_SCALE = "TAI"
     """Scale used as reference internally"""
 
     DEFAULT_SCALE = "UTC"
@@ -180,13 +173,15 @@ class Date:
                 # Modified Julian Day
                 if isinstance(arg, int):
                     d = arg
-                    s = 0.
+                    s = 0.0
                 else:
                     d = int(arg)
                     s = (arg - d) * 86400
             else:
                 raise TypeError("Unknown type '{}'".format(type(arg)))
-        elif len(args) == 2 and (isinstance(args[0], int) and isinstance(args[1], (int, float))):
+        elif len(args) == 2 and (
+            isinstance(args[0], int) and isinstance(args[1], (int, float))
+        ):
             # Julian day and seconds in the day
             d, s = args
         elif len(args) in range(3, 8) and list(map(type, args)) == [int] * len(args):
@@ -195,9 +190,11 @@ class Date:
             dt = datetime(*args, **kwargs)
             d, s = self._convert_dt(dt)
         else:
-            raise TypeError("Unknown type sequence {}".format(", ".join(str(type(x)) for x in args)))
+            raise TypeError(
+                "Unknown type sequence {}".format(", ".join(str(type(x)) for x in args))
+            )
 
-        mjd = d + s / 86400.
+        mjd = d + s / 86400.0
 
         # Retrieve EOP for the given date and store
         eop = EopDb.get(mjd)
@@ -206,36 +203,36 @@ class Date:
         offset = scale.offset(mjd, self.REF_SCALE, eop)
 
         d += int((s + offset) // 86400)
-        s = (s + offset) % 86400.
+        s = (s + offset) % 86400.0
 
         # As Date acts like an immutable object, we can't set its attributes normally
         # like when we do ``self._d = _d``. Furthermore, those attribute represent the date with
         # respect to REF_SCALE
-        super().__setattr__('_d', d)
-        super().__setattr__('_s', s)
-        super().__setattr__('_offset', offset)
-        super().__setattr__('scale', scale)
-        super().__setattr__('eop', eop)
-        super().__setattr__('_cache', {})
+        super().__setattr__("_d", d)
+        super().__setattr__("_s", s)
+        super().__setattr__("_offset", offset)
+        super().__setattr__("scale", scale)
+        super().__setattr__("eop", eop)
+        super().__setattr__("_cache", {})
 
     def __getstate__(self):  # pragma: no cover
         """Used for pickling"""
         return {
-            'd': self._d,
-            's': self._s,
-            'offset': self._offset,
-            'scale': self.scale,
-            'eop': self.eop,
+            "d": self._d,
+            "s": self._s,
+            "offset": self._offset,
+            "scale": self.scale,
+            "eop": self.eop,
         }
 
     def __setstate__(self, state):  # pragma: no cover
         """Used for unpickling"""
-        super().__setattr__('_d', state['d'])
-        super().__setattr__('_s', state['s'])
-        super().__setattr__('_offset', state['offset'])
-        super().__setattr__('scale', state['scale'])
-        super().__setattr__('eop', state['eop'])
-        super().__setattr__('_cache', {})
+        super().__setattr__("_d", state["d"])
+        super().__setattr__("_s", state["s"])
+        super().__setattr__("_offset", state["offset"])
+        super().__setattr__("scale", state["scale"])
+        super().__setattr__("eop", state["eop"])
+        super().__setattr__("_cache", {})
 
     def __setattr__(self, *args):  # pragma: no cover
         raise TypeError("Can not modify attributes of immutable object")
@@ -282,9 +279,9 @@ class Date:
         return "<{} '{}'>".format(self.__class__.__name__, self)
 
     def __str__(self):  # pragma: no cover
-        if 'str' not in self._cache.keys():
-            self._cache['str'] = "{} {}".format(self.datetime.isoformat(), self.scale)
-        return self._cache['str']
+        if "str" not in self._cache.keys():
+            self._cache["str"] = "{} {}".format(self.datetime.isoformat(), self.scale)
+        return self._cache["str"]
 
     def __format__(self, fmt):  # pragma: no cover
         if fmt:
@@ -310,7 +307,7 @@ class Date:
         of the object
         """
         d = self._d
-        s = (self._s - self._offset) % 86400.
+        s = (self._s - self._offset) % 86400.0
         d -= int((s + self._offset) // 86400)
         return d, s
 
@@ -329,9 +326,9 @@ class Date:
         The resulting object is a timezone-naive instance with the same scale
         as the originating Date object.
         """
-        if 'dt_scale' not in self._cache.keys():
-            self._cache['dt_scale'] = self._datetime - timedelta(seconds=self._offset)
-        return self._cache['dt_scale']
+        if "dt_scale" not in self._cache.keys():
+            self._cache["dt_scale"] = self._datetime - timedelta(seconds=self._offset)
+        return self._cache["dt_scale"]
 
     @property
     def _datetime(self):
@@ -339,9 +336,9 @@ class Date:
 
         The resulting object is a timezone-naive instance in the REF_SCALE time-scale
         """
-        if 'dt' not in self._cache.keys():
-            self._cache['dt'] = self.MJD_T0 + timedelta(days=self._d, seconds=self._s)
-        return self._cache['dt']
+        if "dt" not in self._cache.keys():
+            self._cache["dt"] = self.MJD_T0 + timedelta(days=self._d, seconds=self._s)
+        return self._cache["dt"]
 
     @classmethod
     def strptime(cls, data, format, scale=DEFAULT_SCALE):  # pragma: no cover
@@ -378,7 +375,7 @@ class Date:
 
     @classmethod
     def _julian_century(cls, jd):
-        return (jd - 2451545.0) / 36525.
+        return (jd - 2451545.0) / 36525.0
 
     @property
     def julian_century(self):
@@ -406,7 +403,7 @@ class Date:
         Return:
             float: Date in terms of MJD in the REF_SCALE timescale
         """
-        return self._d + self._s / 86400.
+        return self._d + self._s / 86400.0
 
     @property
     def mjd(self):
@@ -415,7 +412,7 @@ class Date:
         Return:
             float
         """
-        return self.d + self.s / 86400.
+        return self.d + self.s / 86400.0
 
     @classmethod
     def range(cls, start=None, stop=None, step=None, inclusive=False):
@@ -471,7 +468,6 @@ except ImportError:  # pragma: no cover
 else:  # pragma: no cover
 
     class DateConverter(mdates.DateConverter):
-
         @staticmethod
         def convert(values, unit, axis):
             try:

@@ -1,4 +1,3 @@
-
 """Definition of ephemeris
 """
 
@@ -137,7 +136,9 @@ class Ephem(Speaker):
             y0 = self[prev_idx]
             y1 = self[prev_idx + 1]
 
-            result = y0[:] + (y1[:] - y0[:]) * (date.mjd - y0.date.mjd) / (y1.date.mjd - y0.date.mjd)
+            result = y0[:] + (y1[:] - y0[:]) * (date.mjd - y0.date.mjd) / (
+                y1.date.mjd - y0.date.mjd
+            )
 
         elif method == self.LAGRANGE:
 
@@ -166,7 +167,9 @@ class Ephem(Speaker):
             for j in range(order):
                 # This mask is here to enforce the m != j in the lagrange polynomials
                 mask = date_subset != date_subset[j]
-                l_j = (date.mjd - date_subset[mask]) / (date_subset[j] - date_subset[mask])
+                l_j = (date.mjd - date_subset[mask]) / (
+                    date_subset[j] - date_subset[mask]
+                )
                 result = result + l_j.prod() * subset[j]
 
         else:
@@ -181,7 +184,9 @@ class Ephem(Speaker):
         """
         return self.interpolate(date)
 
-    def iter(self, *, dates=None, start=None, stop=None, step=None, strict=True, **kwargs):
+    def iter(
+        self, *, dates=None, start=None, stop=None, step=None, strict=True, **kwargs
+    ):
         """Ephemeris generator based on the data of this one, but with different dates
 
         Keyword Arguments:
@@ -238,7 +243,7 @@ class Ephem(Speaker):
         # To allow for a loose control of the dates we have to compute
         # the real starting date of the iterator
 
-        listeners = kwargs.get('listeners', [])
+        listeners = kwargs.get("listeners", [])
 
         if dates:
             for date in dates:
