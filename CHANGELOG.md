@@ -9,7 +9,7 @@ Each release is linked to a git commit.
 
 - Measures data, for orbit determination
 - Common ParseError class, with specific subclasses
-- `black <https://github.com/psf/black>`__
+- [black](https://github.com/psf/black)
 
 ### Modified
 

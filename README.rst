@@ -21,6 +21,9 @@ Beyond
     :alt: Python versions
     :target: https://pypi.python.org/pypi/beyond
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
 This library was started to better understand how Flight Dynamics works. It
 has no intent of efficiency nor performance at the moment, and the goal is
 mainly to develop a simple API for space observations.
