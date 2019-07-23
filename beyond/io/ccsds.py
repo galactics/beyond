@@ -189,9 +189,7 @@ def _read_opm(string):
         Orbit:
     """
 
-    maneuvers = []
-
-    data = {}
+    data = {'MAN': []}
     comments = {}
     for i, line in enumerate(string.splitlines()):
         if not line:
@@ -207,11 +205,11 @@ def _read_opm(string):
 
         if key.startswith('MAN_'):
             if key == "MAN_EPOCH_IGNITION":
-                maneuvers.append({})
-                man_idx = len(maneuvers) - 1
+                man = {}
+                data['MAN'].append(man)
                 if i - 1 in comments:
-                    maneuvers[man_idx]["comment"] = comments[i - 1]
-            maneuvers[man_idx][key] = value
+                    man["comment"] = comments[i - 1]
+            man[key] = value
         else:
             data[key] = value
 
@@ -234,7 +232,7 @@ def _read_opm(string):
     orb.name = name
     orb.cospar_id = cospar_id
 
-    for raw_man in maneuvers:
+    for raw_man in data['MAN']:
 
         man = {}
         man['date'] = Date.strptime(raw_man['MAN_EPOCH_IGNITION'], "%Y-%m-%dT%H:%M:%S.%f", scale=scale)
