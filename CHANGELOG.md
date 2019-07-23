@@ -3,6 +3,19 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [v0.6.6] - 2019-07-23
+
+### Added
+
+- Measures data, for orbit determination
+- Common ParseError class, with specific subclasses
+- `black <https://github.com/psf/black>`__
+
+### Modified
+
+- Config dict is no longer a singleton
+- Use of ``math`` trigonometric functions for IAU1980 and IAU2010 computations, increases speed.
+
 ## [v0.6.5] - 2019-06-10
 
 ### Added
