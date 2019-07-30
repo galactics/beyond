@@ -451,8 +451,8 @@ if __name__ == "__main__":  # pragma: no cover
             start = Date(segment.start_jd - Date.JD_MJD)
             end = Date(segment.end_jd - Date.JD_MJD)
 
-            center = target_names[segment.center]
-            target = target_names[segment.target]
+            center = target_names.get(segment.center, "Unknown")
+            target = target_names.get(segment.target, "Unknown")
             print(
                 "from {start:{fmt}} to {end:{fmt}} : {center} -> {target}".format(
                     start=start, end=end, center=center, target=target, fmt="%Y-%m-%d"
