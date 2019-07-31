@@ -567,9 +567,9 @@ def _dump_tdm(data, **kwargs):
         meta["MODE"] = "SEQUENTIAL"
         meta["PATH"] = ",".join([str(parts[p]) for p in path])
 
-        if Range in measure_set.types:
+        if 'Range' in measure_set.types:
             meta["RANGE_UNITS"] = "km"
-        if Azimut in measure_set.types:
+        if 'Azimut' in measure_set.types:
             meta["ANGLE_TYPE"] = "AZEL"
 
         txt = ["META_START"]
