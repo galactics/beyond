@@ -107,6 +107,12 @@ def loads(text):
         raise HorizonParseError("Unknown frame")
     frame = frames[frame.strip()]
 
+    if frame == "EME2000":
+        # If the central body is an other solar system celestial body
+        # we have to change the reference frame to match the ones defined in beyond
+        if center != "Earth (399)":
+            frame = center.partition("(")[0].strip()
+
     coord = header["Coordinate systm"]
     if coord == "Earth Mean Equator and Equinox of Reference Epoch":
         coord = "equatorial"
