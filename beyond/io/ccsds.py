@@ -567,9 +567,9 @@ def _dump_tdm(data, **kwargs):
         meta["MODE"] = "SEQUENTIAL"
         meta["PATH"] = ",".join([str(parts[p]) for p in path])
 
-        if 'Range' in measure_set.types:
+        if "Range" in measure_set.types:
             meta["RANGE_UNITS"] = "km"
-        if 'Azimut' in measure_set.types:
+        if "Azimut" in measure_set.types:
             meta["ANGLE_TYPE"] = "AZEL"
 
         txt = ["META_START"]
@@ -616,26 +616,3 @@ def _dump_tdm(data, **kwargs):
         text += "\n".join(txt)
 
     return header + "\n" + text
-
-
-if __name__ == "__main__":
-
-    from space.config import config
-
-    config.load()
-
-    now = Date.now()
-    now2 = Date.now() + timedelta(1)
-
-    mes = [
-        Doppler("sat AUS".split(), now, 2222),
-        Range("sat AUS".split(), now - timedelta(0, 3), 6300000.0),
-        Azimut("sat AUS".split(), now, 2),
-        Elevation("sat AUS".split(), now, 1),
-        Doppler("HBK sat HBK".split(), now2, 2222),
-        Range("HBK sat HBK".split(), now2 - timedelta(0, 3), 6300000.0),
-        Azimut("HBK sat HBK".split(), now2, 2),
-        Elevation("HBK sat HBK".split(), now2, 1),
-    ]
-
-    print(dumps(mes))
