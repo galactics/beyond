@@ -112,7 +112,7 @@ class Orbit(np.ndarray):
 
         new_obj = self.__class__(
             self.date,
-            self.base.copy(),
+            np.array(self),
             self.form,
             self.frame,
             self.propagator.copy() if self.propagator is not None else None,
