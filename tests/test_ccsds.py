@@ -3,7 +3,7 @@ from pytest import fixture, raises
 
 from datetime import timedelta
 
-from beyond.orbits.man import Maneuver
+from beyond.orbits.man import ImpulsiveMan
 from beyond.io.tle import Tle
 from beyond.io.ccsds import dumps, loads, CcsdsParseError
 from beyond.dates import Date
@@ -320,8 +320,8 @@ def orb():
 @fixture
 def orb_man(orb):
     orb.maneuvers = [
-        Maneuver(Date(2008, 9, 20, 12, 41, 9, 984493), [280, 0, 0], frame="TNW", comment="Maneuver 1"),
-        Maneuver(Date(2008, 9, 20, 13, 33, 11, 374985), [270, 0, 0], frame="TNW", comment="Maneuver 2"),
+        ImpulsiveMan(Date(2008, 9, 20, 12, 41, 9, 984493), [280, 0, 0], frame="TNW", comment="Maneuver 1"),
+        ImpulsiveMan(Date(2008, 9, 20, 13, 33, 11, 374985), [270, 0, 0], frame="TNW", comment="Maneuver 2"),
     ]
     return orb
 

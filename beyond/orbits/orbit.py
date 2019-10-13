@@ -14,7 +14,7 @@ from .forms import get_form, Form
 from .ephem import Ephem
 from ..frames.frames import get_frame, orbit2frame
 from ..propagators import get_propagator
-from .man import Maneuver
+from .man import ImpulsiveMan
 from .cov import Cov
 
 
@@ -195,13 +195,13 @@ Orbit =
 
     @property
     def maneuvers(self):
-        """list of :py:class:`~beyond.orbits.man.Maneuver`: Maneuver descriptions usable by the
+        """list of :py:class:`~beyond.orbits.man.Man`: Maneuver descriptions usable by the
         propagator. Not all propagators can handle maneuvers. Check their respective documentations
         for more details.
         """
         mans = self.complements.setdefault("maneuvers", [])
 
-        if isinstance(mans, Maneuver):
+        if isinstance(mans, ImpulsiveMan):
             mans = [mans]
             self.complements["maneuvers"] = mans
 
@@ -209,7 +209,7 @@ Orbit =
 
     @maneuvers.setter
     def maneuvers(self, mans):
-        if isinstance(mans, Maneuver):
+        if isinstance(mans, ImpulsiveMan):
             mans = [mans]
 
         self.complements["maneuvers"] = mans

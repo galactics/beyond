@@ -9,7 +9,7 @@ from collections.abc import Iterable
 from ..utils import units
 from ..dates import Date, timedelta
 from ..orbits import Orbit, Ephem
-from ..orbits.man import Maneuver
+from ..orbits.man import ImpulsiveMan, ContinuousMan
 from ..utils.measures import Measure, Range, Doppler, Azimut, Elevation, MeasureSet
 from ..errors import ParseError
 
@@ -261,8 +261,19 @@ def _read_opm(string):
 
         if man["duration"].total_seconds() == 0:
             orb.maneuvers.append(
-                Maneuver(
+                ImpulsiveMan(
                     man["date"], man["dv"], frame=man["frame"], comment=man["comment"]
+                )
+            )
+        else:
+            orb.maneuvers.append(
+                ContinuousMan(
+                    man["date"],
+                    man["duration"],
+                    man["dv"],
+                    frame=man["frame"],
+                    comment=man["comment"],
+                    date_pos="start",
                 )
             )
 
@@ -522,7 +533,26 @@ TRUE_ANOMALY         = {angles[3]: 12.6f} [deg]
                 man.comment if man.comment is not None else "Maneuver {}".format(i + 1)
             )
             frame = cart.frame if man.frame is None else man.frame
-            text += """
+            if isinstance(man, ContinuousMan):
+                text += """
+COMMENT  {comment}
+MAN_EPOCH_IGNITION   = {man.start:%Y-%m-%dT%H:%M:%S.%f}
+MAN_DURATION         = {duration:0.3f} [s]
+MAN_DELTA_MASS       = 0.000 [kg]
+MAN_REF_FRAME        = {frame}
+MAN_DV_1             = {dv[0]:.6f} [km/s]
+MAN_DV_2             = {dv[1]:.6f} [km/s]
+MAN_DV_3             = {dv[2]:.6f} [km/s]
+""".format(
+                    i=i + 1,
+                    man=man,
+                    duration=man.duration.total_seconds(),
+                    dv=man._dv / units.km,
+                    frame=frame,
+                    comment=comment,
+                )
+            else:
+                text += """
 COMMENT  {comment}
 MAN_EPOCH_IGNITION   = {man.date:%Y-%m-%dT%H:%M:%S.%f}
 MAN_DURATION         = 0.000 [s]
@@ -532,8 +562,12 @@ MAN_DV_1             = {dv[0]:.6f} [km/s]
 MAN_DV_2             = {dv[1]:.6f} [km/s]
 MAN_DV_3             = {dv[2]:.6f} [km/s]
 """.format(
-                i=i + 1, man=man, dv=man._dv / units.km, frame=frame, comment=comment
-            )
+                    i=i + 1,
+                    man=man,
+                    dv=man._dv / units.km,
+                    frame=frame,
+                    comment=comment,
+                )
 
     return header + "\n" + meta + text
 

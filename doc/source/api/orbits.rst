@@ -54,10 +54,18 @@ seen from a station.
     :members:
     :special-members: __init__
 
-Maneuver
---------
+Maneuvers
+---------
 
-.. autoclass:: beyond.orbits.man.Maneuver
+.. autoclass:: beyond.orbits.man.ImpulsiveMan
+    :members:
+    :special-members: __init__
+
+.. autoclass:: beyond.orbits.man.KeplerianImpulsiveMan
+    :members:
+    :special-members: __init__
+
+.. autoclass:: beyond.orbits.man.ContinuousMan
     :members:
     :special-members: __init__
 

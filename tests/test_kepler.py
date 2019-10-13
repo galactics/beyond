@@ -10,7 +10,7 @@ from beyond.io.tle import Tle
 from beyond.propagators.kepler import Kepler, SOIPropagator
 from beyond.env.solarsystem import get_body
 from beyond.orbits.listeners import LightListener, NodeListener
-from beyond.orbits.man import Maneuver, DeltaCombined
+from beyond.orbits.man import ImpulsiveMan, KeplerianImpulsiveMan
 
 import beyond.env.jpl as jpl
 
@@ -155,10 +155,10 @@ def test_man(orb):
     # an increment of 100 km of altitude
 
     with raises(ValueError):
-        Maneuver(Date(2008, 9, 20, 13, 48, 21, 763091), (28, 0, 0, 0))
+        ImpulsiveMan(Date(2008, 9, 20, 13, 48, 21, 763091), (28, 0, 0, 0))
 
-    man1 = Maneuver(Date(2008, 9, 20, 13, 48, 21, 763091), (28, 0, 0), frame="TNW")
-    man2 = Maneuver(Date(2008, 9, 20, 14, 34, 39, 970298), (0, 28, 0), frame="QSW")
+    man1 = ImpulsiveMan(Date(2008, 9, 20, 13, 48, 21, 763091), (28, 0, 0), frame="TNW")
+    man2 = ImpulsiveMan(Date(2008, 9, 20, 14, 34, 39, 970298), (0, 28, 0), frame="QSW")
     orb.maneuvers = [man1, man2]
 
     altitude = []
@@ -180,8 +180,8 @@ def test_man(orb):
 def test_man_delta_a(orb):
 
     # We try to dupplicate the change in altitude of the previous test
-    man1 = DeltaCombined(Date(2008, 9, 20, 13, 48, 21, 763091), delta_a=50000)
-    man2 = DeltaCombined(Date(2008, 9, 20, 14, 34, 39, 970298), delta_a=50000)
+    man1 = KeplerianImpulsiveMan(Date(2008, 9, 20, 13, 48, 21, 763091), delta_a=50000)
+    man2 = KeplerianImpulsiveMan(Date(2008, 9, 20, 14, 34, 39, 970298), delta_a=50000)
     orb.maneuvers = [man1, man2]
 
     altitude = []
@@ -210,7 +210,7 @@ def test_man_delta_i(orb):
             man_date = p.date
             break
 
-    man = DeltaCombined(man_date, delta_angle=np.radians(5))
+    man = KeplerianImpulsiveMan(man_date, delta_angle=np.radians(5))
     orb.maneuvers = man
 
     inclination, dates = [], []

@@ -14,7 +14,7 @@ from beyond.io.tle import Tle
 from beyond.dates import timedelta
 from beyond.propagators.kepler import Kepler
 from beyond.env.solarsystem import get_body
-from beyond.orbits.man import Maneuver
+from beyond.orbits.man import ImpulsiveMan
 from beyond.orbits.listeners import ApsideListener
 
 
@@ -35,7 +35,7 @@ for p in orb.iter(start=start, stop=stop, step=step, listeners=ApsideListener())
         perigee = p
         break
 
-man1 = Maneuver(perigee.date, (280, 0, 0), frame="TNW")
+man1 = ImpulsiveMan(perigee.date, (280, 0, 0), frame="TNW")
 orb.maneuvers = [man1]
 
 dates1, alt1 = [], []
@@ -45,7 +45,7 @@ for p in orb.iter(start=perigee.date, stop=stop, step=step, listeners=ApsideList
         apogee = p
         break
 
-man2 = Maneuver(apogee.date, (270, 0, 0), frame="TNW")
+man2 = ImpulsiveMan(apogee.date, (270, 0, 0), frame="TNW")
 
 print(man1.date)
 print(man2.date)

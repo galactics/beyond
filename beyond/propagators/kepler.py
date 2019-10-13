@@ -135,7 +135,7 @@ class Kepler(NumericalPropagator):
         for man in self.orbit.maneuvers:
             if man.check(orb, step):
                 log.debug("Applying maneuver at {} ({})".format(man.date, man.comment))
-                y_n_1[3:] += man.dv(y_n_1)
+                y_n_1[3:] += man.dv(y_n_1, step=step)
 
         return y_n_1
 
