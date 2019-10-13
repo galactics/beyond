@@ -255,7 +255,7 @@ def dump_kvn_meta_odm(data, meta_tag=True, extras={}, **kwargs):
 
     center = data.frame.center.name
 
-    if "Barycenter" in center:
+    if re.search(r"Barycenter|L\d", center):
         center = " ".join(re.findall("[A-Z][^A-Z]*", center))
 
     meta = """{meta}OBJECT_NAME          = {name}
