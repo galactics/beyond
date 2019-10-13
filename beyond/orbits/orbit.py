@@ -295,7 +295,7 @@ Orbit =
     @propagator.setter
     def propagator(self, new_propagator):
 
-        if isinstance(new_propagator, str):
+        if isinstance(new_propagator, str) or new_propagator is None:
             new_propagator = get_propagator(new_propagator)()
 
         self._propagator = new_propagator
