@@ -1,6 +1,7 @@
 
 import numpy as np
 
+from contextlib import contextmanager
 from pytest import fixture, raises, mark
 from unittest.mock import patch
 
@@ -9,7 +10,7 @@ from beyond.dates import Date, timedelta
 from beyond.io.tle import Tle
 from beyond.propagators.kepler import Kepler, SOIPropagator
 from beyond.env.solarsystem import get_body
-from beyond.orbits.listeners import LightListener, NodeListener
+from beyond.orbits.listeners import LightListener, NodeListener, find_event, ApsideListener
 from beyond.orbits.man import ImpulsiveMan, KeplerianImpulsiveMan
 
 import beyond.env.jpl as jpl
@@ -30,19 +31,43 @@ def orb():
     return orb
 
 
+@contextmanager
+def mock_step(orb):
+    with patch('beyond.propagators.kepler.Kepler._make_step', wraps=orb.propagator._make_step) as mock:
+        yield mock
+
+
+def count_steps(td, step, inclusive=True):
+    """Count how many steps it take to travel td
+
+    Args:
+        td (timedelta)
+        step (timedelta)
+    Return:
+        int
+    """
+
+    inclusive = 1 if inclusive else 0
+    return abs(td) // step + inclusive
+
+
 def test_propagate_rk4(orb):
 
     orb.propagator.method = Kepler.RK4
 
     assert orb.date == Date(2008, 9, 20, 12, 25, 40, 104192)
 
+    # simple propagation with a Date object
     orb2 = orb.propagate(orb.date + timedelta(minutes=121, seconds=12))
 
     assert orb2.date == Date(2008, 9, 20, 14, 26, 52, 104192)
     assert orb2.propagator.orbit is None  # brand new propagator
 
+    # simple propagation with a timedelta object
     orb3 = orb2.propagate(timedelta(minutes=12, seconds=5))
 
+    # Check if the propagator.orbit is initializd for orb2
+    # and not yet initialized for orb3
     assert orb3.date == Date(2008, 9, 20, 14, 38, 57, 104192)
     assert orb2.propagator.orbit is not None
     assert orb3.propagator.orbit is None
@@ -51,6 +76,26 @@ def test_propagate_rk4(orb):
         orb3,
         [-3.32227102e+06,  2.71760944e+06, -5.18854876e+06, -3.72026533e+03, -6.64188815e+03, -1.10191470e+03]
     )
+
+    # simple propagation with a negative step
+    orb4 = orb3.propagate(timedelta(minutes=-15))
+    assert orb4.date == orb3.date - timedelta(minutes=15)
+
+
+def test_micro_step(orb):
+
+    with mock_step(orb) as mock:
+        # Propagation with micro-step (< to the Kepler propagator step size)
+        orb2 = orb.propagate(orb.date + timedelta(seconds=20))
+        assert orb2.date == orb.date + timedelta(seconds=20)
+
+        assert mock.call_count == 7
+
+    with mock_step(orb) as mock:    
+        # negative micro-step
+        orb2 = orb.propagate(orb.date - timedelta(seconds=20))
+        assert orb2.date == orb.date - timedelta(seconds=20)
+        assert mock.call_count == 7
 
 
 def test_propagate_euler(orb):
@@ -72,7 +117,7 @@ def test_propagate_euler(orb):
 
     assert np.allclose(
         np.array(orb3),
-        [1.31798055e+06, -1.03274291e+07,  6.55473124e+06,  3.65036569e+03, 2.74331087e+03,  2.91576212e+03]
+        [ 1.31645770e+06, -1.03138233e+07,  6.54634427e+06,  3.64588077e+03,  2.74341537e+03,  2.91049045e+03]
     )
 
 
@@ -117,64 +162,172 @@ def test_iter(orb):
     assert all(data[0] == data2[0])
     assert data[0] is not data2[0]
 
+    # Test retropolation then extrapolation
 
-@mark.skip(reason="Too much changes to make to numerical propagators")
+    # same but with step interpolation
+
+
+# @mark.skip(reason="Too much changes to make to numerical propagators")
 def test_iter_on_dates(orb):
     # Generate a free step ephemeris
     start = orb.date
-    stop1 = start + timedelta(hours=3)
-    step1 = timedelta(seconds=10)
-    stop2 = stop1 + timedelta(hours=3)
-    step2 = timedelta(seconds=120)
+    stop = timedelta(hours=3)
+    step = timedelta(seconds=10)
 
-    dates = list(Date.range(start, stop1, step1)) + list(Date.range(stop1, stop2, step2, inclusive=True))
-
-    ephem = orb.ephem(dates=dates)
+    drange = Date.range(start, stop, step, inclusive=True)
+    ephem = orb.ephem(dates=drange)
 
     assert ephem.start == start
-    assert ephem.stop == stop2
-    assert ephem[1].date - ephem[0].date == step1
-    assert ephem[-1].date - ephem[-2].date == step2
+    assert ephem.stop == start + stop
+    assert ephem[1].date - ephem[0].date == step
+
+
+def test_duty_cycle(orb):
+
+    with mock_step(orb) as mock:
+        date = Date(2008, 9, 20, 13)
+        orb.propagate(date)
+
+        assert mock.call_count == count_steps(orb.date - date, orb.propagator.step)
+        assert mock.call_count == 35
+
+    with mock_step(orb) as mock:
+        date = orb.date - timedelta(seconds=652)
+        orb.propagate(date)
+
+        assert mock.call_count == count_steps(orb.date - date, orb.propagator.step)
+        assert mock.call_count == 11
+
+    with mock_step(orb) as mock:
+
+        start = Date(2008, 9, 20, 13)
+        stop = start + timedelta(minutes=90)
+
+        data = []
+        for p in orb.iter(start=start, stop=stop):
+            data.append(p)
+
+        assert len(data) == 91
+        assert data[0].date == start
+        assert data[-1].date == stop
+        assert mock.call_count == (
+            count_steps(orb.date - start, orb.propagator.step)
+            + count_steps(stop - start, orb.propagator.step, False)
+        )
+        # assert mock.call_count == 125
 
 
 def test_listener(orb):
+    with mock_step(orb) as mock:
 
-    with patch('beyond.propagators.kepler.Kepler._make_step', wraps=orb.propagator._make_step) as mock:
+        start = Date(2008, 9, 20, 13)
+        stop = start + timedelta(minutes=90)
+
         data = []
-        for p in orb.iter(start=Date(2008, 9, 20, 13), stop=timedelta(minutes=90), listeners=LightListener()):
+        for p in orb.iter(start=start, stop=stop, listeners=LightListener()):
             data.append(p)
 
         assert len(data) == 93
-        assert mock.call_count == 228
+        assert mock.call_count == (
+            count_steps(orb.date - start, orb.propagator.step)
+            + count_steps(stop - start, orb.propagator.step, False)
+        )
+        # assert mock.call_count == 125
+
+        events = [x for x in data if x.event]
+        assert len(events) == 2
+        assert events[0].date == Date(2008, 9, 20, 13, 48, 23, 644628)
+        assert events[0].event.info == "Umbra entry"
+
+        assert events[1].date == Date(2008, 9, 20, 14, 19, 30, 126582)
+        assert events[1].event.info == "Umbra exit"
+
+    with mock_step(orb) as mock:
+
+        start = Date(2008, 9, 20, 13)
+        stop = start + timedelta(minutes=90)
+
+        data = []
+        for p in orb.iter(start=start, stop=stop, listeners=ApsideListener()):
+            data.append(p)
+
+        assert len(data) == 93
+        assert mock.call_count == (
+            count_steps(orb.date - start, orb.propagator.step)
+            + count_steps(stop - start, orb.propagator.step, False)
+        )
+        # assert mock.call_count == 125
+
+        events = [x for x in data if x.event]
+        assert len(events) == 2
+        assert str(events[0].date) == "2008-09-20T13:20:22.031823 UTC"
+        assert events[0].event.info == "Apoapsis"
+
+        assert str(events[1].date) == "2008-09-20T14:06:09.988488 UTC"
+        assert events[1].event.info == "Periapsis"
 
 
 def test_man(orb):
 
-    print(repr(orb))
     # At the altitude of the ISS, two maneuvers of 28 m/s should result in roughly
     # an increment of 100 km of altitude
 
     with raises(ValueError):
         ImpulsiveMan(Date(2008, 9, 20, 13, 48, 21, 763091), (28, 0, 0, 0))
 
-    man1 = ImpulsiveMan(Date(2008, 9, 20, 13, 48, 21, 763091), (28, 0, 0), frame="TNW")
-    man2 = ImpulsiveMan(Date(2008, 9, 20, 14, 34, 39, 970298), (0, 28, 0), frame="QSW")
+    peri = find_event('Periapsis', orb.iter(stop=timedelta(minutes=180), listeners=ApsideListener()), offset=1)
+    man1 = ImpulsiveMan(peri.date, (28, 0, 0), frame="TNW")
+    orb.maneuvers = [man1]
+
+    apo = find_event('Apoapsis', orb.iter(stop=timedelta(minutes=180), listeners=ApsideListener()), offset=1)
+    # This should also work, but doesn't return the exact same date as
+    # the uncommented apogee search.
+    # apo = find_event('Apoapsis', orb.iter(start=peri.date - 10*orb.propagator.step, stop=timedelta(minutes=180), listeners=ApsideListener()))
+
+    man2 = ImpulsiveMan(apo.date, (28, 0, 0), frame="TNW")
+
+
     orb.maneuvers = [man1, man2]
 
     altitude = []
+    eccentricity = []
     dates = []
     for p in orb.iter(stop=timedelta(minutes=300)):
         altitude.append(p.copy(form='spherical').r - p.frame.center.r)
+        eccentricity.append(p.copy(form="keplerian").e)
         dates.append(p.date.datetime)
 
     # import matplotlib.pyplot as plt
-    # plt.plot(dates, altitude)
+    # fig = plt.figure()
+    # g1 = fig.add_subplot(111)
+    # g2 = g1.twinx()
+    # p1, = g1.plot(dates, altitude, label="altitude", color="orange")
+    # p2, = g2.plot(dates[:80], eccentricity[:80], label="eccentricity")
+    # g2.plot(dates[150:], eccentricity[150:], label="eccentricity")
+
+    # g1.set_ylabel("Altitude (m)")
+    # g2.set_ylabel("Eccentricity")
+    # g1.yaxis.label.set_color(p1.get_color())
+    # g2.yaxis.label.set_color(p2.get_color())
+    # g2.set_yscale('log')
+    # plt.tight_layout()
     # plt.show()
 
-    before = np.mean(altitude[:80])
-    after = np.mean(altitude[140:])
+    alt_before = np.mean(altitude[:80])
+    alt_after = np.mean(altitude[150:])
 
-    assert 98000 < after - before < 99000
+    ecc_before = np.mean(eccentricity[:80])
+    ecc_after = np.mean(eccentricity[150:])
+
+    assert abs(ecc_before - 6.7e-4) < 1e-6
+    assert abs(ecc_after - 7.46e-4) < 1e-6
+    # assert abs(ecc_after - 6.57e-4) < 1e-6
+
+    assert str(man1.date) == "2008-09-20T14:06:09.988586 UTC"
+    assert str(man2.date) == "2008-09-20T14:52:55.773122 UTC"
+    # assert str(man2.date) == "2008-09-20T14:52:28.201126 UTC"
+
+    assert 97900 < alt_after - alt_before < 98000
 
 
 def test_man_delta_a(orb):
@@ -202,15 +355,9 @@ def test_man_delta_a(orb):
 
 def test_man_delta_i(orb):
 
-    i0 = orb.i
+    asc = find_event("Asc Node", orb.iter(stop=timedelta(minutes=200), listeners=NodeListener()))
 
-    # Search for the next ascending node
-    for p in orb.iter(stop=timedelta(minutes=200), listeners=NodeListener()):
-        if p.event and p.event.info.startswith("Asc"):
-            man_date = p.date
-            break
-
-    man = KeplerianImpulsiveMan(man_date, delta_angle=np.radians(5))
+    man = KeplerianImpulsiveMan(asc.date, delta_angle=np.radians(5))
     orb.maneuvers = man
 
     inclination, dates = [], []
@@ -219,6 +366,7 @@ def test_man_delta_i(orb):
         dates.append(p.date.datetime)
 
     # import matplotlib.pyplot as plt
+    # plt.figure()
     # plt.plot(dates, np.degrees(inclination))
     # plt.show()
 

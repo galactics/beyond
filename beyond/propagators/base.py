@@ -6,14 +6,14 @@ from ..dates import Date
 from ..orbits.listeners import Speaker
 
 
-class Propagator(Speaker, metaclass=ABCMeta):
+class Propagator(metaclass=ABCMeta):
     """Base class for propagators
     """
 
     orbit = None
 
     @abstractmethod
-    def _iter(self, **kwargs):
+    def iter(self, **kwargs):
         pass
 
     @abstractmethod
@@ -28,6 +28,11 @@ class Propagator(Speaker, metaclass=ABCMeta):
 
     def copy(self):
         return self.__class__()
+
+
+class AnalyticalPropagator(Speaker, Propagator):
+    """Base class for analytical propagators (SGP4, Eckstein-Heschler, etc.)
+    """
 
     def iter(self, **kwargs):
         """Compute a range of orbits between two dates
@@ -90,11 +95,6 @@ class Propagator(Speaker, metaclass=ABCMeta):
                 yield listen_orb
             yield orb
 
-
-class AnalyticalPropagator(Propagator):
-    """Base class for analytical propagators (SGP4, Eckstein-Heschler, etc.)
-    """
-
     def _iter(self, **kwargs):
 
         start = kwargs.get("start")
@@ -114,10 +114,29 @@ class NumericalPropagator(Propagator):
     """Base class for numerical propagators (e.g. Cowell)
     """
 
+    def iter(self, **kwargs):
+        if "dates" not in kwargs:
+            start = kwargs.setdefault("start", self.orbit.date)
+            stop = kwargs.get("stop")
+            step = kwargs.setdefault("step", getattr(self, "step", None))
+
+            if stop is None:
+                raise ValueError("The end of the propagation should be defined")
+
+            start = self.orbit.date if start is None else start
+            step = self.step if step is None else step
+
+            if isinstance(kwargs["stop"], timedelta):
+                kwargs["stop"] = start + kwargs["stop"]
+            if start > kwargs["stop"] and step.total_seconds() > 0:
+                kwargs["step"] = -step
+
+        for orb in self._iter(**kwargs):
+            yield orb
+
     def propagate(self, date):
 
-        for orb in self.iter(stop=date, inclusive=True):
-            continue
-        else:
-            # Gives only the last iteration
-            return orb
+        if isinstance(date, timedelta):
+            date = self.orbit.date + date
+
+        return next(self.iter(start=date, stop=date))

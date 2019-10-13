@@ -1,10 +1,11 @@
-from numpy import sqrt, zeros, array
+from numpy import sqrt, zeros, array, sign
 from collections import namedtuple
 import logging
 
 from ..constants import G
 from .base import NumericalPropagator
 from ..dates import Date, timedelta
+from ..orbits.ephem import Ephem
 
 
 __all__ = ["Kepler", "SOIPropagator"]
@@ -90,6 +91,10 @@ class Kepler(NumericalPropagator):
     def orbit(self, orbit):
         self._orbit = orbit.copy(form="cartesian", frame=self.frame)
 
+    @property
+    def butcher(self):
+        return self.BUTCHER[self.method]
+
     def _newton(self, orb, step):
         """Newton's Law of Universal Gravitation
         """
@@ -115,8 +120,7 @@ class Kepler(NumericalPropagator):
         """Compute the next step with the selected method
         """
 
-        method = self.BUTCHER[self.method]
-        a, b, c = method["a"], method["b"], method["c"]
+        a, b, c = self.butcher["a"], self.butcher["b"], self.butcher["c"]
 
         y_n = orb.copy()
         ks = [self._newton(y_n, timedelta(0))]
@@ -141,27 +145,61 @@ class Kepler(NumericalPropagator):
 
     def _iter(self, **kwargs):
 
-        start = kwargs.get("start", self.orbit.date)
-        stop = kwargs.get("stop")
-        step = kwargs.get("step", self.step)
+        dates = kwargs.get("dates")
+
+        if dates is not None:
+            start = dates.start
+            stop = dates.stop
+            step = None
+        else:
+            start = kwargs.get("start", self.orbit.date)
+            stop = kwargs.get("stop")
+            step = kwargs.get("step")
+
+        listeners = kwargs.get("listeners", [])
+
+        # Not very clean !
+        if step is self.step:
+            step = None
 
         orb = self.orbit
 
-        if start > orb.date:
-            # Propagation of the current orbit to the starting point requested
-            for date in Date.range(orb.date + self.step, start, self.step):
-                orb = self._make_step(orb, self.step)
+        if start != orb.date:
+            # Position the start of the real extrapolation when requested
+            # by extrapolation or retropolation
 
-            # Compute the orbit at the real beginning of the requested range
-            orb = self._make_step(orb, start - orb.date)
+            # Step size for initial extrapolation or retropolation
+            _step = sign((start - orb.date).total_seconds()) * self.step
 
-        for date in Date.range(start, stop, step):
+            ephem = [orb]
+
+            for date in Date.range(orb.date, start, _step, inclusive=True):
+                orb = self._make_step(orb, _step)
+                ephem.append(orb)
+
+            for i in range(Ephem.DEFAULT_ORDER - len(ephem)):
+                orb = self._make_step(orb, _step)
+                ephem.append(orb)
+
+            ephem = Ephem(ephem)
+            # Interpolation of the ephemeris to get the desired start date
+            orb = ephem.propagate(start)
+
+        # In order to compute the propagation with the reference step size
+        # (ie self.step), but give the result at the requested step size
+        # (ie step), we use an Ephem object for interpolation
+        ephem = [orb]
+
+        for date in Date.range(start, stop, self.step):
+            orb = self._make_step(orb, self.step)
+            # print(orb.maneuvers)
+            ephem.append(orb)
+
+        ephem = Ephem(ephem)
+
+        for orb in ephem.iter(dates=dates, step=step, listeners=listeners):
+            # orb.maneuvers = self.orbit.maneuvers
             yield orb
-            orb = self._make_step(orb, step)
-
-        # Instead of using Date(inclusive=True), we compute the last point manually,
-        # allowing to have a different step size to fit the desired stop date
-        yield self._make_step(orb, stop - orb.date)
 
 
 SOI = namedtuple("SOI", "radius frame")
@@ -207,6 +245,7 @@ class SOIPropagator(Kepler):
         self.alt = alt if isinstance(alt, (list, tuple)) else [alt]
         self.method = method
         self.out_frame = frame
+        self.frame = frame
         self.active = central.name
 
     @property
