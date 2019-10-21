@@ -229,7 +229,7 @@ class Form(Node):
 
         ex = e * cos(ω)
         ey = e * sin(ω)
-        u = ω + ν
+        u = (ω + ν) % (np.pi * 2)
 
         return np.array([a, ex, ey, i, Ω, u], dtype=float)
 
@@ -301,7 +301,7 @@ TLE = Form("tle", ["i", "Ω", "e", "ω", "M", "n"])
 see :py:class:`~beyond.orbits.tle.Tle` for details
 """
 
-KEPL_C = Form("keplerian_circular", ["a", "ex", "ey", "i", "Ω", "λ"])
+KEPL_C = Form("keplerian_circular", ["a", "ex", "ey", "i", "Ω", "u"])
 """Special case for near-circular orbits
 
     * a : semi-major axis
@@ -309,7 +309,7 @@ KEPL_C = Form("keplerian_circular", ["a", "ex", "ey", "i", "Ω", "λ"])
     * ey : e * sin(ω)
     * i : inclination
     * Ω : right-ascension of ascending node
-    * λ : mean argument of latitude (ω + M)
+    * u : argument of latitude (ω + ν)
 """
 
 KEPL_M = Form("keplerian_mean", ["a", "e", "i", "Ω", "ω", "M"])
