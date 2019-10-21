@@ -129,7 +129,7 @@ class KeplerianImpulsiveMan(ImpulsiveMan):
         )
         delta_v_t = v_final * np.cos(self.delta_angle) - orb.infos.v
 
-        ratio = delta_v_t / delta_v
+        ratio = abs(delta_v_t / delta_v)
         # Due to some floating point operation rounding, this ratio
         # can be superior to one.
         if np.isclose(ratio, 1):
