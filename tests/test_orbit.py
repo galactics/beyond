@@ -62,10 +62,12 @@ def test_init_cart(ref_date):
 
 def test_coord_unit_transform(ref_orbit):
 
-    kep = Form._keplerian_mean_to_keplerian(ref_orbit, Earth)
+    kep_e = Form._keplerian_mean_to_keplerian_eccentric(ref_orbit, Earth)
+    kep = Form._keplerian_eccentric_to_keplerian(kep_e, Earth)
     assert np.allclose(ref_orbit[:5], kep[:5])
 
-    new = Form._keplerian_to_keplerian_mean(kep, Earth)
+    tmp_kep_e = Form._keplerian_to_keplerian_eccentric(kep, Earth)
+    new = Form._keplerian_eccentric_to_keplerian_mean(tmp_kep_e, Earth)
     assert np.allclose(ref_orbit, new)
 
     tle = Form._keplerian_mean_to_tle(ref_orbit, Earth)

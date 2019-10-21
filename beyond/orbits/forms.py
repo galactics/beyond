@@ -115,10 +115,8 @@ class Form(Node):
         return np.array([x, y, z, vx, vy, vz], dtype=float)
 
     @classmethod
-    def _keplerian_to_keplerian_mean(cls, coord, center):
-        """Conversion from Keplerian to Keplerian Mean
-
-        The difference is the use of Mean anomaly instead of True anomaly
+    def _keplerian_to_keplerian_eccentric(cls, coord, center):
+        """Conversion from Keplerian to Keplerian Eccentric
         """
 
         a, e, i, Ω, ω, ν = coord
@@ -127,20 +125,42 @@ class Form(Node):
             cos_E = (e + cos(ν)) / (1 + e * cos(ν))
             sin_E = (sin(ν) * sqrt(1 - e ** 2)) / (1 + e * cos(ν))
             E = arctan2(sin_E, cos_E) % (2 * np.pi)
-            M = E - e * sin(E)  # Mean anomaly
         else:
-            # Hyperbolic case
-            H = arccosh((e + cos(ν)) / (1 + e * cos(ν)))
-            M = e * sinh(H) - H
+            # Hyperbolic case, usually marked H
+            E = arccosh((e + cos(ν)) / (1 + e * cos(ν)))
+
+        return np.array([a, e, i, Ω, ω, E], dtype=float)
+
+    @classmethod
+    def _keplerian_eccentric_to_keplerian_mean(cls, coord, center):
+        """Conversion from Keplerian Eccentric to Keplerian Mean
+        """
+        a, e, i, Ω, ω, E = coord
+
+        if e < 1:
+            M = E - e * sin(E)
+        else:
+            # Hyperbolic case, usually marked H
+            M = e * sinh(E) - E
 
         return np.array([a, e, i, Ω, ω, M], dtype=float)
 
     @classmethod
-    def _keplerian_mean_to_keplerian(cls, coord, center):
-        """Conversion from Mean Keplerian to True Keplerian
+    def _keplerian_mean_to_keplerian_eccentric(cls, coord, center):
+        """Conversion from Mean Keplerian to Keplerian Eccentric
         """
         a, e, i, Ω, ω, M = coord
         E = cls._m_to_e(e, M)
+
+        return np.array([a, e, i, Ω, ω, E], dtype=float)
+
+    @classmethod
+    def _keplerian_eccentric_to_keplerian(cls, coord, center):
+        """Conversion from Mean Keplerian to True Keplerian
+        """
+
+        a, e, i, Ω, ω, E = coord
+
         cos_ν = (cos(E) - e) / (1 - e * cos(E))
         sin_ν = (sin(E) * sqrt(1 - e ** 2)) / (1 - e * cos(E))
 
@@ -312,6 +332,11 @@ KEPL_C = Form("keplerian_circular", ["a", "ex", "ey", "i", "Ω", "u"])
     * u : argument of latitude (ω + ν)
 """
 
+KEPL_E = Form("keplerian_eccentric", ["a", "e", "i", "Ω", "ω", "E"])
+"""Same as Keplerian, but replaces True anomaly with
+`Eccentric anomaly <https://en.wikipedia.org/wiki/Eccentric_anomaly>`__
+"""
+
 KEPL_M = Form("keplerian_mean", ["a", "e", "i", "Ω", "ω", "M"])
 """Same as Keplerian, but replaces True anomaly with
 `Mean anomaly <https://en.wikipedia.org/wiki/Mean_anomaly>`__
@@ -345,7 +370,7 @@ CART = Form("cartesian", ["x", "y", "z", "vx", "vy", "vz"])
 """Cartesian form"""
 
 
-SPHE + CART + KEPL + KEPL_M + TLE
+SPHE + CART + KEPL + KEPL_E + KEPL_M + TLE
 KEPL + KEPL_C
 
 
@@ -353,6 +378,7 @@ _cache = {
     "tle": TLE,
     "keplerian_circular": KEPL_C,
     "keplerian_mean": KEPL_M,
+    "keplerian_eccentric": KEPL_E,
     "keplerian": KEPL,
     "spherical": SPHE,
     "cartesian": CART,
