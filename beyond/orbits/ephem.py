@@ -66,6 +66,12 @@ class Ephem(Speaker):
         """
         return self._orbits[-1].date
 
+    @property
+    def dates(self):
+        """Generator yielding Dates of each Orbit object of the ephem
+        """
+        return (o.date for o in self)
+
     # @property
     # def steps(self):
     #     """Time intervals used in the ephemeris
