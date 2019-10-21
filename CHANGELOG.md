@@ -3,6 +3,18 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [v0.6.7] - 2019-10-21
+
+### Added
+
+- JPL ephemeris : handle unknown objects
+- Maneuvers : Continuous maneuver object
+
+### Modified
+
+- Maneuvers : ImpulsiveMan replace Maneuver object
+- Form : Documentation of keplerian circular form now coherent with code
+
 ## [v0.6.6] - 2019-07-23
 
 ### Added
