@@ -548,3 +548,30 @@ def stations_listeners(stations):
             listeners.append(StationMaskListener(sta))
 
     return listeners
+
+
+def find_event(event, iterator, offset=0):
+    """Find an specific event in a extropolation
+
+    Args:
+        event (str or Event)
+        iterator ():
+        offset (int):
+    Return:
+        Orb
+    """
+
+    if isinstance(event, Event):
+        event = event.info
+
+    i = 0
+
+    for orb in iterator:
+        if orb.event and orb.event.info == event:
+            if i == offset:
+                break
+            i += 1
+    else:
+        raise RuntimeError("No event '{}' found".format(event))
+
+    return orb
