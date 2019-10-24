@@ -3,8 +3,9 @@
 """Date module
 """
 
-from datetime import datetime, timedelta, date
 from numpy import sin, radians
+from collections import namedtuple
+from datetime import datetime, timedelta, date
 
 from ..errors import DateError, UnknownScaleError
 from .eop import EopDb
@@ -416,11 +417,15 @@ class Date:
 
     @classmethod
     def range(cls, start=None, stop=None, step=None, inclusive=False):
+        return DateRange(start, stop, step, inclusive)
+
+    @classmethod
+    def _range(cls, start=None, stop=None, step=None, inclusive=False):
         """Generator of a date range
 
         Args:
             start (Date):
-            stop (Date or datetime.timedelta)!
+            stop (Date or datetime.timedelta):
             step (timedelta):
         Keyword Args:
             inclusive (bool): If ``False``, the stopping date is not included.
@@ -454,6 +459,50 @@ class Date:
         while getattr(date, oper)(stop):
             yield date
             date += step
+
+
+class DateRange:
+    """Object representing a Date.range call
+
+    Allow for manipulation of the range before any compytation
+    """
+
+    _descriptor = namedtuple("range_descriptor", "start stop step inclusive")
+
+    def __init__(self, start, stop, step, inclusive):
+        """
+
+        Args:
+            start (Date):
+            stop (Date or datetime.timedelta):
+            step (timedelta):
+            inclusive (bool): If ``False``, the stopping date is not included.
+                This is the same behavior as the built-in :py:func:`range`.
+        """
+
+        if isinstance(stop, timedelta):
+            stop = start + stop
+
+        self._range = self._descriptor(start, stop, step, inclusive)
+
+    def __iter__(self):
+        for d in Date._range(*self._range):
+            yield d
+
+    def __contains__(self, date):
+        return self.start <= date <= self.stop
+
+    @property
+    def start(self):
+        return self._range.start
+
+    @property
+    def stop(self):
+        return self._range.stop
+
+    @property
+    def step(self):
+        return self._range.step
 
 
 # This part is here to allow matplotlib to display Date objects directly
