@@ -113,6 +113,9 @@ class Ephem(Speaker):
             order (int): In case of ``LAGRANGE`` method is used
         Return:
             Orbit:
+        Raise:
+            ValueError: when date is not in the range of the ephemeris
+            ValueError: when the order of interpolation is insufficient
         """
 
         if not self.start <= date <= self.stop:
@@ -162,6 +165,9 @@ class Ephem(Speaker):
 
             result = np.zeros(6)
 
+            if len(subset) < order:
+                raise ValueError("len(ephem) < order : impossible to interpolate")
+
             # Everything is on wikipedia
             #        k
             # L(x) = Σ y_j * l_j(x)
@@ -207,6 +213,8 @@ class Ephem(Speaker):
                 case.
         Yield:
             :py:class:`Orbit`:
+        Raise:
+            ValueError
 
         There is two ways to use the iter() method.
 
