@@ -81,7 +81,7 @@ class Form(Node):
         K = v_norm ** 2 / 2 - center.µ / r_norm  # specific energy
         a = -center.µ / (2 * K)  # semi-major axis
         e = sqrt(1 - h_norm ** 2 / (a * center.µ))  # eccentricity
-        p = a * (1 - e ** 2)
+        p = a * (1 - e ** 2)  # semi parameter
         i = arccos(h[2] / h_norm)  # inclination
         Ω = arctan2(h[0], -h[1]) % (2 * np.pi)  # right ascension of the ascending node
 
