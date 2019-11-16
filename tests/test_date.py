@@ -277,9 +277,11 @@ def test_plot():
 
     import matplotlib.pyplot as plt
 
+    fig = plt.figure()
     dates = list(Date.range(Date.now(), timedelta(1), timedelta(minutes=10)))
     plt.plot(dates, np.random.rand(len(dates)))
-    plt.draw()
+    plt.draw()  # draws the figure, but does not show it
+    plt.close(fig)  # Delete the figure
 
 
 def test_daterange():
