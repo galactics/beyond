@@ -3,7 +3,7 @@ from pytest import fixture, raises
 
 from datetime import timedelta
 
-from beyond.orbits.man import ImpulsiveMan
+from beyond.orbits.man import ImpulsiveMan, ContinuousMan
 from beyond.io.tle import Tle
 from beyond.io.ccsds import dumps, loads, CcsdsParseError
 from beyond.dates import Date
@@ -319,9 +319,19 @@ def orb():
 
 @fixture
 def orb_man(orb):
+    orb = orb.copy()
     orb.maneuvers = [
         ImpulsiveMan(Date(2008, 9, 20, 12, 41, 9, 984493), [280, 0, 0], frame="TNW", comment="Maneuver 1"),
         ImpulsiveMan(Date(2008, 9, 20, 13, 33, 11, 374985), [270, 0, 0], frame="TNW", comment="Maneuver 2"),
+    ]
+    return orb
+
+@fixture
+def orb_continuous_man(orb):
+    orb = orb.copy()
+    orb.maneuvers = [
+        ContinuousMan(Date(2008, 9, 20, 12, 41, 9, 984493), timedelta(minutes=3), [280, 0, 0], frame="TNW", comment="Maneuver 1"),
+        ContinuousMan(Date(2008, 9, 20, 13, 33, 11, 374985), timedelta(minutes=3), [270, 0, 0], frame="TNW", comment="Maneuver 2"),
     ]
     return orb
 
@@ -365,13 +375,22 @@ def test_dump_opm(orb):
     assert "\n".join(txt[2:]) == "\n".join(ref[2:])
 
 
-def test_dump_opm_man(orb_man):
+def test_dump_opm_man(orb_man, orb_continuous_man):
     ref = ref_man.splitlines()
     txt = dumps(orb_man).splitlines()
 
     # the split is here to avoid the creation date line
     assert txt[0] == ref[0]
     assert "\n".join(txt[2:]) == "\n".join(ref[2:])
+
+    txt = dumps(orb_continuous_man).splitlines()
+    # the split is here to avoid the creation date line
+    assert txt[0] == ref[0]
+    assert "\n".join(txt[2:31]) == "\n".join(ref[2:31])
+    assert txt[31] == "MAN_DURATION         = 180.000 [s]"
+    assert "\n".join(txt[32:40]) == "\n".join(ref[32:40])
+    assert txt[40] == "MAN_DURATION         = 180.000 [s]"
+    assert "\n".join(txt[41]) == "\n".join(ref[41])
 
 
 def test_dump_oem(ephem):
@@ -431,7 +450,7 @@ def test_load_opm(orb):
         loads(truncated_opm)
 
 
-def test_load_opm_man(orb_man):
+def test_load_opm_man(orb_man, orb_continuous_man):
     # With maneuvers
     ref_opm_man = loads(ref_man)
     assert len(ref_opm_man.maneuvers) == 2
@@ -441,6 +460,23 @@ def test_load_opm_man(orb_man):
         assert ref_opm_man.maneuvers[i]._dv.tolist() == man._dv.tolist()
         assert ref_opm_man.maneuvers[i].frame == man.frame
         assert ref_opm_man.maneuvers[i].comment == man.comment
+
+    # Tweak the reference to convert impulsive maneuvers into continuous ones
+    ref_continuous_man = ref_man.splitlines()
+    ref_continuous_man[31] = "MAN_DURATION         = 180.000 [s]"
+    ref_continuous_man[40] = "MAN_DURATION         = 180.000 [s]"
+    ref_continuous_man = "\n".join(ref_continuous_man)
+
+    ref_opm_continuous_man = loads(ref_continuous_man)
+
+    assert len(ref_opm_continuous_man.maneuvers) == 2
+
+    for i, man in enumerate(orb_continuous_man.maneuvers):
+        assert ref_opm_continuous_man.maneuvers[i].date == man.date
+        assert ref_opm_continuous_man.maneuvers[i].duration == man.duration
+        assert ref_opm_continuous_man.maneuvers[i]._dv.tolist() == man._dv.tolist()
+        assert ref_opm_continuous_man.maneuvers[i].frame == man.frame
+        assert ref_opm_continuous_man.maneuvers[i].comment == man.comment
 
 
 def test_load_oem(ephem):
