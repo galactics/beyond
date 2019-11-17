@@ -1,8 +1,10 @@
 
 from pytest import fixture, raises
 
-from datetime import timedelta
+import numpy as np
 from pathlib import Path
+from itertools import product
+from datetime import timedelta
 
 from beyond.orbits.man import ImpulsiveMan, ContinuousMan
 from beyond.io.tle import Tle
@@ -19,6 +21,7 @@ def get_ref(name):
 
 
 ref_opm = get_ref("opm.kvn")
+ref_opm_cov = get_ref("opm_cov.kvn")
 ref_omm = get_ref("omm.kvn")
 ref_opm_strange_units = get_ref("opm_strange_units.kvn")
 ref_man = get_ref("impulsive_man.kvn")
@@ -40,6 +43,63 @@ def omm():
 @fixture
 def opm(omm):
     return omm.copy(form='cartesian')
+
+
+@fixture
+def opm_cov(opm):
+    opm = opm.copy()
+    opm.cov = [
+        [
+            3.331349476038534e2,
+            4.618927349220216e2,
+            -3.070007847730449e2,
+            -3.349365033922630e-1,
+            -2.211832501084875e-1,
+            -3.041346050686871e-1,
+        ],
+        [
+            4.618927349220216e2,
+            6.782421679971363e2,
+            -4.221234189514228e2,
+            -4.686084221046758e-1,
+            -2.864186892102733e-1,
+            -4.989496988610662e-1,
+        ],
+        [
+            -3.070007847730449e2,
+            -4.221234189514228e2,
+            3.231931992380369e2,
+            2.484949578400095e-1,
+            1.798098699846038e-1,
+            3.540310904497689e-1,
+        ],
+        [
+            -3.349365033922630e-1,
+            -4.686084221046758e-1,
+            2.484949578400095e-1,
+            4.296022805587290e-4,
+            2.608899201686016e-4,
+            1.869263192954590e-4,
+        ],
+        [
+            -2.211832501084875e-1,
+            -2.864186892102733e-1,
+            1.798098699846038e-1,
+            2.608899201686016e-4,
+            1.767514756338532e-4,
+            1.008862586240695e-4,
+        ],
+        [
+            -3.041346050686871e-1,
+            -4.989496988610662e-1,
+            3.540310904497689e-1,
+            1.869263192954590e-4,
+            1.008862586240695e-4,
+            6.224444338635500e-4
+        ]
+    ]
+
+    return opm
 
 
 @fixture
@@ -100,14 +160,30 @@ def test_dummy():
 
 def test_dump_opm(opm):
 
-    opm.propagator = Kepler(get_body("Earth"), timedelta(seconds=60))
-
     ref = ref_opm.splitlines()
     txt = dumps(opm).splitlines()
 
     # the split is here to avoid the creation date line
     assert txt[0] == ref[0]
     assert "\n".join(txt[2:]) == "\n".join(ref[2:])
+
+
+def test_dump_opm_cov(opm_cov):
+
+    ref = ref_opm_cov.splitlines()
+    txt = dumps(opm_cov).splitlines()
+
+    # the split is here to avoid the creation date line
+    assert txt[0] == ref[0]
+    assert "\n".join(ref[2:]) == "\n".join(txt[2:])    
+
+    opm_cov2 = opm_cov.copy()
+    opm_cov2.cov.frame = "TNW"
+    txt = dumps(opm_cov2).splitlines()
+
+    opm_cov3 = opm_cov.copy()
+    opm_cov3.cov.frame = "QSW"
+    txt = dumps(opm_cov3).splitlines()
 
 
 def test_dump_omm(omm):
@@ -214,6 +290,15 @@ def test_load_opm(opm):
     truncated_opm = "\n".join(ref_opm.splitlines()[:15] + ref_opm.splitlines()[16:])
     with raises(CcsdsParseError):
         loads(truncated_opm)
+
+
+def test_load_opm_cov(opm_cov):
+    ref_opm = loads(ref_opm_cov)
+    assert_orbit(opm_cov, ref_opm)
+
+    assert hasattr(ref_opm, 'cov')
+    for i, j in product(range(6), repeat=2):
+        assert abs(ref_opm.cov[i, j] - opm_cov.cov[i, j]) < np.finfo(float).eps
 
 
 def test_load_opm_man_impulsive(opm_man):

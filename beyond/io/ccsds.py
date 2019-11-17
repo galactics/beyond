@@ -9,6 +9,7 @@ from collections.abc import Iterable
 from ..utils import units
 from ..dates import Date, timedelta
 from ..orbits import Orbit, Ephem
+from ..orbits.cov import Cov
 from ..orbits.man import ImpulsiveMan, ContinuousMan
 from ..utils.measures import Measure, Range, Doppler, Azimut, Elevation, MeasureSet
 from ..errors import ParseError
@@ -287,7 +288,7 @@ def _read_oem(string):
     return ephems
 
 
-def _make_cov(orb, data):
+def _read_cov(orb, data):
 
     frame = data.get("COV_REF_FRAME", orb.cov.PARENT_FRAME)
     if frame in ("RSW", "RTN"):
@@ -344,7 +345,7 @@ def _make_cov(orb, data):
         ],
     ]
 
-    cov = np.array(values).astype(np.float) * 1e6
+    cov = Cov(orb, np.array(values).astype(np.float) * 1e6)
     cov._frame = frame
 
     return cov
@@ -414,7 +415,7 @@ def _read_opm(string):
             )
 
     if "CX_X" in data:
-        orb.cov = _make_cov(orb, data)
+        orb.cov = _read_cov(orb, data)
 
     return orb
 
@@ -456,6 +457,10 @@ def _read_omm(string):
 
         except KeyError as e:
             raise CcsdsParseError("Missing mandatory parameter '{}'".format(e))
+    else:
+        raise CcsdsParseError(
+            "Unknown OMM theory '{}'".format(data["MEAN_ELEMENT_THEORY"])
+        )
 
     orb = Orbit(date, elements, form, frame, propagator, **kwargs)
     orb.name = name
@@ -464,7 +469,7 @@ def _read_omm(string):
         orb.norad_id = norad_id
 
     if "CX_X" in data:
-        orb.cov = _make_cov(orb, data)
+        orb.cov = _read_cov(orb, data)
 
     return orb
 
@@ -555,6 +560,24 @@ REF_FRAME            = {frame}
     return meta
 
 
+def _dump_cov(cov):
+    text = "\n"
+    if cov.frame != cov.PARENT_FRAME:
+        frame = cov.frame
+        if frame == "QSW":
+            frame = "RSW"
+        text += "COV_REF_FRAME        = {frame}\n".format(frame=frame)
+
+    l = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
+    for i, a in enumerate(l):
+        for j, b in enumerate(l[: i + 1]):
+            txt = "{a}_{b}".format(a=a, b=b)
+
+            text += "C{txt:<19} = {v: 0.16e}\n".format(txt=txt, v=cov[i, j] / 1e6)
+
+    return text
+
+
 def _dump_oem(data, **kwargs):
 
     if isinstance(data, Ephem):
@@ -640,21 +663,7 @@ TRUE_ANOMALY         = {angles[3]: 12.6f} [deg]
 
     # Covariance handling
     if cart.cov.any():
-        text += "\nCOMMENT  COVARIANCE\n"
-        if cart.cov.frame != cart.cov.PARENT_FRAME:
-            frame = cart.cov.frame
-            if frame == "QSW":
-                frame = "RSW"
-            text += "COV_REF_FRAME        = {frame}\n".format(frame=frame)
-
-        l = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
-        for i, a in enumerate(l):
-            for j, b in enumerate(l[: i + 1]):
-                txt = "{a}_{b}".format(a=a, b=b)
-
-                text += "C{txt:<19} = {v: 0.16e}\n".format(
-                    txt=txt, v=cart.cov[i, j] / 1e6
-                )
+        text += _dump_cov(cart.cov)
 
     if cart.maneuvers:
         for i, man in enumerate(cart.maneuvers):
@@ -737,6 +746,9 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
         ndotdot=code_unit(data, "ndotdot", "rev/day**3"),
         mu=wgs72.mu,  # this is already in km**3/s**2
     )
+
+    if data.cov.any():
+        text += _dump_cov(data.cov)
 
     return header + "\n" + meta + text
 
