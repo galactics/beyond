@@ -2,8 +2,8 @@ CCSDS_OMM_VERS = 2.0
 CREATION_DATE = 2019-11-16T17:57:23
 ORIGINATOR = N/A
 
-OBJECT_NAME          = N/A
-OBJECT_ID            = N/A
+OBJECT_NAME          = ISS (ZARYA)
+OBJECT_ID            = 1998-067A
 CENTER_NAME          = EARTH
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC

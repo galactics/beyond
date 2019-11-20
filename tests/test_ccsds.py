@@ -1,4 +1,3 @@
-
 from pytest import fixture, raises
 
 import numpy as np
@@ -16,6 +15,7 @@ from beyond.env.solarsystem import get_body
 
 folder = Path(__file__).parent / "data" / "io" / "ccsds"
 
+
 def get_ref(name):
     return folder.joinpath(name).read_text()
 
@@ -24,7 +24,7 @@ ref_opm = get_ref("opm.kvn")
 ref_opm_cov = get_ref("opm_cov.kvn")
 ref_omm = get_ref("omm.kvn")
 ref_opm_strange_units = get_ref("opm_strange_units.kvn")
-ref_man = get_ref("impulsive_man.kvn")
+ref_man = get_ref("opm_impulsive_man.kvn")
 ref_opm_no_units = get_ref("opm_no_unit.kvn")
 ref_oem = get_ref("oem.kvn")
 ref_double_oem = get_ref("oem_double.kvn")
@@ -32,17 +32,70 @@ ref_tle_bluebook = get_ref("bluebook.tle")
 ref_omm_bluebook = get_ref("bluebook_omm.kvn")
 
 
+@fixture(params=["kvn", "xml"])
+def filetype(request):
+    return request.param
+
+
+@fixture
+def str_opm(filetype):
+    return get_ref("opm.{}".format(filetype))
+
+
+@fixture
+def str_opm_cov(filetype):
+    return get_ref("opm_cov.{}".format(filetype))
+
+
+@fixture
+def str_opm_impulsive_man(filetype):
+    return get_ref("opm_impulsive_man.{}".format(filetype))
+
+
+@fixture
+def str_opm_no_unit(filetype):
+    return get_ref("opm_no_unit.{}".format(filetype))
+
+
+@fixture
+def str_opm_strange_units(filetype):
+    return get_ref("opm_strange_units.{}".format(filetype))
+
+
+@fixture
+def str_omm(filetype):
+    return get_ref("omm.{}".format(filetype))
+
+
+@fixture
+def str_omm_bluebook(filetype):
+    return get_ref("bluebook_omm.{}".format(filetype))
+
+
+@fixture
+def str_oem(filetype):
+    return get_ref("oem.{}".format(filetype))
+
+
+@fixture
+def str_oem_double(filetype):
+    return get_ref("oem_double.{}".format(filetype))
+
+
 @fixture
 def omm():
-    tle = Tle("""1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927
-2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537""")
+    tle = Tle(
+        """ISS (ZARYA)
+1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927
+2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537"""
+    )
 
     return tle.orbit()
 
 
 @fixture
 def opm(omm):
-    return omm.copy(form='cartesian')
+    return omm.copy(form="cartesian")
 
 
 @fixture
@@ -95,8 +148,8 @@ def opm_cov(opm):
             3.540310904497689e-1,
             1.869263192954590e-4,
             1.008862586240695e-4,
-            6.224444338635500e-4
-        ]
+            6.224444338635500e-4,
+        ],
     ]
 
     return opm
@@ -105,9 +158,14 @@ def opm_cov(opm):
 @fixture
 def opm_man(opm):
     opm = opm.copy()
-    opm.propagator = Kepler(get_body('Earth'), timedelta(seconds=60))
+    opm.propagator = Kepler(get_body("Earth"), timedelta(seconds=60))
     opm.maneuvers = [
-        ImpulsiveMan(Date(2008, 9, 20, 12, 41, 9, 984493), [280, 0, 0], frame="TNW", comment="Maneuver 1"),
+        ImpulsiveMan(
+            Date(2008, 9, 20, 12, 41, 9, 984493),
+            [280, 0, 0],
+            frame="TNW",
+            comment="Maneuver 1",
+        ),
         ImpulsiveMan(Date(2008, 9, 20, 13, 33, 11, 374985), [270, 0, 0], frame="TNW"),
     ]
     return opm
@@ -116,17 +174,30 @@ def opm_man(opm):
 @fixture
 def opm_continuous_man(opm):
     opm = opm.copy()
-    opm.propagator = Kepler(get_body('Earth'), timedelta(seconds=60))
+    opm.propagator = Kepler(get_body("Earth"), timedelta(seconds=60))
     opm.maneuvers = [
-        ContinuousMan(Date(2008, 9, 20, 12, 41, 9, 984493), timedelta(minutes=3), [280, 0, 0], frame="TNW", comment="Maneuver 1"),
-        ContinuousMan(Date(2008, 9, 20, 13, 33, 11, 374985), timedelta(minutes=3), [270, 0, 0], frame="TNW"),
+        ContinuousMan(
+            Date(2008, 9, 20, 12, 41, 9, 984493),
+            timedelta(minutes=3),
+            [280, 0, 0],
+            frame="TNW",
+            comment="Maneuver 1",
+        ),
+        ContinuousMan(
+            Date(2008, 9, 20, 13, 33, 11, 374985),
+            timedelta(minutes=3),
+            [270, 0, 0],
+            frame="TNW",
+        ),
     ]
     return opm
 
 
 @fixture
 def ephem(opm):
-    return opm.ephem(start=opm.date, stop=timedelta(minutes=120), step=timedelta(minutes=3))
+    return opm.ephem(
+        start=opm.date, stop=timedelta(minutes=120), step=timedelta(minutes=3)
+    )
 
 
 @fixture
@@ -134,7 +205,7 @@ def ephem2(opm):
     return opm.ephem(start=opm.date, stop=timedelta(hours=5), step=timedelta(minutes=5))
 
 
-def assert_orbit(ref, orb, form='cartesian'):
+def assert_orbit(ref, orb, form="cartesian"):
 
     ref.form = form
     orb.form = form
@@ -151,51 +222,69 @@ def assert_orbit(ref, orb, form='cartesian'):
     assert abs(ref[5] - orb[5]) < 1e-3
 
 
-def test_dummy():
+def assert_string_lines(str1, str2, ignore=[]):
+
+    assert len(str1) == len(str2)
+
+    if isinstance(ignore, str):
+        ignore = [ignore]
+
+    ignore.append("CREATION_DATE")
+
+    for r, t in zip(str1, str2):
+        _ignore = False
+
+        for ig in ignore:
+            if ig in r:
+                _ignore = True
+                break
+        if _ignore:
+            continue
+
+        assert r == t
+
+
+def test_dummy(filetype):
+
     with raises(TypeError):
-        dumps(None)
+        dumps(None, fmt=filetype)
+
     with raises(CcsdsParseError):
         loads("dummy text")
 
 
-def test_dump_opm(opm):
+def test_dump_opm(opm, str_opm, filetype):
 
-    ref = ref_opm.splitlines()
-    txt = dumps(opm).splitlines()
+    ref = str_opm.splitlines()
+    txt = dumps(opm, fmt=filetype).splitlines()
 
-    # the split is here to avoid the creation date line
-    assert txt[0] == ref[0]
-    assert "\n".join(txt[2:]) == "\n".join(ref[2:])
+    assert_string_lines(ref, txt)
 
 
-def test_dump_opm_cov(opm_cov):
+def test_dump_opm_cov(opm_cov, str_opm_cov, filetype):
 
-    ref = ref_opm_cov.splitlines()
-    txt = dumps(opm_cov).splitlines()
+    ref = str_opm_cov.splitlines()
+    txt = dumps(opm_cov, fmt=filetype).splitlines()
 
-    # the split is here to avoid the creation date line
-    assert txt[0] == ref[0]
-    assert "\n".join(ref[2:]) == "\n".join(txt[2:])    
+    assert_string_lines(ref, txt)
 
     opm_cov2 = opm_cov.copy()
     opm_cov2.cov.frame = "TNW"
-    txt = dumps(opm_cov2).splitlines()
+    txt = dumps(opm_cov2, fmt=filetype).splitlines()
 
     opm_cov3 = opm_cov.copy()
     opm_cov3.cov.frame = "QSW"
-    txt = dumps(opm_cov3).splitlines()
+    txt = dumps(opm_cov3, fmt=filetype).splitlines()
 
 
-def test_dump_omm(omm):
-    ref = ref_omm.splitlines()
-    txt = dumps(omm).splitlines()
+def test_dump_omm(omm, str_omm, filetype):
+    ref = str_omm.splitlines()
+    txt = dumps(omm, fmt=filetype).splitlines()
 
-    # the split is here to avoid the creation date line
-    assert txt[0] == ref[0]
-    assert "\n".join(txt[2:]) == "\n".join(ref[2:])
+    assert_string_lines(ref, txt)
 
 
-def test_omm_dump_bluebook():
+def test_dump_omm_bluebook(filetype, str_omm_bluebook):
     """Example from the CCSDS Blue Book (4-1 and 4-2)
     """
 
@@ -207,103 +296,95 @@ def test_omm_dump_bluebook():
 
     # assert tle.epoch == Date(2007, 5, 4, 10, 34, 41, 426400)
 
-    omm = dumps(omm).splitlines()
-    ref_bluebook = ref_omm_bluebook.splitlines()
+    omm = dumps(omm, fmt=filetype).splitlines()
+    ref_bluebook = str_omm_bluebook.splitlines()
 
-    assert omm[0] == ref_bluebook[0]
+    assert ref_bluebook[0] == omm[0]
     for i in range(4, len(ref_bluebook)):
-        assert omm[i] == ref_bluebook[i]
+        assert ref_bluebook[i] == omm[i]
 
 
-def test_dump_opm_man_impulsive(opm_man):
+def test_dump_opm_man_impulsive(opm_man, str_opm_impulsive_man, filetype):
 
-    ref = ref_man.splitlines()
-    txt = dumps(opm_man).splitlines()
+    ref = str_opm_impulsive_man.splitlines()
+    txt = dumps(opm_man, fmt=filetype).splitlines()
 
-    # the split is here to avoid the creation date line
-    assert txt[0] == ref[0]
-    assert "\n".join(txt[2:]) == "\n".join(ref[2:])
+    assert_string_lines(ref, txt)
 
 
-def test_dump_opm_man_continuous(opm_continuous_man):
-    ref = ref_man.splitlines()
-    txt = dumps(opm_continuous_man).splitlines()
-    # the split is here to avoid the creation date line
-    assert txt[0] == ref[0]
-    assert "\n".join(txt[2:31]) == "\n".join(ref[2:31])
-    assert txt[31] == "MAN_DURATION         = 180.000 [s]"
-    assert "\n".join(txt[32:39]) == "\n".join(ref[32:39])
-    assert txt[39] == "MAN_DURATION         = 180.000 [s]"
-    assert "\n".join(txt[40]) == "\n".join(ref[40])
+def test_dump_opm_man_continuous(opm_continuous_man, str_opm_impulsive_man, filetype):
+    ref = str_opm_impulsive_man.splitlines()
+    txt = dumps(opm_continuous_man, fmt=filetype).splitlines()
+
+    assert_string_lines(ref, txt, ignore="MAN_DURATION")
 
 
-def test_dump_oem(ephem):
+def test_dump_oem(ephem, str_oem, filetype):
 
-    ref = ref_oem.splitlines()
-    txt = dumps(ephem).splitlines()
-    # the split is here to avoid the creation date line
-    assert txt[0] == ref[0]
-    assert "\n".join(txt[2:]) == "\n".join(ref[2:])
+    ref = str_oem.splitlines()
+    txt = dumps(ephem, fmt=filetype).splitlines()
 
-
-def test_dump_double_oem(ephem, ephem2):
-
-    ref = ref_double_oem.splitlines()
-    txt = dumps([ephem, ephem2]).splitlines()
-
-    assert txt[0] == ref[0]
-    assert "\n".join(txt[2:]) == "\n".join(ref[2:])
+    assert_string_lines(ref, txt)
 
 
-def test_dump_oem_linear(ephem):
+def test_dump_double_oem(ephem, ephem2, str_oem_double, filetype):
+
+    ref = str_oem_double.splitlines()
+    txt = dumps([ephem, ephem2], fmt=filetype).splitlines()
+
+    assert_string_lines(ref, txt)
+
+
+def test_dump_oem_linear(ephem, filetype):
 
     ephem.method = ephem.LINEAR
-    txt = dumps(ephem).splitlines()
+    txt = dumps(ephem, fmt="xml").splitlines()
 
-    assert "\n".join(txt[2:14]) == """ORIGINATOR = N/A
-
-META_START
-OBJECT_NAME          = N/A
-OBJECT_ID            = N/A
-CENTER_NAME          = EARTH
-REF_FRAME            = TEME
-TIME_SYSTEM          = UTC
-START_TIME           = 2008-09-20T12:25:40.104192
-STOP_TIME            = 2008-09-20T14:25:40.104192
-INTERPOLATION        = LINEAR
-META_STOP"""
+    for line in txt:
+        if "INTERPOLATION" in line:
+            assert "LINEAR" in line
 
 
-def test_load_opm(opm):
+def test_load_opm(opm, str_opm):
 
-    opm2 = loads(ref_opm)
-    assert_orbit(opm, opm2)
+    ref = loads(str_opm)
+    assert_orbit(opm, ref)
 
-    opm3 = loads(ref_opm_no_units)
-    assert_orbit(opm, opm3)
 
+def test_load_opm_no_unit(opm, str_opm_no_unit):
+    ref = loads(str_opm_no_unit)
+    assert_orbit(opm, ref)
+
+
+def test_load_opm_strange_unit(str_opm_strange_units):
     # Dummy units, that aren't specified as valid
-    with raises(CcsdsParseError):
-        loads(ref_opm_strange_units)
+    with raises(CcsdsParseError) as e:
+        loads(str_opm_strange_units)
 
+    assert str(e.value) == "Unknown unit 'm/s' for the field X_DOT"
+
+
+def test_load_opm_truncated():
     # One mandatory line is missing
     truncated_opm = "\n".join(ref_opm.splitlines()[:15] + ref_opm.splitlines()[16:])
-    with raises(CcsdsParseError):
+    with raises(CcsdsParseError) as e:
         loads(truncated_opm)
 
+    assert str(e.value) == "Missing mandatory parameter 'Y'"
 
-def test_load_opm_cov(opm_cov):
-    ref_opm = loads(ref_opm_cov)
+
+def test_load_opm_cov(opm_cov, str_opm_cov):
+    ref_opm = loads(str_opm_cov)
     assert_orbit(opm_cov, ref_opm)
 
-    assert hasattr(ref_opm, 'cov')
+    assert hasattr(ref_opm, "cov")
     for i, j in product(range(6), repeat=2):
         assert abs(ref_opm.cov[i, j] - opm_cov.cov[i, j]) < np.finfo(float).eps
 
 
-def test_load_opm_man_impulsive(opm_man):
+def test_load_opm_man_impulsive(opm_man, str_opm_impulsive_man):
 
-    ref_opm_man = loads(ref_man)
+    ref_opm_man = loads(str_opm_impulsive_man)
     assert len(ref_opm_man.maneuvers) == 2
 
     for i, man in enumerate(opm_man.maneuvers):
@@ -313,14 +394,19 @@ def test_load_opm_man_impulsive(opm_man):
         assert ref_opm_man.maneuvers[i].comment == man.comment
 
 
-def test_load_opm_man_continuous(opm_continuous_man):
+def test_load_opm_man_continuous(opm_continuous_man, str_opm_impulsive_man, filetype):
 
-    ref_opm_man = loads(ref_man)
     # Tweak the reference to convert impulsive maneuvers into continuous ones
-    ref_continuous_man = ref_man.splitlines()
-    ref_continuous_man[31] = "MAN_DURATION         = 180.000 [s]"
-    ref_continuous_man[39] = "MAN_DURATION         = 180.000 [s]"
-    ref_continuous_man = "\n".join(ref_continuous_man)
+    str_opm_continuous_man = str_opm_impulsive_man.splitlines()
+
+    for i, line in enumerate(str_opm_continuous_man):
+        if "MAN_DURATION" in line:
+            if filetype == "kvn":
+                str_opm_continuous_man[i] = "MAN_DURATION         = 180.000 [s]"
+            else:
+                str_opm_continuous_man[i] = '          <MAN_DURATION units="s">180.000</MAN_DURATION>'
+
+    ref_continuous_man = "\n".join(str_opm_continuous_man)
 
     ref_opm_continuous_man = loads(ref_continuous_man)
 
@@ -334,9 +420,9 @@ def test_load_opm_man_continuous(opm_continuous_man):
         assert ref_opm_continuous_man.maneuvers[i].comment == man.comment
 
 
-def test_load_omm(omm):
-    omm2 = loads(ref_omm)
-    assert_orbit(omm, omm2, 'TLE')
+def test_load_omm(omm, str_omm):
+    omm2 = loads(str_omm)
+    assert_orbit(omm, omm2, "TLE")
 
     # omm3 = loads(ref_omm_no_units)
     # assert_orbit(omm, omm3)
@@ -348,32 +434,32 @@ def test_load_omm(omm):
     # # One mandatory line is missing
     # truncated_omm = "\n".join(ref_omm.splitlines()[:15] + ref_omm.splitlines()[16:])
     # with raises(CcsdsParseError):
-    #     loads(truncated_omm)    
+    #     loads(truncated_omm)
 
 
-def test_load_oem(ephem):
+def test_load_oem(ephem, str_oem):
 
-    ephem2 = loads(ref_oem)
+    ref_ephem = loads(str_oem)
 
-    assert ephem2.frame == ephem.frame
-    assert ephem2.start == ephem.start
-    assert ephem2.stop == ephem.stop
-    assert ephem2.method == ephem2.LAGRANGE
-    assert ephem2.order == 8
+    assert ref_ephem.frame == ephem.frame
+    assert ref_ephem.start == ephem.start
+    assert ref_ephem.stop == ephem.stop
+    assert ref_ephem.method == ref_ephem.LAGRANGE
+    assert ref_ephem.order == 8
 
-    for opm, opm2 in zip(ephem, ephem2):
+    for opm, opm2 in zip(ephem, ref_ephem):
         assert_orbit(opm, opm2)
 
-    with raises(CcsdsParseError):
-        loads("\n".join(ref_oem.splitlines()[:15]))
+    # with raises(CcsdsParseError):
+    #     loads("\n".join(ref_oem.splitlines()[:15]))
 
-    with raises(CcsdsParseError):
-        loads("\n".join(ref_oem.splitlines()[:8] + ref_oem.splitlines()[9:]))
+    # with raises(CcsdsParseError):
+    #     loads("\n".join(ref_oem.splitlines()[:8] + ref_oem.splitlines()[9:]))
 
 
-def test_load_double_oem(ephem, ephem2):
+def test_load_double_oem(ephem, ephem2, str_oem_double):
 
-    ephem_bis, ephem2_bis = loads(ref_double_oem)
+    ephem_bis, ephem2_bis = loads(str_oem_double)
 
     assert ephem_bis.frame == ephem.frame
     assert ephem_bis.frame == ephem.frame

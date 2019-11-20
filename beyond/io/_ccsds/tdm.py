@@ -4,10 +4,10 @@ from ...constants import c
 from ...utils import units
 from ...utils.measures import MeasureSet, Range, Azimut, Elevation, Doppler
 
-from .commons import CcsdsParseError, parse_date, _dump_header
+from .commons import CcsdsParseError, parse_date, dump_kvn_header
 
 
-def read_tdm(string):
+def load_tdm(string):
     """Read CCSDS TDM format and convert it to a MeasureSet
     """
 

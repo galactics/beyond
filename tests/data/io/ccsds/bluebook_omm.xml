@@ -7,8 +7,8 @@
     <body>
         <segment>
             <metadata>
-                <OBJECT_NAME>ISS (ZARYA)</OBJECT_NAME>
-                <OBJECT_ID>1998-067A</OBJECT_ID>
+                <OBJECT_NAME>GOES 9 [P]</OBJECT_NAME>
+                <OBJECT_ID>1995-025A</OBJECT_ID>
                 <CENTER_NAME>EARTH</CENTER_NAME>
                 <REF_FRAME>TEME</REF_FRAME>
                 <TIME_SYSTEM>UTC</TIME_SYSTEM>
@@ -16,23 +16,23 @@
             </metadata>
             <data>
                 <meanElements>
-                    <EPOCH>2008-09-20T12:25:40.104192</EPOCH>
-                    <MEAN_MOTION units="rev/day">15.72125391</MEAN_MOTION>
-                    <ECCENTRICITY>0.0006703</ECCENTRICITY>
-                    <INCLINATION units="deg">51.6416</INCLINATION>
-                    <RA_OF_ASC_NODE units="deg">247.4627</RA_OF_ASC_NODE>
-                    <ARG_OF_PERICENTER units="deg">130.5360</ARG_OF_PERICENTER>
-                    <MEAN_ANOMALY units="deg">325.0288</MEAN_ANOMALY>
+                    <EPOCH>2007-03-05T10:34:41.426400</EPOCH>
+                    <MEAN_MOTION units="rev/day">1.00273272</MEAN_MOTION>
+                    <ECCENTRICITY>0.0005013</ECCENTRICITY>
+                    <INCLINATION units="deg">3.0539</INCLINATION>
+                    <RA_OF_ASC_NODE units="deg">81.7939</RA_OF_ASC_NODE>
+                    <ARG_OF_PERICENTER units="deg">249.2363</ARG_OF_PERICENTER>
+                    <MEAN_ANOMALY units="deg">150.1602</MEAN_ANOMALY>
                     <GM units="km**3/s**2">398600.8</GM>
                 </meanElements>
                 <tleParameters>
                     <EPHEMERIS_TYPE>0</EPHEMERIS_TYPE>
                     <CLASSIFICATION_TYPE>U</CLASSIFICATION_TYPE>
-                    <NORAD_CAT_ID>25544</NORAD_CAT_ID>
-                    <ELEMENT_SET_NO>292</ELEMENT_SET_NO>
-                    <REV_AT_EPOCH>56353</REV_AT_EPOCH>
-                    <BSTAR>-0.0000</BSTAR>
-                    <MEAN_MOTION_DOT>-0.00004364</MEAN_MOTION_DOT>
+                    <NORAD_CAT_ID>23581</NORAD_CAT_ID>
+                    <ELEMENT_SET_NO>925</ELEMENT_SET_NO>
+                    <REV_AT_EPOCH>4316</REV_AT_EPOCH>
+                    <BSTAR>0.0001</BSTAR>
+                    <MEAN_MOTION_DOT>-0.00000226</MEAN_MOTION_DOT>
                     <MEAN_MOTION_DDOT>0.0</MEAN_MOTION_DDOT>
                 </tleParameters>
             </data>

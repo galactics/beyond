@@ -3,60 +3,64 @@ import numpy as np
 from ...orbits.cov import Cov
 
 
-def read_cov(orb, data):
+def load_cov(orb, data):
 
-    frame = data.get("COV_REF_FRAME", orb.cov.PARENT_FRAME)
+    if "COV_REF_FRAME" in data:
+        frame = data["COV_REF_FRAME"].text
+    else:
+        frame = orb.cov.PARENT_FRAME
+
     if frame in ("RSW", "RTN"):
         frame = "QSW"
 
     values = [
         [
-            data["CX_X"],
-            data["CY_X"],
-            data["CZ_X"],
-            data["CX_DOT_X"],
-            data["CY_DOT_X"],
-            data["CZ_DOT_X"],
+            data["CX_X"].text,
+            data["CY_X"].text,
+            data["CZ_X"].text,
+            data["CX_DOT_X"].text,
+            data["CY_DOT_X"].text,
+            data["CZ_DOT_X"].text,
         ],
         [
-            data["CY_X"],
-            data["CY_Y"],
-            data["CZ_Y"],
-            data["CX_DOT_Y"],
-            data["CY_DOT_Y"],
-            data["CZ_DOT_Y"],
+            data["CY_X"].text,
+            data["CY_Y"].text,
+            data["CZ_Y"].text,
+            data["CX_DOT_Y"].text,
+            data["CY_DOT_Y"].text,
+            data["CZ_DOT_Y"].text,
         ],
         [
-            data["CZ_X"],
-            data["CZ_Y"],
-            data["CZ_Z"],
-            data["CX_DOT_Z"],
-            data["CY_DOT_Z"],
-            data["CZ_DOT_Z"],
+            data["CZ_X"].text,
+            data["CZ_Y"].text,
+            data["CZ_Z"].text,
+            data["CX_DOT_Z"].text,
+            data["CY_DOT_Z"].text,
+            data["CZ_DOT_Z"].text,
         ],
         [
-            data["CX_DOT_X"],
-            data["CX_DOT_Y"],
-            data["CX_DOT_Z"],
-            data["CX_DOT_X_DOT"],
-            data["CY_DOT_X_DOT"],
-            data["CZ_DOT_X_DOT"],
+            data["CX_DOT_X"].text,
+            data["CX_DOT_Y"].text,
+            data["CX_DOT_Z"].text,
+            data["CX_DOT_X_DOT"].text,
+            data["CY_DOT_X_DOT"].text,
+            data["CZ_DOT_X_DOT"].text,
         ],
         [
-            data["CY_DOT_X"],
-            data["CY_DOT_Y"],
-            data["CY_DOT_Z"],
-            data["CY_DOT_X_DOT"],
-            data["CY_DOT_Y_DOT"],
-            data["CZ_DOT_Y_DOT"],
+            data["CY_DOT_X"].text,
+            data["CY_DOT_Y"].text,
+            data["CY_DOT_Z"].text,
+            data["CY_DOT_X_DOT"].text,
+            data["CY_DOT_Y_DOT"].text,
+            data["CZ_DOT_Y_DOT"].text,
         ],
         [
-            data["CZ_DOT_X"],
-            data["CZ_DOT_Y"],
-            data["CZ_DOT_Z"],
-            data["CZ_DOT_X_DOT"],
-            data["CZ_DOT_Y_DOT"],
-            data["CZ_DOT_Z_DOT"],
+            data["CZ_DOT_X"].text,
+            data["CZ_DOT_Y"].text,
+            data["CZ_DOT_Z"].text,
+            data["CZ_DOT_X_DOT"].text,
+            data["CZ_DOT_Y_DOT"].text,
+            data["CZ_DOT_Z_DOT"].text,
         ],
     ]
 

@@ -1,0 +1,393 @@
+<?xml version="1.0" ?>
+<oem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd" id="CCSDS_OEM_VERS" version="2.0">
+    <header>
+        <CREATION_DATE>2019-11-23T22:13:47</CREATION_DATE>
+        <ORIGINATOR>N/A</ORIGINATOR>
+    </header>
+    <body>
+        <segment>
+            <metadata>
+                <OBJECT_NAME>N/A</OBJECT_NAME>
+                <OBJECT_ID>N/A</OBJECT_ID>
+                <CENTER_NAME>EARTH</CENTER_NAME>
+                <REF_FRAME>TEME</REF_FRAME>
+                <TIME_SYSTEM>UTC</TIME_SYSTEM>
+                <START_TIME>2008-09-20T12:25:40.104192</START_TIME>
+                <STOP_TIME>2008-09-20T14:25:40.104192</STOP_TIME>
+                <INTERPOLATION>LAGRANGE</INTERPOLATION>
+                <INTERPOLATION_DEGREE>7</INTERPOLATION_DEGREE>
+            </metadata>
+            <data>
+                <stateVector>
+                    <EPOCH>2008-09-20T12:25:40.104192</EPOCH>
+                    <X units="km">4083.902464</X>
+                    <Y units="km">-993.632000</Y>
+                    <Z units="km">5243.603665</Z>
+                    <X_DOT units="km/s">2.512837</X_DOT>
+                    <Y_DOT units="km/s">7.259889</Y_DOT>
+                    <Z_DOT units="km/s">-0.583779</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T12:28:40.104192</EPOCH>
+                    <X units="km">4446.682604</X>
+                    <Y units="km">324.930081</Y>
+                    <Z units="km">5028.090339</Z>
+                    <X_DOT units="km/s">1.503730</X_DOT>
+                    <Y_DOT units="km/s">7.338981</Y_DOT>
+                    <Z_DOT units="km/s">-1.802406</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T12:31:40.104192</EPOCH>
+                    <X units="km">4621.397102</X>
+                    <Y units="km">1629.746327</Y>
+                    <Z units="km">4599.304773</Z>
+                    <X_DOT units="km/s">0.430591</X_DOT>
+                    <Y_DOT units="km/s">7.107649</Y_DOT>
+                    <Z_DOT units="km/s">-2.945072</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T12:34:40.104192</EPOCH>
+                    <X units="km">4600.571929</X>
+                    <Y units="km">2865.602021</Y>
+                    <Z units="km">3975.349794</Z>
+                    <X_DOT units="km/s">-0.661242</X_DOT>
+                    <Y_DOT units="km/s">6.575412</Y_DOT>
+                    <Z_DOT units="km/s">-3.963237</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T12:37:40.104192</EPOCH>
+                    <X units="km">4385.008276</X>
+                    <Y units="km">3980.156563</Y>
+                    <Z units="km">3182.633358</Z>
+                    <X_DOT units="km/s">-1.725479</X_DOT>
+                    <Y_DOT units="km/s">5.764603</Y_DOT>
+                    <Z_DOT units="km/s">-4.813497</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T12:40:40.104192</EPOCH>
+                    <X units="km">3983.777724</X>
+                    <Y units="km">4926.185054</Y>
+                    <Z units="km">2254.768787</Z>
+                    <X_DOT units="km/s">-2.716851</X_DOT>
+                    <Y_DOT units="km/s">4.709550</Y_DOT>
+                    <Z_DOT units="km/s">-5.459500</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T12:43:40.104192</EPOCH>
+                    <X units="km">3413.859123</X>
+                    <Y units="km">5663.620893</Y>
+                    <Z units="km">1231.150896</Z>
+                    <X_DOT units="km/s">-3.593103</X_DOT>
+                    <Y_DOT units="km/s">3.455190</Y_DOT>
+                    <Z_DOT units="km/s">-5.873621</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T12:46:40.104192</EPOCH>
+                    <X units="km">2699.420566</X>
+                    <Y units="km">6161.301305</Y>
+                    <Z units="km">155.260192</Z>
+                    <X_DOT units="km/s">-4.316915</X_DOT>
+                    <Y_DOT units="km/s">2.055142</Y_DOT>
+                    <Z_DOT units="km/s">-6.038263</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T12:49:40.104192</EPOCH>
+                    <X units="km">1870.774288</X>
+                    <Y units="km">6398.318451</Y>
+                    <Z units="km">-927.224362</Z>
+                    <X_DOT units="km/s">-4.857602</X_DOT>
+                    <Y_DOT units="km/s">0.569297</Y_DOT>
+                    <Z_DOT units="km/s">-5.946690</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T12:52:40.104192</EPOCH>
+                    <X units="km">963.051607</X>
+                    <Y units="km">6364.905826</Y>
+                    <Z units="km">-1970.414096</Z>
+                    <X_DOT units="km/s">-5.192495</X_DOT>
+                    <Y_DOT units="km/s">-0.938921</Y_DOT>
+                    <Z_DOT units="km/s">-5.603303</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T12:55:40.104192</EPOCH>
+                    <X units="km">14.667968</X>
+                    <Y units="km">6062.814340</Y>
+                    <Z units="km">-2930.196340</Z>
+                    <X_DOT units="km/s">-5.307898</X_DOT>
+                    <Y_DOT units="km/s">-2.405451</Y_DOT>
+                    <Z_DOT units="km/s">-5.023347</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T12:58:40.104192</EPOCH>
+                    <X units="km">-934.343798</X>
+                    <Y units="km">5505.168129</Y>
+                    <Z units="km">-3766.120395</Z>
+                    <X_DOT units="km/s">-5.199568</X_DOT>
+                    <Y_DOT units="km/s">-3.768445</Y_DOT>
+                    <Z_DOT units="km/s">-4.232079</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:01:40.104192</EPOCH>
+                    <X units="km">-1844.042731</X>
+                    <Y units="km">4715.823893</Y>
+                    <Z units="km">-4443.090519</Z>
+                    <X_DOT units="km/s">-4.872732</X_DOT>
+                    <Y_DOT units="km/s">-4.970910</Y_DOT>
+                    <Z_DOT units="km/s">-3.263499</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:04:40.104192</EPOCH>
+                    <X units="km">-2676.252828</X>
+                    <Y units="km">3728.286282</Y>
+                    <Z units="km">-4932.798923</Z>
+                    <X_DOT units="km/s">-4.341683</X_DOT>
+                    <Y_DOT units="km/s">-5.962994</Y_DOT>
+                    <Z_DOT units="km/s">-2.158749</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:07:40.104192</EPOCH>
+                    <X units="km">-3396.132523</X>
+                    <Y units="km">2584.245378</Y>
+                    <Z units="km">-5214.851625</Z>
+                    <X_DOT units="km/s">-3.629021</X_DOT>
+                    <Y_DOT units="km/s">-6.703870</Y_DOT>
+                    <Z_DOT units="km/s">-0.964302</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:10:40.104192</EPOCH>
+                    <X units="km">-3973.581416</X>
+                    <Y units="km">1331.815891</Y>
+                    <Z units="km">-5277.556509</Z>
+                    <X_DOT units="km/s">-2.764640</X_DOT>
+                    <Y_DOT units="km/s">-7.163190</Y_DOT>
+                    <Z_DOT units="km/s">0.269951</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:13:40.104192</EPOCH>
+                    <X units="km">-4384.445296</X>
+                    <Y units="km">23.550466</Y>
+                    <Z units="km">-5118.363252</Z>
+                    <X_DOT units="km/s">-1.784496</X_DOT>
+                    <Y_DOT units="km/s">-7.322132</Y_DOT>
+                    <Z_DOT units="km/s">1.492652</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:16:40.104192</EPOCH>
+                    <X units="km">-4611.485054</X>
+                    <Y units="km">-1285.699209</Y>
+                    <Z units="km">-4743.950862</Z>
+                    <X_DOT units="km/s">-0.729228</X_DOT>
+                    <Y_DOT units="km/s">-7.174063</Y_DOT>
+                    <Z_DOT units="km/s">2.652940</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:19:40.104192</EPOCH>
+                    <X units="km">-4645.083540</X>
+                    <Y units="km">-2541.010297</Y>
+                    <Z units="km">-4169.963408</Z>
+                    <X_DOT units="km/s">0.357384</X_DOT>
+                    <Y_DOT units="km/s">-6.724831</Y_DOT>
+                    <Z_DOT units="km/s">3.702386</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:22:40.104192</EPOCH>
+                    <X units="km">-4483.663382</X>
+                    <Y units="km">-3689.630755</Y>
+                    <Z units="km">-3420.399045</Z>
+                    <X_DOT units="km/s">1.430078</X_DOT>
+                    <Y_DOT units="km/s">-5.992658</Y_DOT>
+                    <Z_DOT units="km/s">4.596909</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:25:40.104192</EPOCH>
+                    <X units="km">-4133.794212</X>
+                    <Y units="km">-4683.164832</Y>
+                    <Z units="km">-2526.661729</Z>
+                    <X_DOT units="km/s">2.443897</X_DOT>
+                    <Y_DOT units="km/s">-5.007591</Y_DOT>
+                    <Z_DOT units="km/s">5.298597</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:28:40.104192</EPOCH>
+                    <X units="km">-3609.971567</X>
+                    <Y units="km">-5479.615268</Y>
+                    <Z units="km">-1526.297610</Z>
+                    <X_DOT units="km/s">3.356046</X_DOT>
+                    <Y_DOT units="km/s">-3.810467</Y_DOT>
+                    <Z_DOT units="km/s">5.777381</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:31:40.104192</EPOCH>
+                    <X units="km">-2934.059087</X>
+                    <Y units="km">-6045.194803</Y>
+                    <Z units="km">-461.449620</Z>
+                    <X_DOT units="km/s">4.127752</X_DOT>
+                    <Y_DOT units="km/s">-2.451365</Y_DOT>
+                    <Z_DOT units="km/s">6.012455</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:34:40.104192</EPOCH>
+                    <X units="km">-2134.404723</X>
+                    <Y units="km">-6355.810710</Y>
+                    <Z units="km">622.909564</Z>
+                    <X_DOT units="km/s">4.726019</X_DOT>
+                    <Y_DOT units="km/s">-0.987549</Y_DOT>
+                    <Z_DOT units="km/s">5.993323</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:37:40.104192</EPOCH>
+                    <X units="km">-1244.659051</X>
+                    <Y units="km">-6398.142795</Y>
+                    <Z units="km">1680.893769</Z>
+                    <X_DOT units="km/s">5.125155</X_DOT>
+                    <Y_DOT units="km/s">0.518989</Y_DOT>
+                    <Z_DOT units="km/s">5.720383</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:40:40.104192</EPOCH>
+                    <X units="km">-302.347805</X>
+                    <Y units="km">-6170.249938</Y>
+                    <Z units="km">2667.675635</Z>
+                    <X_DOT units="km/s">5.307970</X_DOT>
+                    <Y_DOT units="km/s">2.004277</Y_DOT>
+                    <Z_DOT units="km/s">5.204973</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:43:40.104192</EPOCH>
+                    <X units="km">652.736161</X>
+                    <Y units="km">-5681.669803</Y>
+                    <Z units="km">3541.421025</Z>
+                    <X_DOT units="km/s">5.266551</X_DOT>
+                    <Y_DOT units="km/s">3.405222</Y_DOT>
+                    <Z_DOT units="km/s">4.468880</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:46:40.104192</EPOCH>
+                    <X units="km">1580.238051</X>
+                    <Y units="km">-4953.007966</Y>
+                    <Z units="km">4265.085772</Z>
+                    <X_DOT units="km/s">5.002582</X_DOT>
+                    <Y_DOT units="km/s">4.662392</Y_DOT>
+                    <Z_DOT units="km/s">3.543335</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:49:40.104192</EPOCH>
+                    <X units="km">2440.962450</X>
+                    <Y units="km">-4015.045319</Y>
+                    <Z units="km">4807.993735</Z>
+                    <X_DOT units="km/s">4.527208</X_DOT>
+                    <Y_DOT units="km/s">5.722567</Y_DOT>
+                    <Z_DOT units="km/s">2.467599</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:52:40.104192</EPOCH>
+                    <X units="km">3198.534420</X>
+                    <Y units="km">-2907.413304</Y>
+                    <Z units="km">5147.130765</Z>
+                    <X_DOT units="km/s">3.860491</X_DOT>
+                    <Y_DOT units="km/s">6.540956</Y_DOT>
+                    <Z_DOT units="km/s">1.287226</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:55:40.104192</EPOCH>
+                    <X units="km">3820.927739</X>
+                    <Y units="km">-1676.908758</Y>
+                    <Z units="km">5268.104550</Z>
+                    <X_DOT units="km/s">3.030513</X_DOT>
+                    <Y_DOT units="km/s">7.082997</Y_DOT>
+                    <Z_DOT units="km/s">0.052125</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T13:58:40.104192</EPOCH>
+                    <X units="km">4281.806286</X>
+                    <Y units="km">-375.522033</Y>
+                    <Z units="km">5165.743308</Z>
+                    <X_DOT units="km/s">2.072196</X_DOT>
+                    <Y_DOT units="km/s">7.325730</Y_DOT>
+                    <Z_DOT units="km/s">-1.185510</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T14:01:40.104192</EPOCH>
+                    <X units="km">4561.629818</X>
+                    <Y units="km">941.740139</Y>
+                    <Z units="km">4844.316363</Z>
+                    <X_DOT units="km/s">1.025879</X_DOT>
+                    <Y_DOT units="km/s">7.258727</Y_DOT>
+                    <Z_DOT units="km/s">-2.373326</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T14:04:40.104192</EPOCH>
+                    <X units="km">4648.486474</X>
+                    <Y units="km">2219.161521</Y>
+                    <Z units="km">4317.369815</Z>
+                    <X_DOT units="km/s">-0.064305</X_DOT>
+                    <Y_DOT units="km/s">6.884566</Y_DOT>
+                    <Z_DOT units="km/s">-3.460952</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T14:07:40.104192</EPOCH>
+                    <X units="km">4538.616206</X>
+                    <Y units="km">3402.663700</Y>
+                    <Z units="km">3607.179446</Z>
+                    <X_DOT units="km/s">-1.152223</X_DOT>
+                    <Y_DOT units="km/s">6.218831</Y_DOT>
+                    <Z_DOT units="km/s">-4.402107</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T14:10:40.104192</EPOCH>
+                    <X units="km">4236.598734</X>
+                    <Y units="km">4442.108641</Y>
+                    <Z units="km">2743.832051</Z>
+                    <X_DOT units="km/s">-2.191672</X_DOT>
+                    <Y_DOT units="km/s">5.289589</Y_DOT>
+                    <Z_DOT units="km/s">-5.156603</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T14:13:40.104192</EPOCH>
+                    <X units="km">3755.186698</X>
+                    <Y units="km">5293.456116</Y>
+                    <Z units="km">1763.962307</Z>
+                    <X_DOT units="km/s">-3.138383</X_DOT>
+                    <Y_DOT units="km/s">4.136309</Y_DOT>
+                    <Z_DOT units="km/s">-5.692163</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T14:16:40.104192</EPOCH>
+                    <X units="km">3114.777867</X>
+                    <Y units="km">5920.677848</Y>
+                    <Z units="km">709.186816</Z>
+                    <X_DOT units="km/s">-3.952004</X_DOT>
+                    <Y_DOT units="km/s">2.808215</Y_DOT>
+                    <Z_DOT units="km/s">-5.985926</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T14:19:40.104192</EPOCH>
+                    <X units="km">2342.541924</X>
+                    <Y units="km">6297.324902</Y>
+                    <Z units="km">-375.694970</Z>
+                    <X_DOT units="km/s">-4.597935</X_DOT>
+                    <Y_DOT units="km/s">1.362119</Y_DOT>
+                    <Z_DOT units="km/s">-6.025530</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T14:22:40.104192</EPOCH>
+                    <X units="km">1471.237347</X>
+                    <Y units="km">6407.666741</Y>
+                    <Z units="km">-1444.650659</Z>
+                    <X_DOT units="km/s">-5.048908</X_DOT>
+                    <Y_DOT units="km/s">-0.140158</Y_DOT>
+                    <Z_DOT units="km/s">-5.809680</Z_DOT>
+                </stateVector>
+                <stateVector>
+                    <EPOCH>2008-09-20T14:25:40.104192</EPOCH>
+                    <X units="km">537.778438</X>
+                    <Y units="km">6247.339803</Y>
+                    <Z units="km">-2452.414417</Z>
+                    <X_DOT units="km/s">-5.286183</X_DOT>
+                    <Y_DOT units="km/s">-1.634621</Y_DOT>
+                    <Z_DOT units="km/s">-5.348147</Z_DOT>
+                </stateVector>
+            </data>
+        </segment>
+    </body>
+</oem>

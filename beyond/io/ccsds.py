@@ -1,20 +1,24 @@
 """This module provides ways to handle the CCSDS formats
 
-It is based on the `CCSDS standard <https://public.ccsds.org/Publications/BlueBooks.aspx>`__
+It is based on the `CCSDS standard <https://public.ccsds.org/Publications/BlueBooks.aspx>`__.
+
+For XML input/output validation, it is possible to use XSD files provided at
+https://sanaregistry.org/r/ndmxml/.
 """
 
 from collections.abc import Iterable
+import xml.dom.minidom as minidom
 
 from ..orbits import Orbit, Ephem
 from ..utils.measures import Measure
 from ..propagators.base import AnalyticalPropagator
 from ..frames.frames import TEME
 from ..orbits.forms import TLE
-from ._ccsds.opm import read_opm, dump_opm
-from ._ccsds.oem import read_oem, dump_oem
-from ._ccsds.omm import read_omm, dump_omm
-from ._ccsds.tdm import read_tdm, dump_tdm
-from ._ccsds.commons import CcsdsParseError
+from ._ccsds.opm import load_opm, dump_opm
+from ._ccsds.oem import load_oem, dump_oem
+from ._ccsds.omm import load_omm, dump_omm
+from ._ccsds.tdm import load_tdm, dump_tdm
+from ._ccsds.commons import CcsdsParseError, detect
 
 __all__ = ["load", "loads", "dump", "dumps", "CcsdsParseError"]
 
@@ -46,18 +50,21 @@ def loads(text):
     Raise:
         CcsdsParseError: when the text is not a recognizable CCSDS format
     """
-    if "CCSDS_OEM_VERS" in text:
-        func = read_oem
-    elif "CCSDS_OPM_VERS" in text:
-        func = read_opm
-    elif "CCSDS_TDM_VERS" in text:
-        func = read_tdm
-    elif "CCSDS_OMM_VERS" in text:
-        func = read_omm
+
+    type, fmt = detect(text)
+
+    if type == "OEM":
+        func = load_oem
+    elif type == "OPM":
+        func = load_opm
+    elif type == "TDM":
+        func = load_tdm
+    elif type == "OMM":
+        func = load_omm
     else:
         raise CcsdsParseError("Unknown CCSDS type")
 
-    return func(text)
+    return func(text, fmt=fmt)
 
 
 def dump(data, fp, **kwargs):  # pragma: no cover
@@ -76,11 +83,14 @@ def dump(data, fp, **kwargs):  # pragma: no cover
     fp.write(dumps(data, **kwargs))
 
 
-def dumps(data, **kwargs):
+def dumps(data, pretty_print=True, **kwargs):
     """Create a string CCSDS representation of the object
 
     Same arguments and behaviour as :py:func:`dump`
     """
+
+    kwargs.setdefault("fmt", "kvn")
+
     if isinstance(data, Ephem) or (
         isinstance(data, Iterable) and all(isinstance(x, Ephem) for x in data)
     ):
@@ -98,5 +108,8 @@ def dumps(data, **kwargs):
         content = dump_tdm(data, **kwargs)
     else:
         raise TypeError("Unknown object type")
+
+    if kwargs["fmt"] == "xml" and pretty_print:
+        content = minidom.parseString(content).toprettyxml(indent=" " * 4)
 
     return content

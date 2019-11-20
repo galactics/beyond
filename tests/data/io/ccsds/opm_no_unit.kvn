@@ -3,8 +3,8 @@ CREATION_DATE = 2017-06-21T13:20:25
 ORIGINATOR = N/A
 
 META_START
-OBJECT_NAME          = N/A
-OBJECT_ID            = N/A
+OBJECT_NAME          = ISS (ZARYA)
+OBJECT_ID            = 1998-067A
 CENTER_NAME          = EARTH
 REF_FRAME            = TEME
 TIME_SYSTEM          = UTC
@@ -26,3 +26,4 @@ INCLINATION          =    51.641600
 RA_OF_ASC_NODE       =   247.462700
 ARG_OF_PERICENTER    =   130.536000
 TRUE_ANOMALY         =   324.984745
+GM                   = 398600.9368 [km**3/s**2]

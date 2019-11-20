@@ -225,6 +225,12 @@ class Tle:
             "ndot": self.ndot,
             "ndotdot": self.ndotdot,
             "tle": self,
+            "name": self.name,
+            "cospar_id": self.cospar_id,
+            "norad_id": self.norad_id,
+            "element_nb": self.element_nb,
+            "revolutions": self.revolutions,
+            "type": self.type,
         }
         return Orbit(self.epoch, self.to_list(), "TLE", "TEME", "Sgp4", **data)
 
