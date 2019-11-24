@@ -224,7 +224,7 @@ class Form(Node):
         x0 = np.nan
         while x != x0:
             d += 2
-            term *= -E ** 2 / (d * (d + 1))
+            term *= -(E ** 2) / (d * (d + 1))
             x0 = x
             x = x - term
         return x
