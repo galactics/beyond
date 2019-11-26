@@ -1,5 +1,5 @@
 import numpy as np
-import xml.etree.ElementTree as ET
+import lxml.etree as ET
 
 from ...dates import timedelta
 from ...orbits import Orbit
@@ -106,7 +106,7 @@ def _load_opm_kvn(string):
 
 def _load_opm_xml(string):
 
-    data = xml2dict(string)
+    data = xml2dict(string.encode())
 
     metadata = data["body"]["segment"]["metadata"]
     statevector = data["body"]["segment"]["data"]["stateVector"]
@@ -354,7 +354,9 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
                     x = ET.SubElement(mans, "MAN_DV_{}".format(i + 1), units="km/s")
                     x.text = "{:.6f}".format(man._dv[i] / units.km)
 
-        string = ET.tostring(top)
+        string = ET.tostring(
+            top, pretty_print=True, xml_declaration=True, encoding="UTF-8"
+        ).decode()
 
     else:
         raise CcsdsParseError("Unknown format '{}'".format(fmt))

@@ -1,6 +1,6 @@
 import re
 import numpy as np
-import xml.etree.ElementTree as ET
+import lxml.etree as ET
 from collections import namedtuple
 
 from ...utils import units
@@ -174,14 +174,16 @@ ORIGINATOR = {originator}
 
 def dump_xml_header(data, ccsds_type, version="1.0", **kwargs):
 
+    attrib = {
+        "{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation": "http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd",
+        "id": "CCSDS_{}_VERS".format(ccsds_type.upper()),
+        "version": version,
+    }
+
     top = ET.Element(
         ccsds_type.lower(),
-        {
-            "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-            "xsi:noNamespaceSchemaLocation": "http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd",
-            "id": "CCSDS_{}_VERS".format(ccsds_type.upper()),
-            "version": version,
-        },
+        attrib,
+        nsmap={"xsi": "http://www.w3.org/2001/XMLSchema-instance"},
     )
     header = ET.SubElement(top, "header")
     creation_date = ET.SubElement(header, "CREATION_DATE")

@@ -1,5 +1,5 @@
 import numpy as np
-import xml.etree.ElementTree as ET
+import lxml.etree as ET
 
 from ...orbits import Orbit
 from ...propagators.sgp4 import Sgp4, wgs72
@@ -97,7 +97,7 @@ def _load_omm_kvn(string):
 
 def _load_omm_xml(string):
 
-    data = xml2dict(string)
+    data = xml2dict(string.encode())
 
     # if "item" in data.keys():
     #     # To process Space-Track's OMM, wich are not CCSDS compliant...
@@ -298,7 +298,9 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
                     x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
                     x.text = "{:0.16e}".format(data.cov[i, j] * 1e-6)
 
-        string = ET.tostring(top)
+        string = ET.tostring(
+            top, pretty_print=True, encoding="UTF-8", xml_declaration=True
+        ).decode()
 
     else:
         raise CcsdsParseError("Unknown format '{}'".format(fmt))

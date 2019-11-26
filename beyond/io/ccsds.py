@@ -7,7 +7,6 @@ https://sanaregistry.org/r/ndmxml/.
 """
 
 from collections.abc import Iterable
-import xml.dom.minidom as minidom
 
 from ..orbits import Orbit, Ephem
 from ..utils.measures import Measure
@@ -108,8 +107,5 @@ def dumps(data, pretty_print=True, **kwargs):
         content = dump_tdm(data, **kwargs)
     else:
         raise TypeError("Unknown object type")
-
-    if kwargs["fmt"] == "xml" and pretty_print:
-        content = minidom.parseString(content).toprettyxml(indent=" " * 4)
 
     return content

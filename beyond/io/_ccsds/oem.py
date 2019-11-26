@@ -1,5 +1,5 @@
 import numpy as np
-import xml.etree.ElementTree as ET
+import lxml.etree as ET
 
 from ...dates import Date
 from ...utils import units
@@ -99,7 +99,7 @@ def _load_oem_kvn(string):
 
 def _load_oem_xml(string):
 
-    data = xml2dict(string)
+    data = xml2dict(string.encode())
 
     ephems = []
 
@@ -237,7 +237,9 @@ def dump_oem(data, fmt="kvn", **kwargs):
                             x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
                             x.text = "{:0.16e}".format(cart.cov[i, j] / 1e6)
 
-        string = ET.tostring(top)
+        string = ET.tostring(
+            top, pretty_print=True, xml_declaration=True, encoding="UTF-8"
+        ).decode()
 
     else:
         raise CcsdsParseError("Unknown format '{}'".format(fmt))
