@@ -1,5 +1,5 @@
 import numpy as np
-from pytest import fixture, mark
+from pytest import fixture, mark, skip
 from unittest.mock import patch
 from pathlib import Path
 
@@ -77,9 +77,10 @@ def jplfiles():
     }
 
 
-# Specific for dynamically skipping the test if matplotlib is not present
-# as it is not a dependency of the library, but merely a convenience
 def _skip_if_no_mpl():
+    """Specific for dynamically skipping the test if matplotlib is not present
+    as it is not a dependency of the library, but merely a convenience
+    """
     try:
         import matplotlib.pyplot as plt
     except ImportError:
@@ -88,4 +89,18 @@ def _skip_if_no_mpl():
         return False
 
 
-skip_if_no_mpl = mark.skipif(_skip_if_no_mpl(), reason="Missing matplotlib dependency")
+def pytest_configure(config):
+    """Declare the skip_if_no_mpl marker in pytest's '--markers' helper option
+    This has no actual effect on the tests
+    """
+    config.addinivalue_line(
+        "markers", "skip_if_no_mpl: skip if matplotlib is not installed"
+    )
+
+
+def pytest_runtest_setup(item):
+    """This function is called for each test case.
+    It looks if the test case has the skip_if_no_mpl decorator. If so, skip the test case
+    """
+    if _skip_if_no_mpl() and list(item.iter_markers(name="skip_if_no_mpl")):
+        skip("matplotlib not installed")

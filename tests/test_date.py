@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pytest import raises
+from pytest import raises, mark
 from unittest.mock import patch
 from pickle import dumps, loads
 from datetime import datetime, timedelta, timezone
@@ -10,8 +10,6 @@ import numpy as np
 
 from beyond.dates.eop import Eop
 from beyond.dates.date import Date, DateError, UnknownScaleError, DateRange
-
-from conftest import skip_if_no_mpl
 
 
 def test_creation():
@@ -271,7 +269,7 @@ def test_pickle():
     assert date1.change_scale('UT1') == date2.change_scale('UT1')
 
 
-@skip_if_no_mpl
+@mark.skip_if_no_mpl
 def test_plot():
     # This test is ran only if matplotlib is installed
 

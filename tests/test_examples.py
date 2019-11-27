@@ -2,11 +2,9 @@
 these tests are here to check if they still are valid, as the library evolves
 """
 
-from pytest import fixture
+from pytest import fixture, mark
 from pathlib import Path
 from subprocess import run
-
-from conftest import skip_if_no_mpl
 
 
 @fixture(params=['ground-track', 'hohmann', 'listeners', 'station'])
@@ -16,7 +14,7 @@ def cases(request):
     return folder / (request.param + ".py")
 
 
-@skip_if_no_mpl
+@mark.skip_if_no_mpl
 def test_doc(cases):
 
     p = run(["python", cases, "no-display"])
