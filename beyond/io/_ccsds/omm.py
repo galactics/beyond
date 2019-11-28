@@ -26,7 +26,7 @@ def load_omm(string, fmt):
         orb = _load_omm_kvn(string)
     elif fmt == "xml":
         orb = _load_omm_xml(string)
-    else:
+    else:  # pragma: no cover
         raise CcsdsParseError("Unknwon format '{}'".format(fmt))
 
     return orb
@@ -74,20 +74,18 @@ def _load_omm_kvn(string):
                 "norad_id": norad_id,
                 "revolutions": revolutions,
                 "element_nb": element_nb,
+                "cospar_id": cospar_id,
+                "name": name,
             }
 
         except KeyError as e:
-            raise CcsdsParseError("Missing mandatory parameter '{}'".format(e))
-    else:
+            raise CcsdsParseError("Missing mandatory parameter {}".format(e))
+    else:  # pragma: no cover
         raise CcsdsParseError(
             "Unknown OMM theory '{}'".format(data["MEAN_ELEMENT_THEORY"].text)
         )
 
     orb = Orbit(date, elements, form, frame, propagator, **kwargs)
-    orb.name = name
-    orb.cospar_id = cospar_id
-    if "NORAD_CAT_ID" in data:
-        orb.norad_id = norad_id
 
     if "CX_X" in data:
         orb.cov = load_cov(orb, data)
@@ -148,7 +146,7 @@ def _load_omm_xml(string):
 
         except KeyError as e:
             raise CcsdsParseError("Missing mandatory parameter {}".format(e))
-    else:
+    else:  # pragma: no cover
         raise CcsdsParseError(
             "Unknown OMM theory '{}'".format(data["MEAN_ELEMENT_THEORY"].text)
         )
@@ -171,7 +169,7 @@ def dump_omm(data, fmt="kvn", **kwargs):
 
         if isinstance(data.propagator, Sgp4):
             theory = "SGP/SGP4"
-        else:
+        else:  # pragma: no cover
             raise CcsdsParseError(
                 "Unknown propagator type '{}' for OMM".format(data.propagator)
             )
@@ -225,7 +223,7 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
 
         if isinstance(data.propagator, Sgp4):
             theory = "SGP/SGP4"
-        else:
+        else:  # pragma: no cover
             raise CcsdsParseError(
                 "Unknown propagator type '{}' for OMM".format(data.propagator)
             )
@@ -259,7 +257,7 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
         gm = ET.SubElement(meanelements, "GM", units="km**3/s**2")
         gm.text = "{:0.1f}".format(wgs72.mu)
 
-        if theory == "SGP/SGP4":
+        if theory == "SGP/SGP4":  # pragma: no branch
             tle_params = ET.SubElement(data_tag, "tleParameters")
             ephemeris_type = ET.SubElement(tle_params, "EPHEMERIS_TYPE")
             ephemeris_type.text = "0"
@@ -302,7 +300,7 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
             top, pretty_print=True, encoding="UTF-8", xml_declaration=True
         ).decode()
 
-    else:
+    else:  # pragma: no cover
         raise CcsdsParseError("Unknown format '{}'".format(fmt))
 
     return string

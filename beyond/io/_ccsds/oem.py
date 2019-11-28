@@ -56,7 +56,7 @@ def _load_oem_kvn(string):
             # Check for required fields
             for k in required:
                 if k not in ephem:
-                    raise CcsdsParseError("Missing field '{}'".format(k))
+                    raise CcsdsParseError("Missing mandatory parameter '{}'".format(k))
 
             # Conversion to be compliant with beyond.env.jpl dynamic reference
             # frames naming convention.
@@ -78,9 +78,6 @@ def _load_oem_kvn(string):
             )
 
     for i, ephem_dict in enumerate(ephems):
-        if not ephem_dict["orbits"]:
-            raise CcsdsParseError("Empty ephemeris")
-
         # In case there is no recommendation for interpolation
         # default to a Lagrange 8th order
         method = ephem_dict.get("INTERPOLATION", "Lagrange").lower()
@@ -107,41 +104,46 @@ def _load_oem_xml(string):
     if isinstance(segments, dict):
         segments = [segments]
 
-    for segment in segments:
-        metadata = segment["metadata"]
-        data_tag = segment["data"]
+    try:
+        for segment in segments:
+            metadata = segment["metadata"]
+            data_tag = segment["data"]
 
-        ref_frame = metadata["REF_FRAME"].text
-        if metadata["CENTER_NAME"].text.lower() != "earth":
-            ref_frame = metadata["CENTER_NAME"].text.title().replace(" ", "")
+            ref_frame = metadata["REF_FRAME"].text
+            if metadata["CENTER_NAME"].text.lower() != "earth":
+                ref_frame = metadata["CENTER_NAME"].text.title().replace(" ", "")
 
-        ephem = []
-        for statevector in data_tag["stateVector"]:
-            ephem.append(
-                Orbit(
-                    parse_date(statevector["EPOCH"].text, metadata["TIME_SYSTEM"].text),
-                    [
-                        decode_unit(statevector, "X", units.km),
-                        decode_unit(statevector, "Y", units.km),
-                        decode_unit(statevector, "Z", units.km),
-                        decode_unit(statevector, "X_DOT", units.km),
-                        decode_unit(statevector, "Y_DOT", units.km),
-                        decode_unit(statevector, "Z_DOT", units.km),
-                    ],
-                    "cartesian",
-                    ref_frame,
-                    None,
+            ephem = []
+            for statevector in data_tag["stateVector"]:
+                ephem.append(
+                    Orbit(
+                        parse_date(
+                            statevector["EPOCH"].text, metadata["TIME_SYSTEM"].text
+                        ),
+                        [
+                            decode_unit(statevector, "X", units.km),
+                            decode_unit(statevector, "Y", units.km),
+                            decode_unit(statevector, "Z", units.km),
+                            decode_unit(statevector, "X_DOT", units.km),
+                            decode_unit(statevector, "Y_DOT", units.km),
+                            decode_unit(statevector, "Z_DOT", units.km),
+                        ],
+                        "cartesian",
+                        ref_frame,
+                        None,
+                    )
                 )
-            )
 
-        ephem = Ephem(
-            ephem,
-            method=metadata.get("INTERPOLATION", "Lagrange").text.lower(),
-            order=int(metadata.get("INTERPOLATION_DEGREE", 7).text) + 1,
-        )
-        ephem.name = metadata["OBJECT_NAME"].text
-        ephem.cospar_id = metadata["OBJECT_ID"].text
-        ephems.append(ephem)
+            ephem = Ephem(
+                ephem,
+                method=metadata.get("INTERPOLATION", "Lagrange").text.lower(),
+                order=int(metadata.get("INTERPOLATION_DEGREE", 7).text) + 1,
+            )
+            ephem.name = metadata["OBJECT_NAME"].text
+            ephem.cospar_id = metadata["OBJECT_ID"].text
+            ephems.append(ephem)
+    except KeyError as e:
+        raise CcsdsParseError("Missing mandatory parameter {}".format(e))
 
     if len(ephems) == 1:
         ephems = ephems[0]

@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd" id="CCSDS_OPM_VERS" version="2.0">
+  <header>
+    <CREATION_DATE>2019-11-27T20:29:05</CREATION_DATE>
+    <ORIGINATOR>N/A</ORIGINATOR>
+  </header>
+  <body>
+    <segment>
+      <metadata>
+        <OBJECT_NAME>ISS (ZARYA)</OBJECT_NAME>
+        <OBJECT_ID>1998-067A</OBJECT_ID>
+        <CENTER_NAME>EARTH</CENTER_NAME>
+        <REF_FRAME>TEME</REF_FRAME>
+        <TIME_SYSTEM>UTC</TIME_SYSTEM>
+      </metadata>
+      <data>
+        <stateVector>
+          <EPOCH>2008-09-20T12:25:40.104192</EPOCH>
+          <X units="km">4086.147180</X>
+          <Y units="km">-994.936814</Y>
+          <Z units="km">5250.678791</Z>
+          <X_DOT units="km/s">2.511071</X_DOT>
+          <Y_DOT units="km/s">7.255240</Y_DOT>
+          <Z_DOT units="km/s">-0.583165</Z_DOT>
+        </stateVector>
+        <keplerianElements>
+          <SEMI_MAJOR_AXIS units="km">6730.96</SEMI_MAJOR_AXIS>
+          <ECCENTRICITY>0.0006703</ECCENTRICITY>
+          <INCLINATION units="deg">51.6416</INCLINATION>
+          <RA_OF_ASC_NODE units="deg">247.463</RA_OF_ASC_NODE>
+          <ARG_OF_PERICENTER units="deg">130.536</ARG_OF_PERICENTER>
+          <TRUE_ANOMALY units="deg">324.985</TRUE_ANOMALY>
+          <GM units="km**3/s**2">398600.9368</GM>
+        </keplerianElements>
+        <covarianceMatrix>
+          <COV_REF_FRAME>RSW</COV_REF_FRAME>
+          <CX_X>5.8010032236063355e-05</CX_X>
+          <CY_X>-1.8473510518663645e-04</CY_X>
+          <CY_Y>9.9866247749849429e-04</CY_Y>
+          <CZ_X>1.1118476595468817e-04</CZ_X>
+          <CZ_Y>-4.8791014065614649e-04</CZ_Y>
+          <CZ_Z>2.7789761647228466e-04</CZ_Z>
+          <CX_DOT_X>1.5826506528751164e-07</CX_DOT_X>
+          <CX_DOT_Y>-7.5862973734692565e-07</CX_DOT_Y>
+          <CX_DOT_Z>3.5436109526435285e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>6.4862152678401594e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>5.2608037205399288e-08</CY_DOT_X>
+          <CY_DOT_Y>-4.7600374122170197e-07</CY_DOT_Y>
+          <CY_DOT_Z>2.3662322692294305e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.7496720817295827e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>3.4312488703079923e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>7.3844964157943917e-08</CZ_DOT_X>
+          <CZ_DOT_Y>-6.4270507701166057e-08</CZ_DOT_Y>
+          <CZ_DOT_Z>5.0414636669024323e-08</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.5941650927025790e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>-1.2830238447436662e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>2.3705169051094249e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+      </data>
+    </segment>
+  </body>
+</opm>

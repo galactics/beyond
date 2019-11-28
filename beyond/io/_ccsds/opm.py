@@ -35,7 +35,7 @@ def load_opm(string, fmt):
         orb = _load_opm_kvn(string)
     elif fmt == "xml":
         orb = _load_opm_xml(string)
-    else:
+    else:  # pragma: no cover
         raise CcsdsParseError("Unknown format '{}'".format(fmt))
 
     return orb
@@ -50,6 +50,13 @@ def _load_opm_kvn(string):
         cospar_id = data["OBJECT_ID"].text
         scale = data["TIME_SYSTEM"].text
         frame = data["REF_FRAME"].text
+        center = data["CENTER_NAME"].text
+
+        # Convert the frame and center into a beyond frame name
+        # compatible with beyond.env.jpl
+        if center.lower() != "earth":
+            frame = center.title().replace(" ", "")
+
         date = parse_date(data["EPOCH"].text, scale)
         vx = decode_unit(data, "X_DOT", "km/s")
         vy = decode_unit(data, "Y_DOT", "km/s")
@@ -120,6 +127,13 @@ def _load_opm_xml(string):
         cospar_id = metadata["OBJECT_ID"].text
         scale = metadata["TIME_SYSTEM"].text
         frame = metadata["REF_FRAME"].text
+        center = metadata["CENTER_NAME"].text
+
+        # Convert the frame and center into a beyond frame name
+        # compatible with beyond.env.jpl
+        if center.lower() != "earth":
+            frame = center.title().replace(" ", "")
+
         date = parse_date(statevector["EPOCH"].text, scale)
         vx = decode_unit(statevector, "X_DOT", "km/s")
         vy = decode_unit(statevector, "Y_DOT", "km/s")
@@ -358,7 +372,7 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
             top, pretty_print=True, xml_declaration=True, encoding="UTF-8"
         ).decode()
 
-    else:
+    else:  # pragma: no cover
         raise CcsdsParseError("Unknown format '{}'".format(fmt))
 
     return string
