@@ -15,7 +15,9 @@ from .commons import (
     DATE_DEFAULT_FMT,
     xml2dict,
     decode_unit,
+    Field,
 )
+from .cov import load_cov
 
 
 def load_oem(string, fmt):
@@ -31,7 +33,7 @@ def load_oem(string, fmt):
     elif fmt == "xml":
         ephem = _load_oem_xml(string)
     else:  # pragma: no cover
-        raise CcsdsParseError("Unknwon format '{}'".format(fmt))
+        raise CcsdsParseError("Unknown format '{}'".format(fmt))
 
     return ephem
 
@@ -48,7 +50,7 @@ def _load_oem_kvn(string):
             continue
         elif line.startswith("META_START"):
             mode = "meta"
-            ephem = {"orbits": []}
+            ephem = {"orbits": [], "orbit_mapping": {}}
             ephems.append(ephem)
         elif line.startswith("META_STOP"):
             mode = "data"
@@ -62,6 +64,11 @@ def _load_oem_kvn(string):
             # frames naming convention.
             if ephem["CENTER_NAME"].lower() != "earth":
                 ephem["REF_FRAME"] = ephem["CENTER_NAME"].title().replace(" ", "")
+        elif line == "COVARIANCE_START":
+            mode = "covariance"
+            ephem["dangling_covariance"] = []
+        elif line == "COVARIANCE_STOP":
+            mode = None
         elif mode == "meta":
             key, _, value = line.partition("=")
             ephem[key.strip()] = value.strip()
@@ -73,9 +80,60 @@ def _load_oem_kvn(string):
             # and discard acceleration if present
             state_vector = np.array([float(x) for x in state_vector[:6]]) * units.km
 
-            ephem["orbits"].append(
-                Orbit(date, state_vector, "cartesian", ephem["REF_FRAME"], None)
-            )
+            orb = Orbit(date, state_vector, "cartesian", ephem["REF_FRAME"], None)
+            ephem["orbits"].append(orb)
+            ephem["orbit_mapping"][date] = orb
+        elif mode == "covariance":
+            if line.startswith("EPOCH"):
+                cov = {
+                    "EPOCH": parse_date(
+                        line.partition("=")[2].strip(), ephem["TIME_SYSTEM"]
+                    )
+                }
+            elif line.startswith("COV_REF_FRAME"):
+                cov["COV_REF_FRAME"] = Field(line.partition("=")[2].strip(), {})
+            else:
+                values = line.split()
+                if len(values) > 6:  # pragma: no cover
+                    raise CcsdsParseError("Unknown covariance field lenght")
+                elif len(values) == 1:
+                    cov["CX_X"] = Field(values[0], {})
+                elif len(values) == 2:
+                    cov["CY_X"] = Field(values[0], {})
+                    cov["CY_Y"] = Field(values[1], {})
+                elif len(values) == 3:
+                    cov["CZ_X"] = Field(values[0], {})
+                    cov["CZ_Y"] = Field(values[1], {})
+                    cov["CZ_Z"] = Field(values[2], {})
+                elif len(values) == 4:
+                    cov["CX_DOT_X"] = Field(values[0], {})
+                    cov["CX_DOT_Y"] = Field(values[1], {})
+                    cov["CX_DOT_Z"] = Field(values[2], {})
+                    cov["CX_DOT_X_DOT"] = Field(values[3], {})
+                elif len(values) == 5:
+                    cov["CY_DOT_X"] = Field(values[0], {})
+                    cov["CY_DOT_Y"] = Field(values[1], {})
+                    cov["CY_DOT_Z"] = Field(values[2], {})
+                    cov["CY_DOT_X_DOT"] = Field(values[3], {})
+                    cov["CY_DOT_Y_DOT"] = Field(values[4], {})
+                elif len(values) == 6:
+                    cov["CZ_DOT_X"] = Field(values[0], {})
+                    cov["CZ_DOT_Y"] = Field(values[1], {})
+                    cov["CZ_DOT_Z"] = Field(values[2], {})
+                    cov["CZ_DOT_X_DOT"] = Field(values[3], {})
+                    cov["CZ_DOT_Y_DOT"] = Field(values[4], {})
+                    cov["CZ_DOT_Z_DOT"] = Field(values[5], {})
+
+                    if cov["EPOCH"] in ephem["orbit_mapping"]:
+                        orb = ephem["orbit_mapping"][cov["EPOCH"]]
+                        cov_obj = load_cov(orb, cov)
+                        orb.cov = cov_obj
+                    else:  # pragma: no cover
+                        raise CcsdsParseError(
+                            "Impossible to attach a covariance matrix to an orbit object"
+                        )
+                else:  # pragma: no cover
+                    continue
 
     for i, ephem_dict in enumerate(ephems):
         # In case there is no recommendation for interpolation
@@ -114,25 +172,34 @@ def _load_oem_xml(string):
                 ref_frame = metadata["CENTER_NAME"].text.title().replace(" ", "")
 
             ephem = []
+            orbit_mapping = {}
             for statevector in data_tag["stateVector"]:
-                ephem.append(
-                    Orbit(
-                        parse_date(
-                            statevector["EPOCH"].text, metadata["TIME_SYSTEM"].text
-                        ),
-                        [
-                            decode_unit(statevector, "X", units.km),
-                            decode_unit(statevector, "Y", units.km),
-                            decode_unit(statevector, "Z", units.km),
-                            decode_unit(statevector, "X_DOT", units.km),
-                            decode_unit(statevector, "Y_DOT", units.km),
-                            decode_unit(statevector, "Z_DOT", units.km),
-                        ],
-                        "cartesian",
-                        ref_frame,
-                        None,
-                    )
+                orb = Orbit(
+                    parse_date(statevector["EPOCH"].text, metadata["TIME_SYSTEM"].text),
+                    [
+                        decode_unit(statevector, "X", units.km),
+                        decode_unit(statevector, "Y", units.km),
+                        decode_unit(statevector, "Z", units.km),
+                        decode_unit(statevector, "X_DOT", units.km),
+                        decode_unit(statevector, "Y_DOT", units.km),
+                        decode_unit(statevector, "Z_DOT", units.km),
+                    ],
+                    "cartesian",
+                    ref_frame,
+                    None,
                 )
+                ephem.append(orb)
+                orbit_mapping[orb.date] = orb
+
+            for cov in data_tag.get("covarianceMatrix", []):
+                date = parse_date(cov["EPOCH"].text, metadata["TIME_SYSTEM"].text)
+                if date in orbit_mapping:
+                    orb = orbit_mapping[date]
+                    orb.cov = load_cov(orb, cov)
+                else:  # pragma: no cover
+                    raise CcsdsParseError(
+                        "Impossible to attach a covariance matrix to an orbit object"
+                    )
 
             ephem = Ephem(
                 ephem,
@@ -175,14 +242,50 @@ def dump_oem(data, fmt="kvn", **kwargs):
             meta = dump_kvn_meta_odm(data, extras=extras, **kwargs)
 
             text = []
+            cov = []
             for orb in data:
                 text.append(
-                    "{date:%Y-%m-%dT%H:%M:%S.%f} {orb[0]:{fmt}} {orb[1]:{fmt}} {orb[2]:{fmt}} {orb[3]:{fmt}} {orb[4]:{fmt}} {orb[5]:{fmt}}".format(
-                        date=orb.date, orb=orb.base / units.km, fmt=" 10f"
+                    "{date:{dfmt}} {orb[0]:{fmt}} {orb[1]:{fmt}} {orb[2]:{fmt}} {orb[3]:{fmt}} {orb[4]:{fmt}} {orb[5]:{fmt}}".format(
+                        date=orb.date,
+                        orb=orb.base / units.km,
+                        fmt=" 10f",
+                        dfmt=DATE_DEFAULT_FMT,
                     )
                 )
 
-            content.append(meta + "\n".join(text))
+                if orb.cov.any():
+                    cov_text = []
+
+                    if cov:
+                        cov_text.append("")
+
+                    cov_text.append(
+                        "EPOCH = {date:{dfmt}}".format(
+                            date=orb.date, dfmt=DATE_DEFAULT_FMT
+                        )
+                    )
+
+                    if orb.cov.frame != orb.cov.PARENT_FRAME:
+                        frame = orb.cov.frame
+                        if frame == "QSW":
+                            frame = "RSW"
+                        cov_text.append("COV_REF_FRAME = {}".format(frame))
+
+                    elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
+
+                    for i in range(6):
+                        line = []
+                        for j in range(i + 1):
+                            line.append("{: 0.16e}".format(orb.cov[i, j] / 1e6))
+                        cov_text.append(" ".join(line))
+
+                    cov.append("\n".join(cov_text))
+
+            if cov:
+                cov.insert(0, "\n\nCOVARIANCE_START")
+                cov.append("COVARIANCE_STOP\n")
+
+            content.append(meta + "\n".join(text) + "\n".join(cov))
 
         string = header + "\n" + "\n\n\n".join(content)
 
@@ -228,6 +331,9 @@ def dump_oem(data, fmt="kvn", **kwargs):
             for el in data:
                 if el.cov.any():
                     cov = ET.SubElement(data_tag, "covarianceMatrix")
+
+                    cov_date = ET.SubElement(cov, "EPOCH")
+                    cov_date.text = el.date.strftime(DATE_DEFAULT_FMT)
 
                     if el.cov.frame != el.cov.PARENT_FRAME:
                         frame = el.cov.frame

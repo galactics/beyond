@@ -7,8 +7,8 @@
   <body>
     <segment>
       <metadata>
-        <OBJECT_NAME>N/A</OBJECT_NAME>
-        <OBJECT_ID>N/A</OBJECT_ID>
+        <OBJECT_NAME>ISS (ZARYA)</OBJECT_NAME>
+        <OBJECT_ID>1998-067A</OBJECT_ID>
         <CENTER_NAME>EARTH</CENTER_NAME>
         <REF_FRAME>TEME</REF_FRAME>
         <TIME_SYSTEM>UTC</TIME_SYSTEM>
@@ -391,8 +391,8 @@
     </segment>
     <segment>
       <metadata>
-        <OBJECT_NAME>N/A</OBJECT_NAME>
-        <OBJECT_ID>N/A</OBJECT_ID>
+        <OBJECT_NAME>ISS (ZARYA)</OBJECT_NAME>
+        <OBJECT_ID>1998-067A</OBJECT_ID>
         <CENTER_NAME>EARTH</CENTER_NAME>
         <REF_FRAME>TEME</REF_FRAME>
         <TIME_SYSTEM>UTC</TIME_SYSTEM>

@@ -2,13 +2,13 @@
 from pathlib import Path
 import numpy as np
 from pytest import fixture
+from itertools import product
 
 from beyond.orbits.man import ImpulsiveMan, ContinuousMan
 from beyond.io.tle import Tle
 from beyond.dates import Date, timedelta
 from beyond.propagators.kepler import Kepler
 from beyond.env.solarsystem import get_body
-
 
 
 @fixture(params=["kvn", "xml"])
@@ -139,14 +139,22 @@ def orbit_continuous_man(orbit):
 
 @fixture
 def ephem(orbit):
-    return orbit.ephem(
+    ephem = orbit.ephem(
         start=orbit.date, stop=timedelta(minutes=120), step=timedelta(minutes=3)
     )
+    ephem.name = orbit.name
+    ephem.cospar_id = orbit.cospar_id
+    return ephem
 
 
 @fixture
 def ephem2(orbit):
-    return orbit.ephem(start=orbit.date, stop=timedelta(hours=5), step=timedelta(minutes=5))
+    ephem = orbit.ephem(
+        start=orbit.date, stop=timedelta(hours=5), step=timedelta(minutes=5)
+    )
+    ephem.name = orbit.name
+    ephem.cospar_id = orbit.cospar_id
+    return ephem
 
 
 class Helper:
@@ -182,7 +190,9 @@ class Helper:
         assert abs(orb1[5] - orb2[5]) < 1e-3
 
         if orb1.cov.any() and orb2.cov.any():
-            assert (abs(orb1.cov - orb2.cov) < cov_eps).all()
+            elems = "X Y Z X_DOT Y_DOT Z_DOT".split()
+            for i, j in product(range(6), repeat=2):
+                assert abs(orb1.cov[i,j] - orb2.cov[i,j]) < cov_eps, "C{}_{}".format(elems[i], elems[j])
 
         assert len(orb1.maneuvers) == len(orb2.maneuvers)
 
@@ -198,9 +208,8 @@ class Helper:
             assert o1_man.frame == o2_man.frame
             assert o1_man.comment == o2_man.comment
 
-
     @classmethod
-    def assert_ephem(cls, ephem1, ephem2):
+    def assert_ephem(cls, ephem1, ephem2, cov_eps=None):
 
         assert len(ephem1) == len(ephem2)
 
@@ -211,7 +220,7 @@ class Helper:
         assert ephem1.order == ephem2.order
 
         for e1, e2 in zip(ephem1, ephem2):
-            cls.assert_orbit(e1, e2)
+            cls.assert_orbit(e1, e2, cov_eps=cov_eps)
 
     @staticmethod
     def assert_string(str1, str2, ignore=[]):

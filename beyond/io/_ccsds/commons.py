@@ -81,8 +81,10 @@ def detect(string):
 
     if m and m.group(1) in ["OPM", "OMM", "OEM", "TDM"]:
         type = m.group(1)
+    elif m:
+        raise CcsdsParseError("Unknown CCSDS type : {}".format(m))
     else:
-        raise CcsdsParseError("Unknwon CCSDS type")
+        raise CcsdsParseError("Unknown CCSDS type")
 
     return type, format
 

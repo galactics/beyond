@@ -27,7 +27,7 @@ def load_omm(string, fmt):
     elif fmt == "xml":
         orb = _load_omm_xml(string)
     else:  # pragma: no cover
-        raise CcsdsParseError("Unknwon format '{}'".format(fmt))
+        raise CcsdsParseError("Unknown format '{}'".format(fmt))
 
     return orb
 
