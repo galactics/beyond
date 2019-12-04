@@ -1,19 +1,37 @@
 import numpy as np
+import lxml.etree as ET
 
 from ...constants import c
 from ...utils import units
 from ...utils.measures import MeasureSet, Range, Azimut, Elevation, Doppler
 
-from .commons import CcsdsParseError, parse_date, dump_kvn_header
+from .commons import (
+    CcsdsParseError,
+    parse_date,
+    dump_kvn_header,
+    dump_xml_header,
+    DATE_DEFAULT_FMT,
+    xml2dict,
+)
 
 
-def load_tdm(string):
+def load_tdm(string, fmt="kvn"):
     """Read CCSDS TDM format and convert it to a MeasureSet
     """
 
+    if fmt == "kvn":
+        measures = _load_tdm_kvn(string)
+    else:
+        measures = _load_tdm_xml(string)
+
+    return measures
+
+
+def _load_tdm_kvn(string):
+
     mode = "meta"
     meta = {}
-    data = MeasureSet()
+    sets = []
     for i, line in enumerate(string.splitlines()):
 
         if not line or line.startswith("COMMENT"):
@@ -26,6 +44,11 @@ def load_tdm(string):
             path = [participants[int(p) - 1] for p in path_txt.split(",")]
             scale = meta["TIME_SYSTEM"]
             mode = "data"
+            r_unit = units.km
+            if meta.get("RANGE_UNITS") == "s":
+                r_unit *= c
+            data = MeasureSet()
+            sets.append(data)
             continue
         elif line.startswith("DATA_STOP"):
             mode = "meta"
@@ -43,101 +66,225 @@ def load_tdm(string):
             value = float(value)
 
             if key == "RANGE":
-                if meta["RANGE_UNITS"] == "km":
-                    obj = Range(path, date, value * units.km)
-                elif meta["RANGE_UNITS"] == "s":
-                    obj = Range(path, date, value * c * units.km)
-            elif key == "ANGLE_1":
-                if meta["ANGLE_TYPE"] == "AZEL":
-                    obj = Azimut(path, date, np.radians(-value))
-                else:
-                    raise CcsdsParseError("Unknown angle type")
-            elif key == "ANGLE_2":
-                if meta["ANGLE_TYPE"] == "AZEL":
-                    obj = Elevation(path, date, np.radians(value))
-                else:
-                    raise CcsdsParseError("Unknown angle type")
+                obj = Range(path, date, value * r_unit)
+            elif key == "ANGLE_1" and meta["ANGLE_TYPE"] == "AZEL":
+                obj = Azimut(path, date, np.radians(-value))
+            elif key == "ANGLE_2" and meta["ANGLE_TYPE"] == "AZEL":
+                obj = Elevation(path, date, np.radians(value))
+            else:
+                raise CcsdsParseError("Unknown type : {}".format(key))
 
             data.append(obj)
 
-    return data
+    if len(sets) == 1:
+        sets = sets.pop()
+
+    return sets
 
 
-def dump_tdm(data, **kwargs):
+def _load_tdm_xml(string):
 
-    header = _dump_header(data, "TDM", **kwargs)
-    date_fmt = "%Y-%m-%dT%H:%M:%S.%f"
+    data = xml2dict(string.encode())
+
+    sets = []
+    segments = data["body"]["segment"]
+
+    if isinstance(segments, dict):
+        segments = [segments]
+
+    for segment in segments:
+        meta = segment["metadata"]
+        measures = MeasureSet()
+        sets.append(measures)
+
+        participants = [
+            v.text
+            for k, v in sorted(segment["metadata"].items())
+            if k.startswith("PARTICIPANT_")
+        ]
+        path_txt = meta["PATH"].text
+        path = [participants[int(p) - 1] for p in path_txt.split(",")]
+        scale = meta["TIME_SYSTEM"].text
+
+        if "RANGE_UNITS" in meta:
+            r_unit = units.km
+            if meta["RANGE_UNITS"].text == "s":
+                r_unit *= c
+        if "ANGLE_TYPE" in meta:
+            angle_type = meta["ANGLE_TYPE"].text
+
+        for obs in segment["data"]["observation"]:
+            date = parse_date(obs.pop("EPOCH").text, scale)
+            meas_type, value = list(obs.items())[0]
+            value = float(value.text)
+            if meas_type == "RANGE":
+                measures.append(Range(path, date, value * r_unit))
+            elif meas_type == "ANGLE_1" and angle_type == "AZEL":
+                measures.append(Azimut(path, date, np.radians(-value)))
+            elif meas_type == "ANGLE_2" and angle_type == "AZEL":
+                measures.append(Elevation(path, date, np.radians(value)))
+            else:
+                raise CcsdsParseError("Unknown type : {}".format(meas_type))
+
+    if len(sets) == 1:
+        sets = sets.pop()
+
+    return sets
+
+
+def dump_tdm(data, fmt="kvn", **kwargs):
 
     filtered = ((path, data.filter(path=path)) for path in data.paths)
 
-    text = ""
-    for path, measure_set in filtered:
+    if fmt == "kvn":
 
-        meta = {
-            "TIME_SYSTEM": measure_set.start.scale.name,
-            "START_TIME": measure_set.start.strftime(date_fmt),
-            "STOP_TIME": measure_set.stop.strftime(date_fmt),
-        }
+        header = dump_kvn_header(data, "TDM", **kwargs)
 
-        i = 0
-        parts = {}
-        for p in path:
-            if p in parts:
-                continue
-            else:
-                i += 1
-            parts[p] = i
-            meta["PARTICIPANT_{}".format(i)] = p
+        text = ""
+        for path, measure_set in filtered:
 
-        meta["MODE"] = "SEQUENTIAL"
-        meta["PATH"] = ",".join([str(parts[p]) for p in path])
+            meta = {
+                "TIME_SYSTEM": measure_set.start.scale.name,
+                "START_TIME": measure_set.start.strftime(DATE_DEFAULT_FMT),
+                "STOP_TIME": measure_set.stop.strftime(DATE_DEFAULT_FMT),
+            }
 
-        if "Range" in measure_set.types:
-            meta["RANGE_UNITS"] = "km"
-        if "Azimut" in measure_set.types:
-            meta["ANGLE_TYPE"] = "AZEL"
+            i = 0
+            parts = {}
+            for p in path:
+                if p in parts:
+                    continue
+                else:
+                    i += 1
+                parts[p] = i
+                meta["PARTICIPANT_{}".format(i)] = p
 
-        txt = ["META_START"]
+            meta["MODE"] = "SEQUENTIAL"
+            meta["PATH"] = ",".join([str(parts[p]) for p in path])
 
-        for k, v in meta.items():
-            txt.append("{:20} = {}".format(k, v))
+            if "Range" in measure_set.types:
+                meta["RANGE_UNITS"] = "km"
+            if "Azimut" in measure_set.types:
+                meta["ANGLE_TYPE"] = "AZEL"
 
-        txt.append("META_STOP")
-        txt.append("")
-        txt.append("DATA_START")
+            txt = ["META_START"]
 
-        for m in measure_set:
+            for k, v in meta.items():
+                txt.append("{:20} = {}".format(k, v))
 
-            if isinstance(m, Doppler):
-                name = "DOPPLER_INSTANTANEOUS"
-                value_fmt = "16.6f"
-                value = m.value
-            elif isinstance(m, Range):
-                name = "RANGE"
-                value_fmt = "16.6f"
-                value = m.value / units.km
-            elif isinstance(m, Azimut):
-                name = "ANGLE_1"
-                value_fmt = "12.2f"
-                value = -np.degrees(m.value) % 360
-            elif isinstance(m, Elevation):
-                name = "ANGLE_2"
-                value_fmt = "12.2f"
-                value = np.degrees(m.value)
+            txt.append("META_STOP")
+            txt.append("")
+            txt.append("DATA_START")
 
-            txt.append(
-                "{name:20} = {date:{date_fmt}} {value:{value_fmt}}".format(
-                    name=name,
-                    date=m.date,
-                    date_fmt=date_fmt,
-                    value=value,
-                    value_fmt=value_fmt,
+            for m in measure_set:
+
+                if isinstance(m, Doppler):
+                    name = "DOPPLER_INSTANTANEOUS"
+                    value_fmt = "16.6f"
+                    value = m.value
+                elif isinstance(m, Range):
+                    name = "RANGE"
+                    value_fmt = "16.6f"
+                    value = m.value / units.km
+                elif isinstance(m, Azimut):
+                    name = "ANGLE_1"
+                    value_fmt = "12.2f"
+                    value = -np.degrees(m.value) % 360
+                elif isinstance(m, Elevation):
+                    name = "ANGLE_2"
+                    value_fmt = "12.2f"
+                    value = np.degrees(m.value)
+
+                txt.append(
+                    "{name:20} = {date:{DATE_DEFAULT_FMT}} {value:{value_fmt}}".format(
+                        name=name,
+                        date=m.date,
+                        DATE_DEFAULT_FMT=DATE_DEFAULT_FMT,
+                        value=value,
+                        value_fmt=value_fmt,
+                    )
                 )
-            )
 
-        txt.append("DATA_STOP")
-        txt.append("")
+            txt.append("DATA_STOP")
+            txt.append("")
 
-        text += "\n".join(txt)
+            text += "\n".join(txt)
 
-    return header + "\n" + text
+        string = header + "\n" + text
+
+    elif fmt == "xml":
+        top = dump_xml_header(data, "TDM", version="1.0", **kwargs)
+
+        body = ET.SubElement(top, "body")
+
+        for path, measure_set in filtered:
+            segment = ET.SubElement(body, "segment")
+            meta = ET.SubElement(segment, "metadata")
+            ts = ET.SubElement(meta, "TIME_SYSTEM")
+            ts.text = measure_set.start.scale.name
+
+            start = ET.SubElement(meta, "START_TIME")
+            start.text = measure_set.start.strftime(DATE_DEFAULT_FMT)
+
+            stop = ET.SubElement(meta, "STOP_TIME")
+            stop.text = measure_set.stop.strftime(DATE_DEFAULT_FMT)
+
+            i = 0
+            parts = {}
+            for p in path:
+                if p in parts:
+                    continue
+                else:
+                    i += 1
+                parts[p] = i
+                participant = ET.SubElement(meta, "PARTICIPANT_{}".format(i))
+                participant.text = p
+
+            mode = ET.SubElement(meta, "MODE")
+            mode.text = "SEQUENTIAL"
+
+            path_tag = ET.SubElement(meta, "PATH")
+            path_tag.text = ",".join([str(parts[p]) for p in path])
+
+            if "Range" in measure_set.types:
+                r_unit = ET.SubElement(meta, "RANGE_UNITS")
+                r_unit.text = "km"
+            if "Azimut" in measure_set.types:
+                angle_type = ET.SubElement(meta, "ANGLE_TYPE")
+                angle_type.text = "AZEL"
+
+            data_tag = ET.SubElement(segment, "data")
+
+            for m in measure_set:
+                obs = ET.SubElement(data_tag, "observation")
+
+                epoch = ET.SubElement(obs, "EPOCH")
+                epoch.text = m.date.strftime(DATE_DEFAULT_FMT)
+
+                if isinstance(m, Doppler):
+                    name = "DOPPLER_INSTANTANEOUS"
+                    value_fmt = ".6f"
+                    value = m.value
+                elif isinstance(m, Range):
+                    name = "RANGE"
+                    value_fmt = ".6f"
+                    value = m.value / units.km
+                elif isinstance(m, Azimut):
+                    name = "ANGLE_1"
+                    value_fmt = ".2f"
+                    value = -np.degrees(m.value) % 360
+                elif isinstance(m, Elevation):
+                    name = "ANGLE_2"
+                    value_fmt = ".2f"
+                    value = np.degrees(m.value)
+
+                field = ET.SubElement(obs, name)
+                field.text = "{:{}}".format(value, value_fmt)
+
+        string = ET.tostring(
+            top, pretty_print=True, xml_declaration=True, encoding="UTF-8"
+        ).decode()
+    else:  # pragma: no cover
+        raise CcsdsParseError("Unknown format : {}".format(fmt))
+
+    return string
