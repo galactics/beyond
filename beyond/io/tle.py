@@ -154,6 +154,7 @@ class Tle:
         self.ndot = float(first[33:43]) * 2
         self.ndotdot = _float(first[44:52]) * 6
         self.bstar = _float(first[53:61])
+        self.element_nb = int(first[65:68])
         self.revolutions = int(second[63:68])
         self.type = int(first[62:63])
 
@@ -224,6 +225,12 @@ class Tle:
             "ndot": self.ndot,
             "ndotdot": self.ndotdot,
             "tle": self,
+            "name": self.name,
+            "cospar_id": self.cospar_id,
+            "norad_id": self.norad_id,
+            "element_nb": self.element_nb,
+            "revolutions": self.revolutions,
+            "type": self.type,
         }
         return Orbit(self.epoch, self.to_list(), "TLE", "TEME", "Sgp4", **data)
 

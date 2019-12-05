@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<omm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd" id="CCSDS_OMM_VERS" version="2.0">
+  <header>
+    <CREATION_DATE>2019-11-22T06:45:56</CREATION_DATE>
+    <ORIGINATOR>N/A</ORIGINATOR>
+  </header>
+  <body>
+    <segment>
+      <metadata>
+        <OBJECT_NAME>GOES 9 [P]</OBJECT_NAME>
+        <OBJECT_ID>1995-025A</OBJECT_ID>
+        <CENTER_NAME>EARTH</CENTER_NAME>
+        <REF_FRAME>TEME</REF_FRAME>
+        <TIME_SYSTEM>UTC</TIME_SYSTEM>
+        <MEAN_ELEMENT_THEORY>SGP/SGP4</MEAN_ELEMENT_THEORY>
+      </metadata>
+      <data>
+        <meanElements>
+          <EPOCH>2007-03-05T10:34:41.426400</EPOCH>
+          <MEAN_MOTION units="rev/day">1.00273272</MEAN_MOTION>
+          <ECCENTRICITY>0.0005013</ECCENTRICITY>
+          <INCLINATION units="deg">3.0539</INCLINATION>
+          <RA_OF_ASC_NODE units="deg">81.7939</RA_OF_ASC_NODE>
+          <ARG_OF_PERICENTER units="deg">249.2363</ARG_OF_PERICENTER>
+          <MEAN_ANOMALY units="deg">150.1602</MEAN_ANOMALY>
+          <GM units="km**3/s**2">398600.8</GM>
+        </meanElements>
+        <tleParameters>
+          <EPHEMERIS_TYPE>0</EPHEMERIS_TYPE>
+          <CLASSIFICATION_TYPE>U</CLASSIFICATION_TYPE>
+          <NORAD_CAT_ID>23581</NORAD_CAT_ID>
+          <ELEMENT_SET_NO>925</ELEMENT_SET_NO>
+          <REV_AT_EPOCH>4316</REV_AT_EPOCH>
+          <BSTAR>0.0001</BSTAR>
+          <MEAN_MOTION_DOT>-0.00000226</MEAN_MOTION_DOT>
+          <MEAN_MOTION_DDOT>0.0</MEAN_MOTION_DDOT>
+        </tleParameters>
+      </data>
+    </segment>
+  </body>
+</omm>

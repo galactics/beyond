@@ -1,0 +1,29 @@
+CCSDS_OPM_VERS = 2.0
+CREATION_DATE = 2017-06-21T13:20:25
+ORIGINATOR = N/A
+
+META_START
+OBJECT_NAME          = ISS (ZARYA)
+OBJECT_ID            = 1998-067A
+CENTER_NAME          = EARTH
+REF_FRAME            = TEME
+TIME_SYSTEM          = UTC
+META_STOP
+
+COMMENT  State Vector
+EPOCH                = 2008-264T12:25:40.104192
+X                    =  4086.147180
+Y                    =  -994.936814
+Z                    =  5250.678791
+X_DOT                =     2.511071
+Y_DOT                =     7.255240
+Z_DOT                =    -0.583165
+
+COMMENT  Keplerian elements
+SEMI_MAJOR_AXIS      =  6730.963463
+ECCENTRICITY         =     0.000670
+INCLINATION          =    51.641600
+RA_OF_ASC_NODE       =   247.462700
+ARG_OF_PERICENTER    =   130.536000
+TRUE_ANOMALY         =   324.984745
+GM                   = 398600.9368 [km**3/s**2]

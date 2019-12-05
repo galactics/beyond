@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:ndm="urn:ccsds:recommendation:navigation:schema:ndmxml"
+            targetNamespace="urn:ccsds:recommendation:navigation:schema:ndmxml"
+            elementFormDefault="unqualified" 
+            attributeFormDefault="unqualified">
+
+<!--********************************************************************-->
+
+<!--********************************************************************-->
+<!-- NOTE: This is version 1.0, Rev C of the NDM/XML Schema (09/03/2019)-->
+<!-- This component of the schema is the "namespace" module, which      -->
+<!-- imports the namespace with its generic name from the URL containing-->
+<!-- the desired version of the lower level schema.  The identified     -->
+<!-- URL contains those elements exported by the namespace allowing that-->
+<!-- only those whose visibility is required outside the namespace are  -->
+<!-- accessible.                                                        -->
+<!--                                                                    -->
+<!-- NOTE:  This schema applies only to the ODM Version 1.0, aka "the   -->
+<!-- Silver Book".  For current versions of all schemas, use the module -->
+<!-- ndmxml-1.0-namespace.xsd .                                         -->
+<!--                                                                    -->
+<!-- Compatible document versions are:                                  -->
+<!--    NDM/XML 505.0-B-1   Blue Book (12/2010)                         -->
+<!--    ODM     502.0-B-1-S Silver Book (09/2004, replaced by 502.0-B-2)-->
+<!--                                                                    -->
+<!-- ********************** BLUE BOOK CHANGE LOG  ********************* -->
+<!-- 03/14/2010: Original implemementation of schemas.                  -->
+<!-- 10/13/2017: Rev A: Modified to include revA common schemas,        -->
+<!--                    v.1 odm schemas                                 -->
+<!-- 08/29/2018: Rev B: Modified to remove revision version from file   -->
+<!--                    names, since file names on SANA were static     -->
+<!--                    and the schemas basically did not work.         -->
+<!-- 09/03/2019: Rev C: No modifications to this schema; preparation of -->
+<!--                    schema set for introduction of the RDM.         -->
+<!--********************************************************************-->
+
+<!--********************************************************************-->
+<!-- Structural note... this schema is structured so that the structural-->
+<!-- elements of an NDM are developed in separate modules, i.e., there  -->
+<!-- are separate schemas for the OEM and OPM, each of which is         -->
+<!-- maintained separately.  This facilitates the process of applying   -->
+<!-- updates that correlate with the foundation documents. The "common" -->
+<!-- schemas contain elements and types that are used across more than  -->
+<!-- one schema.  The NDM schema allows the construction of a message   -->
+<!-- that contains more than a single OEM or OPM.                       -->
+<!--********************************************************************-->
+
+<!--********************************************************************-->
+<!-- Includes for all schemas: OEM, OPM, NDM, Common                    -->
+<!--********************************************************************-->
+
+   <xsd:include schemaLocation="./ndmxml-1.0-oem-1.0.xsd"/>
+   <xsd:include schemaLocation="./ndmxml-1.0-opm-1.0.xsd"/>
+   <xsd:include schemaLocation="./ndmxml-1.0-ndm-odmsilver.xsd"/>
+   <xsd:include schemaLocation="./ndmxml-1.0-navwg-common.xsd"/>
+   <xsd:include schemaLocation="./ndmxml-1.0-ccsds-common.xsd"/>
+
+</xsd:schema>

@@ -1,0 +1,1047 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd" id="CCSDS_OEM_VERS" version="2.0">
+  <header>
+    <CREATION_DATE>2019-11-30T00:00:34</CREATION_DATE>
+    <ORIGINATOR>N/A</ORIGINATOR>
+  </header>
+  <body>
+    <segment>
+      <metadata>
+        <OBJECT_NAME>ISS (ZARYA)</OBJECT_NAME>
+        <OBJECT_ID>1998-067A</OBJECT_ID>
+        <CENTER_NAME>EARTH</CENTER_NAME>
+        <REF_FRAME>TEME</REF_FRAME>
+        <TIME_SYSTEM>UTC</TIME_SYSTEM>
+        <START_TIME>2008-09-20T12:25:40.104192</START_TIME>
+        <STOP_TIME>2008-09-20T13:25:40.104192</STOP_TIME>
+        <INTERPOLATION>LAGRANGE</INTERPOLATION>
+        <INTERPOLATION_DEGREE>7</INTERPOLATION_DEGREE>
+      </metadata>
+      <data>
+        <stateVector>
+          <EPOCH>2008-09-20T12:25:40.104192</EPOCH>
+          <X units="km">4083.902464</X>
+          <Y units="km">-993.632000</Y>
+          <Z units="km">5243.603665</Z>
+          <X_DOT units="km/s">2.512837</X_DOT>
+          <Y_DOT units="km/s">7.259889</Y_DOT>
+          <Z_DOT units="km/s">-0.583779</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:27:40.104192</EPOCH>
+          <X units="km">4346.049327</X>
+          <Y units="km">-115.828289</Y>
+          <Z units="km">5124.263612</Z>
+          <X_DOT units="km/s">1.849388</X_DOT>
+          <Y_DOT units="km/s">7.347202</Y_DOT>
+          <Z_DOT units="km/s">-1.402131</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:29:40.104192</EPOCH>
+          <X units="km">4526.353992</X>
+          <Y units="km">764.156460</Y>
+          <Z units="km">4908.145359</Z>
+          <X_DOT units="km/s">1.150933</X_DOT>
+          <Y_DOT units="km/s">7.296161</Y_DOT>
+          <Z_DOT units="km/s">-2.194215</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:31:40.104192</EPOCH>
+          <X units="km">4621.397102</X>
+          <Y units="km">1629.746327</Y>
+          <Z units="km">4599.304773</Z>
+          <X_DOT units="km/s">0.430591</X_DOT>
+          <Y_DOT units="km/s">7.107649</Y_DOT>
+          <Z_DOT units="km/s">-2.945072</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:33:40.104192</EPOCH>
+          <X units="km">4629.362568</X>
+          <Y units="km">2464.627681</Y>
+          <Z units="km">4203.550454</Z>
+          <X_DOT units="km/s">-0.298080</X_DOT>
+          <Y_DOT units="km/s">6.785137</Y_DOT>
+          <Z_DOT units="km/s">-3.640489</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:35:40.104192</EPOCH>
+          <X units="km">4550.075225</X>
+          <Y units="km">3253.056142</Y>
+          <Z units="km">3728.338205</Z>
+          <X_DOT units="km/s">-1.021330</X_DOT>
+          <Y_DOT units="km/s">6.334636</Y_DOT>
+          <Z_DOT units="km/s">-4.267271</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:37:40.104192</EPOCH>
+          <X units="km">4385.008276</X>
+          <Y units="km">3980.156563</Y>
+          <Z units="km">3182.633358</Z>
+          <X_DOT units="km/s">-1.725479</X_DOT>
+          <Y_DOT units="km/s">5.764603</Y_DOT>
+          <Z_DOT units="km/s">-4.813497</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:39:40.104192</EPOCH>
+          <X units="km">4137.259091</X>
+          <Y units="km">4632.208602</Y>
+          <Z units="km">2576.742946</Z>
+          <X_DOT units="km/s">-2.397182</X_DOT>
+          <Y_DOT units="km/s">5.085798</Y_DOT>
+          <Z_DOT units="km/s">-5.268762</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:41:40.104192</EPOCH>
+          <X units="km">3811.493707</X>
+          <Y units="km">5196.910872</Y>
+          <Z units="km">1922.121508</Z>
+          <X_DOT units="km/s">-3.023688</X_DOT>
+          <Y_DOT units="km/s">4.311084</Y_DOT>
+          <Z_DOT units="km/s">-5.624391</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:43:40.104192</EPOCH>
+          <X units="km">3413.859123</X>
+          <Y units="km">5663.620893</Y>
+          <Z units="km">1231.150896</Z>
+          <X_DOT units="km/s">-3.593103</X_DOT>
+          <Y_DOT units="km/s">3.455190</Y_DOT>
+          <Z_DOT units="km/s">-5.873621</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:45:40.104192</EPOCH>
+          <X units="km">2951.866337</X>
+          <Y units="km">6023.560789</Y>
+          <Z units="km">516.902443</Z>
+          <X_DOT units="km/s">-4.094630</X_DOT>
+          <Y_DOT units="km/s">2.534415</Y_DOT>
+          <Z_DOT units="km/s">-6.011747</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:47:40.104192</EPOCH>
+          <X units="km">2434.245155</X>
+          <Y units="km">6269.986988</Y>
+          <Z units="km">-207.116435</Z>
+          <X_DOT units="km/s">-4.518787</X_DOT>
+          <Y_DOT units="km/s">1.566306</Y_DOT>
+          <Z_DOT units="km/s">-6.036218</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:49:40.104192</EPOCH>
+          <X units="km">1870.774288</X>
+          <Y units="km">6398.318451</Y>
+          <Z units="km">-927.224362</Z>
+          <X_DOT units="km/s">-4.857602</X_DOT>
+          <Y_DOT units="km/s">0.569297</Y_DOT>
+          <Z_DOT units="km/s">-5.946690</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:51:40.104192</EPOCH>
+          <X units="km">1272.090360</X>
+          <Y units="km">6406.220641</Y>
+          <Z units="km">-1629.831245</Z>
+          <X_DOT units="km/s">-5.104768</X_DOT>
+          <Y_DOT units="km/s">-0.437669</Y_DOT>
+          <Z_DOT units="km/s">-5.745020</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:53:40.104192</EPOCH>
+          <X units="km">649.481585</X>
+          <Y units="km">6293.643666</Y>
+          <Z units="km">-2301.699135</Z>
+          <X_DOT units="km/s">-5.255757</X_DOT>
+          <Y_DOT units="km/s">-1.435523</Y_DOT>
+          <Z_DOT units="km/s">-5.435218</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:55:40.104192</EPOCH>
+          <X units="km">14.667968</X>
+          <Y units="km">6062.814340</Y>
+          <Z units="km">-2930.196340</Z>
+          <X_DOT units="km/s">-5.307898</X_DOT>
+          <Y_DOT units="km/s">-2.405451</Y_DOT>
+          <Z_DOT units="km/s">-5.023347</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:57:40.104192</EPOCH>
+          <X units="km">-620.422834</X>
+          <Y units="km">5718.183205</Y>
+          <Z units="km">-3503.534631</Z>
+          <X_DOT units="km/s">-5.260407</X_DOT>
+          <Y_DOT units="km/s">-3.329262</Y_DOT>
+          <Z_DOT units="km/s">-4.517378</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T12:59:40.104192</EPOCH>
+          <X units="km">-1243.882002</X>
+          <Y units="km">5266.329046</Y>
+          <Z units="km">-4010.988392</Z>
+          <X_DOT units="km/s">-5.114376</X_DOT>
+          <Y_DOT units="km/s">-4.189732</Y_DOT>
+          <Z_DOT units="km/s">-3.927019</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:01:40.104192</EPOCH>
+          <X units="km">-1844.042731</X>
+          <Y units="km">4715.823893</Y>
+          <Z units="km">-4443.090519</Z>
+          <X_DOT units="km/s">-4.872732</X_DOT>
+          <Y_DOT units="km/s">-4.970910</Y_DOT>
+          <Z_DOT units="km/s">-3.263499</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:03:40.104192</EPOCH>
+          <X units="km">-2409.694871</X>
+          <Y units="km">4077.063731</Y>
+          <Z units="km">-4791.801481</Z>
+          <X_DOT units="km/s">-4.540155</X_DOT>
+          <Y_DOT units="km/s">-5.658398</Y_DOT>
+          <Z_DOT units="km/s">-2.539350</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:05:40.104192</EPOCH>
+          <X units="km">-2930.290388</X>
+          <Y units="km">3362.066463</Y>
+          <Z units="km">-5050.651514</Z>
+          <X_DOT units="km/s">-4.122971</X_DOT>
+          <Y_DOT units="km/s">-6.239590</Y_DOT>
+          <Z_DOT units="km/s">-1.768154</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:07:40.104192</EPOCH>
+          <X units="km">-3396.132523</X>
+          <Y units="km">2584.245378</Y>
+          <Z units="km">-5214.851625</Z>
+          <X_DOT units="km/s">-3.629021</X_DOT>
+          <Y_DOT units="km/s">-6.703870</Y_DOT>
+          <Z_DOT units="km/s">-0.964302</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:09:40.104192</EPOCH>
+          <X units="km">-3798.549156</X>
+          <Y units="km">1758.159894</Y>
+          <Z units="km">-5281.374851</Z>
+          <X_DOT units="km/s">-3.067515</X_DOT>
+          <Y_DOT units="km/s">-7.042775</Y_DOT>
+          <Z_DOT units="km/s">-0.142728</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:11:40.104192</EPOCH>
+          <X units="km">-4130.047026</X>
+          <Y units="km">899.248920</Y>
+          <Z units="km">-5249.006488</Z>
+          <X_DOT units="km/s">-2.448863</X_DOT>
+          <Y_DOT units="km/s">-7.250129</Y_DOT>
+          <Z_DOT units="km/s">0.681342</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:13:40.104192</EPOCH>
+          <X units="km">-4384.445296</X>
+          <Y units="km">23.550466</Y>
+          <Z units="km">-5118.363252</Z>
+          <X_DOT units="km/s">-1.784496</X_DOT>
+          <Y_DOT units="km/s">-7.322132</Y_DOT>
+          <Z_DOT units="km/s">1.492652</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:15:40.104192</EPOCH>
+          <X units="km">-4556.986380</X>
+          <Y units="km">-852.586795</Y>
+          <Z units="km">-4891.881774</Z>
+          <X_DOT units="km/s">-1.086676</X_DOT>
+          <Y_DOT units="km/s">-7.257428</Y_DOT>
+          <Z_DOT units="km/s">2.276173</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:17:40.104192</EPOCH>
+          <X units="km">-4644.423748</X>
+          <Y units="km">-1712.800517</Y>
+          <Z units="km">-4573.775823</Z>
+          <X_DOT units="km/s">-0.368285</X_DOT>
+          <Y_DOT units="km/s">-7.057133</Y_DOT>
+          <Z_DOT units="km/s">3.017355</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:19:40.104192</EPOCH>
+          <X units="km">-4645.083540</X>
+          <Y units="km">-2541.010297</Y>
+          <Z units="km">-4169.963408</Z>
+          <X_DOT units="km/s">0.357384</X_DOT>
+          <Y_DOT units="km/s">-6.724831</Y_DOT>
+          <Z_DOT units="km/s">3.702386</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:21:40.104192</EPOCH>
+          <X units="km">-4558.899937</X>
+          <Y units="km">-3321.712044</Y>
+          <Z units="km">-3687.963646</Z>
+          <X_DOT units="km/s">1.076862</X_DOT>
+          <Y_DOT units="km/s">-6.266533</Y_DOT>
+          <Z_DOT units="km/s">4.318435</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:23:40.104192</EPOCH>
+          <X units="km">-4387.422465</X>
+          <Y units="km">-4040.264707</Y>
+          <Z units="km">-3136.764401</Z>
+          <X_DOT units="km/s">1.776735</X_DOT>
+          <Y_DOT units="km/s">-5.690594</Y_DOT>
+          <Z_DOT units="km/s">4.853892</Z_DOT>
+        </stateVector>
+        <stateVector>
+          <EPOCH>2008-09-20T13:25:40.104192</EPOCH>
+          <X units="km">-4133.794212</X>
+          <Y units="km">-4683.164832</Y>
+          <Z units="km">-2526.661729</Z>
+          <X_DOT units="km/s">2.443897</X_DOT>
+          <Y_DOT units="km/s">-5.007591</Y_DOT>
+          <Z_DOT units="km/s">5.298597</Z_DOT>
+        </stateVector>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:25:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:27:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:29:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:31:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:33:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:35:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:37:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:39:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:41:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:43:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:45:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:47:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:49:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:51:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:53:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:55:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:57:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T12:59:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:01:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:03:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:05:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:07:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:09:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:11:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:13:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:15:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:17:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:19:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:21:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:23:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+        <covarianceMatrix>
+          <EPOCH>2008-09-20T13:25:40.104192</EPOCH>
+          <CX_X>3.3313494760385342e-04</CX_X>
+          <CY_X>4.6189273492202161e-04</CY_X>
+          <CY_Y>6.7824216799713629e-04</CY_Y>
+          <CZ_X>-3.0700078477304492e-04</CZ_X>
+          <CZ_Y>-4.2212341895142281e-04</CZ_Y>
+          <CZ_Z>3.2319319923803692e-04</CZ_Z>
+          <CX_DOT_X>-3.3493650339226300e-07</CX_DOT_X>
+          <CX_DOT_Y>-4.6860842210467581e-07</CX_DOT_Y>
+          <CX_DOT_Z>2.4849495784000951e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>4.2960228055872899e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>-2.2118325010848749e-07</CY_DOT_X>
+          <CY_DOT_Y>-2.8641868921027328e-07</CY_DOT_Y>
+          <CY_DOT_Z>1.7980986998460380e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>2.6088992016860161e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>1.7675147563385319e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-3.0413460506868711e-07</CZ_DOT_X>
+          <CZ_DOT_Y>-4.9894969886106624e-07</CZ_DOT_Y>
+          <CZ_DOT_Z>3.5403109044976887e-07</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>1.8692631929545898e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>1.0088625862406950e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>6.2244443386354998e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+      </data>
+    </segment>
+  </body>
+</oem>

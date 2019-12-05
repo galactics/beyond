@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<omm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd" id="CCSDS_OMM_VERS" version="2.0">
+  <header>
+    <CREATION_DATE>2019-11-30T00:02:52</CREATION_DATE>
+    <ORIGINATOR>N/A</ORIGINATOR>
+  </header>
+  <body>
+    <segment>
+      <metadata>
+        <OBJECT_NAME>ISS (ZARYA)</OBJECT_NAME>
+        <OBJECT_ID>1998-067A</OBJECT_ID>
+        <CENTER_NAME>EARTH</CENTER_NAME>
+        <REF_FRAME>TEME</REF_FRAME>
+        <TIME_SYSTEM>UTC</TIME_SYSTEM>
+        <MEAN_ELEMENT_THEORY>SGP/SGP4</MEAN_ELEMENT_THEORY>
+      </metadata>
+      <data>
+        <meanElements>
+          <EPOCH>2008-09-20T12:25:40.104192</EPOCH>
+          <MEAN_MOTION units="rev/day">15.72125391</MEAN_MOTION>
+          <ECCENTRICITY>0.0006703</ECCENTRICITY>
+          <INCLINATION units="deg">51.6416</INCLINATION>
+          <RA_OF_ASC_NODE units="deg">247.4627</RA_OF_ASC_NODE>
+          <ARG_OF_PERICENTER units="deg">130.5360</ARG_OF_PERICENTER>
+          <MEAN_ANOMALY units="deg">325.0288</MEAN_ANOMALY>
+          <GM units="km**3/s**2">398600.8</GM>
+        </meanElements>
+        <tleParameters>
+          <EPHEMERIS_TYPE>0</EPHEMERIS_TYPE>
+          <CLASSIFICATION_TYPE>U</CLASSIFICATION_TYPE>
+          <NORAD_CAT_ID>25544</NORAD_CAT_ID>
+          <ELEMENT_SET_NO>292</ELEMENT_SET_NO>
+          <REV_AT_EPOCH>56353</REV_AT_EPOCH>
+          <BSTAR>-0.0000</BSTAR>
+          <MEAN_MOTION_DOT>-0.00004364</MEAN_MOTION_DOT>
+          <MEAN_MOTION_DDOT>0.0</MEAN_MOTION_DDOT>
+        </tleParameters>
+        <covarianceMatrix>
+          <COV_REF_FRAME>TNW</COV_REF_FRAME>
+          <CX_X>9.9880451167965161e-04</CX_X>
+          <CY_X>1.8437346057938915e-04</CY_X>
+          <CY_Y>5.7868137072326758e-05</CY_Y>
+          <CZ_X>-4.8795288045946602e-04</CZ_X>
+          <CZ_Y>-1.1099719520287708e-04</CZ_Y>
+          <CZ_Z>2.7789761647228466e-04</CZ_Z>
+          <CX_DOT_X>-4.7573232068550994e-07</CX_DOT_X>
+          <CX_DOT_Y>-5.2364326447464493e-08</CX_DOT_Y>
+          <CX_DOT_Z>2.3648700930908497e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>3.4291358620935171e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>7.5887344810486043e-07</CY_DOT_X>
+          <CY_DOT_Y>1.5799355106807309e-07</CY_DOT_Y>
+          <CY_DOT_Z>-3.5445200167746379e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>-2.7484969299773428e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>6.4883278243222926e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-6.4298893957297031e-08</CZ_DOT_X>
+          <CZ_DOT_Y>-7.3820247443762763e-08</CZ_DOT_Y>
+          <CZ_DOT_Z>5.0414636669024323e-08</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>-1.2836366472435056e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>-1.5936716583964860e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>2.3705169051094249e-10</CZ_DOT_Z_DOT>
+        </covarianceMatrix>
+      </data>
+    </segment>
+  </body>
+</omm>
