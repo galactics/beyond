@@ -8,6 +8,7 @@ https://sanaregistry.org/r/ndmxml/.
 
 from collections.abc import Iterable
 
+from ..config import config
 from ..orbits import Orbit, Ephem
 from ..utils.measures import Measure
 from ..propagators.base import AnalyticalPropagator
@@ -78,17 +79,26 @@ def dump(data, fp, **kwargs):  # pragma: no cover
         name (str): Name of the object
         cospar_id (str): International designator of the object
         originator (str): Originator of the CCSDS file
+        fmt (str): Output format of the file, can be 'xml' or 'kvn'. Default to 'kvn'
+
+    It is also possible to set the configuration dict to change the default value
+    of 'fmt'.
+
+    .. code-block:: python
+
+        from beyond.config import config
+        config["io"] = {"ccsds_default_format": "xml"}
     """
     fp.write(dumps(data, **kwargs))
 
 
-def dumps(data, pretty_print=True, **kwargs):
+def dumps(data, **kwargs):
     """Create a string CCSDS representation of the object
 
     Same arguments and behaviour as :py:func:`dump`
     """
 
-    kwargs.setdefault("fmt", "kvn")
+    kwargs.setdefault("fmt", config.get("io", "ccsds_default_format", fallback="kvn"))
 
     if isinstance(data, Ephem) or (
         isinstance(data, Iterable) and all(isinstance(x, Ephem) for x in data)
