@@ -364,7 +364,7 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
                 man_mass.text = "-0.001"
 
                 man_frame = ET.SubElement(mans, "MAN_REF_FRAME")
-                man_frame.text = frame
+                man_frame.text = "{}".format(frame)
 
                 for i in range(3):
                     x = ET.SubElement(mans, "MAN_DV_{}".format(i + 1), units="km/s")
