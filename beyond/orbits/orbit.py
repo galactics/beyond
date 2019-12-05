@@ -228,6 +228,10 @@ Orbit =
     def cov(self, value):
         self.complements["cov"] = Cov(self, value)
 
+    @cov.deleter
+    def cov(self):
+        del self.complements["cov"]
+
     @property
     def form(self):
         """:py:class:`~beyond.orbits.forms.Form`: Form of the coordinates of the orbit
