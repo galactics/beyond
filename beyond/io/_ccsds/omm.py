@@ -296,7 +296,7 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
             for i, a in enumerate(elems):
                 for j, b in enumerate(elems[: i + 1]):
                     x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
-                    x.text = "{:0.16e}".format(data.cov[i, j] * 1e-6)
+                    x.text = "{:0.16e}".format(data.cov[i, j] / 1e6)
 
         string = ET.tostring(
             top, pretty_print=True, encoding="UTF-8", xml_declaration=True

@@ -30,7 +30,7 @@ def load_oem(string, fmt):
         ephem = _load_oem_kvn(string)
     elif fmt == "xml":
         ephem = _load_oem_xml(string)
-    else:
+    else:  # pragma: no cover
         raise CcsdsParseError("Unknwon format '{}'".format(fmt))
 
     return ephem
@@ -111,6 +111,10 @@ def _load_oem_xml(string):
         metadata = segment["metadata"]
         data_tag = segment["data"]
 
+        ref_frame = metadata["REF_FRAME"].text
+        if metadata["CENTER_NAME"].text.lower() != "earth":
+            ref_frame = metadata["CENTER_NAME"].text.title().replace(" ", "")
+
         ephem = []
         for statevector in data_tag["stateVector"]:
             ephem.append(
@@ -125,7 +129,7 @@ def _load_oem_xml(string):
                         decode_unit(statevector, "Z_DOT", units.km),
                     ],
                     "cartesian",
-                    metadata["REF_FRAME"].text,
+                    ref_frame,
                     None,
                 )
             )
@@ -223,8 +227,8 @@ def dump_oem(data, fmt="kvn", **kwargs):
                 if el.cov.any():
                     cov = ET.SubElement(data_tag, "covarianceMatrix")
 
-                    if cart.cov.frame != cart.cov.PARENT_FRAME:
-                        frame = cart.cov.frame
+                    if el.cov.frame != el.cov.PARENT_FRAME:
+                        frame = el.cov.frame
                         if frame == "QSW":
                             frame = "RSW"
 
@@ -235,13 +239,13 @@ def dump_oem(data, fmt="kvn", **kwargs):
                     for i, a in enumerate(elems):
                         for j, b in enumerate(elems[: i + 1]):
                             x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
-                            x.text = "{:0.16e}".format(cart.cov[i, j] / 1e6)
+                            x.text = "{:0.16e}".format(el.cov[i, j] / 1e6)
 
         string = ET.tostring(
             top, pretty_print=True, xml_declaration=True, encoding="UTF-8"
         ).decode()
 
-    else:
+    else:  # pragma: no cover
         raise CcsdsParseError("Unknown format '{}'".format(fmt))
 
     return string

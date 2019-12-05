@@ -1,10 +1,11 @@
-from pytest import fixture, raises
+from pytest import fixture, raises, mark
 
 import numpy as np
 from pathlib import Path
 from itertools import product
 from datetime import timedelta
 
+from beyond.env.jpl import create_frames
 from beyond.orbits.man import ImpulsiveMan, ContinuousMan
 from beyond.io.tle import Tle
 from beyond.io.ccsds import dumps, loads, CcsdsParseError
@@ -48,6 +49,11 @@ def str_opm_cov(filetype):
 
 
 @fixture
+def str_opm_cov_qsw(filetype):
+    return get_ref("opm_cov_qsw.{}".format(filetype))
+
+
+@fixture
 def str_opm_impulsive_man(filetype):
     return get_ref("opm_impulsive_man.{}".format(filetype))
 
@@ -68,6 +74,11 @@ def str_omm(filetype):
 
 
 @fixture
+def str_omm_cov(filetype):
+    return get_ref("omm_cov.{}".format(filetype))
+
+
+@fixture
 def str_omm_bluebook(filetype):
     return get_ref("bluebook_omm.{}".format(filetype))
 
@@ -80,6 +91,11 @@ def str_oem(filetype):
 @fixture
 def str_oem_double(filetype):
     return get_ref("oem_double.{}".format(filetype))
+
+
+@fixture
+def str_oem_interplanetary(filetype):
+    return get_ref("oem_interplanetary.{}".format(filetype))
 
 
 @fixture
@@ -205,7 +221,7 @@ def ephem2(opm):
     return opm.ephem(start=opm.date, stop=timedelta(hours=5), step=timedelta(minutes=5))
 
 
-def assert_orbit(ref, orb, form="cartesian"):
+def assert_orbit(ref, orb, form="cartesian", cov_eps=None):
 
     ref.form = form
     orb.form = form
@@ -220,6 +236,26 @@ def assert_orbit(ref, orb, form="cartesian"):
     assert abs(ref[3] - orb[3]) < 1e-3
     assert abs(ref[4] - orb[4]) < 1e-3
     assert abs(ref[5] - orb[5]) < 1e-3
+
+    cov_eps = np.finfo(float).eps if cov_eps is None else cov_eps
+
+    if ref.cov.any() and orb.cov.any():
+        for i, j in product(range(6), repeat=2):
+            assert abs(ref.cov[i, j] - orb.cov[i, j]) < cov_eps
+
+
+def assert_ephem(ref, ephem):
+
+    assert len(ref) == len(ephem)
+
+    assert ref.frame == ephem.frame
+    assert ref.start == ephem.start
+    assert ref.stop == ephem.stop
+    assert ref.method == ephem.method
+    assert ref.order == ephem.order
+
+    for r, e in zip(ref, ephem):
+        assert_orbit(r, e)
 
 
 def assert_string_lines(str1, str2, ignore=[]):
@@ -284,6 +320,22 @@ def test_dump_omm(omm, str_omm, filetype):
     assert_string_lines(ref, txt)
 
 
+def test_dump_omm_cov(opm_cov, str_omm_cov, filetype):
+    omm_cov = opm_cov.copy(form="TLE")
+    ref = str_omm_cov.splitlines()
+    txt = dumps(omm_cov, fmt=filetype).splitlines()
+
+    assert_string_lines(ref, txt)
+
+    omm_cov2 = omm_cov.copy()
+    omm_cov2.cov.frame = "TNW"
+    txt = dumps(omm_cov2, fmt=filetype).splitlines()
+
+    omm_cov3 = omm_cov.copy()
+    omm_cov3.cov.frame = "QSW"
+    txt = dumps(omm_cov3, fmt=filetype).splitlines()
+
+
 def test_dump_omm_bluebook(filetype, str_omm_bluebook):
     """Example from the CCSDS Blue Book (4-1 and 4-2)
     """
@@ -338,11 +390,32 @@ def test_dump_double_oem(ephem, ephem2, str_oem_double, filetype):
 def test_dump_oem_linear(ephem, filetype):
 
     ephem.method = ephem.LINEAR
-    txt = dumps(ephem, fmt="xml").splitlines()
+    txt = dumps(ephem, fmt=filetype).splitlines()
 
     for line in txt:
         if "INTERPOLATION" in line:
             assert "LINEAR" in line
+
+
+def test_dump_oem_interplanetary(jplfiles, ephem, filetype, str_oem_interplanetary):
+
+    create_frames("Mars")
+    ephem.frame = "Mars"
+
+    txt = dumps(ephem, fmt=filetype).splitlines()
+    assert_string_lines(str_oem_interplanetary.splitlines(), txt)
+
+
+def test_dump_oem_cov(opm_cov, filetype):
+
+    ephem = opm_cov.ephem(start=opm_cov.date, stop=timedelta(hours=6), step=timedelta(minutes=2))
+    dumps(ephem, fmt=filetype)
+
+    ephem[0].cov.frame = "QSW"
+    dumps(ephem, fmt=filetype)
+
+    ephem[0].cov.frame = "TNW"
+    dumps(ephem, fmt=filetype)
 
 
 def test_load_opm(opm, str_opm):
@@ -375,11 +448,15 @@ def test_load_opm_truncated():
 
 def test_load_opm_cov(opm_cov, str_opm_cov):
     ref_opm = loads(str_opm_cov)
+
     assert_orbit(opm_cov, ref_opm)
 
-    assert hasattr(ref_opm, "cov")
-    for i, j in product(range(6), repeat=2):
-        assert abs(ref_opm.cov[i, j] - opm_cov.cov[i, j]) < np.finfo(float).eps
+
+def test_load_opm_cov_qsw(opm_cov, str_opm_cov_qsw):
+    ref_opm = loads(str_opm_cov_qsw)
+    opm_cov.cov.frame = "QSW"
+
+    assert_orbit(opm_cov, ref_opm, cov_eps=1e-12)
 
 
 def test_load_opm_man_impulsive(opm_man, str_opm_impulsive_man):
@@ -437,18 +514,23 @@ def test_load_omm(omm, str_omm):
     #     loads(truncated_omm)
 
 
+def test_load_omm_cov(opm_cov, str_omm_cov):
+
+    omm_cov = opm_cov.copy(form="TLE")
+
+    ref_opm = loads(str_omm_cov)
+    assert_orbit(omm_cov, ref_opm)
+
+    assert hasattr(ref_opm, "cov")
+    for i, j in product(range(6), repeat=2):
+        assert abs(ref_opm.cov[i, j] - omm_cov.cov[i, j]) < np.finfo(float).eps
+
+
 def test_load_oem(ephem, str_oem):
 
     ref_ephem = loads(str_oem)
 
-    assert ref_ephem.frame == ephem.frame
-    assert ref_ephem.start == ephem.start
-    assert ref_ephem.stop == ephem.stop
-    assert ref_ephem.method == ref_ephem.LAGRANGE
-    assert ref_ephem.order == 8
-
-    for opm, opm2 in zip(ephem, ref_ephem):
-        assert_orbit(opm, opm2)
+    assert_ephem(ephem, ref_ephem)
 
     # with raises(CcsdsParseError):
     #     loads("\n".join(ref_oem.splitlines()[:15]))
@@ -461,16 +543,16 @@ def test_load_double_oem(ephem, ephem2, str_oem_double):
 
     ephem_bis, ephem2_bis = loads(str_oem_double)
 
-    assert ephem_bis.frame == ephem.frame
-    assert ephem_bis.frame == ephem.frame
-    assert ephem_bis.start == ephem.start
-    assert ephem_bis.stop == ephem.stop
-    assert ephem_bis.method == ephem_bis.LAGRANGE
-    assert ephem_bis.order == 8
+    assert_ephem(ephem, ephem_bis)
+    assert_ephem(ephem2, ephem2_bis)
 
-    assert ephem2_bis.frame == ephem2.frame
-    assert ephem2_bis.frame == ephem2.frame
-    assert ephem2_bis.start == ephem2.start
-    assert ephem2_bis.stop == ephem2.stop
-    assert ephem2_bis.method == ephem2_bis.LAGRANGE
-    assert ephem2_bis.order == 8
+
+def test_load_oem_interplanetary(jplfiles, ephem, str_oem_interplanetary):
+
+    create_frames(until="Mars")
+
+    ephem.frame = "Mars"
+
+    ref_ephem = loads(str_oem_interplanetary)
+
+    assert_ephem(ephem, ref_ephem)
