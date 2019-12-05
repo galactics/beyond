@@ -14,8 +14,8 @@ from .commons import (
     dump_xml_header,
     dump_xml_meta_odm,
     decode_unit,
-    CcsdsParseError,
-    DATE_DEFAULT_FMT,
+    CcsdsError,
+    DATE_FMT_DEFAULT,
     kvn2dict,
     xml2dict,
 )
@@ -36,7 +36,7 @@ def load_opm(string, fmt):
     elif fmt == "xml":
         orb = _load_opm_xml(string)
     else:  # pragma: no cover
-        raise CcsdsParseError("Unknown format '{}'".format(fmt))
+        raise CcsdsError("Unknown format '{}'".format(fmt))
 
     return orb
 
@@ -65,7 +65,7 @@ def _load_opm_kvn(string):
         y = decode_unit(data, "Y", "km")
         z = decode_unit(data, "Z", "km")
     except KeyError as e:
-        raise CcsdsParseError("Missing mandatory parameter {}".format(e))
+        raise CcsdsError("Missing mandatory parameter {}".format(e))
 
     orb = Orbit(date, [x, y, z, vx, vy, vz], "cartesian", frame, None)
     orb.name = name
@@ -142,7 +142,7 @@ def _load_opm_xml(string):
         y = decode_unit(statevector, "Y", "km")
         z = decode_unit(statevector, "Z", "km")
     except KeyError as e:
-        raise CcsdsParseError("Missing mandatory parameter {}".format(e))
+        raise CcsdsError("Missing mandatory parameter {}".format(e))
 
     orb = Orbit(date, [x, y, z, vx, vy, vz], "cartesian", frame, None)
     orb.name = name
@@ -206,7 +206,7 @@ def dump_opm(data, fmt="kvn", **kwargs):
         meta = dump_kvn_meta_odm(data, **kwargs)
 
         text = """COMMENT  State Vector
-EPOCH                = {cartesian.date:%Y-%m-%dT%H:%M:%S.%f}
+EPOCH                = {cartesian.date:{dfmt}}
 X                    = {cartesian.x: 12.6f} [km]
 Y                    = {cartesian.y: 12.6f} [km]
 Z                    = {cartesian.z: 12.6f} [km]
@@ -228,6 +228,7 @@ GM                   = {gm:11.4f} [km**3/s**2]
             kep_e=kep.e,
             angles=np.degrees(kep[2:]),
             gm=kep.frame.center.mu / (units.km ** 3),
+            dfmt=DATE_FMT_DEFAULT,
         )
 
         # Covariance handling
@@ -247,7 +248,7 @@ GM                   = {gm:11.4f} [km**3/s**2]
                     duration = 0
 
                 text += """{comment}
-MAN_EPOCH_IGNITION   = {date:%Y-%m-%dT%H:%M:%S.%f}
+MAN_EPOCH_IGNITION   = {date:{dfmt}}
 MAN_DURATION         = {duration:0.3f} [s]
 MAN_DELTA_MASS       = 0.000 [kg]
 MAN_REF_FRAME        = {frame}
@@ -262,6 +263,7 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
                     dv=man._dv / units.km,
                     frame=frame,
                     comment=comment,
+                    dfmt=DATE_FMT_DEFAULT,
                 )
 
         string = header + "\n" + meta + text
@@ -284,7 +286,7 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
 
         statevector = ET.SubElement(data_tag, "stateVector")
         epoch = ET.SubElement(statevector, "EPOCH")
-        epoch.text = data.date.strftime(DATE_DEFAULT_FMT)
+        epoch.text = data.date.strftime(DATE_FMT_DEFAULT)
 
         elems = {
             "X": "x",
@@ -354,7 +356,7 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
                     duration = 0
 
                 man_epoch = ET.SubElement(mans, "MAN_EPOCH_IGNITION")
-                man_epoch.text = date.strftime(DATE_DEFAULT_FMT)
+                man_epoch.text = date.strftime(DATE_FMT_DEFAULT)
                 man_dur = ET.SubElement(mans, "MAN_DURATION", units="s")
                 man_dur.text = "{:0.3f}".format(duration)
 
@@ -373,6 +375,6 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
         ).decode()
 
     else:  # pragma: no cover
-        raise CcsdsParseError("Unknown format '{}'".format(fmt))
+        raise CcsdsError("Unknown format '{}'".format(fmt))
 
     return string

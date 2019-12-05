@@ -17,9 +17,9 @@ from ._ccsds.opm import load_opm, dump_opm
 from ._ccsds.oem import load_oem, dump_oem
 from ._ccsds.omm import load_omm, dump_omm
 from ._ccsds.tdm import load_tdm, dump_tdm
-from ._ccsds.commons import CcsdsParseError, detect
+from ._ccsds.commons import CcsdsError, detect
 
-__all__ = ["load", "loads", "dump", "dumps", "CcsdsParseError"]
+__all__ = ["load", "loads", "dump", "dumps", "CcsdsError"]
 
 
 def load(fp):  # pragma: no cover
@@ -32,7 +32,7 @@ def load(fp):  # pragma: no cover
     Return:
         Orbit or Ephem
     Raise:
-        CcsdsParseError: when the text is not a recognizable CCSDS format
+        CcsdsError: when the text is not a recognizable CCSDS format
     """
     return loads(fp.read())
 
@@ -47,7 +47,7 @@ def loads(text):
     Return:
         Orbit or Ephem
     Raise:
-        CcsdsParseError: when the text is not a recognizable CCSDS format
+        CcsdsError: when the text is not a recognizable CCSDS format
     """
 
     type, fmt = detect(text)
@@ -61,7 +61,7 @@ def loads(text):
     elif type == "OMM":
         func = load_omm
     else:
-        raise CcsdsParseError("Unknown CCSDS type")
+        raise CcsdsError("Unknown CCSDS type")
 
     return func(text, fmt=fmt)
 

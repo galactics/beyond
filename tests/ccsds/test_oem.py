@@ -1,7 +1,7 @@
 from pytest import raises, fixture
 
 from beyond.env.jpl import create_frames
-from beyond.io.ccsds import dumps, loads, CcsdsParseError
+from beyond.io.ccsds import dumps, loads, CcsdsError
 from beyond.dates import timedelta
 
 
@@ -73,7 +73,7 @@ def test_load_oem(ephem, datafile, helper):
 
     helper.assert_ephem(ephem, data)
 
-    # with raises(CcsdsParseError):
+    # with raises(CcsdsError):
     #     loads("\n".join(ref_oem.splitlines()[:15]))
 
     truncated = datafile("oem").split()
@@ -82,7 +82,7 @@ def test_load_oem(ephem, datafile, helper):
             truncated.pop(i)
             break
 
-    with raises(CcsdsParseError) as e:
+    with raises(CcsdsError) as e:
         loads("\n".join(truncated))
 
     assert str(e.value) == "Missing mandatory parameter 'REF_FRAME'"

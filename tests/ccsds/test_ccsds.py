@@ -2,7 +2,7 @@ import xmlschema
 from pathlib import Path
 from pytest import raises
 
-from beyond.io.ccsds import dumps, loads, CcsdsParseError
+from beyond.io.ccsds import dumps, loads, CcsdsError
 
 
 def test_dummy(ccsds_format):
@@ -10,7 +10,7 @@ def test_dummy(ccsds_format):
     with raises(TypeError):
         dumps(None, fmt=ccsds_format)
 
-    with raises(CcsdsParseError):
+    with raises(CcsdsError):
         loads("dummy text")
 
 

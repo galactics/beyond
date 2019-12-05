@@ -6,11 +6,11 @@ from ...utils import units
 from ...utils.measures import MeasureSet, Range, Azimut, Elevation, Doppler
 
 from .commons import (
-    CcsdsParseError,
+    CcsdsError,
     parse_date,
     dump_kvn_header,
     dump_xml_header,
-    DATE_DEFAULT_FMT,
+    DATE_FMT_DEFAULT,
     xml2dict,
 )
 
@@ -72,7 +72,7 @@ def _load_tdm_kvn(string):
             elif key == "ANGLE_2" and meta["ANGLE_TYPE"] == "AZEL":
                 obj = Elevation(path, date, np.radians(value))
             else:
-                raise CcsdsParseError("Unknown type : {}".format(key))
+                raise CcsdsError("Unknown type : {}".format(key))
 
             data.append(obj)
 
@@ -124,7 +124,7 @@ def _load_tdm_xml(string):
             elif meas_type == "ANGLE_2" and angle_type == "AZEL":
                 measures.append(Elevation(path, date, np.radians(value)))
             else:
-                raise CcsdsParseError("Unknown type : {}".format(meas_type))
+                raise CcsdsError("Unknown type : {}".format(meas_type))
 
     if len(sets) == 1:
         sets = sets.pop()
@@ -145,8 +145,8 @@ def dump_tdm(data, fmt="kvn", **kwargs):
 
             meta = {
                 "TIME_SYSTEM": measure_set.start.scale.name,
-                "START_TIME": measure_set.start.strftime(DATE_DEFAULT_FMT),
-                "STOP_TIME": measure_set.stop.strftime(DATE_DEFAULT_FMT),
+                "START_TIME": measure_set.start.strftime(DATE_FMT_DEFAULT),
+                "STOP_TIME": measure_set.stop.strftime(DATE_FMT_DEFAULT),
             }
 
             i = 0
@@ -196,10 +196,10 @@ def dump_tdm(data, fmt="kvn", **kwargs):
                     value = np.degrees(m.value)
 
                 txt.append(
-                    "{name:20} = {date:{DATE_DEFAULT_FMT}} {value:{value_fmt}}".format(
+                    "{name:20} = {date:{DATE_FMT_DEFAULT}} {value:{value_fmt}}".format(
                         name=name,
                         date=m.date,
-                        DATE_DEFAULT_FMT=DATE_DEFAULT_FMT,
+                        DATE_FMT_DEFAULT=DATE_FMT_DEFAULT,
                         value=value,
                         value_fmt=value_fmt,
                     )
@@ -224,10 +224,10 @@ def dump_tdm(data, fmt="kvn", **kwargs):
             ts.text = measure_set.start.scale.name
 
             start = ET.SubElement(meta, "START_TIME")
-            start.text = measure_set.start.strftime(DATE_DEFAULT_FMT)
+            start.text = measure_set.start.strftime(DATE_FMT_DEFAULT)
 
             stop = ET.SubElement(meta, "STOP_TIME")
-            stop.text = measure_set.stop.strftime(DATE_DEFAULT_FMT)
+            stop.text = measure_set.stop.strftime(DATE_FMT_DEFAULT)
 
             i = 0
             parts = {}
@@ -259,7 +259,7 @@ def dump_tdm(data, fmt="kvn", **kwargs):
                 obs = ET.SubElement(data_tag, "observation")
 
                 epoch = ET.SubElement(obs, "EPOCH")
-                epoch.text = m.date.strftime(DATE_DEFAULT_FMT)
+                epoch.text = m.date.strftime(DATE_FMT_DEFAULT)
 
                 if isinstance(m, Doppler):
                     name = "DOPPLER_INSTANTANEOUS"
@@ -285,6 +285,6 @@ def dump_tdm(data, fmt="kvn", **kwargs):
             top, pretty_print=True, xml_declaration=True, encoding="UTF-8"
         ).decode()
     else:  # pragma: no cover
-        raise CcsdsParseError("Unknown format : {}".format(fmt))
+        raise CcsdsError("Unknown format : {}".format(fmt))
 
     return string

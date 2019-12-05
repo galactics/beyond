@@ -5,7 +5,7 @@ from pytest import raises
 import numpy as np
 
 from beyond.io.tle import Tle
-from beyond.io.ccsds import dumps, loads, CcsdsParseError
+from beyond.io.ccsds import dumps, loads, CcsdsError
 
 
 def test_dump_omm(tle, datafile, ccsds_format, helper):
@@ -62,7 +62,7 @@ def test_load_omm(tle, datafile, helper):
     # helper.assert_orbit(omm, omm3)
 
     # # Dummy units, that aren't specified as valid
-    # with raises(CcsdsParseError):
+    # with raises(CcsdsError):
     #     loads(ref_omm_strange_units)
 
 
@@ -75,7 +75,7 @@ def test_load_omm_truncated(datafile):
             break
     truncated_omm = "\n".join(list_omm)
 
-    with raises(CcsdsParseError) as e:
+    with raises(CcsdsError) as e:
         loads(truncated_omm)
 
     assert str(e.value) == "Missing mandatory parameter 'EPOCH'"
@@ -90,7 +90,7 @@ def test_load_omm_missing_sgp4(datafile):
             break
     truncated_omm = "\n".join(list_omm)
 
-    with raises(CcsdsParseError) as e:
+    with raises(CcsdsError) as e:
         loads(truncated_omm)
 
     assert str(e.value) == "Missing mandatory parameter 'MEAN_MOTION'"  

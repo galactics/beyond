@@ -9,14 +9,14 @@ from .commons import (
     xml2dict,
     kvn2dict,
     parse_date,
-    CcsdsParseError,
+    CcsdsError,
     decode_unit,
     code_unit,
     dump_kvn_header,
     dump_kvn_meta_odm,
     dump_xml_header,
     dump_xml_meta_odm,
-    DATE_DEFAULT_FMT,
+    DATE_FMT_DEFAULT,
 )
 
 
@@ -27,7 +27,7 @@ def load_omm(string, fmt):
     elif fmt == "xml":
         orb = _load_omm_xml(string)
     else:  # pragma: no cover
-        raise CcsdsParseError("Unknown format '{}'".format(fmt))
+        raise CcsdsError("Unknown format '{}'".format(fmt))
 
     return orb
 
@@ -46,7 +46,7 @@ def _load_omm_kvn(string):
         frame = data["REF_FRAME"].text
         date = parse_date(data["EPOCH"].text, scale)
     except KeyError as e:
-        raise CcsdsParseError("Missing mandatory parameter {}".format(e))
+        raise CcsdsError("Missing mandatory parameter {}".format(e))
 
     if data["MEAN_ELEMENT_THEORY"].text in ("SGP/SGP4", "SGP4"):
         try:
@@ -79,9 +79,9 @@ def _load_omm_kvn(string):
             }
 
         except KeyError as e:
-            raise CcsdsParseError("Missing mandatory parameter {}".format(e))
+            raise CcsdsError("Missing mandatory parameter {}".format(e))
     else:  # pragma: no cover
-        raise CcsdsParseError(
+        raise CcsdsError(
             "Unknown OMM theory '{}'".format(data["MEAN_ELEMENT_THEORY"].text)
         )
 
@@ -113,7 +113,7 @@ def _load_omm_xml(string):
         frame = metadata["REF_FRAME"].text
         date = parse_date(mean_elements["EPOCH"].text, scale)
     except KeyError as e:
-        raise CcsdsParseError("Missing mandatory parameter {}".format(e))
+        raise CcsdsError("Missing mandatory parameter {}".format(e))
 
     if metadata["MEAN_ELEMENT_THEORY"].text in ("SGP/SGP4", "SGP4"):
         try:
@@ -145,9 +145,9 @@ def _load_omm_xml(string):
             }
 
         except KeyError as e:
-            raise CcsdsParseError("Missing mandatory parameter {}".format(e))
+            raise CcsdsError("Missing mandatory parameter {}".format(e))
     else:  # pragma: no cover
-        raise CcsdsParseError(
+        raise CcsdsError(
             "Unknown OMM theory '{}'".format(data["MEAN_ELEMENT_THEORY"].text)
         )
 
@@ -170,7 +170,7 @@ def dump_omm(data, fmt="kvn", **kwargs):
         if isinstance(data.propagator, Sgp4):
             theory = "SGP/SGP4"
         else:  # pragma: no cover
-            raise CcsdsParseError(
+            raise CcsdsError(
                 "Unknown propagator type '{}' for OMM".format(data.propagator)
             )
 
@@ -179,7 +179,7 @@ def dump_omm(data, fmt="kvn", **kwargs):
         )
 
         text = """
-EPOCH                = {tle.date:%Y-%m-%dT%H:%M:%S.%f}
+EPOCH                = {tle.date:{dfmt}}
 MEAN_MOTION          = {n: 12.8f} [rev/day]
 ECCENTRICITY         = {tle.e: 11.7f}
 INCLINATION          = {i: 8.4f} [deg]
@@ -207,6 +207,7 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
             ndot=code_unit(data, "ndot", "rev/day**2") / 2,
             ndotdot=code_unit(data, "ndotdot", "rev/day**3") / 6,
             mu=wgs72.mu,  # this is already in km**3/s**2
+            dfmt=DATE_FMT_DEFAULT,
         )
 
         if data.cov.any():
@@ -224,7 +225,7 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
         if isinstance(data.propagator, Sgp4):
             theory = "SGP/SGP4"
         else:  # pragma: no cover
-            raise CcsdsParseError(
+            raise CcsdsError(
                 "Unknown propagator type '{}' for OMM".format(data.propagator)
             )
 
@@ -237,7 +238,7 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
         meanelements = ET.SubElement(data_tag, "meanElements")
 
         epoch = ET.SubElement(meanelements, "EPOCH")
-        epoch.text = data.date.strftime(DATE_DEFAULT_FMT)
+        epoch.text = data.date.strftime(DATE_FMT_DEFAULT)
 
         sma = ET.SubElement(meanelements, "MEAN_MOTION", units="rev/day")
         sma.text = "{:0.8f}".format(code_unit(data, "n", "rev/day"))
@@ -301,6 +302,6 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
         ).decode()
 
     else:  # pragma: no cover
-        raise CcsdsParseError("Unknown format '{}'".format(fmt))
+        raise CcsdsError("Unknown format '{}'".format(fmt))
 
     return string

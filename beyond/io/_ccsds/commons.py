@@ -9,7 +9,7 @@ from ...orbits import Orbit
 from ...errors import ParseError
 
 
-class CcsdsParseError(ParseError):
+class CcsdsError(ParseError):
     pass
 
 
@@ -27,7 +27,9 @@ units_dict = {
 
 
 Field = namedtuple("Field", "text attrib")
-DATE_DEFAULT_FMT = "%Y-%m-%dT%H:%M:%S.%f"
+DATE_FMT_DEFAULT = "%Y-%m-%dT%H:%M:%S.%f"
+DATE_FMT_NO_MSEC = "%Y-%m-%dT%H:%M:%S"
+DATE_FMT_D_OF_Y = "%Y-%jT%H:%M:%S.%f"
 
 
 def decode_unit(data, name, default=None):
@@ -38,7 +40,7 @@ def decode_unit(data, name, default=None):
     unit = data[name].attrib.get("units", default)
 
     if unit not in units_dict:
-        raise CcsdsParseError("Unknown unit '{}' for the field {}".format(unit, name))
+        raise CcsdsError("Unknown unit '{}' for the field {}".format(unit, name))
 
     return float(value) * units_dict[unit]
 
@@ -48,7 +50,7 @@ def code_unit(data, name, unit):
     """
 
     if unit not in units_dict:
-        raise CcsdsParseError("Unknown unit '{}' for the field {}".format(unit, name))
+        raise CcsdsError("Unknown unit '{}' for the field {}".format(unit, name))
 
     return data[name] / units_dict[unit]
 
@@ -58,12 +60,12 @@ def parse_date(string, scale):
     """
 
     try:
-        out = Date.strptime(string, "%Y-%m-%dT%H:%M:%S.%f", scale=scale)
+        out = Date.strptime(string, DATE_FMT_DEFAULT, scale=scale)
     except ValueError:
         try:
-            out = Date.strptime(string, "%Y-%jT%H:%M:%S.%f", scale=scale)
+            out = Date.strptime(string, DATE_FMT_D_OF_Y, scale=scale)
         except ValueError:
-            out = Date.strptime(string, "%Y-%m-%dT%H:%M:%S", scale=scale)
+            out = Date.strptime(string, DATE_FMT_NO_MSEC, scale=scale)
 
     return out
 
@@ -82,9 +84,9 @@ def detect(string):
     if m and m.group(1) in ["OPM", "OMM", "OEM", "TDM"]:
         type = m.group(1)
     elif m:
-        raise CcsdsParseError("Unknown CCSDS type : {}".format(m))
+        raise CcsdsError("Unknown CCSDS type : {}".format(m))
     else:
-        raise CcsdsParseError("Unknown CCSDS type")
+        raise CcsdsError("Unknown CCSDS type")
 
     return type, format
 
@@ -164,13 +166,14 @@ def kvn2dict(string):
 def dump_kvn_header(data, ccsds_type, version="1.0", **kwargs):
 
     return """CCSDS_{type}_VERS = {version}
-CREATION_DATE = {creation_date:%Y-%m-%dT%H:%M:%S}
+CREATION_DATE = {creation_date:{fmt}}
 ORIGINATOR = {originator}
 """.format(
         type=ccsds_type.upper(),
         creation_date=Date.now(),
         originator=kwargs.get("originator", "N/A"),
         version=version,
+        fmt=DATE_FMT_DEFAULT,
     )
 
 
@@ -189,7 +192,7 @@ def dump_xml_header(data, ccsds_type, version="1.0", **kwargs):
     )
     header = ET.SubElement(top, "header")
     creation_date = ET.SubElement(header, "CREATION_DATE")
-    creation_date.text = Date.now().strftime("%Y-%m-%dT%H:%M:%S")
+    creation_date.text = Date.now().strftime(DATE_FMT_DEFAULT)
     originator = ET.SubElement(header, "ORIGINATOR")
     originator.text = kwargs.get("originator", "N/A")
 

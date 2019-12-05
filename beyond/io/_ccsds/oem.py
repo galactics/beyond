@@ -7,12 +7,12 @@ from ...orbits import Orbit, Ephem
 
 from .commons import (
     parse_date,
-    CcsdsParseError,
+    CcsdsError,
     dump_kvn_header,
     dump_kvn_meta_odm,
     dump_xml_header,
     dump_xml_meta_odm,
-    DATE_DEFAULT_FMT,
+    DATE_FMT_DEFAULT,
     xml2dict,
     decode_unit,
     Field,
@@ -33,7 +33,7 @@ def load_oem(string, fmt):
     elif fmt == "xml":
         ephem = _load_oem_xml(string)
     else:  # pragma: no cover
-        raise CcsdsParseError("Unknown format '{}'".format(fmt))
+        raise CcsdsError("Unknown format '{}'".format(fmt))
 
     return ephem
 
@@ -58,7 +58,7 @@ def _load_oem_kvn(string):
             # Check for required fields
             for k in required:
                 if k not in ephem:
-                    raise CcsdsParseError("Missing mandatory parameter '{}'".format(k))
+                    raise CcsdsError("Missing mandatory parameter '{}'".format(k))
 
             # Conversion to be compliant with beyond.env.jpl dynamic reference
             # frames naming convention.
@@ -95,7 +95,7 @@ def _load_oem_kvn(string):
             else:
                 values = line.split()
                 if len(values) > 6:  # pragma: no cover
-                    raise CcsdsParseError("Unknown covariance field lenght")
+                    raise CcsdsError("Unknown covariance field lenght")
                 elif len(values) == 1:
                     cov["CX_X"] = Field(values[0], {})
                 elif len(values) == 2:
@@ -129,7 +129,7 @@ def _load_oem_kvn(string):
                         cov_obj = load_cov(orb, cov)
                         orb.cov = cov_obj
                     else:  # pragma: no cover
-                        raise CcsdsParseError(
+                        raise CcsdsError(
                             "Impossible to attach a covariance matrix to an orbit object"
                         )
                 else:  # pragma: no cover
@@ -197,7 +197,7 @@ def _load_oem_xml(string):
                     orb = orbit_mapping[date]
                     orb.cov = load_cov(orb, cov)
                 else:  # pragma: no cover
-                    raise CcsdsParseError(
+                    raise CcsdsError(
                         "Impossible to attach a covariance matrix to an orbit object"
                     )
 
@@ -210,7 +210,7 @@ def _load_oem_xml(string):
             ephem.cospar_id = metadata["OBJECT_ID"].text
             ephems.append(ephem)
     except KeyError as e:
-        raise CcsdsParseError("Missing mandatory parameter {}".format(e))
+        raise CcsdsError("Missing mandatory parameter {}".format(e))
 
     if len(ephems) == 1:
         ephems = ephems[0]
@@ -232,8 +232,8 @@ def dump_oem(data, fmt="kvn", **kwargs):
             data.form = "cartesian"
 
             extras = {
-                "START_TIME": "{:{}}".format(data.start, DATE_DEFAULT_FMT),
-                "STOP_TIME": "{:{}}".format(data.stop, DATE_DEFAULT_FMT),
+                "START_TIME": "{:{}}".format(data.start, DATE_FMT_DEFAULT),
+                "STOP_TIME": "{:{}}".format(data.stop, DATE_FMT_DEFAULT),
                 "INTERPOLATION": data.method.upper(),
             }
             if data.method != data.LINEAR:
@@ -249,7 +249,7 @@ def dump_oem(data, fmt="kvn", **kwargs):
                         date=orb.date,
                         orb=orb.base / units.km,
                         fmt=" 10f",
-                        dfmt=DATE_DEFAULT_FMT,
+                        dfmt=DATE_FMT_DEFAULT,
                     )
                 )
 
@@ -261,7 +261,7 @@ def dump_oem(data, fmt="kvn", **kwargs):
 
                     cov_text.append(
                         "EPOCH = {date:{dfmt}}".format(
-                            date=orb.date, dfmt=DATE_DEFAULT_FMT
+                            date=orb.date, dfmt=DATE_FMT_DEFAULT
                         )
                     )
 
@@ -297,8 +297,8 @@ def dump_oem(data, fmt="kvn", **kwargs):
             segment = ET.SubElement(body, "segment")
 
             extras = {
-                "START_TIME": data.start.strftime(DATE_DEFAULT_FMT),
-                "STOP_TIME": data.stop.strftime(DATE_DEFAULT_FMT),
+                "START_TIME": data.start.strftime(DATE_FMT_DEFAULT),
+                "STOP_TIME": data.stop.strftime(DATE_FMT_DEFAULT),
                 "INTERPOLATION": data.method.upper(),
             }
             if data.method != data.LINEAR:
@@ -311,7 +311,7 @@ def dump_oem(data, fmt="kvn", **kwargs):
             for el in data:
                 statevector = ET.SubElement(data_tag, "stateVector")
                 epoch = ET.SubElement(statevector, "EPOCH")
-                epoch.text = el.date.strftime(DATE_DEFAULT_FMT)
+                epoch.text = el.date.strftime(DATE_FMT_DEFAULT)
 
                 elems = {
                     "X": "x",
@@ -333,7 +333,7 @@ def dump_oem(data, fmt="kvn", **kwargs):
                     cov = ET.SubElement(data_tag, "covarianceMatrix")
 
                     cov_date = ET.SubElement(cov, "EPOCH")
-                    cov_date.text = el.date.strftime(DATE_DEFAULT_FMT)
+                    cov_date.text = el.date.strftime(DATE_FMT_DEFAULT)
 
                     if el.cov.frame != el.cov.PARENT_FRAME:
                         frame = el.cov.frame
@@ -354,6 +354,6 @@ def dump_oem(data, fmt="kvn", **kwargs):
         ).decode()
 
     else:  # pragma: no cover
-        raise CcsdsParseError("Unknown format '{}'".format(fmt))
+        raise CcsdsError("Unknown format '{}'".format(fmt))
 
     return string

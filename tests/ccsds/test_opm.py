@@ -2,7 +2,7 @@
 from pytest import raises
 
 from beyond.env.jpl import create_frames
-from beyond.io.ccsds import dumps, loads, CcsdsParseError
+from beyond.io.ccsds import dumps, loads, CcsdsError
 
 
 def test_dump_opm(orbit, datafile, ccsds_format, helper):
@@ -73,7 +73,7 @@ def test_load_opm_no_unit(orbit, datafile, helper):
 
 def test_load_opm_strange_unit(datafile):
     # Dummy units, that aren't specified as valid
-    with raises(CcsdsParseError) as e:
+    with raises(CcsdsError) as e:
         loads(datafile("opm_strange_units"))
 
     assert str(e.value) == "Unknown unit 'm/s' for the field X_DOT"
@@ -90,7 +90,7 @@ def test_load_opm_truncated(datafile):
             break
     truncated_opm = "\n".join(list_opm)
 
-    with raises(CcsdsParseError) as e:
+    with raises(CcsdsError) as e:
         loads(truncated_opm)
 
     assert str(e.value) == "Missing mandatory parameter 'EPOCH'"
