@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:ndm="urn:ccsds:recommendation:navigation:schema:ndmxml"
+            targetNamespace="urn:ccsds:recommendation:navigation:schema:ndmxml"
+            elementFormDefault="unqualified" 
+            attributeFormDefault="unqualified">
+
+<!--********************************************************************-->
+
+    <!--********************************************************************-->
+    <!-- NOTE: This is version 1.0 of the RDM/XML Schema (16-May-2019)      -->
+    <!--                                                                    -->
+    <!-- Compatible document versions are:                                  -->
+    <!-- NDM/XML 505.0-B-1 Blue Book (12/2010)                              -->
+    <!-- RDM 508.1-B-1     Blue Book (10/2019)                              -->
+    <!--                                                                    -->
+    <!--********************* BLUE BOOK CHANGE LOG *************************-->
+    <!--                                                                    -->
+    <!-- 09/03/2019: NDM/XML Schema Set C. First version of schema set that -->
+    <!--             processes the Re-Entry Data Message.                   -->
+    <!--********************************************************************-->
+
+    <!--********************************************************************-->
+    <!-- Include common schemas                                             -->
+    <!--********************************************************************-->
+
+    <xsd:include schemaLocation="./ndmxml-1.0-navwg-common.xsd" />
+    <xsd:include schemaLocation="./ndmxml-1.0-ccsds-common.xsd" />
+
+    <!--********************************************************************-->
+    <!-- A RDM consists of a "header" and a "body".                         -->
+    <!--********************************************************************-->
+
+    <xsd:complexType name="rdmType">
+        <xsd:sequence>
+            <xsd:element name="header" type="ndm:rdmHeader" />
+            <xsd:element name="body" type="ndm:rdmBody" />
+        </xsd:sequence>
+        <xsd:attribute name="id" fixed="CCSDS_RDM_VERS" use="required" />
+        <xsd:attribute name="version" fixed="1.0" use="required" />
+    </xsd:complexType>
+
+    <!--********************************************************************-->
+    <!-- A RDM header                                                       -->
+    <!--********************************************************************-->
+
+    <xsd:complexType name="rdmHeader">
+        <xsd:sequence>
+            <xsd:element name="COMMENT" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="CREATION_DATE" type="ndm:epochType" />
+            <xsd:element name="ORIGINATOR" type="xsd:string" />
+            <xsd:element name="MESSAGE_ID" type="xsd:string" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!--********************************************************************-->
+    <!-- The RDM "body" consists of 1 "segment", described below.           -->
+    <!--********************************************************************-->
+
+    <xsd:complexType name="rdmBody">
+        <xsd:sequence>
+            <xsd:element name="segment" type="ndm:rdmSegment" minOccurs="1" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!--********************************************************************-->
+    <!-- The RDM "segment" consists of a "metadata" section and a "data"    -->
+    <!-- section.                                                           -->
+    <!--********************************************************************-->
+
+    <xsd:complexType name="rdmSegment">
+        <xsd:sequence>
+            <xsd:element name="metadata" type="ndm:rdmMetadata" />
+            <xsd:element name="data" type="ndm:rdmData" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!--********************************************************************-->
+    <!-- RDM metadata section.                                              -->
+    <!--********************************************************************-->
+
+    <xsd:complexType name="rdmMetadata">
+        <xsd:sequence>
+            <xsd:element name="COMMENT" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="OBJECT_NAME" type="xsd:string" />
+            <xsd:element name="INTERNATIONAL_DESIGNATOR" type="xsd:string" />
+            <xsd:element name="CATALOG_NAME" type="xsd:string" minOccurs="0" />
+            <xsd:element name="OBJECT_DESIGNATOR" type="xsd:string" minOccurs="0" />
+            <xsd:element name="OBJECT_TYPE" type="ndm:objectDescriptionType" minOccurs="0" />
+            <xsd:element name="OBJECT_OWNER" type="xsd:string" minOccurs="0" />
+            <xsd:element name="OBJECT_OPERATOR" type="xsd:string" minOccurs="0" />
+            <xsd:element name="CONTROLLED_REENTRY" type="ndm:controlledType" />
+            <xsd:element name="CENTER_NAME" type="xsd:string" />
+            <xsd:element name="TIME_SYSTEM" type="xsd:string" />
+            <xsd:element name="EPOCH_TZERO" type="ndm:epochType" />
+            <xsd:element name="REF_FRAME" type="xsd:string" minOccurs="0" />
+            <xsd:element name="REF_FRAME_EPOCH" type="ndm:epochType" minOccurs="0" />
+            <xsd:element name="EPHEMERIS_NAME" type="xsd:string" minOccurs="0" />
+            <xsd:element name="GRAVITY_MODEL" type="xsd:string" minOccurs="0" />
+            <xsd:element name="ATMOSPHERIC_MODEL" type="xsd:string" minOccurs="0" />
+            <xsd:element name="SOLAR_FLUX_PREDICTION" type="xsd:string" minOccurs="0" />
+            <xsd:element name="N_BODY_PERTURBATIONS" type="xsd:string" minOccurs="0" />
+            <xsd:element name="SOLAR_RAD_PRESSURE" type="xsd:string" minOccurs="0" />
+            <xsd:element name="EARTH_TIDES" type="xsd:string" minOccurs="0" />
+            <xsd:element name="INTRACK_THRUST" type="ndm:yesNoType" minOccurs="0" />
+            <xsd:element name="DRAG_PARAMETERS_SOURCE" type="xsd:string" minOccurs="0" />
+            <xsd:element name="DRAG_PARAMETERS_ALTITUDE" type="ndm:distanceType" minOccurs="0" />
+            <xsd:element name="REENTRY_UNCERTAINTY_METHOD" type="ndm:reentryUncertaintyMethodType" minOccurs="0" />
+            <xsd:element name="REENTRY_DISINTEGRATION" type="ndm:disintegrationType" minOccurs="0" />
+            <xsd:element name="IMPACT_UNCERTAINTY_METHOD" type="ndm:impactUncertaintyType" minOccurs="0" />
+            <xsd:element name="PREVIOUS_MESSAGE_ID" type="xsd:string" minOccurs="0" />
+            <xsd:element name="PREVIOUS_MESSAGE_EPOCH" type="ndm:epochType" minOccurs="0" />
+            <xsd:element name="NEXT_MESSAGE_EPOCH" type="ndm:epochType" minOccurs="0" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!--********************************************************************-->
+    <!-- RDM data section.                                                  -->
+    <!--********************************************************************-->
+
+    <xsd:complexType name="rdmData">
+        <xsd:sequence>
+            <xsd:element name="COMMENT" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="atmosphericReentryParameters" type="ndm:atmosphericReentryParametersType" />
+            <xsd:element name="groundImpactParameters" type="ndm:groundImpactParametersType" minOccurs="0" />
+            <xsd:element name="stateVector" type="ndm:stateVectorType" minOccurs="0" />
+            <xsd:element name="covarianceMatrix" type="ndm:opmCovarianceMatrixType" minOccurs="0" />
+            <xsd:element name="spacecraftParameters" type="ndm:rdmSpacecraftParametersType" minOccurs="0" />
+            <xsd:element name="odParameters" type="ndm:odParametersType" minOccurs="0" />
+            <xsd:element name="userDefinedParameters" type="ndm:userDefinedType" minOccurs="0" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+</xsd:schema>

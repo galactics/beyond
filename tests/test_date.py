@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pytest import raises
+from pytest import raises, mark
 from unittest.mock import patch
 from pickle import dumps, loads
 from datetime import datetime, timedelta, timezone
@@ -9,9 +9,7 @@ from datetime import datetime, timedelta, timezone
 import numpy as np
 
 from beyond.dates.eop import Eop
-from beyond.dates.date import Date, DateError, UnknownScaleError
-
-from conftest import skip_if_no_mpl
+from beyond.dates.date import Date, DateError, UnknownScaleError, DateRange
 
 
 def test_creation():
@@ -271,12 +269,74 @@ def test_pickle():
     assert date1.change_scale('UT1') == date2.change_scale('UT1')
 
 
-@skip_if_no_mpl
+@mark.skip_if_no_mpl
 def test_plot():
     # This test is ran only if matplotlib is installed
 
     import matplotlib.pyplot as plt
 
+    fig = plt.figure()
     dates = list(Date.range(Date.now(), timedelta(1), timedelta(minutes=10)))
     plt.plot(dates, np.random.rand(len(dates)))
-    plt.draw()
+    plt.draw()  # draws the figure, but does not show it
+    plt.close(fig)  # Delete the figure
+
+
+def test_daterange():
+
+    start = Date(2016, 11, 16, 22, 38)
+    stop = timedelta(hours=1)
+    step = timedelta(seconds=30)
+
+    # classic range
+    l1 = list(Date.range(start, stop, step))
+    assert len(l1) == stop // step
+
+    # Inclusive range
+    l2 = list(Date.range(start, stop, step, inclusive=True))
+    assert len(l2) == stop // step + 1
+
+    r = Date.range(start, stop, step)
+    rlist = list(r)
+    assert isinstance(r, DateRange)
+    assert rlist[0] == r.start
+    assert rlist[-1] == r.stop - r.step
+
+    r = Date.range(start, stop, step, inclusive=True)
+    rlist = list(r)
+    assert isinstance(r, DateRange)
+    assert rlist[0] == r.start
+    assert rlist[-1] == r.stop
+
+    # Addition of ranges
+    # r1 = Date.range(start, stop, step)
+    # r2 = Date.range(start + stop, stop, step * 2)
+
+    # r = r1 + r2
+    # assert isinstance(r, DateRange)
+    # assert r.start == start
+    # assert r.stop == start + 2*stop
+    # assert r.steps == {step, step*2}
+
+    # l = list(r)
+    # assert len(l) == stop // step + stop // (step * 2)
+
+    # stop as a Date object
+    stop = Date(2016, 11, 16, 22, 40)
+    l3 = Date.range(start, stop, step)
+
+    # Inverse order
+    start = Date(2016, 11, 16, 22, 40)
+    stop = - timedelta(minutes=2)
+    step = - timedelta(seconds=30)
+
+    l4 = list(Date.range(start, stop, step))
+    assert len(l4) == stop // step
+
+    # Error when the date range (start/stop) is not coherent with the step
+    with raises(ValueError):
+        list(Date.range(start, stop, -step))
+
+    # Error when the step is null.
+    with raises(ValueError):
+        list(Date.range(start, stop, timedelta(0)))

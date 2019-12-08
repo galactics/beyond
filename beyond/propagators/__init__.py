@@ -16,11 +16,14 @@ def get_propagator(name):
     from .sgp4 import Sgp4
     from .sgp4beta import Sgp4Beta
     from .kepler import Kepler
+    from .none import NonePropagator
 
     scope = locals().copy()
     scope.update(globals())
 
-    if name not in scope:
+    if name is None:
+        return NonePropagator
+    elif name not in scope:
         raise UnknownPropagatorError(name)
-
-    return scope[name]
+    else:
+        return scope[name]

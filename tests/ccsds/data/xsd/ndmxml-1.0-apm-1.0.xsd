@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:ndm="urn:ccsds:recommendation:navigation:schema:ndmxml"
+            targetNamespace="urn:ccsds:recommendation:navigation:schema:ndmxml"
+            elementFormDefault="unqualified" 
+            attributeFormDefault="unqualified">
+
+<!--********************************************************************-->
+
+<!--********************************************************************-->
+<!-- NOTE: This is version 1.0, Rev C of the NDM/XML Schema (09/03/2019)-->
+<!-- This component of the schema is the "APM" module, which contains   -->
+<!-- elements that are used exclusively in the Attitude Parameter       -->
+<!-- Message (APM).                                                     -->
+<!--                                                                    -->
+<!-- Compatible document versions are:                                  -->
+<!--    NDM/XML 505.0-B-1   Blue Book (12/2010)                         -->
+<!--    ADM     504.0-B-1   Blue Book (05/2008)                         -->
+<!--                                                                    -->
+<!-- *********************  BLUE BOOK CHANGE LOG  ********************* -->
+<!-- 03/14/2010: Original implemementation of schemas.                  -->
+<!-- 10/13/2017: Modified to include revA common schemas                -->
+<!-- 08/29/2018: Rev B: Modified to remove revision version from file   -->
+<!--                    names, since file names on SANA were static     -->
+<!--                    and the schemas basically did not work.         -->
+<!-- 09/03/2019: Rev C: No modifications to this schema; preparation of -->
+<!--                    schema set for introduction of the RDM.         -->
+<!--********************************************************************-->
+
+<!--********************************************************************-->
+<!-- Include common schemas                                             -->
+<!--********************************************************************-->
+
+<xsd:include schemaLocation="./ndmxml-1.0-ccsds-common.xsd"/>
+<xsd:include schemaLocation="./ndmxml-1.0-navwg-common.xsd"/>
+
+
+<!--********************************************************************-->
+<!-- An APM consists of a "header" and a "body".  The header is a       -->
+<!-- construct that is shared by all NDM's, found in the "common" schema-->
+<!--********************************************************************-->
+<xsd:complexType name="apmType">
+   <xsd:sequence>
+      <xsd:element name="header" type="ndm:ndmHeader"/>
+      <xsd:element name="body" type="ndm:apmBody"/>
+   </xsd:sequence>
+   <xsd:attribute  name="id"       use="required"  fixed="CCSDS_APM_VERS"/>
+   <xsd:attribute  name="version"  use="required"  fixed="1.0"/>
+</xsd:complexType>
+
+
+<!--********************************************************************-->
+<!-- The APM "body" consists of a single "segment", described below.    -->
+<!--********************************************************************-->
+<xsd:complexType name="apmBody">
+   <xsd:sequence>
+      <xsd:element name="segment" type="ndm:apmSegment" 
+         minOccurs="1" maxOccurs="1"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!--********************************************************************-->
+<!-- The APM "segment" consists of a "metadata" section and a "data"    -->
+<!-- section.  Structurally it is necessary in order to ensure proper   -->
+<!-- relationship between the alignment of metadata and data sections.  -->
+<!--********************************************************************-->  
+<xsd:complexType name="apmSegment">
+   <xsd:sequence>
+      <xsd:element name="metadata" type="ndm:apmMetadata"/>
+      <xsd:element name="data" type="ndm:apmData"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!--********************************************************************-->
+<!-- APM Metadata Section                                               -->
+<!--********************************************************************-->
+<xsd:complexType name="apmMetadata">
+   <xsd:sequence>
+      <xsd:element name="COMMENT" type="xsd:string" 
+         minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="OBJECT_NAME" type="xsd:string"/>
+      <xsd:element name="OBJECT_ID" type="xsd:string"/>
+      <xsd:element name="CENTER_NAME" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="TIME_SYSTEM" type="ndm:timeSystemType"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!--********************************************************************-->
+<!-- APM Data Section                                                   -->
+<!--********************************************************************-->
+<xsd:complexType name="apmData">
+   <xsd:sequence>
+      <xsd:element name="COMMENT" type="xsd:string"
+         minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="quaternionState" type="ndm:quaternionStateType"/>
+      <xsd:element name="eulerElementsThree" type="ndm:eulerElementsThreeType" 
+         minOccurs="0"/>
+      <xsd:element name="eulerElementsSpin" type="ndm:eulerElementsSpinType" 
+         minOccurs="0"/>
+      <xsd:element name="spacecraftParameters" 
+         type="ndm:attSpacecraftParametersType" minOccurs="0"/>
+      <xsd:element name="maneuverParameters"   
+         type="ndm:attManeuverParametersType" minOccurs="0" maxOccurs="unbounded"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!--********************************************************************-->
+<!-- "Logical Blocks" used in the APM                                   -->
+<!--********************************************************************-->
+<xsd:complexType name="quaternionStateType">
+   <xsd:sequence>
+      <xsd:element name="COMMENT" type="xsd:string" 
+         minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="EPOCH" type="ndm:epochType"/>
+      <xsd:element name="Q_FRAME_A" type="xsd:string"/>
+      <xsd:element name="Q_FRAME_B" type="xsd:string"/>
+      <xsd:element name="Q_DIR" type="ndm:rotDirectionType"/>
+      <xsd:element name="quaternion" type="ndm:quaternionType"/>
+      <xsd:element name="quaternionRate" type="ndm:quaternionRateType"
+         minOccurs="0"/>
+   </xsd:sequence>
+</xsd:complexType> 
+
+
+<!--********************************************************************-->
+<!-- NOTE:  For some spacecraft, the "eulerElementsThreeType" and       -->
+<!-- "eulerElementsSpinType" described in the next 2 sections may       -->
+<!-- appear in the same APM, according to the AACS design of the        -->
+<!-- spacecraft.                                                        -->    
+<!--********************************************************************-->
+<xsd:complexType name="eulerElementsThreeType">
+   <xsd:sequence>
+      <xsd:element name="COMMENT" type="xsd:string" 
+         minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="EULER_FRAME_A" type="xsd:string" minOccurs="0" />
+      <xsd:element name="EULER_FRAME_B" type="xsd:string" minOccurs="0" />
+      <xsd:element name="EULER_DIR"     type="ndm:rotDirectionType" minOccurs="0" />
+      <xsd:element name="EULER_ROT_SEQ" type="ndm:rotseqType" minOccurs="0" />
+      <xsd:element name="RATE_FRAME" type="ndm:apmRateFrameType" minOccurs="0" />
+      <xsd:element name="rotationAngles" type="ndm:rotationAngleType" minOccurs="0"/>
+      <xsd:element name="rotationRates"  type="ndm:rotationRateType"  minOccurs="0"/>
+   </xsd:sequence>   
+</xsd:complexType>
+
+
+<xsd:complexType name="eulerElementsSpinType">
+   <xsd:sequence>
+      <xsd:element name="COMMENT" type="xsd:string" 
+         minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="SPIN_FRAME_A" type="xsd:string" />
+      <xsd:element name="SPIN_FRAME_B" type="xsd:string"/>
+      <xsd:element name="SPIN_DIR" type="ndm:rotDirectionType" minOccurs="0"/>
+      <xsd:element name="SPIN_ALPHA" type="ndm:angleType" minOccurs="0" />
+      <xsd:element name="SPIN_DELTA" type="ndm:angleType" minOccurs="0" />
+      <xsd:element name="SPIN_ANGLE" type="ndm:angleType" minOccurs="0" />
+      <xsd:element name="SPIN_ANGLE_VEL" type="ndm:angleRateType" minOccurs="0" />
+      <xsd:element name="NUTATION" type="ndm:angleType" minOccurs="0" />
+      <xsd:element name="NUTATION_PER" type="ndm:durationType" minOccurs="0" />
+      <xsd:element name="NUTATION_PHASE" type="ndm:angleType" minOccurs="0" />
+   </xsd:sequence>   
+</xsd:complexType> 
+
+
+<xsd:complexType name="attSpacecraftParametersType">
+   <xsd:sequence>
+      <xsd:element name="COMMENT" type="xsd:string" 
+         minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="INERTIA_REF_FRAME" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="I11" type="ndm:momentType"/>
+      <xsd:element name="I22" type="ndm:momentType"/>
+      <xsd:element name="I33" type="ndm:momentType"/>
+      <xsd:element name="I12" type="ndm:momentType"/>
+      <xsd:element name="I13" type="ndm:momentType"/>
+      <xsd:element name="I23" type="ndm:momentType"/>
+   </xsd:sequence>    
+</xsd:complexType> 
+
+
+<xsd:complexType name="attManeuverParametersType">
+   <xsd:sequence>
+      <xsd:element name="COMMENT" type="xsd:string" 
+         minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="MAN_EPOCH_START" type="ndm:epochType"/>
+      <xsd:element name="MAN_DURATION" type="ndm:durationType"/>
+      <xsd:element name="MAN_REF_FRAME" type="xsd:string"/>
+      <xsd:element name="MAN_TOR_1" type="ndm:torqueType"/>
+      <xsd:element name="MAN_TOR_2" type="ndm:torqueType"/>
+      <xsd:element name="MAN_TOR_3" type="ndm:torqueType"/>
+   </xsd:sequence>    
+</xsd:complexType> 
+
+
+<!--********************************************************************-->
+<!-- Simple Types and Complex Types Unique to the APM.                  -->
+<!--********************************************************************-->
+
+<xsd:complexType name="momentType">
+   <xsd:simpleContent>
+      <xsd:extension base="xsd:double">
+         <xsd:attribute name="units" type="ndm:momentUnits" use="optional"/>
+      </xsd:extension>
+   </xsd:simpleContent>
+</xsd:complexType>
+
+
+<xsd:simpleType name="momentUnits">
+   <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="kg*m**2"/>
+   </xsd:restriction>
+</xsd:simpleType>
+
+
+<xsd:simpleType name="apmRateFrameType">
+   <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="EULER_FRAME_A"/>
+      <xsd:enumeration value="EULER_FRAME_B"/>
+   </xsd:restriction>
+</xsd:simpleType>
+
+
+<xsd:complexType name="torqueType">
+   <xsd:simpleContent>
+      <xsd:extension base="xsd:double">
+         <xsd:attribute name="units" type="ndm:torqueUnits" use="optional"/>
+      </xsd:extension>
+   </xsd:simpleContent>
+</xsd:complexType>
+
+
+<xsd:simpleType name="torqueUnits">
+   <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="N*m"/>
+   </xsd:restriction>
+</xsd:simpleType>
+
+</xsd:schema>

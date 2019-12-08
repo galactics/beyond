@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:ndm="urn:ccsds:recommendation:navigation:schema:ndmxml"
+            targetNamespace="urn:ccsds:recommendation:navigation:schema:ndmxml"
+            elementFormDefault="unqualified" 
+            attributeFormDefault="unqualified">
+
+<!--********************************************************************-->
+
+<!--********************************************************************-->
+<!-- NOTE: This is version 1.0, Rev C of the NDM/XML Schema (09/03/2019)-->
+<!-- This component of the schema is the "AEM" module, which contains   -->
+<!-- elements that are used exclusively in the Attitude Ephemeris       -->
+<!-- Message (AEM).                                                     -->
+<!--                                                                    -->
+<!-- Compatible document versions are:                                  -->
+<!--    NDM/XML 505.0-B-1   Blue Book (12/2010)                         -->
+<!--    ADM     504.0-B-1   Blue Book (05/2008)                         -->
+<!--                                                                    -->
+<!-- *********************  BLUE BOOK CHANGE LOG  ********************* -->
+<!-- 03/14/2010: Original implemementation of schemas.                  -->
+<!-- 10/13/2017: Rev A: Modified to include revA common schemas.        -->
+<!-- 08/29/2018: Rev B: Modified to remove revision version from file   -->
+<!--                    names, since file names on SANA were static     -->
+<!--                    and the schemas basically did not work.         -->
+<!-- 09/03/2019: Rev C: No modifications to this schema; preparation of -->
+<!--                    schema set for introduction of the RDM.         -->
+<!--********************************************************************-->
+
+<!--********************************************************************-->
+<!-- Include common schemas                                             -->
+<!--********************************************************************-->
+
+<xsd:include schemaLocation="./ndmxml-1.0-ccsds-common.xsd"/>
+<xsd:include schemaLocation="./ndmxml-1.0-navwg-common.xsd"/>
+
+
+<!--********************************************************************-->
+<!-- An AEM consists of a "header" and a "body".  The header is a       -->
+<!-- construct that is shared by all NDM's, found in the "common" schema-->
+<!--********************************************************************-->
+
+<xsd:complexType name="aemType">
+   <xsd:sequence>
+      <xsd:element name="header" type="ndm:ndmHeader"/>
+      <xsd:element name="body" type="ndm:aemBody"/>
+   </xsd:sequence>
+   <xsd:attribute  name="id"       use="required"  fixed="CCSDS_AEM_VERS"/>
+   <xsd:attribute  name="version"  use="required"  fixed="1.0"/>
+</xsd:complexType>
+
+
+<!--********************************************************************-->
+<!-- The AEM "body" consists of 1 or more "segments", described below.  -->
+<!--********************************************************************-->
+
+<xsd:complexType name="aemBody">
+   <xsd:sequence>
+      <xsd:element name="segment" type="ndm:aemSegment" 
+         minOccurs="1" maxOccurs="unbounded"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!--********************************************************************-->
+<!-- The AEM "segment" consists of a "metadata" section and a "data"    -->
+<!-- section.  The segment construct is shown in Table 4-1 of ADM, but  -->
+<!-- is not explicitly stated in the text.  The segment construct is    -->
+<!-- required in order to enforce the ordering and correspondence of    -->
+<!-- metadata sections and data sections that is described in the ADM.  -->
+<!--********************************************************************-->  
+
+<xsd:complexType name="aemSegment">
+   <xsd:sequence>
+      <xsd:element name="metadata" type="ndm:aemMetadata"/>
+      <xsd:element name="data" type="ndm:aemData"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!--********************************************************************-->
+<!-- AEM Metadata Section                                               -->
+<!--********************************************************************-->
+
+<xsd:complexType name="aemMetadata">
+   <xsd:sequence>
+      <xsd:element name="COMMENT" type="xsd:string" 
+         minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="OBJECT_NAME" type="xsd:string"/>
+      <xsd:element name="OBJECT_ID" type="xsd:string"/>
+      <xsd:element name="CENTER_NAME" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="REF_FRAME_A" type="xsd:string"/>
+      <xsd:element name="REF_FRAME_B" type="xsd:string"/>
+      <xsd:element name="ATTITUDE_DIR" type="ndm:rotDirectionType"/>
+      <xsd:element name="TIME_SYSTEM" type="ndm:timeSystemType"/>
+      <xsd:element name="START_TIME"  type="ndm:epochType"/>
+      <xsd:element name="USEABLE_START_TIME" type="ndm:epochType" minOccurs="0"/>
+      <xsd:element name="USEABLE_STOP_TIME"  type="ndm:epochType" minOccurs="0"/>
+      <xsd:element name="STOP_TIME"   type="ndm:epochType"/>
+      <xsd:element name="ATTITUDE_TYPE" type="ndm:attitudeTypeType"/>
+      <xsd:element name="QUATERNION_TYPE" type="ndm:quaternionTypeType"
+         minOccurs="0"/>
+      <xsd:element name="EULER_ROT_SEQ" type="ndm:rotseqType" minOccurs="0"/>
+      <xsd:element name="RATE_FRAME" type="ndm:aemRateFrameType" minOccurs="0"/>
+      <xsd:element name="INTERPOLATION_METHOD" type="xsd:string"
+         minOccurs="0"/>
+       <xsd:element name="INTERPOLATION_DEGREE" type="xsd:positiveInteger"
+         minOccurs="0"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!--********************************************************************-->
+<!-- AEM Data Section                                                   -->
+<!--********************************************************************-->
+
+<xsd:complexType name="aemData">
+   <xsd:sequence>
+      <xsd:element name="COMMENT" type="xsd:string" 
+         minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="attitudeState" type="ndm:attitudeStateType" 
+         minOccurs="1" maxOccurs="unbounded"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!--********************************************************************-->
+<!-- "Ephemeris Line Types" used in the AEM                             -->
+<!--********************************************************************-->
+
+<xsd:complexType name="attitudeStateType">
+   <xsd:choice>
+      <xsd:element name="quaternionState" type="ndm:quaternionEphemerisType"/>
+      <xsd:element name="quaternionDerivative" type="ndm:quaternionDerivativeType"/>
+      <xsd:element name="quaternionEulerRate" type="ndm:quaternionEulerRateType"/>
+      <xsd:element name="eulerAngle" type="ndm:eulerAngleType"/>
+      <xsd:element name="eulerAngleRate" type="ndm:eulerAngleRateType"/>
+      <xsd:element name="spin" type="ndm:spinType"/>
+      <xsd:element name="spinNutation" type="ndm:spinNutationType"/>
+   </xsd:choice>
+</xsd:complexType>
+
+
+<!-- type 1 AEM data: Quaternion Type -->
+<xsd:complexType name="quaternionEphemerisType">
+   <xsd:sequence>
+      <xsd:element name="EPOCH" type="ndm:epochType"/>
+      <xsd:element name="quaternion" type="ndm:quaternionType"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!-- type 2 AEM data: Quaternion Derivative Type -->
+<xsd:complexType name="quaternionDerivativeType">
+   <xsd:sequence>
+      <xsd:element name="EPOCH" type="ndm:epochType"/>
+      <xsd:element name="quaternion" type="ndm:quaternionType"/>   
+      <xsd:element name="quaternionRate" type="ndm:quaternionRateType"/> 
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!-- type 3 AEM data:  Quaternion Euler Rate Type -->
+<xsd:complexType name="quaternionEulerRateType">
+   <xsd:sequence>
+      <xsd:element name="EPOCH" type="ndm:epochType"/>
+      <xsd:element name="quaternion" type="ndm:quaternionType"/>      
+      <xsd:element name="rotationRates" type="ndm:rotationRateType" minOccurs="0"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!-- type 4 AEM data:  Euler Angle Type -->
+<xsd:complexType name="eulerAngleType">
+   <xsd:sequence>
+      <xsd:element name="EPOCH" type="ndm:epochType"/>      
+      <xsd:element name="rotationAngles" type="ndm:rotationAngleType" minOccurs="0"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!-- type 5 AEM data:  Euler Angle Rate Type -->
+<xsd:complexType name="eulerAngleRateType">
+   <xsd:sequence>
+      <xsd:element name="EPOCH" type="ndm:epochType"/>      
+      <xsd:element name="rotationAngles" type="ndm:rotationAngleType" minOccurs="0"/>
+      <xsd:element name="rotationRates" type="ndm:rotationRateType" minOccurs="0"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!-- type 6 AEM data:  Spin Type -->
+<xsd:complexType name="spinType">
+   <xsd:sequence>
+      <xsd:element name="EPOCH" type="ndm:epochType"/>
+      <xsd:element name="SPIN_ALPHA" type="ndm:angleType"/>
+      <xsd:element name="SPIN_DELTA" type="ndm:angleType"/>
+      <xsd:element name="SPIN_ANGLE" type="ndm:angleType"/>
+      <xsd:element name="SPIN_ANGLE_VEL" type="ndm:angleRateType"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!-- type 7 AEM data:  Spin Nutation Type -->
+<xsd:complexType name="spinNutationType">
+   <xsd:sequence>
+      <xsd:element name="EPOCH" type="ndm:epochType"/>
+      <xsd:element name="SPIN_ALPHA" type="ndm:angleType"/>
+      <xsd:element name="SPIN_DELTA" type="ndm:angleType"/>
+      <xsd:element name="SPIN_ANGLE" type="ndm:angleType"/>
+      <xsd:element name="SPIN_ANGLE_VEL" type="ndm:angleRateType"/>
+      <xsd:element name="NUTATION" type="ndm:angleType"/>
+      <xsd:element name="NUTATION_PER" type="ndm:durationType"/>
+      <xsd:element name="NUTATION_PHASE" type="ndm:angleType"/>
+   </xsd:sequence>
+</xsd:complexType>
+
+
+<!--********************************************************************-->
+<!-- Simple Types and Complex Types Unique to the AEM                   -->
+<!--********************************************************************-->
+
+<xsd:simpleType name="attitudeTypeType">
+   <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="quaternion"/>
+      <xsd:enumeration value="QUATERNION"/>
+      <xsd:enumeration value="quaternion/derivative"/>
+      <xsd:enumeration value="QUATERNION/DERIVATIVE"/>   
+      <xsd:enumeration value="quaternion/rate"/>
+      <xsd:enumeration value="QUATERNION/RATE"/>
+      <xsd:enumeration value="euler_angle"/>
+      <xsd:enumeration value="EULER_ANGLE"/>
+      <xsd:enumeration value="euler_angle/rate"/>
+      <xsd:enumeration value="EULER_ANGLE/RATE"/>
+      <xsd:enumeration value="spin"/>
+      <xsd:enumeration value="SPIN"/>
+      <xsd:enumeration value="spin/nutation"/>
+      <xsd:enumeration value="SPIN/NUTATION"/>
+   </xsd:restriction>
+</xsd:simpleType>
+
+
+<xsd:simpleType name="quaternionTypeType">
+   <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="first"/>
+      <xsd:enumeration value="FIRST"/>
+      <xsd:enumeration value="last"/>
+      <xsd:enumeration value="LAST"/>   
+   </xsd:restriction>
+</xsd:simpleType>
+
+
+<xsd:simpleType name="aemRateFrameType">
+   <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="ref_frame_a"/>
+      <xsd:enumeration value="REF_FRAME_A"/>
+      <xsd:enumeration value="ref_frame_b"/>
+      <xsd:enumeration value="REF_FRAME_B"/>
+   </xsd:restriction>
+</xsd:simpleType>
+
+</xsd:schema>

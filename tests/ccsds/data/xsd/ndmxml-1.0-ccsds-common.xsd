@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:ndm="urn:ccsds:recommendation:navigation:schema:ndmxml"
+            targetNamespace="urn:ccsds:recommendation:navigation:schema:ndmxml"
+            elementFormDefault="unqualified" 
+            attributeFormDefault="unqualified">
+
+<!--********************************************************************-->
+
+<!--********************************************************************-->
+<!-- NOTE: This is version 1.0, Rev C of the NDM/XML Schema (xx/xx/2019)-->
+<!-- This component of the schema is the "CCSDS common" module,         -->
+<!-- which is scheduled for deletion with NDMXML Version 2.0. For now,  -->
+<!-- it is an empty schema to preserve structural continuity.           -->
+<!--                                                                    -->
+<!-- *********************  BLUE BOOK CHANGE LOG  ********************* -->
+<!-- 03/14/2010: Original implemementation of schemas.                  -->
+<!-- 10/13/2017: Rev A: No modifications, but renamed for consistency   -->
+<!--                    with Rev A revisions to other schemas.          -->
+<!-- 08/29/2018: Rev B: Modified to remove revision version from file   -->
+<!--                    names, since file names on SANA were static     -->
+<!--                    and the schemas basically did not work.         -->
+<!-- 08/16/2019: Rev C: Schema contents moved to "Navwg common" schema  -->
+<!--                    in preparation for deletion.                    -->
+<!--********************************************************************-->
+
+
+</xsd:schema>

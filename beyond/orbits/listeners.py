@@ -323,6 +323,55 @@ class ApsideListener(Listener):
         return orb.r_dot
 
 
+class AnomalyEvent(Event):
+    pass
+
+
+class AnomalyListener(Listener):
+
+    event = AnomalyEvent
+
+    ANOMALIES = {
+        "true": ("keplerian", "ν"),
+        "mean": ("keplerian_mean", "M"),
+        "eccentric": ("keplerian_eccentric", "E"),
+        "aol": ("keplerian_circular", "u"),
+    }
+
+    def __init__(self, value, anomaly="true", frame=None):
+        self.value = value
+        self.anomaly = anomaly
+        self.frame = frame
+
+    @property
+    def _anomaly(self):
+        if self.anomaly not in self.ANOMALIES:
+            raise ValueError("Unknown '{}' anomaly type".format(self.anomaly))
+
+        return self.ANOMALIES[self.anomaly]
+
+    @property
+    def form(self):
+        return self._anomaly[0]
+
+    @property
+    def attr(self):
+        return self._anomaly[1]
+
+    def info(self, orb):
+        # breakpoint()
+        return AnomalyEvent(
+            self, "Anomaly {}={:.2f}".format(self.attr, np.degrees(self.convert(orb)))
+        )
+
+    def convert(self, orb):
+        return getattr(orb.copy(frame=self.frame, form=self.form), self.attr)
+
+    def __call__(self, orb):
+        v = self.convert(orb) - self.value
+        return (v + np.pi) % (2 * np.pi) - np.pi
+
+
 class SignalEvent(Event):  # pragma: no cover
     def __str__(self):
         return "{} {} {}".format(self.info, self.elev, self.station)
@@ -499,3 +548,30 @@ def stations_listeners(stations):
             listeners.append(StationMaskListener(sta))
 
     return listeners
+
+
+def find_event(event, iterator, offset=0):
+    """Find an specific event in a extropolation
+
+    Args:
+        event (str or Event)
+        iterator ():
+        offset (int):
+    Return:
+        Orb
+    """
+
+    if isinstance(event, Event):
+        event = event.info
+
+    i = 0
+
+    for orb in iterator:
+        if orb.event and orb.event.info == event:
+            if i == offset:
+                break
+            i += 1
+    else:
+        raise RuntimeError("No event '{}' found".format(event))
+
+    return orb

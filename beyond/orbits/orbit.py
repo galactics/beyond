@@ -228,6 +228,10 @@ Orbit =
     def cov(self, value):
         self.complements["cov"] = Cov(self, value)
 
+    @cov.deleter
+    def cov(self):
+        del self.complements["cov"]
+
     @property
     def form(self):
         """:py:class:`~beyond.orbits.forms.Form`: Form of the coordinates of the orbit
@@ -295,7 +299,7 @@ Orbit =
     @propagator.setter
     def propagator(self, new_propagator):
 
-        if isinstance(new_propagator, str):
+        if isinstance(new_propagator, str) or new_propagator is None:
             new_propagator = get_propagator(new_propagator)()
 
         self._propagator = new_propagator

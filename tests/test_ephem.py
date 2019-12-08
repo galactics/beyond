@@ -1,8 +1,9 @@
-
+import numpy as np
 from datetime import timedelta
 
 from beyond.dates import Date
 from beyond.io.tle import Tle
+from beyond.orbits.listeners import find_event, NodeListener, ApsideListener
 
 from pytest import raises, fixture
 
@@ -11,8 +12,8 @@ from pytest import raises, fixture
 def start():
     return Date(2008, 9, 20, 12, 30)
 
-stop = timedelta(hours=1)
-step = timedelta(minutes=3)
+stop = timedelta(hours=1.5)
+step = timedelta(minutes=1)
 
 
 @fixture
@@ -41,13 +42,13 @@ def test_interpolate(ephem):
 
     orb = ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27), method="linear")
 
-    assert list(orb[:3]) == [-2343119.6282188366, 4140259.6343833795, -4744905.5643210905]
-    assert list(orb[3:]) == [-4568.825145249858, -5572.6341438079435, -2614.704833575209]
+    assert np.allclose(orb[:3], [-2348566.346123897, 4148355.890326985, -4755222.226501104])
+    assert np.allclose(orb[3:], [-4578.0740694225515, -5585.023397109828, -2619.4707804499653])
 
     orb = ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27), method="lagrange")
 
-    assert list(orb[:3]) == [-2349933.1374301873, 4150754.2288609436, -4757989.96860434]
-    assert list(orb[3:]) == [-4580.715466516539, -5588.283144821399, -2620.9683124126564]
+    assert np.allclose(orb[:3], [-2349933.1374301873, 4150754.2288609436, -4757989.96860434])
+    assert np.allclose(orb[3:], [-4580.715466516539, -5588.283144821399, -2620.9683124126564])
 
     with raises(ValueError):
         # We ask for a value clearly out of range
@@ -92,7 +93,7 @@ def test_subephem(ref_orb, ephem, start):
     # Changing of the starting date, with an arbitraty date
     # (i.e. will take the next available point)
     subephem = ephem.ephem(start=ephem.start + timedelta(minutes=10, seconds=12))
-    assert subephem.start == ephem.start + timedelta(minutes=12)
+    assert subephem.start == ephem.start + timedelta(minutes=11)
     assert subephem.stop == ephem.stop
     assert len(subephem) == (subephem.stop - subephem.start) // step + 1
 
@@ -104,9 +105,9 @@ def test_subephem(ref_orb, ephem, start):
 
     # Same as above, but as the stop date doesn't match one of the original ephemeris points,
     # the last point of the newly generated ephemeris will be on the previous point.
-    subephem = ephem.ephem(stop=timedelta(minutes=11))
+    subephem = ephem.ephem(stop=timedelta(minutes=11, seconds=30))
     assert subephem.start == ephem.start
-    assert subephem.stop == ephem.start + timedelta(minutes=9)
+    assert subephem.stop == ephem.start + timedelta(minutes=11)
     assert len(subephem) == (subephem.stop - subephem.start) // step + 1
 
 
@@ -114,7 +115,7 @@ def test_iter_on_dates(ephem):
 
     # Generate a free step ephemeris
     start = ephem.start
-    stop1 = start + (ephem.stop - ephem.start) / 2
+    stop1 = start + timedelta(hours=1, minutes=10)
     step1 = timedelta(seconds=60)
     stop2 = ephem.stop
     step2 = timedelta(seconds=120)
@@ -153,14 +154,14 @@ def test_tolerant(ephem):
         ephem.ephem(start=start, stop=stop)
 
     with raises(ValueError):
-        ephem.ephem(stop=timedelta(hours=1.5))
+        ephem.ephem(stop=timedelta(hours=2))
 
     subephem = ephem.ephem(start=start, stop=stop, strict=False)
 
     assert subephem.start == ephem.start
     assert subephem.stop == start + stop
 
-    subephem = ephem.ephem(stop=timedelta(hours=1.5), strict=False)
+    subephem = ephem.ephem(stop=timedelta(hours=2), strict=False)
     assert subephem.start == ephem.start
     assert subephem.stop == ephem.stop
 
@@ -173,6 +174,46 @@ def test_tolerant(ephem):
     assert len(subephem) == 0
 
     # Case where start is before and stop is after
-    subephem = ephem.ephem(start=start, stop=timedelta(hours=1, minutes=15), strict=False)
+    subephem = ephem.ephem(start=start, stop=timedelta(hours=1, minutes=45), strict=False)
     assert subephem.start == ephem.start
     assert subephem.stop == ephem.stop
+
+
+def test_sensitivity(ephem):
+
+    ref_asc = find_event('Asc Node', ephem.iter(listeners=NodeListener()))
+    ref_desc = find_event('Desc Node', ephem.iter(listeners=NodeListener()))
+
+    ref_apo = find_event('Apoapsis', ephem.iter(listeners=ApsideListener()))
+    ref_peri = find_event('Periapsis', ephem.iter(listeners=ApsideListener()))
+
+    assert str(ref_asc.date) == "2008-09-20T13:32:56.656687 UTC"
+    assert str(ref_desc.date) == "2008-09-20T12:47:05.809521 UTC"
+
+    offsets = [
+        timedelta(seconds=60),
+        timedelta(seconds=20),
+        timedelta(seconds=120),
+        timedelta(seconds=43),
+        timedelta(seconds=57),
+        timedelta(seconds=179),
+        timedelta(seconds=98),
+        timedelta(seconds=138),
+        timedelta(seconds=200),
+    ]
+
+    step = timedelta(minutes=1)
+
+    for offset in offsets:
+        subephem = ephem.ephem(start=ephem.start + offset, step=step)
+        assert subephem.start == ephem.start + offset
+
+        asc = find_event('Asc Node', subephem.iter(listeners=NodeListener()))
+        desc = find_event('Desc Node', subephem.iter(listeners=NodeListener()))
+        assert abs(ref_asc.date - asc.date) <= timedelta.resolution, offset
+        assert abs(ref_desc.date - desc.date) <= timedelta.resolution, offset
+
+        apo = find_event('Apoapsis', subephem.iter(listeners=ApsideListener()))
+        peri = find_event('Periapsis', subephem.iter(listeners=ApsideListener()))
+        assert abs(ref_apo.date - apo.date) <= timedelta(microseconds=6), offset
+        assert abs(ref_peri.date - peri.date) <= timedelta(microseconds=6), offset

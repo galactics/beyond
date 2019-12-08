@@ -72,7 +72,7 @@ class Propagator(Speaker, metaclass=ABCMeta):
             stop = kwargs.get("stop")
             step = kwargs.setdefault("step", getattr(self, "step", None))
 
-            if "stop" is None:
+            if stop is None:
                 raise ValueError("The end of the propagation should be defined")
 
             start = self.orbit.date if start is None else start

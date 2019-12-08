@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd" id="CCSDS_OPM_VERS" version="2.0">
+  <header>
+    <CREATION_DATE>2019-11-21T21:41:41</CREATION_DATE>
+    <ORIGINATOR>N/A</ORIGINATOR>
+  </header>
+  <body>
+    <segment>
+      <metadata>
+        <OBJECT_NAME>ISS (ZARYA)</OBJECT_NAME>
+        <OBJECT_ID>1998-067A</OBJECT_ID>
+        <CENTER_NAME>EARTH</CENTER_NAME>
+        <REF_FRAME>TEME</REF_FRAME>
+        <TIME_SYSTEM>UTC</TIME_SYSTEM>
+      </metadata>
+      <data>
+        <stateVector>
+          <EPOCH>2008-09-20T12:25:40.104192</EPOCH>
+          <X units="m">3459023.611000</X>
+          <Y units="m">5617725.542000</Y>
+          <Z units="m">1316222.323000</Z>
+          <X_DOT units="m/s">-3535.844000</X_DOT>
+          <Y_DOT units="m/s">3550.405000</Y_DOT>
+          <Z_DOT units="m/s">-5846.067000</Z_DOT>
+        </stateVector>
+        <keplerianElements>
+          <SEMI_MAJOR_AXIS units="km">-0.00672358</SEMI_MAJOR_AXIS>
+          <ECCENTRICITY>1.00055e+09</ECCENTRICITY>
+          <INCLINATION units="deg">51.6416</INCLINATION>
+          <RA_OF_ASC_NODE units="deg">247.463</RA_OF_ASC_NODE>
+          <ARG_OF_PERICENTER units="deg">165.529</ARG_OF_PERICENTER>
+          <TRUE_ANOMALY units="deg">0.0220225</TRUE_ANOMALY>
+          <GM units="km**3/s**2">398600.9368</GM>
+        </keplerianElements>
+      </data>
+    </segment>
+  </body>
+</opm>

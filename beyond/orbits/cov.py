@@ -73,6 +73,9 @@ class Cov(np.ndarray):
         if frame == self._frame:
             return
 
+        if frame not in ("TNW", "QSW", self.PARENT_FRAME):
+            raise ValueError("Unknown covariance frame : {}".format(frame))
+
         if self._frame == "TNW":
             m1 = to_tnw(self.orb).T
         elif self._frame == "QSW":

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:ndm="urn:ccsds:recommendation:navigation:schema:ndmxml"
+            targetNamespace="urn:ccsds:recommendation:navigation:schema:ndmxml"
+            elementFormDefault="unqualified" 
+            attributeFormDefault="unqualified">
+
+<!--********************************************************************-->
+
+<!--********************************************************************-->
+<!-- NOTE: This is version 1.0, Rev C of the NDM/XML Schema (09/03/2019)-->
+<!-- This component of the schema is the NDM "combined instantiation"   -->
+<!-- module, used where more than one NDM is combined in a single       -->
+<!-- message.                                                           -->
+<!--                                                                    -->
+<!-- Compatible document versions are:                                  -->
+<!--    NDM/XML 505.0-B-1   Blue Book (12/2010)                         -->
+<!--    ODM     502.0-B-2   Blue Book (11/2009)                         -->
+<!--    ADM     504.0-B-1   Blue Book (05/2008)                         -->
+<!--    TDM     503.0-B-1   Blue Book (11/2007)                         -->
+<!--    CDM     508.0-B-1   Blue Book (06/2013)                         -->
+<!--    RDM     508.1-B-1   Blue Book (10/2019)                         -->
+<!--                                                                    -->
+<!-- ********************** BLUE BOOK CHANGE LOG  ********************* -->
+<!-- 03/14/2010: Original implemementation of schemas.                  -->
+<!-- 06/25/2013: Rev 0: Added CDM schema and element.                   -->
+<!-- 10/13/2017: Rev A: Modified to include revA common schemas.        -->
+<!-- 08/29/2018: Rev B: Modified to remove revision version from file   -->
+<!--                    names, since file names on SANA were static     -->
+<!--                    and the schemas basically did not work.         -->
+<!-- 09/03/2019: Rev C: Minor modifications to this schema in order to  -->
+<!--                    prep schema set for introduction of the RDM.    -->
+<!--********************************************************************-->
+
+<!--********************************************************************-->
+<!-- Structural note... this schema is structured so that the structural-->
+<!-- elements of an NDM are developed in separate modules, i.e., there  -->
+<!-- are separate schemas for the AEM, APM, OEM, OPM, and TDM, each of  -->
+<!-- which is maintained separately.  This facilitates the process of   -->
+<!-- applying updates that correlate with the foundation documents.     -->
+<!-- The "common" schema includes data types that may be shared across  -->
+<!-- more than one message.                                             -->
+<!--********************************************************************-->
+
+<!--********************************************************************-->
+<!-- Includes for all schema modules: AEM,APM,CDM,OEM,OPM,TDM,Common    -->
+<!--********************************************************************-->
+
+<xsd:include schemaLocation="./ndmxml-1.0-aem-1.0.xsd"/>
+<xsd:include schemaLocation="./ndmxml-1.0-apm-1.0.xsd"/>
+<xsd:include schemaLocation="./ndmxml-1.0-cdm-1.0.xsd"/>
+<xsd:include schemaLocation="./ndmxml-1.0-oem-2.0.xsd"/>
+<xsd:include schemaLocation="./ndmxml-1.0-omm-2.0.xsd"/>
+<xsd:include schemaLocation="./ndmxml-1.0-opm-2.0.xsd"/>
+<xsd:include schemaLocation="./ndmxml-1.0-rdm-1.0.xsd"/>
+<xsd:include schemaLocation="./ndmxml-1.0-tdm-1.0.xsd"/>
+<xsd:include schemaLocation="./ndmxml-1.0-navwg-common.xsd"/>
+<xsd:include schemaLocation="./ndmxml-1.0-ccsds-common.xsd"/>
+
+<!--********************************************************************-->
+<!--  NOTE: In general, a combined instantiation Navigation Data Message-->
+<!--  (NDM) should consist of at least *one* AEM,APM,CDM,OEM,OPM,RDM,   -->
+<!--  or TDM.  Beyond that, a single NDM may consist of any number of   -->
+<!--  AEMs,APMs,CDMs,OEMs,OMMs,OPMs,RDMs,TDM,in any combination & order.-->
+<!--  Note that the setting of the attribute 'minOccurs="0"' at this    -->
+<!--  level means that an empty NDM can be sent if so desired, (e.g.,   -->
+<!--  for testing purposes).                                            -->
+<!--********************************************************************-->
+
+<xsd:complexType name="ndmType">
+   <xsd:sequence>
+      <xsd:element name="COMMENT" type="xsd:string" 
+         minOccurs="0" maxOccurs="unbounded"/>       
+      <xsd:choice minOccurs="0" maxOccurs="unbounded">
+         <xsd:element name="aem" type="ndm:aemType" />
+         <xsd:element name="apm" type="ndm:apmType" />
+         <xsd:element name="cdm" type="ndm:cdmType" />
+         <xsd:element name="oem" type="ndm:oemType" />
+         <xsd:element name="omm" type="ndm:ommType" />
+         <xsd:element name="opm" type="ndm:opmType" />
+         <xsd:element name="rdm" type="ndm:rdmType" />
+         <xsd:element name="tdm" type="ndm:tdmType" />
+      </xsd:choice>
+   </xsd:sequence>
+</xsd:complexType>
+
+</xsd:schema>
