@@ -3,6 +3,25 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [v0.6.8] - 2019-12-08
+
+### Added
+
+- NonePropagator for unmoving objects
+- Eccentric anomaly form
+- AnomalyListener
+- find_event function
+- Add python 3.8 support
+- Add CCSDS XML parsing and dumping
+
+### Modified
+
+- Raise exception when not enough points to interpolate an ephemeris
+
+### Removed
+
+- Removed python 3.5 support
+
 ## [v0.6.7] - 2019-10-21
 
 ### Added
