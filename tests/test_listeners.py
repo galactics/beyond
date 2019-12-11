@@ -1,7 +1,9 @@
 
-from pytest import raises, mark
+import numpy as np
+from pytest import raises, mark, fixture
 
 from beyond.orbits import Ephem
+from beyond.io.tle import Tle
 from beyond.dates import Date, timedelta
 from beyond.orbits.listeners import *
 
@@ -10,27 +12,34 @@ The ephemeris interpolation generate a little time difference, which is
 why we use an 'epsilon'.
 """
 
+@fixture
+def molniya(common_env):
 
-def iter_listeners(orb, listeners, mode):
+    return Tle("""MOLNIYA 1-90
+1 24960U 97054A   18123.22759647  .00000163  00000-0  24467-3 0  9999
+2 24960  62.6812 182.7824 6470982 294.8616  12.8538  3.18684355160009""").orbit()
 
-    start = Date(2018, 4, 5, 16, 50)
-    stop = timedelta(minutes=100)
-    step = timedelta(minutes=3)
 
-    kwargs = {}
+def iter_listeners(orb, listeners, mode, **kwargs):
+
+    start = kwargs.get("start", Date(2018, 4, 5, 16, 50))
+    stop = kwargs.get("stop", timedelta(minutes=100))
+    step = kwargs.get("step", timedelta(minutes=3))
+
+    subkwargs = {}
     if mode == 'range-nostep':
-        kwargs['start'] = start
-        kwargs['stop'] = stop
+        subkwargs['start'] = start
+        subkwargs['stop'] = stop
         if not isinstance(orb, Ephem):
-            kwargs['step'] = step
+            subkwargs['step'] = step
     elif mode == 'range':
-        kwargs['start'] = start
-        kwargs['stop'] = stop
-        kwargs['step'] = step
+        subkwargs['start'] = start
+        subkwargs['stop'] = stop
+        subkwargs['step'] = step
     else:
-        kwargs['dates'] = Date.range(start, stop, step)
+        subkwargs['dates'] = Date.range(start, stop, step)
 
-    for orb in orb.iter(listeners=listeners, **kwargs):
+    for orb in orb.iter(listeners=listeners, **subkwargs):
         if orb.event:
             yield orb
 
@@ -151,3 +160,109 @@ def test_radial_velocity(station, orbit, mode):
     # Test for RadialVelocity triggered only when in sight of the station
     events = list(iter_listeners(orbit, RadialVelocityListener(station, sight=True), mode))
     assert len(events) == 1
+
+
+@mark.parametrize('mode', modes)
+def test_true_anomaly(molniya, mode):
+
+    stop = molniya.infos.period
+    step = timedelta(minutes=10)
+
+    events = iter_listeners(molniya, AnomalyListener(np.pi), mode, stop=stop, step=step)
+    p = next(events)
+    assert abs(p.date - Date(2018,  4, 5, 18, 14, 7, 743079)).total_seconds() < 3.7e-5
+    assert p.event.info == "True Anomaly = 180.00"
+    with raises(StopIteration):
+        p = next(events)
+
+    events = iter_listeners(molniya, AnomalyListener(3 * np.pi / 2), mode, stop=stop, step=step)
+    p = next(events)
+    assert abs(p.date - Date(2018,  4, 5, 21, 33, 10, 712900)).total_seconds() < 3.7e-5
+    assert p.event.info == "True Anomaly = 270.00"
+    with raises(StopIteration):
+        p = next(events)
+
+    events = iter_listeners(molniya, AnomalyListener(0), mode, stop=stop, step=step)
+    p = next(events)
+    assert abs(p.date - Date(2018,  4, 5, 22, 0, 2, 409409)).total_seconds() < 8e-6
+    assert p.event.info == "True Anomaly = 0.00"
+    with raises(StopIteration):
+        next(events)
+
+    events = iter_listeners(molniya, AnomalyListener(np.pi / 2), mode, stop=stop, step=step)
+    p = next(events)
+    assert abs(p.date - Date(2018,  4, 5, 22, 26, 54, 209357)).total_seconds() < 3.7e-5
+    assert p.event.info == "True Anomaly = 90.00"
+    with raises(StopIteration):
+        p = next(events)
+
+
+@mark.parametrize('mode', modes)
+def test_mean_anomaly(molniya, mode):
+
+    stop = molniya.infos.period
+    step = timedelta(minutes=10)
+
+    events = iter_listeners(molniya, AnomalyListener(np.pi, "mean"), mode, stop=stop, step=step)
+    p = next(events)
+    assert abs(p.date - Date(2018,  4, 5, 18, 14, 7, 743079)).total_seconds() < 3.7e-5
+    assert p.event.info == "Mean Anomaly = 180.00"
+    with raises(StopIteration):
+        p = next(events)
+
+    events = iter_listeners(molniya, AnomalyListener(3 * np.pi / 2, "mean"), mode, stop=stop, step=step)
+    p = next(events)
+    assert abs(p.date - Date(2018,  4, 5, 20, 7, 5, 494487)).total_seconds() < 3.7e-5
+    assert p.event.info == "Mean Anomaly = 270.00"
+    with raises(StopIteration):
+        p = next(events)
+
+    events = iter_listeners(molniya, AnomalyListener(0, "mean"), mode, stop=stop, step=step)
+    p = next(events)
+    assert abs(p.date - Date(2018,  4, 5, 22, 0, 2, 409409)).total_seconds() < 8e-6
+    assert p.event.info == "Mean Anomaly = 0.00"
+    with raises(StopIteration):
+        next(events)
+
+    events = iter_listeners(molniya, AnomalyListener(np.pi / 2, "mean"), mode, stop=stop, step=step)
+    p = next(events)
+    assert abs(p.date - Date(2018,  4, 5, 23, 52, 59, 555389)).total_seconds() < 3.7e-5
+    assert p.event.info == "Mean Anomaly = 90.00"
+    with raises(StopIteration):
+        p = next(events)
+
+
+@mark.parametrize('mode', modes)
+def test_aol(orbit, mode):
+
+    events = iter_listeners(orbit, AnomalyListener(3 * np.pi / 2, "aol"), mode)
+    p = next(events)
+    assert abs(p.date - Date(2018,  4, 5, 17, 10, 49, 816867)).total_seconds() < 1.8e-5
+    assert p.event.info == "Argument of Latitude = 270.00"
+
+    with raises(StopIteration):
+        next(events)
+
+    events = iter_listeners(orbit, AnomalyListener(0, "aol"), mode)
+    p = next(events)
+    assert abs(p.date - Date(2018,  4, 5, 17, 33, 59, 488529)).total_seconds() < 3.7e-5
+    assert p.event.info == "Argument of Latitude = 0.00"
+
+    with raises(StopIteration):
+        next(events)
+
+    events = iter_listeners(orbit, AnomalyListener(np.pi / 2, "aol"), mode)
+    p = next(events)
+    assert abs(p.date - Date(2018,  4, 5, 17, 57, 7, 129464)).total_seconds() < 1.8e-5
+    assert p.event.info == "Argument of Latitude = 90.00"
+
+    with raises(StopIteration):
+        next(events)
+
+    events = iter_listeners(orbit, AnomalyListener(np.pi, "aol"), mode)
+    p = next(events)
+    assert abs(p.date - Date(2018,  4, 5, 18, 20, 15, 389911)).total_seconds() < 1.8e-5
+    assert p.event.info == "Argument of Latitude = 180.00"
+
+    with raises(StopIteration):
+        next(events)

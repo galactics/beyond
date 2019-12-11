@@ -346,7 +346,7 @@ class AnomalyListener(Listener):
 
     @property
     def _anomaly(self):
-        if self.anomaly not in self.ANOMALIES:
+        if self.anomaly not in self.ANOMALIES:  # pragma: no cover
             raise ValueError("Unknown '{}' anomaly type".format(self.anomaly))
 
         return self.ANOMALIES[self.anomaly]
@@ -359,18 +359,28 @@ class AnomalyListener(Listener):
     def attr(self):
         return self._anomaly[1]
 
+    def diff(self, orb):
+        return (self.convert(orb) - self.value + np.pi) % (2 * np.pi) - np.pi
+
+    def check(self, orb):
+        return abs(self.diff(orb)) < 2 and super().check(orb)
+
     def info(self, orb):
         # breakpoint()
+        if self.anomaly == "aol":
+            txt = "Argument of Latitude"
+        else:
+            txt = "{} Anomaly".format(self.anomaly.title())
+
         return AnomalyEvent(
-            self, "Anomaly {}={:.2f}".format(self.attr, np.degrees(self.convert(orb)))
+            self, "{} = {:.2f}".format(txt, np.degrees(self.convert(orb)))
         )
 
     def convert(self, orb):
         return getattr(orb.copy(frame=self.frame, form=self.form), self.attr)
 
     def __call__(self, orb):
-        v = self.convert(orb) - self.value
-        return (v + np.pi) % (2 * np.pi) - np.pi
+        return self.diff(orb)
 
 
 class SignalEvent(Event):  # pragma: no cover
