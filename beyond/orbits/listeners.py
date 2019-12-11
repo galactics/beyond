@@ -16,7 +16,7 @@ __all__ = [
     "TerminatorListener",
     "ApsideListener",
     "NodeListener",
-    "ZeroDopplerListener",
+    "RadialVelocityListener",
 ]
 
 
@@ -488,9 +488,9 @@ class StationMaxListener(Listener):
         return orb.phi_dot
 
 
-class ZeroDopplerEvent(Event):  # pragma: no cover
+class RadialVelocityEvent(Event):  # pragma: no cover
     def __init__(self, listener):
-        super().__init__(listener, "Zero Doppler")
+        super().__init__(listener, "Radial Velocity")
 
     @property
     def frame(self):
@@ -500,9 +500,9 @@ class ZeroDopplerEvent(Event):  # pragma: no cover
         return "Zero Doppler {}".format(self.frame)
 
 
-class ZeroDopplerListener(Listener):
+class RadialVelocityListener(Listener):
 
-    event = ZeroDopplerEvent
+    event = RadialVelocityEvent
 
     def __init__(self, frame, sight=False):
         """
@@ -515,7 +515,7 @@ class ZeroDopplerListener(Listener):
         self.sight = sight
 
     def info(self, orb):
-        return ZeroDopplerEvent(self)
+        return self.event(self)
 
     def check(self, orb):
 

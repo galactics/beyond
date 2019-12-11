@@ -136,18 +136,18 @@ def test_terminator(orbit, mode):
 
 
 @mark.parametrize('mode', modes)
-def test_zero_doppler(station, orbit, mode):
+def test_radial_velocity(station, orbit, mode):
 
-    events = iter_listeners(orbit, ZeroDopplerListener(station), mode)
+    events = iter_listeners(orbit, RadialVelocityListener(station), mode)
     p = next(events)
 
     assert abs(p.date - Date(2018, 4, 5, 17, 7, 29, 581221)).total_seconds() <= 2e-5
-    assert p.event.info == "Zero Doppler"
+    assert p.event.info == "Radial Velocity"
 
     p = next(events)
     assert abs(p.date - Date(2018, 4, 5, 17, 56, 5, 511934)).total_seconds() <= 3.5e-5
-    assert p.event.info == "Zero Doppler"
+    assert p.event.info == "Radial Velocity"
 
-    # Test for ZeroDoppler triggered only when in sight of the station
-    events = list(iter_listeners(orbit, ZeroDopplerListener(station, sight=True), mode))
+    # Test for RadialVelocity triggered only when in sight of the station
+    events = list(iter_listeners(orbit, RadialVelocityListener(station, sight=True), mode))
     assert len(events) == 1
