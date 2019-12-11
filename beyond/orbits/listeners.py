@@ -16,6 +16,7 @@ __all__ = [
     "TerminatorListener",
     "ApsideListener",
     "NodeListener",
+    "AnomalyListener",
     "RadialVelocityListener",
 ]
 
