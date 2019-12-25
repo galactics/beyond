@@ -127,30 +127,7 @@ class KeplerianImpulsiveMan(ImpulsiveMan):
         return txt
 
     def dv(self, orb, **kwargs):
-        delta_v_a = (
-            orb.frame.center.mu
-            * self.delta_a
-            / (2 * orb.infos.v * orb.infos.kep.a ** 2)
-        )
-
-        v_final = orb.infos.v + delta_v_a
-        delta_v = np.sqrt(
-            orb.infos.v ** 2
-            + v_final ** 2
-            - 2 * orb.infos.v * v_final * np.cos(self.delta_angle)
-        )
-        delta_v_t = v_final * np.cos(self.delta_angle) - orb.infos.v
-
-        ratio = abs(delta_v_t / delta_v)
-        # Due to some floating point operation rounding, this ratio
-        # can be superior to one.
-        if np.isclose(ratio, 1):
-            delta_v_w = 0
-        else:
-            alpha = np.arccos(ratio)
-            delta_v_w = delta_v * np.sin(alpha)
-
-        self._dv = [delta_v_t, 0, delta_v_w]
+        self._dv = dkep2dv(orb, delta_a=self.delta_a, delta_angle=self.delta_angle)
 
         return to_tnw(orb).T @ self._dv
 
@@ -267,6 +244,39 @@ class ContinuousMan(Man):
         return projected_accel
 
 
+class KeplerianContinuousMan(ContinuousMan):
+    def __init__(self, date, duration, **kwargs):
+        kwargs["frame"] = "TNW"
+        self.delta_a = kwargs.pop("delta_a", 0)
+        self.delta_angle = kwargs.pop("delta_i", 0)
+        super().__init__(date, duration, np.zeros(3), **kwargs)
+
+    def accel(self, orb, step):
+        self._dv = dkep2dv(orb, delta_a=self.delta_a, delta_angle=self.delta_angle)
+        return super().accel(orb, step)
 
 
+def dkep2dv(orb, *, delta_a=0, delta_angle=0):
+    """Convert a increment in keplerian elements to a delta v in TNW
+    """
+    dv_a = orb.frame.center.mu * delta_a / (2 * orb.infos.v * orb.infos.kep.a ** 2)
 
+    v_final = orb.infos.v + dv_a
+    dv = np.sqrt(
+        orb.infos.v ** 2
+        + v_final ** 2
+        - 2 * orb.infos.v * v_final * np.cos(delta_angle)
+    )
+    dv_t = v_final * np.cos(delta_angle) - orb.infos.v
+
+    ratio = abs(dv_t / dv)
+
+    # Due to some floating point operation rounding, this ratio
+    # can be superior to one.
+    if np.isclose(ratio, 1):
+        dv_w = 0
+    else:
+        alpha = np.arccos(ratio)
+        dv_w = dv * np.sin(alpha)
+
+    return np.array([dv_t, 0, dv_w])
