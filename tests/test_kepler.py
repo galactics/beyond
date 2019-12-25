@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from contextlib import contextmanager
@@ -277,32 +276,27 @@ def test_listener(orbit_kepler):
         assert events[1].event.info == "Apoapsis"
 
 
-def test_man(orb):
+def test_man(molniya_kepler):
 
-    # At the altitude of the ISS, two maneuvers of 28 m/s should result in roughly
-    # an increment of 100 km of altitude
+    # Test of a circularisation of a molniya orbit
+    # At apogee, this is roughly 1400 m/s
 
     with raises(ValueError):
-        ImpulsiveMan(Date(2008, 9, 20, 13, 48, 21, 763091), (28, 0, 0, 0))
+        ImpulsiveMan(Date(2018, 9, 20, 13, 48, 21, 763091), (28, 0, 0, 0))
 
-    peri = find_event('Periapsis', orb.iter(stop=timedelta(minutes=180), listeners=ApsideListener()), offset=1)
-    man1 = ImpulsiveMan(peri.date, (28, 0, 0), frame="TNW")
-    orb.maneuvers = [man1]
+    apo = find_event('Apoapsis', molniya_kepler.iter(stop=timedelta(hours=26), listeners=ApsideListener()), offset=1)
+    man = ImpulsiveMan(apo.date, (1427., 0, 0), frame="TNW")
 
-    apo = find_event('Apoapsis', orb.iter(stop=timedelta(minutes=180), listeners=ApsideListener()), offset=1)
-    # This should also work, but doesn't return the exact same date as
-    # the uncommented apogee search.
-    # apo = find_event('Apoapsis', orb.iter(start=peri.date - 10*orb.propagator.step, stop=timedelta(minutes=180), listeners=ApsideListener()))
+    # Check on the sensitivity of the find_event function
+    apo2 = find_event('Apoapsis', molniya_kepler.iter(start=molniya_kepler.date + timedelta(seconds=243, minutes=5), stop=timedelta(hours=26), listeners=ApsideListener()), offset=1)
+    assert abs(apo.date - apo2.date) < timedelta(seconds=1)
 
-    man2 = ImpulsiveMan(apo.date, (28, 0, 0), frame="TNW")
-
-
-    orb.maneuvers = [man1, man2]
+    molniya_kepler.maneuvers = man
 
     altitude = []
     eccentricity = []
     dates = []
-    for p in orb.iter(stop=timedelta(minutes=300)):
+    for p in molniya_kepler.iter(stop=timedelta(hours=36)):
         altitude.append(p.copy(form='spherical').r - p.frame.center.r)
         eccentricity.append(p.copy(form="keplerian").e)
         dates.append(p.date.datetime)
@@ -312,8 +306,7 @@ def test_man(orb):
     # g1 = fig.add_subplot(111)
     # g2 = g1.twinx()
     # p1, = g1.plot(dates, altitude, label="altitude", color="orange")
-    # p2, = g2.plot(dates[:80], eccentricity[:80], label="eccentricity")
-    # g2.plot(dates[150:], eccentricity[150:], label="eccentricity")
+    # p2, = g2.plot(dates, eccentricity, label="eccentricity")
 
     # g1.set_ylabel("Altitude (m)")
     # g2.set_ylabel("Eccentricity")
@@ -323,33 +316,35 @@ def test_man(orb):
     # plt.tight_layout()
     # plt.show()
 
-    alt_before = np.mean(altitude[:80])
-    alt_after = np.mean(altitude[150:])
+    # retrieve the index of the first point after the maneuver
+    man_idx = (np.array(dates) > man.date.datetime).argmax()
 
-    ecc_before = np.mean(eccentricity[:80])
-    ecc_after = np.mean(eccentricity[150:])
+    alt_before = np.mean(altitude[:man_idx])
+    alt_after = np.mean(altitude[man_idx:])
 
-    assert abs(ecc_before - 6.7e-4) < 1e-6
-    assert abs(ecc_after - 7.46e-4) < 1e-6
+    ecc_before = np.mean(eccentricity[:man_idx])
+    ecc_after = np.mean(eccentricity[man_idx:])
+
+    assert abs(ecc_before - 6.47e-1) < 2e-4
+    assert abs(ecc_after - 3e-3) < 2e-4
     # assert abs(ecc_after - 6.57e-4) < 1e-6
 
-    assert str(man1.date) == "2008-09-20T14:06:09.988586 UTC"
-    assert str(man2.date) == "2008-09-20T14:52:55.773122 UTC"
-    # assert str(man2.date) == "2008-09-20T14:52:28.201126 UTC"
+    assert str(man.date) == "2018-05-03T16:29:23.246451 UTC"
 
-    assert 97900 < alt_after - alt_before < 98000
+    # 8'000 km increment in altitude
+    assert 8000000 < alt_after - alt_before < 8200000
 
 
-def test_man_delta_a(orb):
+def test_man_delta_a(molniya_kepler):
 
-    # We try to dupplicate the change in altitude of the previous test
-    man1 = KeplerianImpulsiveMan(Date(2008, 9, 20, 13, 48, 21, 763091), delta_a=50000)
-    man2 = KeplerianImpulsiveMan(Date(2008, 9, 20, 14, 34, 39, 970298), delta_a=50000)
-    orb.maneuvers = [man1, man2]
+    apo = find_event('Apoapsis', molniya_kepler.iter(stop=timedelta(hours=26), listeners=ApsideListener()), offset=1)
+    man1 = KeplerianImpulsiveMan(apo.date, delta_a=5900000)
+
+    molniya_kepler.maneuvers = man1
 
     altitude = []
     dates = []
-    for p in orb.iter(stop=timedelta(minutes=300)):
+    for p in molniya_kepler.iter(stop=timedelta(hours=26)):
         altitude.append(p.copy(form='spherical').r - p.frame.center.r)
         dates.append(p.date.datetime)
 
@@ -357,21 +352,23 @@ def test_man_delta_a(orb):
     # plt.plot(dates, altitude)
     # plt.show()
 
-    before = np.mean(altitude[:80])
-    after = np.mean(altitude[140:])
+    man_idx = (np.array(dates) > man1.date.datetime).argmax()
 
-    assert 99000 < after - before < 101000
+    before = np.mean(altitude[:man_idx])
+    after = np.mean(altitude[man_idx:])
+
+    assert int(np.linalg.norm(man1._dv)) == 1477
+    assert 9100000 < after - before < 9200000
 
 
-def test_man_delta_i(orb):
+def test_man_delta_i(orbit_kepler):
 
-    asc = find_event("Asc Node", orb.iter(stop=timedelta(minutes=200), listeners=NodeListener()))
-
+    asc = find_event("Asc Node", orbit_kepler.iter(stop=timedelta(minutes=200), listeners=NodeListener()))
     man = KeplerianImpulsiveMan(asc.date, delta_angle=np.radians(5))
-    orb.maneuvers = man
+    orbit_kepler.maneuvers = man
 
     inclination, dates = [], []
-    for p in orb.iter(stop=timedelta(minutes=100)):
+    for p in orbit_kepler.iter(stop=timedelta(minutes=100)):
         inclination.append(p.copy(form="keplerian").i)
         dates.append(p.date.datetime)
 
@@ -384,6 +381,43 @@ def test_man_delta_i(orb):
     after = np.degrees(np.mean(inclination[-30:]))
 
     assert 4.99 < after - before <= 5.01
+
+
+@mark.parametrize("method", ["dv", "accel"])
+def test_man_continuous(method, molniya_kepler):
+
+    duration = timedelta(minutes=10)
+
+    apo = find_event('Apoapsis', molniya_kepler.iter(stop=timedelta(hours=26), listeners=ApsideListener()), offset=1)
+    
+    if method == "accel":
+        man1 = ContinuousMan(apo.date, duration, accel=[2.37834, 0, 0], frame="TNW", date_pos="median")
+    else:
+        man1 = ContinuousMan(apo.date, duration, dv=[1427, 0, 0], frame="TNW", date_pos="median")
+
+    molniya_kepler.maneuvers = man1
+
+    altitude = []
+    dates = []
+    for p in molniya_kepler.iter(stop=timedelta(hours=26)):
+        altitude.append(p.copy(form='spherical').r - p.frame.center.r)
+        dates.append(p.date.datetime)
+
+    # import matplotlib.pyplot as plt
+    # plt.figure()
+    # plt.plot(dates, altitude)
+    # plt.axvline(man1.start.datetime, linestyle=":", color="r", lw=1)
+    # plt.axvline(man1.stop.datetime, linestyle=":", color="r", lw=1)
+    # plt.grid(ls=":")
+    # plt.show()
+
+    man_idx_min = (np.array(dates) > man1.date.datetime - duration / 2).argmax()
+    man_idx_max = (np.array(dates) > man1.date.datetime + duration / 2).argmax()
+
+    before = np.mean(altitude[:man_idx_min])
+    after = np.mean(altitude[man_idx_max:])
+
+    assert 8100000 < after - before < 8200000
 
 
 def test_soi(jplfiles):
