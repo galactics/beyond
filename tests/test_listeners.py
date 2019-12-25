@@ -7,18 +7,6 @@ from beyond.io.tle import Tle
 from beyond.dates import Date, timedelta
 from beyond.orbits.listeners import *
 
-"""Here the reference in term of time is given by the TLE propagation.
-The ephemeris interpolation generate a little time difference, which is
-why we use an 'epsilon'.
-"""
-
-@fixture
-def molniya(common_env):
-
-    return Tle("""MOLNIYA 1-90
-1 24960U 97054A   18123.22759647  .00000163  00000-0  24467-3 0  9999
-2 24960  62.6812 182.7824 6470982 294.8616  12.8538  3.18684355160009""").orbit()
-
 
 def iter_listeners(orb, listeners, mode, **kwargs):
 
@@ -165,7 +153,11 @@ def test_radial_velocity(station, orbit, mode):
 @mark.parametrize('mode', modes)
 def test_true_anomaly(molniya, mode):
 
-    stop = molniya.infos.period
+    if isinstance(molniya, Ephem):
+        stop = molniya[0].infos.period
+    else:
+        stop = molniya.infos.period
+
     step = timedelta(minutes=10)
 
     events = iter_listeners(molniya, AnomalyListener(np.pi), mode, stop=stop, step=step)
@@ -200,7 +192,10 @@ def test_true_anomaly(molniya, mode):
 @mark.parametrize('mode', modes)
 def test_mean_anomaly(molniya, mode):
 
-    stop = molniya.infos.period
+    if isinstance(molniya, Ephem):
+        stop = molniya[0].infos.period
+    else:
+        stop = molniya.infos.period
     step = timedelta(minutes=10)
 
     events = iter_listeners(molniya, AnomalyListener(np.pi, "mean"), mode, stop=stop, step=step)
