@@ -1,15 +1,13 @@
-from numpy import sqrt, zeros, array, sign
+from numpy import zeros, array, sign, linalg
 from collections import namedtuple
 import logging
 
-from ..constants import G
 from .base import NumericalPropagator
 from ..dates import Date, timedelta
 from ..orbits.ephem import Ephem
-
+from ..orbits.man import ImpulsiveMan, ContinuousMan
 
 __all__ = ["Kepler", "SOIPropagator"]
-
 
 log = logging.getLogger(__name__)
 
@@ -111,8 +109,12 @@ class Kepler(NumericalPropagator):
 
             # Compute induced attraction to the object of interest
             diff = orb_body[:3] - orb[:3]
-            norm = sqrt(sum(diff ** 2)) ** 3
-            new_body[3:] += G * body.mass * diff / norm
+            norm = linalg.norm(diff) ** 3
+            new_body[3:] += body.µ * diff / norm
+
+        for man in self.orbit.maneuvers:
+            if isinstance(man, ContinuousMan) and man.check(date):
+                new_body[3:] += man.accel(orb, step)
 
         return new_body
 
@@ -137,8 +139,7 @@ class Kepler(NumericalPropagator):
         #     error = step.total_seconds() * (b - method['b_star']) @ ks
 
         for man in self.orbit.maneuvers:
-            if man.check(orb, step):
-                log.debug("Applying maneuver at {} ({})".format(man.date, man.comment))
+            if isinstance(man, ImpulsiveMan) and man.check(orb.date, step):
                 y_n_1[3:] += man.dv(y_n_1, step=step)
 
         return y_n_1
@@ -192,13 +193,11 @@ class Kepler(NumericalPropagator):
 
         for date in Date.range(start, stop, self.step):
             orb = self._make_step(orb, self.step)
-            # print(orb.maneuvers)
             ephem.append(orb)
 
         ephem = Ephem(ephem)
 
         for orb in ephem.iter(dates=dates, step=step, listeners=listeners):
-            # orb.maneuvers = self.orbit.maneuvers
             yield orb
 
 
@@ -323,6 +322,8 @@ class SOIPropagator(Kepler):
                     break
 
             start = orb.date
+
+            # Here the SoI is changed, see self.orbit setter
             self.orbit = orb
 
             if start < stop:

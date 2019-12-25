@@ -123,14 +123,14 @@ def orbit_continuous_man(orbit):
         ContinuousMan(
             Date(2008, 9, 20, 12, 41, 9, 984493),
             timedelta(minutes=3),
-            [280, 0, 0],
+            dv=[280, 0, 0],
             frame="TNW",
             comment="Maneuver 1",
         ),
         ContinuousMan(
             Date(2008, 9, 20, 13, 33, 11, 374985),
             timedelta(minutes=3),
-            [270, 0, 0],
+            dv=[270, 0, 0],
             frame="TNW",
         ),
     ]

@@ -98,7 +98,7 @@ def _load_opm_kvn(string):
                 ContinuousMan(
                     man["date"],
                     man["duration"],
-                    man["dv"],
+                    dv=man["dv"],
                     frame=man["frame"],
                     comment=man["comment"],
                     date_pos="start",
@@ -181,7 +181,7 @@ def _load_opm_xml(string):
                     ContinuousMan(
                         man["date"],
                         man["duration"],
-                        man["dv"],
+                        dv=man["dv"],
                         frame=man["frame"],
                         comment=man["comment"],
                         date_pos="start",

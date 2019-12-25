@@ -14,7 +14,7 @@ from .forms import get_form, Form
 from .ephem import Ephem
 from ..frames.frames import get_frame, orbit2frame
 from ..propagators import get_propagator
-from .man import ImpulsiveMan
+from .man import Man
 from .cov import Cov
 
 
@@ -201,7 +201,7 @@ Orbit =
         """
         mans = self.complements.setdefault("maneuvers", [])
 
-        if isinstance(mans, ImpulsiveMan):
+        if isinstance(mans, Man):
             mans = [mans]
             self.complements["maneuvers"] = mans
 
@@ -209,7 +209,7 @@ Orbit =
 
     @maneuvers.setter
     def maneuvers(self, mans):
-        if isinstance(mans, ImpulsiveMan):
+        if isinstance(mans, Man):
             mans = [mans]
 
         self.complements["maneuvers"] = mans
