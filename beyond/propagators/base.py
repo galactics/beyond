@@ -1,6 +1,5 @@
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
-from collections.abc import Iterable
 
 from ..dates import Date
 from ..orbits.listeners import Speaker

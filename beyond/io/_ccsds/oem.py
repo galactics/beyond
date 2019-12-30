@@ -1,7 +1,6 @@
 import numpy as np
 import lxml.etree as ET
 
-from ...dates import Date
 from ...utils import units
 from ...orbits import Orbit, Ephem
 
