@@ -94,7 +94,9 @@ class Measure(metaclass=ABCMeta):
     def __sub__(self, other):
         if self.__class__ != other.__class__:
             raise TypeError(
-                "Impossible to compute residuals for different measures types"
+                "Impossible to compute residuals for different measures types {} != {}".format(
+                    self.__class__, other.__class__
+                )
             )
 
         if self.date != other.date:
@@ -119,20 +121,21 @@ class StationMeasure(Measure):
 class Azimut(StationMeasure):
     def from_orbit(self, orb):
         return self.__class__(
-            orb.date, orb.copy(frame=self.frame, form="spherical").theta
+            self.path, orb.date, orb.copy(frame=self.frame, form="spherical").theta
         )
 
 
 class Elevation(StationMeasure):
     def from_orbit(self, orb):
         return self.__class__(
-            orb.date, orb.copy(frame=self.frame, form="spherical").phi
+            self.path, orb.date, orb.copy(frame=self.frame, form="spherical").phi
         )
 
 
 class Range(StationMeasure):
     def from_orbit(self, orb):
         return self.__class__(
+            self.path,
             orb.date,
             orb.copy(frame=self.frame, form="spherical").r * (len(self.path) - 1),
         )
@@ -141,7 +144,7 @@ class Range(StationMeasure):
 class Doppler(StationMeasure):
     def from_orbit(self, orb):
         return self.__class__(
-            orb.date, orb.copy(frame=self.frame, form="spherical").r_dot
+            self.path, orb.date, orb.copy(frame=self.frame, form="spherical").r_dot
         )
 
 
