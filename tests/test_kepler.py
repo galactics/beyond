@@ -61,6 +61,28 @@ def count_steps(td, step, inclusive=True):
     return abs(td) // step + inclusive
 
 
+def plot_delta_a(dates, altitude, eccentricity=None):
+
+    import matplotlib.pyplot as plt
+    fig = plt.figure()
+
+    g1 = fig.add_subplot(111)
+    p1, = g1.plot(dates, altitude, label="altitude", color="orange")
+    g1.set_ylabel("Altitude (m)")
+    g1.yaxis.label.set_color(p1.get_color())
+    g1.grid(ls=":")
+
+    if eccentricity:
+        g2 = g1.twinx()
+        p2, = g2.plot(dates, eccentricity, label="eccentricity")
+        g2.set_ylabel("Eccentricity")
+        g2.yaxis.label.set_color(p2.get_color())
+        g2.set_yscale('log')
+
+    plt.tight_layout()
+    plt.show()
+
+
 def test_propagate_rk4(orbit_kepler):
 
     orbit_kepler.propagator.method = Kepler.RK4
@@ -276,7 +298,7 @@ def test_listener(orbit_kepler):
         assert events[1].event.info == "Apoapsis"
 
 
-def test_man(molniya_kepler):
+def test_man_impulsive(molniya_kepler):
 
     # Test of a circularisation of a molniya orbit
     # At apogee, this is roughly 1400 m/s
@@ -301,20 +323,7 @@ def test_man(molniya_kepler):
         eccentricity.append(p.copy(form="keplerian").e)
         dates.append(p.date.datetime)
 
-    # import matplotlib.pyplot as plt
-    # fig = plt.figure()
-    # g1 = fig.add_subplot(111)
-    # g2 = g1.twinx()
-    # p1, = g1.plot(dates, altitude, label="altitude", color="orange")
-    # p2, = g2.plot(dates, eccentricity, label="eccentricity")
-
-    # g1.set_ylabel("Altitude (m)")
-    # g2.set_ylabel("Eccentricity")
-    # g1.yaxis.label.set_color(p1.get_color())
-    # g2.yaxis.label.set_color(p2.get_color())
-    # g2.set_yscale('log')
-    # plt.tight_layout()
-    # plt.show()
+    # plot_delta_a(dates, altitude, eccentricity)
 
     # retrieve the index of the first point after the maneuver
     man_idx = (np.array(dates) > man.date.datetime).argmax()
@@ -348,9 +357,7 @@ def test_man_delta_a(molniya_kepler):
         altitude.append(p.copy(form='spherical').r - p.frame.center.r)
         dates.append(p.date.datetime)
 
-    # import matplotlib.pyplot as plt
-    # plt.plot(dates, altitude)
-    # plt.show()
+    # plot_delta_a(dates, altitude)
 
     man_idx = (np.array(dates) > man1.date.datetime).argmax()
 
@@ -390,29 +397,25 @@ def test_man_continuous(method, molniya_kepler):
 
     apo = find_event('Apoapsis', molniya_kepler.iter(stop=timedelta(hours=26), listeners=ApsideListener()), offset=1)
     
-    if method == "accel":
-        man1 = ContinuousMan(apo.date, duration, accel=[2.37834, 0, 0], frame="TNW", date_pos="median")
-    else:
+    if method == "dv":
         man1 = ContinuousMan(apo.date, duration, dv=[1427, 0, 0], frame="TNW", date_pos="median")
+    else:
+        man1 = ContinuousMan(apo.date, duration, accel=[2.37834, 0, 0], frame="TNW", date_pos="median")
 
     molniya_kepler.maneuvers = man1
 
     altitude = []
+    eccentricity = []
     dates = []
     for p in molniya_kepler.iter(stop=timedelta(hours=26)):
         altitude.append(p.copy(form='spherical').r - p.frame.center.r)
+        eccentricity.append(p.copy(form="keplerian").e)
         dates.append(p.date.datetime)
 
-    # import matplotlib.pyplot as plt
-    # plt.figure()
-    # plt.plot(dates, altitude)
-    # plt.axvline(man1.start.datetime, linestyle=":", color="r", lw=1)
-    # plt.axvline(man1.stop.datetime, linestyle=":", color="r", lw=1)
-    # plt.grid(ls=":")
-    # plt.show()
+    # plot_delta_a(dates, altitude, eccentricity)
 
-    man_idx_min = (np.array(dates) > man1.date.datetime - duration / 2).argmax()
-    man_idx_max = (np.array(dates) > man1.date.datetime + duration / 2).argmax()
+    man_idx_min = (np.array(dates) > man1.start.datetime).argmax()
+    man_idx_max = (np.array(dates) > man1.stop.datetime).argmax()
 
     before = np.mean(altitude[:man_idx_min])
     after = np.mean(altitude[man_idx_max:])
