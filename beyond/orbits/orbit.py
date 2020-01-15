@@ -407,21 +407,57 @@ class OrbitInfos:
         return self.orb.frame.center.mu
 
     @property
+    def type(self):
+        for t in "elliptic hyperbolic parabolic".split():
+            if getattr(self, t):
+                return t
+
+    @property
+    def elliptic(self):
+        """True if the orbit it elliptic
+        """
+        return self.kep.e < 1
+
+    @property
+    def parabolic(self):
+        """True if the orbit it parabolic
+        """
+        return self.kep.e == 1
+
+    @property
+    def hyperbolic(self):
+        """True if the orbit it hyperbolic
+        """
+        return self.kep.e > 1
+
+    @property
     def energy(self):
         """Mechanical energy of the orbit
         """
         return -self.mu / (2 * self.kep.a)
 
     @property
+    def n(self):
+        """Mean motion
+        """
+        return np.sqrt(self.mu / self.kep.a ** 3)
+
+    @property
     def period(self):
         """Period of the orbit as a timedelta
         """
+        if not self.elliptic:
+            raise ValueError("period undefined : orbit is hyperbolic")
+
         return timedelta(seconds=2 * np.pi * np.sqrt(self.kep.a ** 3 / self.mu))
 
     @property
     def apocenter(self):
         """Radius of the apocenter
         """
+        if not self.elliptic:
+            raise ValueError("apocenter undefined : orbit is hyperbolic")
+
         return self.kep.a * (1 + self.kep.e)
 
     @property
@@ -432,6 +468,8 @@ class OrbitInfos:
 
     @property
     def r(self):
+        """Instantaneous radius
+        """
         return self.sphe.r
 
     @property
@@ -448,12 +486,17 @@ class OrbitInfos:
 
     @property
     def v(self):
+        """Instantaneous velocity
+        """
         return np.sqrt(self.mu * (2 / self.r - 1 / self.kep.a))
 
     @property
     def va(self):
         """Velocity at apocenter
         """
+        if not self.elliptic:
+            raise ValueError("va undefined : orbit not elliptic")
+
         return np.sqrt(self.mu * (2 / (self.ra) - 1 / self.kep.a))
 
     @property
@@ -461,6 +504,23 @@ class OrbitInfos:
         """Velocity at pericenter
         """
         return np.sqrt(self.mu * (2 / (self.rp) - 1 / self.kep.a))
+
+    @property
+    def vinf(self):
+        """Hyperbolic excess velocity
+        """
+        if not self.hyperbolic:
+            raise ValueError("vinf undefined : orbit not hyperbolic")
+        return np.sqrt(self.mu / abs(self.kep.a))
+
+    @property
+    def dinf(self):
+        """Distance between the focus and the asymptote
+        """
+        if not self.hyperbolic:
+            raise ValueError("dinf undefined : orbit not hyperbolic")
+
+        return abs(self.kep.a * self.kep.e) * np.sqrt(1 - (1 / self.kep.e) ** 2)
 
     @property
     def cos_fpa(self):
