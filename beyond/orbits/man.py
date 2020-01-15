@@ -262,6 +262,8 @@ def dkep2dv(orb, *, delta_a=0, delta_angle=0):
     dv_a = orb.frame.center.mu * delta_a / (2 * orb.infos.v * orb.infos.kep.a ** 2)
 
     v_final = orb.infos.v + dv_a
+
+    # Al-Kashi
     dv = np.sqrt(
         orb.infos.v ** 2
         + v_final ** 2
@@ -276,7 +278,7 @@ def dkep2dv(orb, *, delta_a=0, delta_angle=0):
     if np.isclose(ratio, 1):
         dv_w = 0
     else:
-        alpha = np.arccos(ratio)
-        dv_w = dv * np.sin(alpha)
+        # equivalent to dv_w = dv * np.sin(np.arccos(ratio))
+        dv_w = dv * np.sqrt(1 - ratio ** 2)
 
     return np.array([dv_t, 0, dv_w])
