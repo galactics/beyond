@@ -23,7 +23,7 @@ class Body:
     """Generic class for the description of physical characteristics of celestial body
     """
 
-    def __init__(self, name, mass, equatorial_radius, *, flattening=1):
+    def __init__(self, name, mass, equatorial_radius, *, flattening=1, **kwargs):
         self.name = name
         """Name of the celestial body"""
         self.mass = mass
@@ -32,6 +32,9 @@ class Body:
         """Equatorial radius of the celestial body"""
         self.flattening = flattening
         """Flattening of the celestial body"""
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
     def __repr__(self):
         return "<Body '%s'>" % self.name
@@ -74,6 +77,8 @@ Earth = Body(
     mass=5.97237e24,
     equatorial_radius=6378136.3,
     flattening=1 / 298.257223563,
+    J2=1.08262668355315130e-3,
+    J3=-2.532243534e-6,
 )
 """Earth physical characteristics"""
 

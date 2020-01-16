@@ -40,3 +40,27 @@ def test_wrong_none(iss_tle):
 
     with raises(UnknownPropagatorError):
         orbit.propagate(timedelta(minutes=12))
+
+
+def test_kepler(iss_tle):
+
+    orbit = iss_tle.orbit().copy(form="keplerian", frame="EME2000")
+    orbit.propagator = "Kepler"
+
+    # Test that the orbit is perfectly periodic, and that nothing comes
+    # to perturbate the path of the orbit
+    orb2 = orbit.propagate(orbit.infos.period).copy(form="keplerian")
+
+    assert orbit.date + orbit.infos.period == orb2.date
+    assert_almost_equal(orbit.tolist(), orb2.tolist())
+
+
+def test_j2(iss_tle):
+    orbit = iss_tle.orbit().copy(form="keplerian", frame="EME2000")
+    orbit.propagator = "J2"
+
+    orb2 = orbit.propagate(orbit.infos.period).copy(form="keplerian")
+
+    assert orbit.date + orbit.infos.period == orb2.date
+    # a, e and i should not be modified
+    assert_almost_equal(np.asarray(orbit[:3]), np.asarray(orb2[:3]))

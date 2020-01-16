@@ -14,12 +14,16 @@ def get_propagator(name):
         Propagator class
     """
 
+    from .j2 import J2
+    from .kepler import Kepler
     from .keplernum import KeplerNum
     from .none import NonePropagator
     from .sgp4 import Sgp4
     from .sgp4beta import Sgp4Beta
 
     scope = {
+        "J2": J2,
+        "Kepler": Kepler,
         "KeplerNum": KeplerNum,
         "NonePropagator": NonePropagator,
         "Sgp4": Sgp4,

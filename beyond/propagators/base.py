@@ -18,6 +18,7 @@ class Propagator(metaclass=ABCMeta):
     @abstractmethod
     def propagate(self, date):
         """Propagate the orbit to a given date
+
         Args:
             date (Date)
         Return:
