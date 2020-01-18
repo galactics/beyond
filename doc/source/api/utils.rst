@@ -14,3 +14,9 @@ Node
 .. automodule:: beyond.utils.node
     :members:
     :show-inheritance:
+
+Beta
+----
+
+.. automodule:: beyond.utils.beta
+    :members:
