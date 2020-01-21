@@ -21,6 +21,12 @@ Beta
 .. automodule:: beyond.utils.beta
     :members:
 
+LTAN
+----
+
+.. automodule:: beyond.utils.ltan
+    :members:
+
 Constellation
 -------------
 
