@@ -20,3 +20,17 @@ Beta
 
 .. automodule:: beyond.utils.beta
     :members:
+
+Constellation
+-------------
+
+.. automodule:: beyond.utils.constellation
+    :members:
+    :special-members: __init__
+    :show-inheritance:
+
+LEO
+---
+
+.. automodule:: beyond.utils.leo
+    :members:
