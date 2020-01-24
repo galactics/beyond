@@ -20,6 +20,7 @@ class Form(Node):
     alt = {
         "theta": "θ",
         "phi": "φ",
+        "raan": "Ω",
         "Omega": "Ω",
         "omega": "ω",
         "nu": "ν",
