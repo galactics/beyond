@@ -27,7 +27,6 @@ class Speaker(metaclass=ABCMeta):
     By calling :py:meth:`listen`, the subclass can trigger the listeners.
     """
 
-    SPEAKER_MODE = "global"
     _eps_bisect = timedelta.resolution
 
     def listen(self, orb, listeners):
@@ -69,10 +68,7 @@ class Speaker(metaclass=ABCMeta):
 
         while abs(step) >= self._eps_bisect:
             date = begin.date + step
-            if self.SPEAKER_MODE == "global":
-                orb = self.propagate(date)
-            else:
-                orb = begin.propagate(date)
+            orb = self.propagate(date)
             if listener(begin) * listener(orb) > 0:
                 begin = orb
             else:

@@ -26,8 +26,6 @@ class KeplerNum(NumericalPropagator):
     DOPRI = "dopri"
     FRAME = "EME2000"
 
-    SPEAKER_MODE = "iterative"
-
     # Butcher tableau of the different methods available
     BUTCHER = {
         EULER: {"a": array([]), "b": array([1]), "c": array([0])},
