@@ -13,7 +13,7 @@ from ..errors import OrbitError
 from .forms import get_form, Form
 from .ephem import Ephem
 from ..frames.frames import get_frame, orbit2frame
-from ..propagators import get_propagator
+from ..propagators import Propagator, get_propagator, UnknownPropagatorError
 from .man import Man
 from .cov import Cov
 
@@ -299,7 +299,7 @@ Orbit =
     @propagator.setter
     def propagator(self, new_propagator):
 
-        if isinstance(new_propagator, str) or new_propagator is None:
+        if isinstance(new_propagator, str):
             new_propagator = get_propagator(new_propagator)()
 
         self._propagator = new_propagator
@@ -327,6 +327,9 @@ Orbit =
         Return:
             Orbit
         """
+
+        if not isinstance(self.propagator, Propagator):
+            raise UnknownPropagatorError(self.propagator)
 
         if self.propagator.orbit is not self:
             self.propagator.orbit = self
