@@ -3,6 +3,22 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [Unreleased]
+
+### Added
+
+- OrbitInfo for hyperbolic orbits
+- Kepler and J2 analytical propagators
+- Beta angle computation
+- Constellation and LEO builder
+- Local Time at Ascending Node computation module
+
+### Modified
+
+- ZeroDoppler listeners renamed as RadialVelocity
+- The Kepler numerical propagator (now renamed as KeplerNum) use Ephem objects for interpolation
+- NonePropagator is not used anymore when ``orb.propagator = None``
+
 ## [v0.6.8] - 2019-12-08
 
 ### Added
