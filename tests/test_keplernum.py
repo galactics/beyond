@@ -7,7 +7,7 @@ from unittest.mock import patch
 import beyond.io.ccsds as ccsds
 from beyond.dates import Date, timedelta
 from beyond.io.tle import Tle
-from beyond.propagators.kepler import Kepler, SOIPropagator
+from beyond.propagators.keplernum import KeplerNum, SOIPropagator
 from beyond.env.solarsystem import get_body
 from beyond.orbits.listeners import LightListener, NodeListener, find_event, ApsideListener
 from beyond.orbits.man import ImpulsiveMan, KeplerianImpulsiveMan, ContinuousMan, KeplerianContinuousMan
@@ -20,7 +20,7 @@ def orbit_kepler(iss_tle):
 
     orbit = iss_tle.orbit()
 
-    orbit.propagator = Kepler(
+    orbit.propagator = KeplerNum(
         timedelta(seconds=60),
         bodies=get_body('Earth')
     )
@@ -33,7 +33,7 @@ def molniya_kepler(molniya_tle):
 
     molniya = molniya_tle.orbit()
 
-    molniya.propagator = Kepler(
+    molniya.propagator = KeplerNum(
         timedelta(seconds=120),
         bodies=get_body('Earth')
     )
@@ -43,7 +43,7 @@ def molniya_kepler(molniya_tle):
 
 @contextmanager
 def mock_step(orb):
-    with patch('beyond.propagators.kepler.Kepler._make_step', wraps=orb.propagator._make_step) as mock:
+    with patch('beyond.propagators.keplernum.KeplerNum._make_step', wraps=orb.propagator._make_step) as mock:
         yield mock
 
 
@@ -85,7 +85,7 @@ def plot_delta_a(dates, altitude, eccentricity=None):
 
 def test_propagate_rk4(orbit_kepler):
 
-    orbit_kepler.propagator.method = Kepler.RK4
+    orbit_kepler.propagator.method = KeplerNum.RK4
 
     assert orbit_kepler.date == Date(2018, 5, 4, 13, 20, 47, 630976)
 
@@ -132,7 +132,7 @@ def test_micro_step(orbit_kepler):
 
 def test_propagate_euler(orbit_kepler):
 
-    orbit_kepler.propagator.method = Kepler.EULER
+    orbit_kepler.propagator.method = KeplerNum.EULER
 
     assert orbit_kepler.date == Date(2018, 5, 4, 13, 20, 47, 630976)
 
@@ -155,7 +155,7 @@ def test_propagate_euler(orbit_kepler):
 
 def test_propagate_dopri(orbit_kepler):
 
-    orbit_kepler.propagator.method = Kepler.DOPRI
+    orbit_kepler.propagator.method = KeplerNum.DOPRI
 
     assert orbit_kepler.date == Date(2018, 5, 4, 13, 20, 47, 630976)
 

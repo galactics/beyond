@@ -7,7 +7,7 @@ from beyond.config import config
 from beyond.dates.eop import Eop
 from beyond.frames.stations import create_station
 from beyond.io.tle import Tle
-from beyond.propagators.kepler import Kepler
+from beyond.propagators.keplernum import KeplerNum
 from beyond.dates import Date, timedelta
 from beyond.env.solarsystem import get_body
 
@@ -71,7 +71,7 @@ def orbit(request, iss_tle):
 
         return orb.ephem(start=start, stop=stop, step=step)
     elif request.param == "kepler":
-        orb.propagator = Kepler(
+        orb.propagator = KeplerNum(
             timedelta(seconds=60),
             get_body('Earth')
         )

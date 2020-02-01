@@ -7,7 +7,7 @@ from itertools import product
 from beyond.orbits.man import ImpulsiveMan, ContinuousMan
 from beyond.io.tle import Tle
 from beyond.dates import Date, timedelta
-from beyond.propagators.kepler import Kepler
+from beyond.propagators.keplernum import KeplerNum
 from beyond.env.solarsystem import get_body
 
 
@@ -102,7 +102,7 @@ def orbit_cov(orbit):
 @fixture
 def orbit_man(orbit):
     orbit = orbit.copy()
-    orbit.propagator = Kepler(get_body("Earth"), timedelta(seconds=60))
+    orbit.propagator = KeplerNum(get_body("Earth"), timedelta(seconds=60))
     orbit.maneuvers = [
         ImpulsiveMan(
             Date(2008, 9, 20, 12, 41, 9, 984493),
@@ -118,7 +118,7 @@ def orbit_man(orbit):
 @fixture
 def orbit_continuous_man(orbit):
     orbit = orbit.copy()
-    orbit.propagator = Kepler(get_body("Earth"), timedelta(seconds=60))
+    orbit.propagator = KeplerNum(get_body("Earth"), timedelta(seconds=60))
     orbit.maneuvers = [
         ContinuousMan(
             Date(2008, 9, 20, 12, 41, 9, 984493),

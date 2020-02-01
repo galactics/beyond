@@ -7,12 +7,12 @@ from ..dates import Date, timedelta
 from ..orbits.ephem import Ephem
 from ..orbits.man import ImpulsiveMan, ContinuousMan
 
-__all__ = ["Kepler", "SOIPropagator"]
+__all__ = ["KeplerNum", "SOIPropagator"]
 
 log = logging.getLogger(__name__)
 
 
-class Kepler(NumericalPropagator):
+class KeplerNum(NumericalPropagator):
     """Keplerian motion numerical propagator
 
     This propagator provide three methods of propagation ``euler``, ``rk4`` and
@@ -204,8 +204,8 @@ class Kepler(NumericalPropagator):
 SOI = namedtuple("SOI", "radius frame")
 
 
-class SOIPropagator(Kepler):
-    """Kepler propagator capable of switching between the Sphere of Influence of
+class SOIPropagator(KeplerNum):
+    """KeplerNum propagator capable of switching between the Sphere of Influence of
     different solar system bodies
     """
 
@@ -222,7 +222,7 @@ class SOIPropagator(Kepler):
     }
 
     def __init__(
-        self, central_step, alt_step, central, alt, *, method=Kepler.RK4, frame=None
+        self, central_step, alt_step, central, alt, *, method=KeplerNum.RK4, frame=None
     ):
         """
         Args:
@@ -232,7 +232,7 @@ class SOIPropagator(Kepler):
                 influence of an alternate body
             central (Body): Central body
             alt (list of Body): Objects to potentially use
-            method (str): Method of extrapolation (see :py:class:`Kepler`)
+            method (str): Method of extrapolation (see :py:class:`KeplerNum`)
             frame (str): Frame of the resulting extrapolation. If ``None``, the
                 result will change frame depending on the sphere of influence
                 it is in
@@ -286,7 +286,7 @@ class SOIPropagator(Kepler):
         return active
 
     def _change_soi(self, body):
-        """Modify the inner parameters of the Kepler propagator in order to place
+        """Modify the inner parameters of the KeplerNum propagator in order to place
         the spacecraft in the right Sphere of Influence
         """
 

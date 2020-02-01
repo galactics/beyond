@@ -49,8 +49,8 @@ being WGS72.
 .. autoclass:: beyond.propagators.sgp4beta.WGS72
 .. autoclass:: beyond.propagators.sgp4beta.WGS84
 
-Kepler
-------
+KeplerNum
+---------
 
 Basic Keplerian propagator, computing the position of the next iteration by integrating
 of the acceleration components applied to the satellite by numerous bodies (Earth, Moon, Sun, etc.).
@@ -58,7 +58,7 @@ This propagator is currently in development.
 
 This propagator is able do handle maneuvers, as exposed in the :ref:`maneuvers` example.
 
-.. automodule:: beyond.propagators.kepler
+.. automodule:: beyond.propagators.keplernum
     :members:
     :special-members: __init__
     :show-inheritance:
