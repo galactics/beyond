@@ -40,3 +40,9 @@ LEO
 
 .. automodule:: beyond.utils.leo
     :members:
+
+Lambert's problem
+-----------------
+
+.. automodule:: beyond.utils.lambert
+    :members:

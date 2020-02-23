@@ -14,6 +14,7 @@ Each release is linked to a git commit.
 - Local Time at Ascending Node computation module
 - Real adaptive step size for KeplerNum propagator
 - Runge-Kutta-Fehlberg method for KeplerNum
+- Lambert's problem solver
 
 ### Modified
 
