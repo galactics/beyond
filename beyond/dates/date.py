@@ -532,3 +532,4 @@ else:  # pragma: no cover
             return values
 
     munits.registry.setdefault(Date, DateConverter())
+    munits.registry.setdefault(DateRange, DateConverter())
