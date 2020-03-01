@@ -21,6 +21,8 @@ Available forms are
 
 .. autodata:: beyond.orbits.forms.KEPL_C
 
+.. autodata:: beyond.orbits.forms.KEPL_E
+
 
 Orbit
 -----

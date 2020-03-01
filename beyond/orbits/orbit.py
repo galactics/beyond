@@ -443,7 +443,7 @@ class OrbitInfos:
     def n(self):
         """Mean motion
         """
-        return np.sqrt(self.mu / self.kep.a ** 3)
+        return np.sqrt(self.mu / abs(self.kep.a) ** 3)
 
     @property
     def period(self):

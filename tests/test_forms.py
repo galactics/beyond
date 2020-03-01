@@ -4,7 +4,7 @@ import numpy as np
 
 from beyond.dates import Date
 from beyond.orbits import Orbit
-from beyond.orbits.forms import TLE, KEPL_C, KEPL_M, KEPL, SPHE, CART
+from beyond.orbits.forms import TLE, KEPL_E, KEPL_C, KEPL_M, KEPL, SPHE, CART
 
 
 @fixture
@@ -92,6 +92,20 @@ def ref_tle(ref_date):
         TLE,
         "EME2000",
         "Sgp4"
+    )
+
+
+@fixture
+def ref_kepl_hyper(ref_date):
+    return Orbit(
+        ref_date,
+        [
+            -7192631.11295, 1.00218439, 1.71926101045,
+            5.51044449998, 1.17890601985, 0.1,
+        ],
+        KEPL,
+        "EME2000",
+        None
     )
 
 
@@ -207,3 +221,48 @@ def test_tle(ref_tle):
         7.19263113e+06, 2.18439000e-03, 1.71926101e+00,
         5.51044450e+00, 1.17890602e+00, 3.04334144e+00
     ])
+
+
+def test_hyperbolic(ref_kepl_hyper):
+
+    def to_orbit(arr, form):
+        return Orbit(
+            ref_kepl_hyper.date,
+            arr,
+            form,
+            ref_kepl_hyper.frame,
+            None
+        )
+
+    # To cartesian ...
+    cart = to_orbit(KEPL(ref_kepl_hyper, CART), CART.name)
+    assert np.allclose(cart, [
+        1687.60352732, -4761.78462622, 14918.72031867,
+        -159632.45044557, 140048.25302776, 74649.10622557
+    ])
+
+    # ... and back
+    kepl_h = CART(cart, KEPL)
+    assert np.allclose(kepl_h, ref_kepl_hyper)
+
+    # To keplerian eccentric ...
+    kepl_e = to_orbit(KEPL(ref_kepl_hyper, KEPL_E), KEPL_E.name)
+    assert np.allclose(kepl_e, [
+        -7.19263111e+06, 1.00218439e+00, 1.71926101e+00,
+        5.51044450e+00, 1.17890602e+00, 3.30579237e-03
+    ])
+
+    # ... and back
+    kepl_h = to_orbit(KEPL_E(kepl_e, KEPL), KEPL.name)
+    assert np.allclose(kepl_h, ref_kepl_hyper)
+
+    # To Keplerian mean ...
+    kepl_m = to_orbit(KEPL_E(kepl_e, KEPL_M), KEPL_M.name)
+    assert np.allclose(kepl_m, [
+        -7.19263111e+06, 1.00218439e+00, 1.71926101e+00,
+        5.51044450e+00, 1.17890602e+00, 7.22717405e-06
+    ])
+
+    # ... and back
+    kepl_e2 = to_orbit(KEPL_M(kepl_m, KEPL_E), KEPL_E.name)
+    assert np.allclose(kepl_e, kepl_e2)
