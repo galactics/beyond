@@ -155,7 +155,7 @@ def test_propagate_euler(orbit_kepler):
 
 def test_propagate_dopri(orbit_kepler):
 
-    orbit_kepler.propagator.method = KeplerNum.DOPRI
+    orbit_kepler.propagator.method = KeplerNum.DOPRI54
 
     assert orbit_kepler.date == Date(2018, 5, 4, 13, 20, 47, 630976)
 

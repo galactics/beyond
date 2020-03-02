@@ -19,11 +19,25 @@ class KeplerNum(NumericalPropagator):
     ``dopri``
     See `Runge-Kutta methods <https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods>`__
     for details.
+
+    For adaptive step size, the highest order is used to compute the next
+    state, and the lowest to determine the error and adapt the stepsize.
+    For example RKF54 use order 5 for state computation, and order 4 for
+    error estimation.
     """
 
     RK4 = "rk4"
+    """Runge-Kutta 4th order fixed stepsize integrator"""
+
+    RKF54 = "rkf54"
+    """Runge-Kutta 5th order adaptive stepsize integrator"""
+
     EULER = "euler"
-    DOPRI = "dopri"
+    """Euler fixed-step integrator"""
+
+    DOPRI54 = "dopri54"
+    """Dormand-Prince 5th order adaptive stepsize integrator"""
+
     FRAME = "EME2000"
 
     # Butcher tableau of the different methods available
@@ -34,7 +48,20 @@ class KeplerNum(NumericalPropagator):
             "b": array([1 / 6, 1 / 3, 1 / 3, 1 / 6]),
             "c": array([0, 1 / 2, 1 / 2, 1]),
         },
-        DOPRI: {
+        RKF54: {
+            "a": [
+                [],
+                array([1 / 4]),
+                array([3 / 32, 9 / 32]),
+                array([1932 / 2197, -7200 / 2197, 7296 / 2197]),
+                array([439 / 216, -8, 3680 / 513, -845 / 4104]),
+                array([-8 / 27, 2, -3544 / 2565, 1859 / 4104, -11 / 40]),
+            ],
+            "b": array([16 / 135, 0, 6656 / 12825, 28561 / 56430, -9 / 50, 2 / 55]),
+            "b_star": array([25 / 216, 0, 1408 / 2565, 2197 / 4104, -1 / 5, 0]),
+            "c": array([0, 1 / 4, 3 / 8, 12 / 13, 1, 1 / 2]),
+        },
+        DOPRI54: {
             "a": [
                 [],
                 array([1 / 5]),
@@ -65,7 +92,7 @@ class KeplerNum(NumericalPropagator):
         Args:
             step (datetime.timedelta): Step size of the propagator
             bodies (tuple): List of bodies to take into account
-            method (str): Integration method (:py:attr:`DOPRI`, :py:attr:`RK4` or :py:attr:`EULER`)
+            method (str): Integration method (see class attributes)
             frame (str): Frame to use for the propagation
             tol (float): Error tolerance for adaptive stepsize methods
         """
@@ -139,9 +166,9 @@ class KeplerNum(NumericalPropagator):
             y_n_1 = y_n + step.total_seconds() * bb @ ks
             y_n_1.date = y_n.date + step
 
-            # Error estimation, in cases where adaptively methods are used
+            # Error estimation, in cases where adaptive stepsize methods are used
             if "b_star" not in self.butcher:
-                # This is not an adaptative step method, there is no need to iterate
+                # This is not an adaptive stepsize method, there is no need to iterate
                 # here
                 break
 
