@@ -18,6 +18,7 @@ __all__ = [
     "NodeListener",
     "AnomalyListener",
     "RadialVelocityListener",
+    "find_event",
 ]
 
 
@@ -28,6 +29,14 @@ class Speaker(metaclass=ABCMeta):
     """
 
     _eps_bisect = timedelta.resolution
+
+    @classmethod
+    def clear_listeners(cls, listeners):
+        if isinstance(listeners, Listener):
+            listeners = [listeners]
+
+        for listener in listeners:
+            listener.clear()
 
     def listen(self, orb, listeners):
         """This method allows to loop over the listeners and trigger the :py:meth:`_bisect` method
@@ -110,6 +119,9 @@ class Listener(metaclass=ABCMeta):
     @abstractmethod
     def __call__(self, orb):  # pragma: no cover
         pass
+
+    def clear(self):
+        self.prev = None
 
 
 class Event:

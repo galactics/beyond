@@ -261,3 +261,106 @@ def test_aol(orbit, mode):
 
     with raises(StopIteration):
         next(events)
+
+
+def test_find_event(orbit):
+
+    kwargs = {
+        "start": Date(2018, 4, 5, 16, 50),
+        "stop": timedelta(minutes=200),
+        "step": timedelta(minutes=3),
+        "listeners": AnomalyListener(3 * np.pi / 2, "aol")
+    }
+
+    orb_iterator = orbit.iter(**kwargs)
+
+    p = find_event("Argument of Latitude = 270.00", orb_iterator)
+
+    assert abs(p.date - Date(2018,  4, 5, 17, 10, 49, 816867)).total_seconds() < 1.8e-5
+    assert p.event.info == "Argument of Latitude = 270.00"
+
+
+def test_find_event_offset(orbit):
+
+    kwargs = {
+        "start": Date(2018, 4, 5, 16, 50),
+        "stop": timedelta(minutes=200),
+        "step": timedelta(minutes=3),
+        "listeners": AnomalyListener(3 * np.pi / 2, "aol")
+    }
+
+    orb_iterator = orbit.iter(**kwargs)
+    p = find_event("Argument of Latitude = 270.00", orb_iterator, offset=1)
+
+    assert abs(p.date - Date(2018,  4, 5, 18, 43, 25, 683360)).total_seconds() < 1.8e-5
+    assert p.event.info == "Argument of Latitude = 270.00"
+
+
+def test_find_event_two_calls(orbit):
+
+    # Multiple calls to find_event should not be problematic
+    # In this case, the second call to find_event should return
+    # an Orbit object which date is at 18:43:25, but instead
+    # gives the first result at 17:10:49.
+    # By looking at what the iterator does, it seems that the
+    # events_iterator yields two Orbit at the same date, then
+    # a third at the expected date of 18:43:25
+    # This problem disappears if the iterator is flattened
+    # with ``orb_iterator = list(orbit.iter(**kwargs))``
+
+    # It does not make sense that this test does not pass, but the next
+    # (test_find_event_two_calls_bis) does. It drives me MAAAAD !
+
+    kwargs = {
+        "start": Date(2018, 4, 5, 16, 50),
+        "stop": timedelta(minutes=200),
+        "step": timedelta(minutes=3),
+        "listeners": AnomalyListener(3 * np.pi / 2, "aol")
+    }
+
+    orb_iterator = orbit.iter(**kwargs)
+
+    p = find_event("Argument of Latitude = 270.00", orb_iterator)
+
+    assert abs(p.date - Date(2018, 4, 5, 17, 10, 49, 816867)).total_seconds() < 1.8e-5
+    assert p.event.info == "Argument of Latitude = 270.00"
+
+    orb_iterator = orbit.iter(**kwargs)
+    p = find_event("Argument of Latitude = 270.00", orb_iterator, offset=1)
+
+    assert abs(p.date - Date(2018,  4, 5, 18, 43, 25, 683360)).total_seconds() < 1.8e-5
+    assert p.event.info == "Argument of Latitude = 270.00"
+
+    orb_iterator = orbit.iter(**kwargs)
+    with raises(RuntimeError):
+        find_event("Argument of Latitude = 270.00", orb_iterator, offset=2)
+
+
+def test_find_event_two_calls_bis(orbit):
+
+    # This case, where we search for the 90 deg Argument of Latitude
+    # does not crash unexpectedly.
+
+    kwargs = {
+        "start": Date(2018, 4, 5, 16, 50),
+        "stop": timedelta(minutes=200),
+        "step": timedelta(minutes=3),
+        "listeners": AnomalyListener(np.pi / 2, "aol")
+    }
+
+    orb_iterator = orbit.iter(**kwargs)
+
+    p1 = find_event("Argument of Latitude = 90.00", orb_iterator)
+
+    assert abs(p1.date - Date(2018, 4, 5, 17, 57, 7, 129464)).total_seconds() < 1.8e-5
+    assert p1.event.info == "Argument of Latitude = 90.00"
+
+    orb_iterator2 = orbit.iter(**kwargs)
+    p2 = find_event("Argument of Latitude = 90.00", orb_iterator2, offset=1)
+
+    assert abs(p2.date - Date(2018, 4, 5, 19, 29, 42, 991221)).total_seconds() < 1.8e-5
+    assert p2.event.info == "Argument of Latitude = 90.00"
+
+    orb_iterator3 = orbit.iter(**kwargs)
+    with raises(RuntimeError):
+        find_event("Argument of Latitude = 90.00", orb_iterator3, offset=2)
