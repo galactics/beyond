@@ -570,7 +570,7 @@ def stations_listeners(stations):
     return listeners
 
 
-def find_event(event, iterator, offset=0):
+def find_event(iterator, event, offset=0):
     """Find an specific event in a extropolation
 
     Args:

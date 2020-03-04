@@ -274,7 +274,7 @@ def test_find_event(orbit):
 
     orb_iterator = orbit.iter(**kwargs)
 
-    p = find_event("Argument of Latitude = 270.00", orb_iterator)
+    p = find_event(orb_iterator, "Argument of Latitude = 270.00")
 
     assert abs(p.date - Date(2018,  4, 5, 17, 10, 49, 816867)).total_seconds() < 1.8e-5
     assert p.event.info == "Argument of Latitude = 270.00"
@@ -290,7 +290,7 @@ def test_find_event_offset(orbit):
     }
 
     orb_iterator = orbit.iter(**kwargs)
-    p = find_event("Argument of Latitude = 270.00", orb_iterator, offset=1)
+    p = find_event(orb_iterator, "Argument of Latitude = 270.00", offset=1)
 
     assert abs(p.date - Date(2018,  4, 5, 18, 43, 25, 683360)).total_seconds() < 1.8e-5
     assert p.event.info == "Argument of Latitude = 270.00"
@@ -320,20 +320,20 @@ def test_find_event_two_calls(orbit):
 
     orb_iterator = orbit.iter(**kwargs)
 
-    p = find_event("Argument of Latitude = 270.00", orb_iterator)
+    p = find_event(orb_iterator, "Argument of Latitude = 270.00")
 
     assert abs(p.date - Date(2018, 4, 5, 17, 10, 49, 816867)).total_seconds() < 1.8e-5
     assert p.event.info == "Argument of Latitude = 270.00"
 
     orb_iterator = orbit.iter(**kwargs)
-    p = find_event("Argument of Latitude = 270.00", orb_iterator, offset=1)
+    p = find_event(orb_iterator, "Argument of Latitude = 270.00", offset=1)
 
     assert abs(p.date - Date(2018,  4, 5, 18, 43, 25, 683360)).total_seconds() < 1.8e-5
     assert p.event.info == "Argument of Latitude = 270.00"
 
     orb_iterator = orbit.iter(**kwargs)
     with raises(RuntimeError):
-        find_event("Argument of Latitude = 270.00", orb_iterator, offset=2)
+        find_event(orb_iterator, "Argument of Latitude = 270.00", offset=2)
 
 
 def test_find_event_two_calls_bis(orbit):
@@ -350,20 +350,20 @@ def test_find_event_two_calls_bis(orbit):
 
     orb_iterator = orbit.iter(**kwargs)
 
-    p1 = find_event("Argument of Latitude = 90.00", orb_iterator)
+    p1 = find_event(orb_iterator, "Argument of Latitude = 90.00")
 
     assert abs(p1.date - Date(2018, 4, 5, 17, 57, 7, 129464)).total_seconds() < 1.8e-5
     assert p1.event.info == "Argument of Latitude = 90.00"
 
     orb_iterator2 = orbit.iter(**kwargs)
-    p2 = find_event("Argument of Latitude = 90.00", orb_iterator2, offset=1)
+    p2 = find_event(orb_iterator2, "Argument of Latitude = 90.00", offset=1)
 
     assert abs(p2.date - Date(2018, 4, 5, 19, 29, 42, 991221)).total_seconds() < 1.8e-5
     assert p2.event.info == "Argument of Latitude = 90.00"
 
     orb_iterator3 = orbit.iter(**kwargs)
     with raises(RuntimeError):
-        find_event("Argument of Latitude = 90.00", orb_iterator3, offset=2)
+        find_event(orb_iterator3, "Argument of Latitude = 90.00", offset=2)
 
 
 def test_event_iterator(orbit):

@@ -30,7 +30,7 @@ step = timedelta(seconds=60)
 orb.propagator = Kepler(step, bodies=get_body("Earth"))
 
 # Research for the next perigee
-perigee = find_event('Periapsis', orb.iter(stop=stop, listeners=ApsideListener()))
+perigee = find_event(orb.iter(stop=stop, listeners=ApsideListener()), 'Periapsis')
 
 man1 = ImpulsiveMan(perigee.date, (280, 0, 0), frame="TNW")
 orb.maneuvers = [man1]
@@ -38,8 +38,8 @@ orb.maneuvers = [man1]
 dates1, alt1 = [], []
 
 # Research for the next apogee after the first maneuver
-apogee = find_event('Apoapsis', orb.iter(start=perigee.date - step * 10, stop=stop, listeners=ApsideListener()))
-# apogee = find_event('Apoapsis', orb.iter(stop=stop, listeners=ApsideListener()), offset=1)
+apogee = find_event(orb.iter(start=perigee.date - step * 10, stop=stop, listeners=ApsideListener()), 'Apoapsis')
+# apogee = find_event(orb.iter(stop=stop, listeners=ApsideListener()), 'Apoapsis', offset=1)
 
 # Adding the second maneuver to the orbit
 man2 = ImpulsiveMan(apogee.date, (270, 0, 0), frame="TNW")
