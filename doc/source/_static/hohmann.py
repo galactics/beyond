@@ -12,7 +12,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from beyond.io.tle import Tle
 from beyond.dates import timedelta
-from beyond.propagators.kepler import Kepler
+from beyond.propagators.keplernum import KeplerNum
 from beyond.env.solarsystem import get_body
 from beyond.orbits.man import ImpulsiveMan
 from beyond.orbits.listeners import ApsideListener, find_event
@@ -27,7 +27,7 @@ stop = timedelta(minutes=300)
 step = timedelta(seconds=60)
 
 # Changing the propagator to Keplerian, as SGP4 is not able to perform maneuvers
-orb.propagator = Kepler(step, bodies=get_body("Earth"))
+orb.propagator = KeplerNum(step, bodies=get_body("Earth"))
 
 # Research for the next perigee
 perigee = find_event('Periapsis', orb.iter(stop=stop, listeners=ApsideListener()))
