@@ -325,6 +325,8 @@ class AnomalyEvent(Event):
 
 
 class AnomalyListener(Listener):
+    """Listener for anomaly (in the orbital sense)
+    """
 
     event = AnomalyEvent
 
@@ -336,6 +338,12 @@ class AnomalyListener(Listener):
     }
 
     def __init__(self, value, anomaly="true", frame=None):
+        """
+        Args:
+            value (float):
+            anomaly (str): Type of anomaly, can be any from 'true', 'mean', 'eccentric' or 'aol'
+            frame (str):
+        """
         self.value = value
         self.anomaly = anomaly
         self.frame = frame
@@ -343,7 +351,7 @@ class AnomalyListener(Listener):
     @property
     def _anomaly(self):
         if self.anomaly not in self.ANOMALIES:  # pragma: no cover
-            raise ValueError("Unknown '{}' anomaly type".format(self.anomaly))
+            raise ValueError("Unknown anomaly type : {}".format(self.anomaly))
 
         return self.ANOMALIES[self.anomaly]
 
