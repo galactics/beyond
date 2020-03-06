@@ -364,3 +364,51 @@ def test_find_event_two_calls_bis(orbit):
     orb_iterator3 = orbit.iter(**kwargs)
     with raises(RuntimeError):
         find_event("Argument of Latitude = 90.00", orb_iterator3, offset=2)
+
+
+def test_event_iterator(orbit):
+
+    kwargs = {
+        "start": Date(2018, 4, 5, 16, 50),
+        "stop": timedelta(minutes=100),
+        "step": timedelta(minutes=3),
+        "listeners": [
+            AnomalyListener(3 * np.pi / 2, "aol"),
+            AnomalyListener(np.pi / 2, "aol"),
+            ApsideListener(),
+        ]
+    }
+
+    # iterate over the orbit, but filter only the AoL events, leaving
+    # apsides events out
+    orb_iterator = orbit.iter(**kwargs)
+    events = [
+        "Argument of Latitude = 270.00",
+        "Argument of Latitude = 90.00",
+    ]
+
+    iterator = events_iterator(orb_iterator, *events)
+
+    p = next(iterator)
+    assert abs(p.date - Date(2018,  4, 5, 17, 10, 49, 816867)).total_seconds() < 1.8e-5
+    assert p.event.info == "Argument of Latitude = 270.00"
+
+    p = next(iterator)
+    assert abs(p.date - Date(2018,  4, 5, 17, 57, 7, 129464)).total_seconds() < 1.8e-5
+    assert p.event.info == "Argument of Latitude = 90.00"
+
+    # No more events to filter in the iterator 
+    with raises(StopIteration):
+        p = next(iterator)
+
+
+    # Same iterator construction, but this time we filter only apsudes events
+    iterator = events_iterator(orbit.iter(**kwargs), "Apoapsis")
+
+    p = next(iterator)
+    assert abs(p.date - Date(2018,  4, 5, 16, 58, 54, 546919)).total_seconds() < 4e-5
+    assert p.event.info == "Apoapsis"
+
+    # No more events to filter in the iterator 
+    with raises(StopIteration):
+        p = next(iterator)

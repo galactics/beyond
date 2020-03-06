@@ -18,6 +18,7 @@ Each release is linked to a git commit.
 - ZeroDoppler listeners renamed as RadialVelocity
 - The Kepler numerical propagator (now renamed as KeplerNum) use Ephem objects for interpolation
 - NonePropagator is not used anymore when ``orb.propagator = None``
+- ``find_event`` uses ``events_iterator``, and Listeners are cleaned of residual states before each iterator creation
 
 ## [v0.6.8] - 2019-12-08
 

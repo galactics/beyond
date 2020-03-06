@@ -19,6 +19,7 @@ __all__ = [
     "AnomalyListener",
     "RadialVelocityListener",
     "find_event",
+    "events_iterator",
 ]
 
 
@@ -580,17 +581,28 @@ def find_event(event, iterator, offset=0):
         Orb
     """
 
-    if isinstance(event, Event):
+    if isinstance(event, Event):  # pragma: no cover
         event = event.info
 
-    i = 0
-
-    for orb in iterator:
-        if orb.event and orb.event.info == event:
-            if i == offset:
-                break
-            i += 1
+    for i, orb in enumerate(events_iterator(iterator, event)):
+        if i == offset:
+            break
     else:
-        raise RuntimeError("No event '{}' found".format(event))
+        raise RuntimeError("No event '{}' found at offset={}".format(event, offset))
 
     return orb
+
+
+def events_iterator(iterator, *events):
+    """Iterate only over the listed events
+
+    Args:
+        iterator :
+        events (List[str]):
+    Yield:
+        Orbit:
+    """
+
+    for orb in iterator:
+        if orb.event and (not events or orb.event.info in events):
+            yield orb
