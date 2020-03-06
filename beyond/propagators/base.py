@@ -90,6 +90,8 @@ class AnalyticalPropagator(Speaker, Propagator):
 
         listeners = kwargs.pop("listeners", [])
 
+        self.clear_listeners(listeners)
+
         for orb in self._iter(**kwargs):
             for listen_orb in self.listen(orb, listeners):
                 yield listen_orb

@@ -306,11 +306,11 @@ def test_man_impulsive(molniya_kepler):
     with raises(ValueError):
         ImpulsiveMan(Date(2018, 9, 20, 13, 48, 21, 763091), (28, 0, 0, 0))
 
-    apo = find_event('Apoapsis', molniya_kepler.iter(stop=timedelta(hours=26), listeners=ApsideListener()), offset=1)
+    apo = find_event(molniya_kepler.iter(stop=timedelta(hours=26), listeners=ApsideListener()), 'Apoapsis', offset=1)
     man = ImpulsiveMan(apo.date, (1427., 0, 0), frame="TNW")
 
     # Check on the sensitivity of the find_event function
-    apo2 = find_event('Apoapsis', molniya_kepler.iter(start=molniya_kepler.date + timedelta(seconds=243, minutes=5), stop=timedelta(hours=26), listeners=ApsideListener()), offset=1)
+    apo2 = find_event(molniya_kepler.iter(start=molniya_kepler.date + timedelta(seconds=243, minutes=5), stop=timedelta(hours=26), listeners=ApsideListener()), 'Apoapsis', offset=1)
     assert abs(apo.date - apo2.date) < timedelta(seconds=1)
 
     molniya_kepler.maneuvers = man
@@ -346,7 +346,7 @@ def test_man_impulsive(molniya_kepler):
 
 def test_man_delta_a(molniya_kepler):
 
-    apo = find_event('Apoapsis', molniya_kepler.iter(stop=timedelta(hours=26), listeners=ApsideListener()), offset=1)
+    apo = find_event(molniya_kepler.iter(stop=timedelta(hours=26), listeners=ApsideListener()), 'Apoapsis', offset=1)
     man1 = KeplerianImpulsiveMan(apo.date, delta_a=5900000)
 
     molniya_kepler.maneuvers = man1
@@ -370,7 +370,7 @@ def test_man_delta_a(molniya_kepler):
 
 def test_man_delta_i(orbit_kepler):
 
-    asc = find_event("Asc Node", orbit_kepler.iter(stop=timedelta(minutes=200), listeners=NodeListener()))
+    asc = find_event(orbit_kepler.iter(stop=timedelta(minutes=200), listeners=NodeListener()), "Asc Node")
     man = KeplerianImpulsiveMan(asc.date, delta_angle=np.radians(5))
     orbit_kepler.maneuvers = man
 
@@ -395,7 +395,7 @@ def test_man_continuous(method, molniya_kepler):
 
     duration = timedelta(minutes=10)
 
-    apo = find_event('Apoapsis', molniya_kepler.iter(stop=timedelta(hours=26), listeners=ApsideListener()), offset=1)
+    apo = find_event(molniya_kepler.iter(stop=timedelta(hours=26), listeners=ApsideListener()), 'Apoapsis', offset=1)
     
     if method == "dv":
         man1 = ContinuousMan(apo.date, duration, dv=[1427, 0, 0], frame="TNW", date_pos="median")

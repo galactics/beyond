@@ -259,6 +259,8 @@ class Ephem(Speaker):
 
         listeners = kwargs.get("listeners", [])
 
+        self.clear_listeners(listeners)
+
         if dates:
             for date in dates:
                 orb = self.propagate(date)

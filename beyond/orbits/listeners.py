@@ -18,6 +18,8 @@ __all__ = [
     "NodeListener",
     "AnomalyListener",
     "RadialVelocityListener",
+    "find_event",
+    "events_iterator",
 ]
 
 
@@ -28,6 +30,14 @@ class Speaker(metaclass=ABCMeta):
     """
 
     _eps_bisect = timedelta.resolution
+
+    @classmethod
+    def clear_listeners(cls, listeners):
+        if isinstance(listeners, Listener):
+            listeners = [listeners]
+
+        for listener in listeners:
+            listener.clear()
 
     def listen(self, orb, listeners):
         """This method allows to loop over the listeners and trigger the :py:meth:`_bisect` method
@@ -110,6 +120,9 @@ class Listener(metaclass=ABCMeta):
     @abstractmethod
     def __call__(self, orb):  # pragma: no cover
         pass
+
+    def clear(self):
+        self.prev = None
 
 
 class Event:
@@ -565,7 +578,7 @@ def stations_listeners(stations):
     return listeners
 
 
-def find_event(event, iterator, offset=0):
+def find_event(iterator, event, offset=0):
     """Find an specific event in a extropolation
 
     Args:
@@ -576,17 +589,28 @@ def find_event(event, iterator, offset=0):
         Orb
     """
 
-    if isinstance(event, Event):
+    if isinstance(event, Event):  # pragma: no cover
         event = event.info
 
-    i = 0
-
-    for orb in iterator:
-        if orb.event and orb.event.info == event:
-            if i == offset:
-                break
-            i += 1
+    for i, orb in enumerate(events_iterator(iterator, event)):
+        if i == offset:
+            break
     else:
-        raise RuntimeError("No event '{}' found".format(event))
+        raise RuntimeError("No event '{}' found at offset={}".format(event, offset))
 
     return orb
+
+
+def events_iterator(iterator, *events):
+    """Iterate only over the listed events
+
+    Args:
+        iterator :
+        events (List[str]):
+    Yield:
+        Orbit:
+    """
+
+    for orb in iterator:
+        if orb.event and (not events or orb.event.info in events):
+            yield orb
