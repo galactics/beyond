@@ -12,6 +12,8 @@ Each release is linked to a git commit.
 - Beta angle computation
 - Constellation and LEO builder
 - Local Time at Ascending Node computation module
+- Real adaptive step size for KeplerNum propagator
+- Runge-Kutta-Fehlberg method for KeplerNum
 
 ### Modified
 

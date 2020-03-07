@@ -19,11 +19,25 @@ class KeplerNum(NumericalPropagator):
     ``dopri``
     See `Runge-Kutta methods <https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods>`__
     for details.
+
+    For adaptive step size, the highest order is used to compute the next
+    state, and the lowest to determine the error and adapt the stepsize.
+    For example RKF54 use order 5 for state computation, and order 4 for
+    error estimation.
     """
 
     RK4 = "rk4"
+    """Runge-Kutta 4th order fixed stepsize integrator"""
+
+    RKF54 = "rkf54"
+    """Runge-Kutta 5th order adaptive stepsize integrator"""
+
     EULER = "euler"
-    DOPRI = "dopri"
+    """Euler fixed-step integrator"""
+
+    DOPRI54 = "dopri54"
+    """Dormand-Prince 5th order adaptive stepsize integrator"""
+
     FRAME = "EME2000"
 
     # Butcher tableau of the different methods available
@@ -34,7 +48,20 @@ class KeplerNum(NumericalPropagator):
             "b": array([1 / 6, 1 / 3, 1 / 3, 1 / 6]),
             "c": array([0, 1 / 2, 1 / 2, 1]),
         },
-        DOPRI: {
+        RKF54: {
+            "a": [
+                [],
+                array([1 / 4]),
+                array([3 / 32, 9 / 32]),
+                array([1932 / 2197, -7200 / 2197, 7296 / 2197]),
+                array([439 / 216, -8, 3680 / 513, -845 / 4104]),
+                array([-8 / 27, 2, -3544 / 2565, 1859 / 4104, -11 / 40]),
+            ],
+            "b": array([16 / 135, 0, 6656 / 12825, 28561 / 56430, -9 / 50, 2 / 55]),
+            "b_star": array([25 / 216, 0, 1408 / 2565, 2197 / 4104, -1 / 5, 0]),
+            "c": array([0, 1 / 4, 3 / 8, 12 / 13, 1, 1 / 2]),
+        },
+        DOPRI54: {
             "a": [
                 [],
                 array([1 / 5]),
@@ -60,19 +87,21 @@ class KeplerNum(NumericalPropagator):
         },
     }
 
-    def __init__(self, step, bodies, *, method=RK4, frame=FRAME):
+    def __init__(self, step, bodies, *, method=RK4, frame=FRAME, tol=1e-3):
         """
         Args:
             step (datetime.timedelta): Step size of the propagator
             bodies (tuple): List of bodies to take into account
-            method (str): Integration method (:py:attr:`DOPRI`, :py:attr:`RK4` or :py:attr:`EULER`)
+            method (str): Integration method (see class attributes)
             frame (str): Frame to use for the propagation
+            tol (float): Error tolerance for adaptive stepsize methods
         """
 
         self.step = step
         self.bodies = bodies if isinstance(bodies, (list, tuple)) else [bodies]
         self.method = method.lower()
         self.frame = frame
+        self.tol = tol
 
     def copy(self):
         return self.__class__(
@@ -120,27 +149,52 @@ class KeplerNum(NumericalPropagator):
         """Compute the next step with the selected method
         """
 
-        a, b, c = self.butcher["a"], self.butcher["b"], self.butcher["c"]
+        aa, bb, cc = self.butcher["a"], self.butcher["b"], self.butcher["c"]
 
         y_n = orb.copy()
-        ks = [self._newton(y_n, timedelta(0))]
 
-        for a, c in zip(a[1:], c[1:]):
-            k_plus1 = self._newton(y_n + a @ ks * step.total_seconds(), step * c)
-            ks.append(k_plus1)
+        MAX_ITER = 10
 
-        y_n_1 = y_n + step.total_seconds() * b @ ks
-        y_n_1.date = y_n.date + step
+        for i in range(MAX_ITER):
 
-        # Error estimation, in cases where adaptively methods are used
-        # if 'b_star' in method:
-        #     error = step.total_seconds() * (b - method['b_star']) @ ks
+            ks = [self._newton(y_n, timedelta(0))]
+            i += 1
+            for a, c in zip(aa[1:], cc[1:]):
+                k_plus1 = self._newton(y_n + a @ ks * step.total_seconds(), step * c)
+                ks.append(k_plus1)
+
+            y_n_1 = y_n + step.total_seconds() * bb @ ks
+            y_n_1.date = y_n.date + step
+
+            # Error estimation, in cases where adaptive stepsize methods are used
+            if "b_star" not in self.butcher:
+                # This is not an adaptive stepsize method, there is no need to iterate
+                # here
+                break
+
+            error = step.total_seconds() * (bb - self.butcher["b_star"]) @ ks
+
+            p_error = linalg.norm(error[:3])
+            # v_eps = linalg.norm(error[3:])
+
+            if p_error <= self.tol:
+                # The target accuracy is met, the current step size is sufficient
+                break
+
+            # Modify the step size
+            step = min(self.step, step * (self.tol / (2 * p_error)) ** (1/(len(bb) - 1)))
+        else:
+            raise RuntimeError(
+                "{} : No convergence in step size after {} iterations.".format(
+                    self.method, MAX_ITER
+                )
+            )
 
         for man in self.orbit.maneuvers:
             if isinstance(man, ImpulsiveMan) and man.check(orb.date, step):
                 y_n_1[3:] += man.dv(y_n_1, step=step)
 
-        return y_n_1
+        return step, y_n_1
 
     def _iter(self, **kwargs):
 
@@ -172,12 +226,17 @@ class KeplerNum(NumericalPropagator):
 
             ephem = [orb]
 
-            for date in Date.range(orb.date, start, _step, inclusive=True):
-                orb = self._make_step(orb, _step)
+            date = orb.date
+            mname = "__lt__" if _step.total_seconds() > 0 else "__gt__"
+            while getattr(date, mname)(start):
+                real_step, orb = self._make_step(orb, _step)
                 ephem.append(orb)
+                date += real_step
 
+            # Provide enough extra steps to allow Ephem to interpolate
+            # with order DEFAULT_ORDER
             for i in range(Ephem.DEFAULT_ORDER - len(ephem)):
-                orb = self._make_step(orb, _step)
+                real_step, orb = self._make_step(orb, _step)
                 ephem.append(orb)
 
             ephem = Ephem(ephem)
@@ -189,13 +248,20 @@ class KeplerNum(NumericalPropagator):
         # (ie step), we use an Ephem object for interpolation
         ephem = [orb]
 
-        for date in Date.range(start, stop, self.step):
-            orb = self._make_step(orb, self.step)
+        date = start
+        while date < stop:
+            real_step, orb = self._make_step(orb, self.step)
             ephem.append(orb)
+            date += real_step
 
         ephem = Ephem(ephem)
 
-        for orb in ephem.iter(dates=dates, step=step, listeners=listeners):
+        if kwargs.get("real_steps", False):
+            ephem_iter = ephem.iter(dates=dates, listeners=listeners)
+        else:
+            ephem_iter = ephem.iter(dates=dates, step=step, listeners=listeners)
+
+        for orb in ephem_iter:
             yield orb
 
 
