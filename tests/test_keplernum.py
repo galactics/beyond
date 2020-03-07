@@ -167,8 +167,8 @@ def test_propagate_dopri(orbit_kepler):
     orb3 = orb2.propagate(timedelta(minutes=12, seconds=5))
 
     assert orb3.date == Date(2018, 5, 4, 15, 34, 4, 630976)
-    assert orb2.propagator.orbit is not None
-    assert orb3.propagator.orbit is None
+    assert orb2.propagator.orbit is not None  # This propagator has been used
+    assert orb3.propagator.orbit is None  # This one not
 
     assert np.allclose(
         np.array(orb3),
