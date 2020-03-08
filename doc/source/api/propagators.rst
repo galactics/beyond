@@ -88,6 +88,16 @@ ClohessyWiltshire
     :special-members: __init__
     :show-inheritance:
 
+Sphere of Influence
+-------------------
+
+There is two propagators handling `Sphere of Influence <https://en.wikipedia.org/wiki/Sphere_of_influence_(astrodynamics)>`__ transitions.
+
+.. automodule:: beyond.propagators.soi
+    :members: SoIAnalytical, SoINumerical
+    :special-members: __init__
+    :show-inheritance:
+
 Listeners
 =========
 

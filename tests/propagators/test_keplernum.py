@@ -7,7 +7,8 @@ from unittest.mock import patch
 import beyond.io.ccsds as ccsds
 from beyond.dates import Date, timedelta
 from beyond.io.tle import Tle
-from beyond.propagators.keplernum import KeplerNum, SOIPropagator
+from beyond.propagators.keplernum import KeplerNum
+from beyond.propagators.soi import SoINumerical
 from beyond.env.solarsystem import get_body
 from beyond.propagators.listeners import LightListener, NodeListener, find_event, ApsideListener
 from beyond.orbits.man import ImpulsiveMan, KeplerianImpulsiveMan, ContinuousMan, KeplerianContinuousMan
@@ -426,65 +427,3 @@ def test_man_continuous(method, molniya_kepler):
     after = np.mean(altitude[man_idx_max:])
 
     assert 8100000 < after - before < 8200000
-
-
-@mark.jpl
-def test_soi(jplfiles):
-
-    opm = ccsds.loads("""CCSDS_OPM_VERS = 2.0
-CREATION_DATE = 2019-02-22T23:22:31
-ORIGINATOR = N/A
-
-META_START
-OBJECT_NAME          = N/A
-OBJECT_ID            = N/A
-CENTER_NAME          = EARTH
-REF_FRAME            = EME2000
-TIME_SYSTEM          = UTC
-META_STOP
-
-COMMENT  State Vector
-EPOCH                = 2018-05-02T00:00:00.000000
-X                    =  6678.000000 [km]
-Y                    =     0.000000 [km]
-Z                    =     0.000000 [km]
-X_DOT                =     0.000000 [km/s]
-Y_DOT                =     7.088481 [km/s]
-Z_DOT                =     3.072802 [km/s]
-
-COMMENT  Keplerian elements
-SEMI_MAJOR_AXIS      =  6678.000000 [km]
-ECCENTRICITY         =     0.000000
-INCLINATION          =    23.436363 [deg]
-RA_OF_ASC_NODE       =     0.000000 [deg]
-ARG_OF_PERICENTER    =     0.000000 [deg]
-TRUE_ANOMALY         =     0.000000 [deg]
-
-COMMENT  Escaping Earth
-MAN_EPOCH_IGNITION   = 2018-05-02T00:39:03.955092
-MAN_DURATION         = 0.000 [s]
-MAN_DELTA_MASS       = 0.000 [kg]
-MAN_REF_FRAME        = TNW
-MAN_DV_1             = 3.456791 [km/s]
-MAN_DV_2             = 0.000000 [km/s]
-MAN_DV_3             = 0.000000 [km/s]
-""")
-
-    planetary_step = timedelta(seconds=180)
-    solar_step = timedelta(hours=12)
-
-    jpl.create_frames()
-
-    central = jpl.get_body('Sun')
-    planets = jpl.get_body('Earth')
-
-    opm = opm.as_orbit(SOIPropagator(solar_step, planetary_step, central, planets))
-
-    frames = set()
-    for orb in opm.iter(stop=timedelta(5)):
-        frames.add(orb.frame.name)
-
-    assert not frames.symmetric_difference(['Sun', 'EME2000'])
-
-    # Check if the last point is out of Earth sphere of influence
-    assert orb.copy(frame='EME2000', form="spherical").r > SOIPropagator.SOI['Earth'].radius
