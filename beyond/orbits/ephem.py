@@ -119,7 +119,7 @@ class Ephem(Speaker):
         """
 
         if not self.start <= date <= self.stop:
-            raise ValueError("Date '%s' not in range" % date)
+            raise ValueError("Date '{}' not in range [{}, {}]".format(date, self.start, self.stop))
 
         prev_idx = 0
         ephem = self
@@ -277,7 +277,7 @@ class Ephem(Speaker):
                 start = self.start
             elif start < self.start:
                 if strict:
-                    raise ValueError("Start date not in range")
+                    raise ValueError("Start date not in range [{}, {}]".format(self.start, self.stop))
                 else:
                     real_start = self.start
 
@@ -288,7 +288,7 @@ class Ephem(Speaker):
                     stop = start + stop
                 if stop > self.stop:
                     if strict:
-                        raise ValueError("Stop date not in range")
+                        raise ValueError("Stop date not in range [{}, {}]".format(self.start, self.stop))
                     else:
                         stop = self.stop
 
