@@ -6,19 +6,12 @@ For XML input/output validation, it is possible to use XSD files provided at
 https://sanaregistry.org/r/ndmxml/.
 """
 
-from collections.abc import Iterable
-
-from ..config import config
-from ..orbits import Orbit, Ephem
-from ..utils.measures import Measure
-from ..propagators.base import AnalyticalPropagator
-from ..frames.frames import TEME
-from ..orbits.forms import TLE
-from ._ccsds.opm import load_opm, dump_opm
-from ._ccsds.oem import load_oem, dump_oem
-from ._ccsds.omm import load_omm, dump_omm
-from ._ccsds.tdm import load_tdm, dump_tdm
-from ._ccsds.commons import CcsdsError, detect
+from ...config import config
+from . import opm
+from . import oem
+from . import omm
+from . import tdm
+from .commons import CcsdsError, detect2load, detect2dump
 
 __all__ = ["load", "loads", "dump", "dumps", "CcsdsError"]
 
@@ -31,7 +24,7 @@ def load(fp):  # pragma: no cover
     Args:
         fp: file descriptor of a CCSDS file
     Return:
-        Orbit or Ephem
+        Orbit, Ephem, List[Ephem] or MeasureSet
     Raise:
         CcsdsError: when the text is not a recognizable CCSDS format
     """
@@ -46,40 +39,42 @@ def loads(text):
     Args:
         text (str):
     Return:
-        Orbit or Ephem
+        Orbit, Ephem, List[Ephem] or MeasureSet
     Raise:
         CcsdsError: when the text is not a recognizable CCSDS format
     """
 
-    type, fmt = detect(text)
+    type, fmt = detect2load(text)
 
-    if type == "OEM":
-        func = load_oem
-    elif type == "OPM":
-        func = load_opm
-    elif type == "TDM":
-        func = load_tdm
-    elif type == "OMM":
-        func = load_omm
-    else:
-        raise CcsdsError("Unknown CCSDS type")
+    if type == "oem":
+        func = oem.loads
+    elif type == "opm":
+        func = opm.loads
+    elif type == "tdm":
+        func = tdm.loads
+    elif type == "omm":
+        func = omm.loads
+    else:  # pragma: no cover
+        raise CcsdsError("Unknown CCSDS type : {}".format(type))
 
     return func(text, fmt=fmt)
 
 
 def dump(data, fp, **kwargs):  # pragma: no cover
     """Write a CCSDS file depending on the type of data, this could be an OPM
-    file (Orbit or list of Orbit), an OEM file (Ephem), or a TDM file
+    file (Orbit), an OEM file (Ephem or list of Ephem), or a TDM file
     (MeasureSet).
 
     Args:
-        data (Orbit, list of Orbit, Ephem, or MeasureSet)
+        data (Orbit, Ephem, List[Ephem] or MeasureSet)
         fp (file descriptor)
     Keyword Arguments:
         name (str): Name of the object
         cospar_id (str): International designator of the object
         originator (str): Originator of the CCSDS file
         fmt (str): Output format of the file, can be 'xml' or 'kvn'. Default to 'kvn'
+    Raise:
+        TypeError: if the data object class is not handled
 
     It is also possible to set the configuration dict to change the default value
     of 'fmt'.
@@ -98,24 +93,17 @@ def dumps(data, **kwargs):
     Same arguments and behaviour as :py:func:`dump`
     """
 
-    kwargs.setdefault("fmt", config.get("io", "ccsds_default_format", fallback="kvn"))
+    type = detect2dump(data)
 
-    if isinstance(data, Ephem) or (
-        isinstance(data, Iterable) and all(isinstance(x, Ephem) for x in data)
-    ):
-        content = dump_oem(data, **kwargs)
-    elif isinstance(data, Orbit):
-        if (
-            isinstance(data.propagator, AnalyticalPropagator)
-            and issubclass(data.frame, TEME)
-            and data.form is TLE
-        ):
-            content = dump_omm(data, **kwargs)
-        else:
-            content = dump_opm(data, **kwargs)
-    elif isinstance(data, Iterable) and all(isinstance(x, Measure) for x in data):
-        content = dump_tdm(data, **kwargs)
-    else:
-        raise TypeError("Unknown object type")
+    if type == "oem":
+        content = oem.dumps(data, **kwargs)
+    elif type == "opm":
+        content = opm.dumps(data, **kwargs)
+    elif type == "omm":
+        content = omm.dumps(data, **kwargs)
+    elif type == "tdm":
+        content = tdm.dumps(data, **kwargs)
+    else:  # pragma: no cover
+        raise CcsdsError("Unknown object type for CCSDS : {}".format(type))
 
     return content

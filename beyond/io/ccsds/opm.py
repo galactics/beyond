@@ -18,10 +18,11 @@ from .commons import (
     DATE_FMT_DEFAULT,
     kvn2dict,
     xml2dict,
+    get_format,
 )
 
 
-def load_opm(string, fmt):
+def loads(string, fmt):
     """Read of OPM string
 
     Args:
@@ -32,16 +33,29 @@ def load_opm(string, fmt):
     """
 
     if fmt == "kvn":
-        orb = _load_opm_kvn(string)
+        orb = _loads_kvn(string)
     elif fmt == "xml":
-        orb = _load_opm_xml(string)
+        orb = _loads_xml(string)
     else:  # pragma: no cover
         raise CcsdsError("Unknown format '{}'".format(fmt))
 
     return orb
 
 
-def _load_opm_kvn(string):
+def dumps(data, **kwargs):
+
+    # Inject a default format if it is not provided, either by argument or by configuration
+    fmt = get_format(**kwargs)
+
+    if fmt == "kvn":
+        return _dumps_kvn(data, **kwargs)
+    elif fmt == "xml":
+        return _dumps_xml(data, **kwargs)
+    else:  # pragma: no cover
+        raise CcsdsError("Unknown format '{}'".format(fmt))
+
+
+def _loads_kvn(string):
 
     data = kvn2dict(string)
 
@@ -111,7 +125,7 @@ def _load_opm_kvn(string):
     return orb
 
 
-def _load_opm_xml(string):
+def _loads_xml(string):
 
     data = xml2dict(string.encode())
 
@@ -194,18 +208,15 @@ def _load_opm_xml(string):
     return orb
 
 
-def dump_opm(data, fmt="kvn", **kwargs):
-
+def _dumps_kvn(data, **kwargs):
     cart = data.copy(form="cartesian")
     kep = data.copy(form="keplerian")
 
-    if fmt == "kvn":
+    header = dump_kvn_header(data, "OPM", version="2.0", **kwargs)
 
-        header = dump_kvn_header(data, "OPM", version="2.0", **kwargs)
+    meta = dump_kvn_meta_odm(data, **kwargs)
 
-        meta = dump_kvn_meta_odm(data, **kwargs)
-
-        text = """COMMENT  State Vector
+    text = """COMMENT  State Vector
 EPOCH                = {cartesian.date:{dfmt}}
 X                    = {cartesian.x: 12.6f} [km]
 Y                    = {cartesian.y: 12.6f} [km]
@@ -223,31 +234,31 @@ ARG_OF_PERICENTER    = {angles[2]: 12.6f} [deg]
 TRUE_ANOMALY         = {angles[3]: 12.6f} [deg]
 GM                   = {gm:11.4f} [km**3/s**2]
 """.format(
-            cartesian=cart / units.km,
-            kep_a=kep.a / units.km,
-            kep_e=kep.e,
-            angles=np.degrees(kep[2:]),
-            gm=kep.frame.center.mu / (units.km ** 3),
-            dfmt=DATE_FMT_DEFAULT,
-        )
+        cartesian=cart / units.km,
+        kep_a=kep.a / units.km,
+        kep_e=kep.e,
+        angles=np.degrees(kep[2:]),
+        gm=kep.frame.center.mu / (units.km ** 3),
+        dfmt=DATE_FMT_DEFAULT,
+    )
 
-        # Covariance handling
-        if cart.cov.any():
-            text += dump_cov(cart.cov)
+    # Covariance handling
+    if cart.cov.any():
+        text += dump_cov(cart.cov)
 
-        if cart.maneuvers:
-            for i, man in enumerate(cart.maneuvers):
-                comment = "\nCOMMENT  {}".format(man.comment) if man.comment else ""
+    if cart.maneuvers:
+        for i, man in enumerate(cart.maneuvers):
+            comment = "\nCOMMENT  {}".format(man.comment) if man.comment else ""
 
-                frame = cart.frame if man.frame is None else man.frame
-                if isinstance(man, ContinuousMan):
-                    date = man.start
-                    duration = man.duration.total_seconds()
-                else:
-                    date = man.date
-                    duration = 0
+            frame = cart.frame if man.frame is None else man.frame
+            if isinstance(man, ContinuousMan):
+                date = man.start
+                duration = man.duration.total_seconds()
+            else:
+                date = man.date
+                duration = 0
 
-                text += """{comment}
+            text += """{comment}
 MAN_EPOCH_IGNITION   = {date:{dfmt}}
 MAN_DURATION         = {duration:0.3f} [s]
 MAN_DELTA_MASS       = 0.000 [kg]
@@ -256,125 +267,125 @@ MAN_DV_1             = {dv[0]:.6f} [km/s]
 MAN_DV_2             = {dv[1]:.6f} [km/s]
 MAN_DV_3             = {dv[2]:.6f} [km/s]
 """.format(
-                    i=i + 1,
-                    date=date,
-                    duration=duration,
-                    man=man,
-                    dv=man._dv / units.km,
-                    frame=frame,
-                    comment=comment,
-                    dfmt=DATE_FMT_DEFAULT,
-                )
+                i=i + 1,
+                date=date,
+                duration=duration,
+                man=man,
+                dv=man._dv / units.km,
+                frame=frame,
+                comment=comment,
+                dfmt=DATE_FMT_DEFAULT,
+            )
 
-        string = header + "\n" + meta + text
+    return header + "\n" + meta + text
 
-    elif fmt == "xml":
-        # Write an intermediary, with field name, unit and value
-        # like a dict of tuple
-        # {
-        #     "X": (cartesian.x / units.km, units.km)
-        # }
 
-        top = dump_xml_header(data, "OPM", version="2.0", **kwargs)
+def _dumps_xml(data, **kwargs):
 
-        body = ET.SubElement(top, "body")
-        segment = ET.SubElement(body, "segment")
+    cart = data.copy(form="cartesian")
+    kep = data.copy(form="keplerian")
 
-        dump_xml_meta_odm(segment, data, **kwargs)
+    # Write an intermediary, with field name, unit and value
+    # like a dict of tuple
+    # {
+    #     "X": (cartesian.x / units.km, units.km)
+    # }
 
-        data_tag = ET.SubElement(segment, "data")
+    top = dump_xml_header(data, "OPM", version="2.0", **kwargs)
 
-        statevector = ET.SubElement(data_tag, "stateVector")
-        epoch = ET.SubElement(statevector, "EPOCH")
-        epoch.text = data.date.strftime(DATE_FMT_DEFAULT)
+    body = ET.SubElement(top, "body")
+    segment = ET.SubElement(body, "segment")
 
-        elems = {
-            "X": "x",
-            "Y": "y",
-            "Z": "z",
-            "X_DOT": "vx",
-            "Y_DOT": "vy",
-            "Z_DOT": "vz",
-        }
+    dump_xml_meta_odm(segment, data, **kwargs)
 
-        for k, v in elems.items():
-            x = ET.SubElement(statevector, k, units="km" if "DOT" not in k else "km/s")
-            x.text = "{:0.6f}".format(getattr(cart, v) / units.km)
+    data_tag = ET.SubElement(segment, "data")
 
-        keplerian = ET.SubElement(data_tag, "keplerianElements")
+    statevector = ET.SubElement(data_tag, "stateVector")
+    epoch = ET.SubElement(statevector, "EPOCH")
+    epoch.text = data.date.strftime(DATE_FMT_DEFAULT)
 
-        sma = ET.SubElement(keplerian, "SEMI_MAJOR_AXIS", units="km")
-        sma.text = "{:0.6}".format(kep.a / units.km)
-        ecc = ET.SubElement(keplerian, "ECCENTRICITY")
-        ecc.text = "{:0.6}".format(kep.e)
+    elems = {
+        "X": "x",
+        "Y": "y",
+        "Z": "z",
+        "X_DOT": "vx",
+        "Y_DOT": "vy",
+        "Z_DOT": "vz",
+    }
 
-        elems = {
-            "INCLINATION": "i",
-            "RA_OF_ASC_NODE": "Omega",
-            "ARG_OF_PERICENTER": "omega",
-            "TRUE_ANOMALY": "nu",
-        }
+    for k, v in elems.items():
+        x = ET.SubElement(statevector, k, units="km" if "DOT" not in k else "km/s")
+        x.text = "{:0.6f}".format(getattr(cart, v) / units.km)
 
-        for k, v in elems.items():
-            x = ET.SubElement(keplerian, k, units="deg")
-            x.text = "{:0.6}".format(np.degrees(getattr(kep, v)))
+    keplerian = ET.SubElement(data_tag, "keplerianElements")
 
-        gm = ET.SubElement(keplerian, "GM", units="km**3/s**2")
-        gm.text = "{:11.4f}".format(kep.frame.center.mu / (units.km ** 3))
+    sma = ET.SubElement(keplerian, "SEMI_MAJOR_AXIS", units="km")
+    sma.text = "{:0.6}".format(kep.a / units.km)
+    ecc = ET.SubElement(keplerian, "ECCENTRICITY")
+    ecc.text = "{:0.6}".format(kep.e)
 
-        if cart.cov.any():
-            cov = ET.SubElement(data_tag, "covarianceMatrix")
+    elems = {
+        "INCLINATION": "i",
+        "RA_OF_ASC_NODE": "Omega",
+        "ARG_OF_PERICENTER": "omega",
+        "TRUE_ANOMALY": "nu",
+    }
 
-            if cart.cov.frame != cart.cov.PARENT_FRAME:
-                frame = cart.cov.frame
-                if frame == "QSW":
-                    frame = "RSW"
+    for k, v in elems.items():
+        x = ET.SubElement(keplerian, k, units="deg")
+        x.text = "{:0.6}".format(np.degrees(getattr(kep, v)))
 
-                cov_frame = ET.SubElement(cov, "COV_REF_FRAME")
-                cov_frame.text = "{frame}".format(frame=frame)
+    gm = ET.SubElement(keplerian, "GM", units="km**3/s**2")
+    gm.text = "{:11.4f}".format(kep.frame.center.mu / (units.km ** 3))
 
-            elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
-            for i, a in enumerate(elems):
-                for j, b in enumerate(elems[: i + 1]):
-                    x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
-                    x.text = "{:0.16e}".format(cart.cov[i, j] / 1e6)
+    if cart.cov.any():
+        cov = ET.SubElement(data_tag, "covarianceMatrix")
 
-        if cart.maneuvers:
-            for man in cart.maneuvers:
-                mans = ET.SubElement(data_tag, "maneuverParameters")
-                if man.comment:
-                    com = ET.SubElement(mans, "COMMENT")
-                    com.text = man.comment
+        if cart.cov.frame != cart.cov.PARENT_FRAME:
+            frame = cart.cov.frame
+            if frame == "QSW":
+                frame = "RSW"
 
-                frame = cart.frame if man.frame is None else man.frame
+            cov_frame = ET.SubElement(cov, "COV_REF_FRAME")
+            cov_frame.text = "{frame}".format(frame=frame)
 
-                if isinstance(man, ContinuousMan):
-                    date = man.start
-                    duration = man.duration.total_seconds()
-                else:
-                    date = man.date
-                    duration = 0
+        elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
+        for i, a in enumerate(elems):
+            for j, b in enumerate(elems[: i + 1]):
+                x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
+                x.text = "{:0.16e}".format(cart.cov[i, j] / 1e6)
 
-                man_epoch = ET.SubElement(mans, "MAN_EPOCH_IGNITION")
-                man_epoch.text = date.strftime(DATE_FMT_DEFAULT)
-                man_dur = ET.SubElement(mans, "MAN_DURATION", units="s")
-                man_dur.text = "{:0.3f}".format(duration)
+    if cart.maneuvers:
+        for man in cart.maneuvers:
+            mans = ET.SubElement(data_tag, "maneuverParameters")
+            if man.comment:
+                com = ET.SubElement(mans, "COMMENT")
+                com.text = man.comment
 
-                man_mass = ET.SubElement(mans, "MAN_DELTA_MASS", units="kg")
-                man_mass.text = "-0.001"
+            frame = cart.frame if man.frame is None else man.frame
 
-                man_frame = ET.SubElement(mans, "MAN_REF_FRAME")
-                man_frame.text = "{}".format(frame)
+            if isinstance(man, ContinuousMan):
+                date = man.start
+                duration = man.duration.total_seconds()
+            else:
+                date = man.date
+                duration = 0
 
-                for i in range(3):
-                    x = ET.SubElement(mans, "MAN_DV_{}".format(i + 1), units="km/s")
-                    x.text = "{:.6f}".format(man._dv[i] / units.km)
+            man_epoch = ET.SubElement(mans, "MAN_EPOCH_IGNITION")
+            man_epoch.text = date.strftime(DATE_FMT_DEFAULT)
+            man_dur = ET.SubElement(mans, "MAN_DURATION", units="s")
+            man_dur.text = "{:0.3f}".format(duration)
 
-        string = ET.tostring(
-            top, pretty_print=True, xml_declaration=True, encoding="UTF-8"
-        ).decode()
+            man_mass = ET.SubElement(mans, "MAN_DELTA_MASS", units="kg")
+            man_mass.text = "-0.001"
 
-    else:  # pragma: no cover
-        raise CcsdsError("Unknown format '{}'".format(fmt))
+            man_frame = ET.SubElement(mans, "MAN_REF_FRAME")
+            man_frame.text = "{}".format(frame)
 
-    return string
+            for i in range(3):
+                x = ET.SubElement(mans, "MAN_DV_{}".format(i + 1), units="km/s")
+                x.text = "{:.6f}".format(man._dv[i] / units.km)
+
+    return ET.tostring(
+        top, pretty_print=True, xml_declaration=True, encoding="UTF-8"
+    ).decode()
