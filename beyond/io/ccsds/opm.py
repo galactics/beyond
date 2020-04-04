@@ -122,6 +122,11 @@ def _loads_kvn(string):
     if "CX_X" in data:
         orb.cov = load_cov(orb, data)
 
+    for k in data.keys():
+        if k.startswith("USER_DEFINED"):
+            ud = orb.complements.setdefault("ccsds_user_defined", {})
+            ud[k[13:]] = data[k].text
+
     return orb
 
 
@@ -205,6 +210,12 @@ def _loads_xml(string):
     if cov:
         orb.cov = load_cov(orb, cov)
 
+    ud_dict = data["body"]["segment"]["data"].get("userDefinedParameters", {})
+
+    for field in ud_dict.get("USER_DEFINED", []):
+        ud = orb.complements.setdefault("ccsds_user_defined", {})
+        ud[field.attrib["parameter"]] = field.text
+
     return orb
 
 
@@ -276,6 +287,11 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
                 comment=comment,
                 dfmt=DATE_FMT_DEFAULT,
             )
+
+    if "ccsds_user_defined" in data.complements:
+        text += "\n"
+        for k, v in data.complements["ccsds_user_defined"].items():
+            text += "USER_DEFINED_{} = {}\n".format(k, v)
 
     return header + "\n" + meta + text
 
@@ -385,6 +401,12 @@ def _dumps_xml(data, **kwargs):
             for i in range(3):
                 x = ET.SubElement(mans, "MAN_DV_{}".format(i + 1), units="km/s")
                 x.text = "{:.6f}".format(man._dv[i] / units.km)
+
+    if "ccsds_user_defined" in data.complements:
+        ud = ET.SubElement(data_tag, "userDefinedParameters")
+        for k, v in data.complements["ccsds_user_defined"].items():
+            el = ET.SubElement(ud, "USER_DEFINED", parameter=k)
+            el.text = v
 
     return ET.tostring(
         top, pretty_print=True, xml_declaration=True, encoding="UTF-8"
