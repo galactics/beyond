@@ -182,7 +182,9 @@ class KeplerNum(NumericalPropagator):
                 break
 
             # Modify the step size
-            step = min(self.step, step * (self.tol / (2 * p_error)) ** (1/(len(bb) - 1)))
+            step = min(
+                self.step, step * (self.tol / (2 * p_error)) ** (1 / (len(bb) - 1))
+            )
         else:
             raise RuntimeError(
                 "{} : No convergence in step size after {} iterations.".format(
