@@ -4,7 +4,7 @@ and integrate them in the frames stack.
 See the `NAIF website <https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/>`__
 for more informations about the format and content of these files.
 
-For the module to work properly, the .bsp files should be sourced via the `env.jpl.bsp`
+For the module to work properly, the .bsp files should be sourced via the `env.jpl.files`
 configuration variable.
 
 The following configuration will provide access to the Solar System, Mars, Jupiter, Saturn and
@@ -14,18 +14,30 @@ their respective major satellites
 
     from beyond.config import config
 
-    config.update({
-        "env": {
-            "jpl": [
-                "/path/to/de430.bsp",
-                "/path/to/mar097.bsp",
-                "/path/to/jup310.bsp",
-                "/path/to/sat360xl.bsp"
-            ]
-        }
-    })
+    config.set("env", "jpl", "files", [
+        "/path/to/de430.bsp",
+        "/path/to/mar097.bsp",
+        "/path/to/jup310.bsp",
+        "/path/to/sat360xl.bsp"
+    ])
 
 This module rely heavily on the jplephem library, which parse the binary .BSP format
+
+In order to use a reference frame of a celestial object, one has to create it first.
+For example, to compute the Orbit of the ISS with respect to the reference frame of
+Mars (because, why not !)
+
+.. code-block:: python
+
+    from beyond.env.jpl import create_frames
+
+    iss.frame = "Mars"  # would fail
+    
+    create_frames("Mars")
+    iss.frame = "Mars"  # would succeed
+
+Alternatively, it is possible to set the ``env.jpl.dynamic_frames`` configuration variable
+to ``True`` to force the frame creation when needed. By default this is disabled.
 
 In addition to .BSP files, you can provide files in the
 `PCK text format <https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/>`__ (generally with a
@@ -37,18 +49,14 @@ These files allows to convert to keplerian elements with correct physical consta
 
 .. code-block:: python
 
-    config.update({
-        "env": {
-            "jpl": [
-                "/path/to/de430.bsp",
-                "/path/to/mar097.bsp",
-                "/path/to/jup310.bsp",
-                "/path/to/sat360xl.bsp",
-                "/path/to/pck00010.tpc",
-                "/path/to/gm_de431.tpc"
-            ]
-        }
-    })
+    config.set("env", "jpl", "files", [
+        "/path/to/de430.bsp",
+        "/path/to/mar097.bsp",
+        "/path/to/jup310.bsp",
+        "/path/to/sat360xl.bsp",
+        "/path/to/pck00010.tpc",
+        "/path/to/gm_de431.tpc"
+    ])
 
 Examples of both .bsp and .tcp files are available in the ``tests/data/jpl`` folder.
 
@@ -57,6 +65,7 @@ To display the content of a .bsp file you can use::
     $ python -m beyond.env.jpl <file>...
 """
 
+import logging
 import numpy as np
 from pathlib import Path
 
@@ -73,6 +82,7 @@ from jplephem.spk import SPK, S_PER_DAY
 from jplephem.names import target_names
 
 __all__ = ["get_body", "get_orbit", "list_bodies", "create_frames"]
+log = logging.getLogger(__name__)
 
 
 class Body(ConstantBody):
@@ -141,7 +151,7 @@ class Bsp:
         """
         segments = []
 
-        files = config.get("env", "jpl", fallback=[])
+        files = config.get("env", "jpl", "files", fallback=[])
 
         if not files:
             raise JplConfigError("No JPL file defined")
@@ -152,6 +162,10 @@ class Bsp:
             filepath = Path(filepath)
 
             if filepath.suffix.lower() != ".bsp":
+                continue
+
+            if not filepath.exists():
+                log.warning("File not found : {}".format(filepath))
                 continue
 
             segments.extend(SPK.open(str(filepath)).segments)
@@ -248,12 +262,21 @@ class Pck(dict):
 
         self.clear()
 
+        files = config.get("env", "jpl", "files", fallback=[])
+
+        if not files:
+            raise JplConfigError("No JPL file defined")
+
         # Parsing of multiple files provided in the configuration variable
-        for filepath in config["env"]["jpl"]:
+        for filepath in files:
 
             filepath = Path(filepath)
 
             if filepath.suffix.lower() != ".tpc":
+                continue
+
+            if not filepath.exists():
+                log.warning("File not found : {}".format(filepath))
                 continue
 
             with filepath.open() as fp:
@@ -366,6 +389,7 @@ def get_orbit(name, date):
     for a, b in Bsp().top.steps(name):
         if b.name not in _propagator_cache:
 
+            log.debug("creating frame {}".format(b.name))
             # Creation of the specific propagator class
             propagator = type(
                 "%sBspPropagator" % b.name,
@@ -424,8 +448,10 @@ def create_frames(until=None):
     now = Date.now()
 
     if until:
+        log.debug("Creating frames until {}".format(until))
         get_orbit(until, now)
     else:
+        log.debug("Creating all available frames")
         for body in list_bodies():
             get_orbit(body.name, now)
 

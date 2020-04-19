@@ -44,7 +44,8 @@ import sys
 import logging
 import numpy as np
 
-from ..errors import UnknownFrameError
+from ..config import config
+from ..errors import UnknownFrameError, UnknownBodyError
 from ..constants import Earth
 from ..utils.matrix import rot3
 from ..utils.node import Node
@@ -89,8 +90,17 @@ def get_frame(frame):
     Return:
         ~beyond.frames.frames.Frame
     """
+
     if frame not in dynamic.keys():
-        raise UnknownFrameError(frame)
+        if config.get("env", "jpl", "dynamic_frames", fallback=False):
+            from ..env.jpl import create_frames, JplConfigError
+
+            try:
+                create_frames(frame)
+            except (JplConfigError, UnknownBodyError) as e:
+                raise UnknownFrameError(frame) from e
+        else:
+            raise UnknownFrameError(frame)
 
     return dynamic[frame]
 

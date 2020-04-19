@@ -90,13 +90,11 @@ def molniya(request, molniya_tle):
 
 @fixture
 def jplfiles():
-    config['env'] = {
-        'jpl': [
-            str(Path(__file__).parent / "data" / "jpl" / "de403_2000-2020.bsp"),
-            str(Path(__file__).parent / "data" / "jpl" / "pck00010.tpc"),
-            str(Path(__file__).parent / "data" / "jpl" / "gm_de431.tpc"),
-        ]
-    }
+    config.set('env', 'jpl', 'files', [
+        str(Path(__file__).parent / "data" / "jpl" / "de403_2000-2020.bsp"),
+        str(Path(__file__).parent / "data" / "jpl" / "pck00010.tpc"),
+        str(Path(__file__).parent / "data" / "jpl" / "gm_de431.tpc"),
+    ])
 
 
 def _skip_if_no_mpl():

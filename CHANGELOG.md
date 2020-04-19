@@ -5,6 +5,16 @@ Each release is linked to a git commit.
 
 ## [Unreleased]
 
+### Added
+
+- Optional dynamic interplanetary frame via the `env.jpl.dynamic_frames` configuration variable
+
+### Modified
+
+- The list of `bsp` and `tpc` files to read for the `beyond.env.jpl` module to work
+  should be provided to the `env.jpl.files` configuration variable, instead of the previous
+  `env.jpl`
+
 ### Fixed
 
 - Wrong assumption on the config dict structure now leads to a ``ConfigError``
