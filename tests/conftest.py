@@ -19,12 +19,7 @@ np.set_printoptions(linewidth=200)
 def config_override():
     """Create a dummy config dict containing basic data
     """
-
-    config.update({
-        "eop": {
-            "missing_policy": "pass",
-        }
-    })
+    config.set("eop", "missing_policy", "pass")
 
 
 @fixture

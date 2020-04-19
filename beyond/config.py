@@ -4,6 +4,8 @@ The configuration is a simple dictionary. See :ref:`configuration` for
 details.
 """
 
+from .errors import ConfigError
+
 
 class Config(dict):
     """Configuration
@@ -25,12 +27,21 @@ class Config(dict):
         give the fallback value specified.
         """
 
+        fullkeys = list(keys).copy()
+
         section, *keys = keys
         out = super().get(section, fallback)
 
         while isinstance(out, dict):
             key = keys.pop(0)
             out = out.get(key, fallback)
+
+        if keys and out is not fallback:
+            raise ConfigError(
+                "Dict structure mismatch : Looked for '{}', stopped at '{}'".format(
+                    ".".join(fullkeys), key
+                )
+            )
 
         return out
 

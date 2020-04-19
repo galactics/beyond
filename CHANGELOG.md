@@ -3,6 +3,12 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [Unreleased]
+
+### Fixed
+
+- Wrong assumption on the config dict structure now leads to a ``ConfigError``
+
 ## [v0.6.9] - 2020-04-19
 
 ### Added
