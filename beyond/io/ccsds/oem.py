@@ -1,7 +1,6 @@
 import numpy as np
 import lxml.etree as ET
 
-from ...dates import Date
 from ...utils import units
 from ...orbits import Orbit, Ephem
 
@@ -16,11 +15,12 @@ from .commons import (
     xml2dict,
     decode_unit,
     Field,
+    get_format,
 )
 from .cov import load_cov
 
 
-def load_oem(string, fmt):
+def loads(string, fmt):
     """
     Args:
         string (str): String containing the OEM
@@ -29,16 +29,33 @@ def load_oem(string, fmt):
     """
 
     if fmt == "kvn":
-        ephem = _load_oem_kvn(string)
+        ephem = _loads_kvn(string)
     elif fmt == "xml":
-        ephem = _load_oem_xml(string)
+        ephem = _loads_xml(string)
     else:  # pragma: no cover
         raise CcsdsError("Unknown format '{}'".format(fmt))
 
     return ephem
 
 
-def _load_oem_kvn(string):
+def dumps(data, **kwargs):
+
+    fmt = get_format(**kwargs)
+
+    if isinstance(data, Ephem):
+        data = [data]
+
+    if fmt == "kvn":
+        string = _dumps_kvn(data, **kwargs)
+    elif fmt == "xml":
+        string = _dumps_xml(data, **kwargs)
+    else:  # pragma: no cover
+        raise CcsdsError("Unknown format '{}'".format(fmt))
+
+    return string
+
+
+def _loads_kvn(string):
 
     ephems = []
     required = ("REF_FRAME", "CENTER_NAME", "TIME_SYSTEM", "OBJECT_ID", "OBJECT_NAME")
@@ -152,7 +169,7 @@ def _load_oem_kvn(string):
     return ephems
 
 
-def _load_oem_xml(string):
+def _loads_xml(string):
 
     data = xml2dict(string.encode())
 
@@ -218,142 +235,132 @@ def _load_oem_xml(string):
     return ephems
 
 
-def dump_oem(data, fmt="kvn", **kwargs):
+def _dumps_kvn(data, **kwargs):
 
-    if isinstance(data, Ephem):
-        data = [data]
+    header = dump_kvn_header(data, "OEM", version="2.0", **kwargs)
 
-    if fmt == "kvn":
-        header = dump_kvn_header(data, "OEM", version="2.0", **kwargs)
+    content = []
+    for i, data in enumerate(data):
 
-        content = []
-        for i, data in enumerate(data):
+        data.form = "cartesian"
 
-            data.form = "cartesian"
+        extras = {
+            "START_TIME": "{:{}}".format(data.start, DATE_FMT_DEFAULT),
+            "STOP_TIME": "{:{}}".format(data.stop, DATE_FMT_DEFAULT),
+            "INTERPOLATION": data.method.upper(),
+        }
+        if data.method != data.LINEAR:
+            extras["INTERPOLATION_DEGREE"] = "{}".format(data.order - 1)
 
-            extras = {
-                "START_TIME": "{:{}}".format(data.start, DATE_FMT_DEFAULT),
-                "STOP_TIME": "{:{}}".format(data.stop, DATE_FMT_DEFAULT),
-                "INTERPOLATION": data.method.upper(),
-            }
-            if data.method != data.LINEAR:
-                extras["INTERPOLATION_DEGREE"] = "{}".format(data.order - 1)
+        meta = dump_kvn_meta_odm(data, extras=extras, **kwargs)
 
-            meta = dump_kvn_meta_odm(data, extras=extras, **kwargs)
+        text = []
+        cov = []
+        for orb in data:
+            text.append(
+                "{date:{dfmt}} {orb[0]:{fmt}} {orb[1]:{fmt}} {orb[2]:{fmt}} {orb[3]:{fmt}} {orb[4]:{fmt}} {orb[5]:{fmt}}".format(
+                    date=orb.date,
+                    orb=orb.base / units.km,
+                    fmt=" 10f",
+                    dfmt=DATE_FMT_DEFAULT,
+                )
+            )
 
-            text = []
-            cov = []
-            for orb in data:
-                text.append(
-                    "{date:{dfmt}} {orb[0]:{fmt}} {orb[1]:{fmt}} {orb[2]:{fmt}} {orb[3]:{fmt}} {orb[4]:{fmt}} {orb[5]:{fmt}}".format(
-                        date=orb.date,
-                        orb=orb.base / units.km,
-                        fmt=" 10f",
-                        dfmt=DATE_FMT_DEFAULT,
-                    )
+            if orb.cov.any():
+                cov_text = []
+
+                if cov:
+                    cov_text.append("")
+
+                cov_text.append(
+                    "EPOCH = {date:{dfmt}}".format(date=orb.date, dfmt=DATE_FMT_DEFAULT)
                 )
 
-                if orb.cov.any():
-                    cov_text = []
+                if orb.cov.frame != orb.cov.PARENT_FRAME:
+                    frame = orb.cov.frame
+                    if frame == "QSW":
+                        frame = "RSW"
+                    cov_text.append("COV_REF_FRAME = {}".format(frame))
 
-                    if cov:
-                        cov_text.append("")
+                elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
 
-                    cov_text.append(
-                        "EPOCH = {date:{dfmt}}".format(
-                            date=orb.date, dfmt=DATE_FMT_DEFAULT
-                        )
-                    )
+                for i in range(6):
+                    line = []
+                    for j in range(i + 1):
+                        line.append("{: 0.16e}".format(orb.cov[i, j] / 1e6))
+                    cov_text.append(" ".join(line))
 
-                    if orb.cov.frame != orb.cov.PARENT_FRAME:
-                        frame = orb.cov.frame
-                        if frame == "QSW":
-                            frame = "RSW"
-                        cov_text.append("COV_REF_FRAME = {}".format(frame))
+                cov.append("\n".join(cov_text))
 
-                    elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
+        if cov:
+            cov.insert(0, "\n\nCOVARIANCE_START")
+            cov.append("COVARIANCE_STOP\n")
 
-                    for i in range(6):
-                        line = []
-                        for j in range(i + 1):
-                            line.append("{: 0.16e}".format(orb.cov[i, j] / 1e6))
-                        cov_text.append(" ".join(line))
+        content.append(meta + "\n".join(text) + "\n".join(cov))
 
-                    cov.append("\n".join(cov_text))
+    return header + "\n" + "\n\n\n".join(content)
 
-            if cov:
-                cov.insert(0, "\n\nCOVARIANCE_START")
-                cov.append("COVARIANCE_STOP\n")
 
-            content.append(meta + "\n".join(text) + "\n".join(cov))
+def _dumps_xml(data, **kwargs):
+    top = dump_xml_header(data, "OEM", version="2.0", **kwargs)
+    body = ET.SubElement(top, "body")
 
-        string = header + "\n" + "\n\n\n".join(content)
+    for i, data in enumerate(data):
+        segment = ET.SubElement(body, "segment")
 
-    elif fmt == "xml":
-        top = dump_xml_header(data, "OEM", version="2.0", **kwargs)
-        body = ET.SubElement(top, "body")
+        extras = {
+            "START_TIME": data.start.strftime(DATE_FMT_DEFAULT),
+            "STOP_TIME": data.stop.strftime(DATE_FMT_DEFAULT),
+            "INTERPOLATION": data.method.upper(),
+        }
+        if data.method != data.LINEAR:
+            extras["INTERPOLATION_DEGREE"] = str(data.order - 1)
 
-        for i, data in enumerate(data):
-            segment = ET.SubElement(body, "segment")
+        dump_xml_meta_odm(segment, data, extras=extras, **kwargs)
 
-            extras = {
-                "START_TIME": data.start.strftime(DATE_FMT_DEFAULT),
-                "STOP_TIME": data.stop.strftime(DATE_FMT_DEFAULT),
-                "INTERPOLATION": data.method.upper(),
+        data_tag = ET.SubElement(segment, "data")
+
+        for el in data:
+            statevector = ET.SubElement(data_tag, "stateVector")
+            epoch = ET.SubElement(statevector, "EPOCH")
+            epoch.text = el.date.strftime(DATE_FMT_DEFAULT)
+
+            elems = {
+                "X": "x",
+                "Y": "y",
+                "Z": "z",
+                "X_DOT": "vx",
+                "Y_DOT": "vy",
+                "Z_DOT": "vz",
             }
-            if data.method != data.LINEAR:
-                extras["INTERPOLATION_DEGREE"] = str(data.order - 1)
 
-            dump_xml_meta_odm(segment, data, extras=extras, **kwargs)
+            for k, v in elems.items():
+                x = ET.SubElement(
+                    statevector, k, units="km" if "DOT" not in k else "km/s"
+                )
+                x.text = "{:0.6f}".format(getattr(el, v) / units.km)
 
-            data_tag = ET.SubElement(segment, "data")
+        for el in data:
+            if el.cov.any():
+                cov = ET.SubElement(data_tag, "covarianceMatrix")
 
-            for el in data:
-                statevector = ET.SubElement(data_tag, "stateVector")
-                epoch = ET.SubElement(statevector, "EPOCH")
-                epoch.text = el.date.strftime(DATE_FMT_DEFAULT)
+                cov_date = ET.SubElement(cov, "EPOCH")
+                cov_date.text = el.date.strftime(DATE_FMT_DEFAULT)
 
-                elems = {
-                    "X": "x",
-                    "Y": "y",
-                    "Z": "z",
-                    "X_DOT": "vx",
-                    "Y_DOT": "vy",
-                    "Z_DOT": "vz",
-                }
+                if el.cov.frame != el.cov.PARENT_FRAME:
+                    frame = el.cov.frame
+                    if frame == "QSW":
+                        frame = "RSW"
 
-                for k, v in elems.items():
-                    x = ET.SubElement(
-                        statevector, k, units="km" if "DOT" not in k else "km/s"
-                    )
-                    x.text = "{:0.6f}".format(getattr(el, v) / units.km)
+                    cov_frame = ET.SubElement(cov, "COV_REF_FRAME")
+                    cov_frame.text = "{frame}".format(frame=frame)
 
-            for el in data:
-                if el.cov.any():
-                    cov = ET.SubElement(data_tag, "covarianceMatrix")
+                elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
+                for i, a in enumerate(elems):
+                    for j, b in enumerate(elems[: i + 1]):
+                        x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
+                        x.text = "{:0.16e}".format(el.cov[i, j] / 1e6)
 
-                    cov_date = ET.SubElement(cov, "EPOCH")
-                    cov_date.text = el.date.strftime(DATE_FMT_DEFAULT)
-
-                    if el.cov.frame != el.cov.PARENT_FRAME:
-                        frame = el.cov.frame
-                        if frame == "QSW":
-                            frame = "RSW"
-
-                        cov_frame = ET.SubElement(cov, "COV_REF_FRAME")
-                        cov_frame.text = "{frame}".format(frame=frame)
-
-                    elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
-                    for i, a in enumerate(elems):
-                        for j, b in enumerate(elems[: i + 1]):
-                            x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
-                            x.text = "{:0.16e}".format(el.cov[i, j] / 1e6)
-
-        string = ET.tostring(
-            top, pretty_print=True, xml_declaration=True, encoding="UTF-8"
-        ).decode()
-
-    else:  # pragma: no cover
-        raise CcsdsError("Unknown format '{}'".format(fmt))
-
-    return string
+    return ET.tostring(
+        top, pretty_print=True, xml_declaration=True, encoding="UTF-8"
+    ).decode()

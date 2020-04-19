@@ -50,7 +50,7 @@ class Timescale(Node):
         jd = mjd + Date.JD_MJD
         jj = Date._julian_century(jd)
         m = radians(357.5277233 + 35999.05034 * jj)
-        delta_lambda = radians(246.11 + 0.90251792 * (jd - 2451545.0))
+        delta_lambda = radians(246.11 + 0.90251792 * (jd - Date.J2000))
         return 0.001657 * sin(m) + 0.000022 * sin(delta_lambda)
 
     def offset(self, mjd, new_scale, eop):
@@ -148,6 +148,9 @@ class Date:
 
     JD_MJD = 2400000.5
     """Offset between JD and MJD"""
+
+    J2000 = 2451545.0
+    """Offset between JD and J2000"""
 
     REF_SCALE = "TAI"
     """Scale used as reference internally"""
@@ -376,7 +379,7 @@ class Date:
 
     @classmethod
     def _julian_century(cls, jd):
-        return (jd - 2451545.0) / 36525.0
+        return (jd - cls.J2000) / 36525.0
 
     @property
     def julian_century(self):
@@ -532,3 +535,4 @@ else:  # pragma: no cover
             return values
 
     munits.registry.setdefault(Date, DateConverter())
+    munits.registry.setdefault(DateRange, DateConverter())

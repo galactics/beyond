@@ -66,13 +66,21 @@ from ..orbits import Orbit
 from ..utils.node import Node
 from ..propagators.base import AnalyticalPropagator
 from ..dates import Date
-from ..constants import Body, G
+from ..constants import Body as ConstantBody, G
 from .solarsystem import EarthPropagator
 
 from jplephem.spk import SPK, S_PER_DAY
 from jplephem.names import target_names
 
 __all__ = ["get_body", "get_orbit", "list_bodies", "create_frames"]
+
+
+class Body(ConstantBody):
+    """
+    """
+
+    def propagate(self, date):
+        return get_orbit(self.name, date)
 
 
 class Target(Node):
@@ -316,23 +324,22 @@ class Pck(dict):
         except KeyError:
             obj = {}
 
+        kwargs = {
+            "name": name.title(),
+            "equatorial_radius": 0,
+            "mass": 0,
+        }
+
         # Shape
         if "RADII" in obj:
-            radii = obj["RADII"][0] * 1000.0
-            flattening = 1 - (obj["RADII"][2] / obj["RADII"][0])
-        else:
-            radii = 0
-            flattening = 0
+            kwargs["equatorial_radius"] = obj["RADII"][0] * 1000.0
+            kwargs["flattening"] = 1 - (obj["RADII"][2] / obj["RADII"][0])
 
         # mass
         if "GM" in obj:
-            mass = obj["GM"][0] * 1e9 / G
-        else:
-            mass = 0
+            kwargs["mass"] = obj["GM"][0] * 1e9 / G
 
-        return Body(
-            name=name.title(), mass=mass, equatorial_radius=radii, flattening=flattening
-        )
+        return Body(**kwargs)
 
 
 # Cache containing all the propagators used
@@ -344,7 +351,7 @@ def get_orbit(name, date):
 
     Args:
         name (str): The name of the body desired. For exact nomenclature, see
-            :py:func:`available_planets`
+            :py:func:`list_bodies`
         date (Date): Date at which the state vector will be extracted
     Return:
         Orbit: Orbit of the desired object, in the reference frame in which it is declared in
@@ -432,9 +439,7 @@ def get_body(name):
         :py:class:`~beyond.constants.Body`
     """
 
-    body = Pck()[name]
-    body.propagate = lambda date: get_orbit(name, date)
-    return body
+    return Pck()[name]
 
 
 if __name__ == "__main__":  # pragma: no cover

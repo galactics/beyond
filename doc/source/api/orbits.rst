@@ -21,6 +21,8 @@ Available forms are
 
 .. autodata:: beyond.orbits.forms.KEPL_C
 
+.. autodata:: beyond.orbits.forms.KEPL_E
+
 
 Orbit
 -----
@@ -45,10 +47,6 @@ Ephem
 
 Listeners
 ---------
-
-Listeners allow to watch for state transition during the propagation of an orbit.
-For example, the :abbr:`AOS (Acquisition Of Signal)` and :abbr:`LOS (Loss Of Signal)` of a satellite as
-seen from a station.
 
 .. automodule:: beyond.orbits.listeners
     :members:

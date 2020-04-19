@@ -2,6 +2,7 @@
 """
 
 from ..errors import UnknownPropagatorError
+from .base import Propagator
 
 
 def get_propagator(name):
@@ -13,17 +14,23 @@ def get_propagator(name):
         Propagator class
     """
 
+    from .j2 import J2
+    from .kepler import Kepler
+    from .keplernum import KeplerNum
+    from .none import NonePropagator
     from .sgp4 import Sgp4
     from .sgp4beta import Sgp4Beta
-    from .kepler import Kepler
-    from .none import NonePropagator
 
-    scope = locals().copy()
-    scope.update(globals())
+    scope = {
+        "J2": J2,
+        "Kepler": Kepler,
+        "KeplerNum": KeplerNum,
+        "NonePropagator": NonePropagator,
+        "Sgp4": Sgp4,
+        "Sgp4Beta": Sgp4Beta,
+    }
 
-    if name is None:
-        return NonePropagator
-    elif name not in scope:
+    if name not in scope:
         raise UnknownPropagatorError(name)
     else:
         return scope[name]

@@ -17,22 +17,38 @@ from .commons import (
     dump_xml_header,
     dump_xml_meta_odm,
     DATE_FMT_DEFAULT,
+    get_format,
 )
 
 
-def load_omm(string, fmt):
+def loads(string, fmt):
 
     if fmt == "kvn":
-        orb = _load_omm_kvn(string)
+        orb = _loads_kvn(string)
     elif fmt == "xml":
-        orb = _load_omm_xml(string)
+        orb = _loads_xml(string)
     else:  # pragma: no cover
         raise CcsdsError("Unknown format '{}'".format(fmt))
 
     return orb
 
 
-def _load_omm_kvn(string):
+def dumps(data, **kwargs):
+
+    # Inject a default format if it is not provided, either by argument or by configuration
+    fmt = get_format(**kwargs)
+
+    if fmt == "kvn":
+        string = _dumps_kvn(data, **kwargs)
+    elif fmt == "xml":
+        string = _dumps_xml(data, **kwargs)
+    else:  # pragma: no cover
+        raise CcsdsError("Unknown format '{}'".format(fmt))
+
+    return string
+
+
+def _loads_kvn(string):
 
     data = kvn2dict(string)
     # if "item" in data.keys():
@@ -90,10 +106,15 @@ def _load_omm_kvn(string):
     if "CX_X" in data:
         orb.cov = load_cov(orb, data)
 
+    for k in data.keys():
+        if k.startswith("USER_DEFINED"):
+            ud = orb.complements.setdefault("ccsds_user_defined", {})
+            ud[k[13:]] = data[k].text
+
     return orb
 
 
-def _load_omm_xml(string):
+def _loads_xml(string):
 
     data = xml2dict(string.encode())
 
@@ -158,27 +179,29 @@ def _load_omm_xml(string):
     if cov:
         orb.cov = load_cov(orb, cov)
 
+    ud_dict = data["body"]["segment"]["data"].get("userDefinedParameters", {})
+
+    for field in ud_dict.get("USER_DEFINED", []):
+        ud = orb.complements.setdefault("ccsds_user_defined", {})
+        ud[field.attrib["parameter"]] = field.text
+
     return orb
 
 
-def dump_omm(data, fmt="kvn", **kwargs):
+def _dumps_kvn(data, **kwargs):
 
-    if fmt == "kvn":
+    header = dump_kvn_header(data, "OMM", version="2.0", **kwargs)
 
-        header = dump_kvn_header(data, "OMM", version="2.0", **kwargs)
+    if isinstance(data.propagator, Sgp4):
+        theory = "SGP/SGP4"
+    else:  # pragma: no cover
+        raise CcsdsError("Unknown propagator type '{}' for OMM".format(data.propagator))
 
-        if isinstance(data.propagator, Sgp4):
-            theory = "SGP/SGP4"
-        else:  # pragma: no cover
-            raise CcsdsError(
-                "Unknown propagator type '{}' for OMM".format(data.propagator)
-            )
+    meta = dump_kvn_meta_odm(
+        data, meta_tag=False, extras={"MEAN_ELEMENT_THEORY": theory}, **kwargs
+    )
 
-        meta = dump_kvn_meta_odm(
-            data, meta_tag=False, extras={"MEAN_ELEMENT_THEORY": theory}, **kwargs
-        )
-
-        text = """
+    text = """
 EPOCH                = {tle.date:{dfmt}}
 MEAN_MOTION          = {n: 12.8f} [rev/day]
 ECCENTRICITY         = {tle.e: 11.7f}
@@ -197,111 +220,113 @@ BSTAR                = {bstar:6.4f} [1/ER]
 MEAN_MOTION_DOT      = {ndot: 10.8f} [rev/day**2]
 MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
 """.format(
-            n=code_unit(data, "n", "rev/day"),
-            i=code_unit(data, "i", "deg"),
-            Omega=code_unit(data, "Omega", "deg"),
-            omega=code_unit(data, "omega", "deg"),
-            M=code_unit(data, "M", "deg"),
-            tle=data,
-            bstar=code_unit(data, "bstar", "1/ER"),
-            ndot=code_unit(data, "ndot", "rev/day**2") / 2,
-            ndotdot=code_unit(data, "ndotdot", "rev/day**3") / 6,
-            mu=wgs72.mu,  # this is already in km**3/s**2
-            dfmt=DATE_FMT_DEFAULT,
-        )
+        n=code_unit(data, "n", "rev/day"),
+        i=code_unit(data, "i", "deg"),
+        Omega=code_unit(data, "Omega", "deg"),
+        omega=code_unit(data, "omega", "deg"),
+        M=code_unit(data, "M", "deg"),
+        tle=data,
+        bstar=code_unit(data, "bstar", "1/ER"),
+        ndot=code_unit(data, "ndot", "rev/day**2") / 2,
+        ndotdot=code_unit(data, "ndotdot", "rev/day**3") / 6,
+        mu=wgs72.mu,  # this is already in km**3/s**2
+        dfmt=DATE_FMT_DEFAULT,
+    )
 
-        if data.cov.any():
-            text += dump_cov(data.cov)
+    if data.cov.any():
+        text += dump_cov(data.cov)
 
-        string = header + "\n" + meta + text
+    if "ccsds_user_defined" in data.complements:
+        text += "\n"
+        for k, v in data.complements["ccsds_user_defined"].items():
+            text += "USER_DEFINED_{} = {}\n".format(k, v)
 
-    elif fmt == "xml":
+    return header + "\n" + meta + text
 
-        top = dump_xml_header(data, "OMM", version="2.0", **kwargs)
 
-        body = ET.SubElement(top, "body")
-        segment = ET.SubElement(body, "segment")
+def _dumps_xml(data, **kwargs):
+    top = dump_xml_header(data, "OMM", version="2.0", **kwargs)
 
-        if isinstance(data.propagator, Sgp4):
-            theory = "SGP/SGP4"
-        else:  # pragma: no cover
-            raise CcsdsError(
-                "Unknown propagator type '{}' for OMM".format(data.propagator)
-            )
+    body = ET.SubElement(top, "body")
+    segment = ET.SubElement(body, "segment")
 
-        dump_xml_meta_odm(
-            segment, data, extras={"MEAN_ELEMENT_THEORY": theory}, **kwargs
-        )
-
-        data_tag = ET.SubElement(segment, "data")
-
-        meanelements = ET.SubElement(data_tag, "meanElements")
-
-        epoch = ET.SubElement(meanelements, "EPOCH")
-        epoch.text = data.date.strftime(DATE_FMT_DEFAULT)
-
-        sma = ET.SubElement(meanelements, "MEAN_MOTION", units="rev/day")
-        sma.text = "{:0.8f}".format(code_unit(data, "n", "rev/day"))
-        ecc = ET.SubElement(meanelements, "ECCENTRICITY")
-        ecc.text = "{:0.7f}".format(data.e)
-
-        elems = {
-            "INCLINATION": "i",
-            "RA_OF_ASC_NODE": "Omega",
-            "ARG_OF_PERICENTER": "omega",
-            "MEAN_ANOMALY": "M",
-        }
-        for k, v in elems.items():
-            x = ET.SubElement(meanelements, k, units="deg")
-            x.text = "{:0.4f}".format(np.degrees(getattr(data, v)))
-
-        gm = ET.SubElement(meanelements, "GM", units="km**3/s**2")
-        gm.text = "{:0.1f}".format(wgs72.mu)
-
-        if theory == "SGP/SGP4":  # pragma: no branch
-            tle_params = ET.SubElement(data_tag, "tleParameters")
-            ephemeris_type = ET.SubElement(tle_params, "EPHEMERIS_TYPE")
-            ephemeris_type.text = "0"
-            classification = ET.SubElement(tle_params, "CLASSIFICATION_TYPE")
-            classification.text = "U"
-            norad_id = ET.SubElement(tle_params, "NORAD_CAT_ID")
-            norad_id.text = str(data.norad_id)
-            element_nb = ET.SubElement(tle_params, "ELEMENT_SET_NO")
-            element_nb.text = str(data.element_nb)
-            revolutions = ET.SubElement(tle_params, "REV_AT_EPOCH")
-            revolutions.text = str(data.revolutions)
-
-            bstar = ET.SubElement(tle_params, "BSTAR")
-            bstar.text = "{:.4f}".format(data.bstar)
-
-            ndot = ET.SubElement(tle_params, "MEAN_MOTION_DOT")
-            ndot.text = "{:.8f}".format(data.ndot)
-
-            ndotdot = ET.SubElement(tle_params, "MEAN_MOTION_DDOT")
-            ndotdot.text = "{:.1f}".format(data.ndotdot)
-
-        if data.cov.any():
-            cov = ET.SubElement(data_tag, "covarianceMatrix")
-
-            if data.cov.frame != data.cov.PARENT_FRAME:
-                frame = data.cov.frame
-                if frame == "QSW":
-                    frame = "RSW"
-
-                cov_frame = ET.SubElement(cov, "COV_REF_FRAME")
-                cov_frame.text = "{frame}".format(frame=frame)
-
-            elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
-            for i, a in enumerate(elems):
-                for j, b in enumerate(elems[: i + 1]):
-                    x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
-                    x.text = "{:0.16e}".format(data.cov[i, j] / 1e6)
-
-        string = ET.tostring(
-            top, pretty_print=True, encoding="UTF-8", xml_declaration=True
-        ).decode()
-
+    if isinstance(data.propagator, Sgp4):
+        theory = "SGP/SGP4"
     else:  # pragma: no cover
-        raise CcsdsError("Unknown format '{}'".format(fmt))
+        raise CcsdsError("Unknown propagator type '{}' for OMM".format(data.propagator))
 
-    return string
+    dump_xml_meta_odm(segment, data, extras={"MEAN_ELEMENT_THEORY": theory}, **kwargs)
+
+    data_tag = ET.SubElement(segment, "data")
+
+    meanelements = ET.SubElement(data_tag, "meanElements")
+
+    epoch = ET.SubElement(meanelements, "EPOCH")
+    epoch.text = data.date.strftime(DATE_FMT_DEFAULT)
+
+    sma = ET.SubElement(meanelements, "MEAN_MOTION", units="rev/day")
+    sma.text = "{:0.8f}".format(code_unit(data, "n", "rev/day"))
+    ecc = ET.SubElement(meanelements, "ECCENTRICITY")
+    ecc.text = "{:0.7f}".format(data.e)
+
+    elems = {
+        "INCLINATION": "i",
+        "RA_OF_ASC_NODE": "Omega",
+        "ARG_OF_PERICENTER": "omega",
+        "MEAN_ANOMALY": "M",
+    }
+    for k, v in elems.items():
+        x = ET.SubElement(meanelements, k, units="deg")
+        x.text = "{:0.4f}".format(np.degrees(getattr(data, v)))
+
+    gm = ET.SubElement(meanelements, "GM", units="km**3/s**2")
+    gm.text = "{:0.1f}".format(wgs72.mu)
+
+    if theory == "SGP/SGP4":  # pragma: no branch
+        tle_params = ET.SubElement(data_tag, "tleParameters")
+        ephemeris_type = ET.SubElement(tle_params, "EPHEMERIS_TYPE")
+        ephemeris_type.text = "0"
+        classification = ET.SubElement(tle_params, "CLASSIFICATION_TYPE")
+        classification.text = "U"
+        norad_id = ET.SubElement(tle_params, "NORAD_CAT_ID")
+        norad_id.text = str(data.norad_id)
+        element_nb = ET.SubElement(tle_params, "ELEMENT_SET_NO")
+        element_nb.text = str(data.element_nb)
+        revolutions = ET.SubElement(tle_params, "REV_AT_EPOCH")
+        revolutions.text = str(data.revolutions)
+
+        bstar = ET.SubElement(tle_params, "BSTAR")
+        bstar.text = "{:.4f}".format(data.bstar)
+
+        ndot = ET.SubElement(tle_params, "MEAN_MOTION_DOT")
+        ndot.text = "{:.8f}".format(data.ndot)
+
+        ndotdot = ET.SubElement(tle_params, "MEAN_MOTION_DDOT")
+        ndotdot.text = "{:.1f}".format(data.ndotdot)
+
+    if data.cov.any():
+        cov = ET.SubElement(data_tag, "covarianceMatrix")
+
+        if data.cov.frame != data.cov.PARENT_FRAME:
+            frame = data.cov.frame
+            if frame == "QSW":
+                frame = "RSW"
+
+            cov_frame = ET.SubElement(cov, "COV_REF_FRAME")
+            cov_frame.text = "{frame}".format(frame=frame)
+
+        elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
+        for i, a in enumerate(elems):
+            for j, b in enumerate(elems[: i + 1]):
+                x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
+                x.text = "{:0.16e}".format(data.cov[i, j] / 1e6)
+
+    if "ccsds_user_defined" in data.complements:
+        ud = ET.SubElement(data_tag, "userDefinedParameters")
+        for k, v in data.complements["ccsds_user_defined"].items():
+            el = ET.SubElement(ud, "USER_DEFINED", parameter=k)
+            el.text = v
+
+    return ET.tostring(
+        top, pretty_print=True, encoding="UTF-8", xml_declaration=True
+    ).decode()

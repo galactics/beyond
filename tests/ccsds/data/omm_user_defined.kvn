@@ -1,0 +1,32 @@
+CCSDS_OMM_VERS = 2.0
+CREATION_DATE = 2019-11-16T17:57:23
+ORIGINATOR = N/A
+
+OBJECT_NAME          = ISS (ZARYA)
+OBJECT_ID            = 1998-067A
+CENTER_NAME          = EARTH
+REF_FRAME            = TEME
+TIME_SYSTEM          = UTC
+MEAN_ELEMENT_THEORY  = SGP/SGP4
+
+
+EPOCH                = 2008-09-20T12:25:40.104192
+MEAN_MOTION          =  15.72125391 [rev/day]
+ECCENTRICITY         =   0.0006703
+INCLINATION          =  51.6416 [deg]
+RA_OF_ASC_NODE       = 247.4627 [deg]
+ARG_OF_PERICENTER    = 130.5360 [deg]
+MEAN_ANOMALY         = 325.0288 [deg]
+GM                   = 398600.8 [km**3/s**2]
+
+EPHEMERIS_TYPE       = 0
+CLASSIFICATION_TYPE  = U
+NORAD_CAT_ID         = 25544
+ELEMENT_SET_NO       = 292
+REV_AT_EPOCH         = 56353
+BSTAR                = -0.0000 [1/ER]
+MEAN_MOTION_DOT      = -0.00002182 [rev/day**2]
+MEAN_MOTION_DDOT     = 0.0 [rev/day**3]
+
+USER_DEFINED_FOO = foo enters
+USER_DEFINED_BAR = a bar

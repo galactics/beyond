@@ -75,7 +75,7 @@ def _sideral(date):
     """Sideral time in radians
     """
     jd = date.change_scale("UT1").jd
-    return 2 * np.pi * (0.779057273264 + 1.00273781191135448 * (jd - 2451545.0))
+    return 2 * np.pi * (0.779057273264 + 1.00273781191135448 * (jd - date.J2000))
 
 
 def sideral(date):

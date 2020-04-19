@@ -58,6 +58,17 @@ def test_dump_opm_interplanetary(jplfiles, orbit, ccsds_format, datafile, helper
     helper.assert_string(datafile("opm_interplanetary"), txt)
 
 
+def test_dump_opm_user_defined(orbit, ccsds_format, datafile, helper):
+
+    subdict = orbit.complements["ccsds_user_defined"] = {}
+
+    subdict["FOO"] = "foo enters"
+    subdict["BAR"] = "a bar"
+    txt = dumps(orbit, fmt=ccsds_format)
+
+    helper.assert_string(datafile("opm_user_defined"), txt)
+
+
 ########## LOAD
 
 def test_load_opm(orbit, datafile, helper):
@@ -176,3 +187,15 @@ def test_load_interplanetary(jplfiles, orbit, datafile, helper):
     data_opm = loads(datafile("opm_interplanetary"))
 
     helper.assert_orbit(orbit, data_opm)
+
+
+def test_load_user_defined(orbit, datafile, helper):
+
+    data_opm = loads(datafile("opm_user_defined"))
+
+    helper.assert_orbit(orbit, data_opm)
+
+    assert "ccsds_user_defined" in data_opm.complements
+    subdict = data_opm.complements["ccsds_user_defined"]
+    assert subdict["FOO"] == "foo enters"
+    assert subdict["BAR"] == "a bar"

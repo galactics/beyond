@@ -10,7 +10,7 @@ from inspect import isclass
 from pkg_resources import iter_entry_points
 
 from ..config import config
-from ..errors import EopError, EopWarning, ConfigError
+from ..errors import EopError, ConfigError
 
 __all__ = ["register", "EopDb", "TaiUtc", "Finals", "Finals2000A"]
 

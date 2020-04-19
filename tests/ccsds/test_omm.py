@@ -54,6 +54,17 @@ def test_dump_omm_bluebook(ccsds_format, datafile, str_tle_bluebook):
         assert ref_bluebook[i] == omm[i]
 
 
+def test_dump_omm_user_defined(tle, ccsds_format, datafile, helper):
+
+    subdict = tle.complements["ccsds_user_defined"] = {}
+
+    subdict["FOO"] = "foo enters"
+    subdict["BAR"] = "a bar"
+    txt = dumps(tle, fmt=ccsds_format)
+
+    helper.assert_string(datafile("omm_user_defined"), txt)
+
+
 def test_load_omm(tle, datafile, helper):
     data = loads(datafile("omm"))
     helper.assert_orbit(tle, data, "TLE")
@@ -102,3 +113,15 @@ def test_load_omm_cov(orbit_cov, datafile, helper):
     data = loads(datafile("omm_cov"))
 
     helper.assert_orbit(tle_cov, data)
+
+
+def test_load_user_defined(tle, datafile, helper):
+
+    data_omm = loads(datafile("omm_user_defined"))
+
+    helper.assert_orbit(tle, data_omm)
+
+    assert "ccsds_user_defined" in data_omm.complements
+    subdict = data_omm.complements["ccsds_user_defined"]
+    assert subdict["FOO"] == "foo enters"
+    assert subdict["BAR"] == "a bar"

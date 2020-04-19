@@ -2,11 +2,17 @@ import re
 import numpy as np
 import lxml.etree as ET
 from collections import namedtuple
+from collections.abc import Iterable
 
 from ...utils import units
 from ...dates import Date
-from ...orbits import Orbit
+from ...orbits import Orbit, Ephem
 from ...errors import ParseError
+from ...utils.measures import Measure
+from ...propagators.base import AnalyticalPropagator
+from ...frames.frames import TEME
+from ...orbits.forms import TLE
+from ...config import config
 
 
 class CcsdsError(ParseError):
@@ -30,6 +36,16 @@ Field = namedtuple("Field", "text attrib")
 DATE_FMT_DEFAULT = "%Y-%m-%dT%H:%M:%S.%f"
 DATE_FMT_NO_MSEC = "%Y-%m-%dT%H:%M:%S"
 DATE_FMT_D_OF_Y = "%Y-%jT%H:%M:%S.%f"
+
+DEFAULT_FMT = "kvn"
+
+
+def get_format(**kwargs):
+    """retrieve the format to dump the file into
+    """
+    return kwargs.get(
+        "fmt", config.get("io", "ccsds_default_format", fallback=DEFAULT_FMT)
+    )
 
 
 def decode_unit(data, name, default=None):
@@ -70,7 +86,7 @@ def parse_date(string, scale):
     return out
 
 
-def detect(string):
+def detect2load(string):
     """Detect the type and format of the CCSDS file
 
     types may be : "OPM", "OMM", "OEM", "TDM"
@@ -82,13 +98,46 @@ def detect(string):
     m = re.search(r"CCSDS_([A-Z]{3})_VERS", string, re.M)
 
     if m and m.group(1) in ["OPM", "OMM", "OEM", "TDM"]:
-        type = m.group(1)
+        type = m.group(1).lower()
     elif m:
         raise CcsdsError("Unknown CCSDS type : {}".format(m))
     else:
         raise CcsdsError("Unknown CCSDS type")
 
     return type, format
+
+
+def detect2dump(data, **kwargs):
+    """Detect the type of the input data and provide the type of ccsds
+    file to generate
+
+    Args:
+        data (Ephem or List[Ephem] or Orbit or MeasureSet)
+    Return:
+        str: type of data (e.g. "oem", "opm", "omm", etc.)
+    Raise:
+        TypeError: for unknown type detected
+    """
+
+    if isinstance(data, Ephem) or (
+        isinstance(data, Iterable) and all(isinstance(x, Ephem) for x in data)
+    ):
+        type = "oem"
+    elif isinstance(data, Orbit):
+        if (
+            isinstance(data.propagator, AnalyticalPropagator)
+            and issubclass(data.frame, TEME)
+            and data.form is TLE
+        ):
+            type = "omm"
+        else:
+            type = "opm"
+    elif isinstance(data, Iterable) and all(isinstance(x, Measure) for x in data):
+        type = "tdm"
+    else:
+        raise TypeError("Unknown object type")
+
+    return type
 
 
 def xml2dict(string):
@@ -105,7 +154,13 @@ def xml2dict(string):
         data = {}
         for subelem in elem:
             if hasattr(subelem, "text") and subelem.text.strip():
-                data[subelem.tag] = Field(subelem.text, subelem.attrib)
+                field = Field(subelem.text, subelem.attrib)
+                if subelem.tag not in data:
+                    data[subelem.tag] = field
+                elif not isinstance(data[subelem.tag], list):
+                    data[subelem.tag] = [data[subelem.tag], field]
+                else:
+                    data[subelem.tag].append(field)
             elif subelem.tag in data:
                 if not isinstance(data[subelem.tag], list):
                     # We encounter a new child, but a sibling with the same

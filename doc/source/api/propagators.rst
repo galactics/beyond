@@ -10,6 +10,23 @@ All propagators follow the :py:class:`Propagator` interface.
 
 .. autoclass:: beyond.propagators.base.AnalyticalPropagator
 
+Kepler
+------
+
+Basic analytical Keplerian propagator, computing the position by only taking the evolution of
+the mean anomaly into account.
+
+.. automodule:: beyond.propagators.kepler
+    :members:
+
+J2
+--
+
+Analytical propagator, taking the central body effect on the orbit, and the J2 term
+
+.. automodule:: beyond.propagators.j2
+    :members:
+
 SGP4
 ----
 
@@ -49,16 +66,16 @@ being WGS72.
 .. autoclass:: beyond.propagators.sgp4beta.WGS72
 .. autoclass:: beyond.propagators.sgp4beta.WGS84
 
-Kepler
-------
+KeplerNum
+---------
 
-Basic Keplerian propagator, computing the position of the next iteration by integrating
+Basic numerical Keplerian propagator, computing the position of the next iteration by integrating
 of the acceleration components applied to the satellite by numerous bodies (Earth, Moon, Sun, etc.).
 This propagator is currently in development.
 
 This propagator is able do handle maneuvers, as exposed in the :ref:`maneuvers` example.
 
-.. automodule:: beyond.propagators.kepler
+.. automodule:: beyond.propagators.keplernum
     :members:
     :special-members: __init__
     :show-inheritance:

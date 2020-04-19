@@ -1,3 +1,11 @@
+"""Listeners allow to watch for state transition during the propagation of an orbit.
+For example, the :abbr:`AOS (Acquisition Of Signal)` and :abbr:`LOS (Loss Of Signal)` of
+a satellite as seen from a station.
+
+Each time a propagator (a subclass of :py:class:`Speaker`) detects a state transition, it
+creates an Orbit instance at the date of the event, and add an ``event`` attribute which
+is an :py:class:`Event` instance.
+"""
 import numpy as np
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
@@ -16,7 +24,10 @@ __all__ = [
     "TerminatorListener",
     "ApsideListener",
     "NodeListener",
-    "ZeroDopplerListener",
+    "AnomalyListener",
+    "RadialVelocityListener",
+    "find_event",
+    "events_iterator",
 ]
 
 
@@ -26,8 +37,17 @@ class Speaker(metaclass=ABCMeta):
     By calling :py:meth:`listen`, the subclass can trigger the listeners.
     """
 
-    SPEAKER_MODE = "global"
     _eps_bisect = timedelta.resolution
+
+    @classmethod
+    def clear_listeners(cls, listeners):
+        """Clear Listeners in order to do a propagation with a clean state
+        """
+        if isinstance(listeners, Listener):
+            listeners = [listeners]
+
+        for listener in listeners:
+            listener.clear()
 
     def listen(self, orb, listeners):
         """This method allows to loop over the listeners and trigger the :py:meth:`_bisect` method
@@ -68,10 +88,7 @@ class Speaker(metaclass=ABCMeta):
 
         while abs(step) >= self._eps_bisect:
             date = begin.date + step
-            if self.SPEAKER_MODE == "global":
-                orb = self.propagate(date)
-            else:
-                orb = begin.propagate(date)
+            orb = self.propagate(date)
             if listener(begin) * listener(orb) > 0:
                 begin = orb
             else:
@@ -114,8 +131,16 @@ class Listener(metaclass=ABCMeta):
     def __call__(self, orb):  # pragma: no cover
         pass
 
+    def clear(self):
+        """Clear the state of the listener, in order to make a new iteration
+        """
+        self.prev = None
+
 
 class Event:
+    """An instance of this class, or its subclass, is added as attribute to the Orbit
+    instance each time a state change is detected.
+    """
     def __init__(self, listener, info):
         self.listener = listener
         self.info = info
@@ -328,6 +353,8 @@ class AnomalyEvent(Event):
 
 
 class AnomalyListener(Listener):
+    """Listener for anomaly (in the orbital sense)
+    """
 
     event = AnomalyEvent
 
@@ -339,14 +366,20 @@ class AnomalyListener(Listener):
     }
 
     def __init__(self, value, anomaly="true", frame=None):
+        """
+        Args:
+            value (float):
+            anomaly (str): Type of anomaly, can be any from 'true', 'mean', 'eccentric' or 'aol'
+            frame (str):
+        """
         self.value = value
         self.anomaly = anomaly
         self.frame = frame
 
     @property
     def _anomaly(self):
-        if self.anomaly not in self.ANOMALIES:
-            raise ValueError("Unknown '{}' anomaly type".format(self.anomaly))
+        if self.anomaly not in self.ANOMALIES:  # pragma: no cover
+            raise ValueError("Unknown anomaly type : {}".format(self.anomaly))
 
         return self.ANOMALIES[self.anomaly]
 
@@ -358,18 +391,28 @@ class AnomalyListener(Listener):
     def attr(self):
         return self._anomaly[1]
 
+    def _diff(self, orb):
+        return (self._convert(orb) - self.value + np.pi) % (2 * np.pi) - np.pi
+
+    def check(self, orb):
+        return abs(self._diff(orb)) < 2 and super().check(orb)
+
     def info(self, orb):
         # breakpoint()
+        if self.anomaly == "aol":
+            txt = "Argument of Latitude"
+        else:
+            txt = "{} Anomaly".format(self.anomaly.title())
+
         return AnomalyEvent(
-            self, "Anomaly {}={:.2f}".format(self.attr, np.degrees(self.convert(orb)))
+            self, "{} = {:.2f}".format(txt, np.degrees(self._convert(orb)))
         )
 
-    def convert(self, orb):
+    def _convert(self, orb):
         return getattr(orb.copy(frame=self.frame, form=self.form), self.attr)
 
     def __call__(self, orb):
-        v = self.convert(orb) - self.value
-        return (v + np.pi) % (2 * np.pi) - np.pi
+        return self._diff(orb)
 
 
 class SignalEvent(Event):  # pragma: no cover
@@ -488,9 +531,9 @@ class StationMaxListener(Listener):
         return orb.phi_dot
 
 
-class ZeroDopplerEvent(Event):  # pragma: no cover
+class RadialVelocityEvent(Event):  # pragma: no cover
     def __init__(self, listener):
-        super().__init__(listener, "Zero Doppler")
+        super().__init__(listener, "Radial Velocity")
 
     @property
     def frame(self):
@@ -500,9 +543,9 @@ class ZeroDopplerEvent(Event):  # pragma: no cover
         return "Zero Doppler {}".format(self.frame)
 
 
-class ZeroDopplerListener(Listener):
+class RadialVelocityListener(Listener):
 
-    event = ZeroDopplerEvent
+    event = RadialVelocityEvent
 
     def __init__(self, frame, sight=False):
         """
@@ -515,7 +558,7 @@ class ZeroDopplerListener(Listener):
         self.sight = sight
 
     def info(self, orb):
-        return ZeroDopplerEvent(self)
+        return self.event(self)
 
     def check(self, orb):
 
@@ -532,10 +575,17 @@ class ZeroDopplerListener(Listener):
 def stations_listeners(stations):
     """Function for creating listeners for a a list of station
 
+    Each station will have the following Listeners attached:
+
+        - :py:class:`StationSignalListener`
+        - :py:class:`StationMaxListener`
+        - :py:class:`StationMaskListener` if the station has a mask defined
+          (see :py:func:`~beyond.frames.stations.create_station` for details)
+
     Args:
         stations (iterable): List of TopocentricFrame
     Return:
-        list of Listener
+        list of Listeners
     """
     stations = stations if isinstance(stations, (list, tuple)) else [stations]
 
@@ -550,28 +600,39 @@ def stations_listeners(stations):
     return listeners
 
 
-def find_event(event, iterator, offset=0):
+def find_event(iterator, event, offset=0):
     """Find an specific event in a extropolation
 
     Args:
-        event (str or Event)
-        iterator ():
-        offset (int):
+        iterator (Iterable[Orbit]): Itertator in which to look for the event
+        event (str or Event): Event to look for
+        offset (int): The function will return the Nth event detected
     Return:
-        Orb
+        Orbit
     """
 
-    if isinstance(event, Event):
+    if isinstance(event, Event):  # pragma: no cover
         event = event.info
 
-    i = 0
-
-    for orb in iterator:
-        if orb.event and orb.event.info == event:
-            if i == offset:
-                break
-            i += 1
+    for i, orb in enumerate(events_iterator(iterator, event)):
+        if i == offset:
+            break
     else:
-        raise RuntimeError("No event '{}' found".format(event))
+        raise RuntimeError("No event '{}' found at offset={}".format(event, offset))
 
     return orb
+
+
+def events_iterator(iterator, *events):
+    """Iterate only over the listed events
+
+    Args:
+        iterator (Iterable[Orbit])
+        events (List[str]):
+    Yield:
+        Orbit:
+    """
+
+    for orb in iterator:
+        if orb.event and (not events or orb.event.info in events):
+            yield orb

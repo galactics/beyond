@@ -181,11 +181,11 @@ def test_tolerant(ephem):
 
 def test_sensitivity(ephem):
 
-    ref_asc = find_event('Asc Node', ephem.iter(listeners=NodeListener()))
-    ref_desc = find_event('Desc Node', ephem.iter(listeners=NodeListener()))
+    ref_asc = find_event(ephem.iter(listeners=NodeListener()), 'Asc Node')
+    ref_desc = find_event(ephem.iter(listeners=NodeListener()), 'Desc Node')
 
-    ref_apo = find_event('Apoapsis', ephem.iter(listeners=ApsideListener()))
-    ref_peri = find_event('Periapsis', ephem.iter(listeners=ApsideListener()))
+    ref_apo = find_event(ephem.iter(listeners=ApsideListener()), 'Apoapsis')
+    ref_peri = find_event(ephem.iter(listeners=ApsideListener()), 'Periapsis')
 
     assert str(ref_asc.date) == "2008-09-20T13:32:56.656687 UTC"
     assert str(ref_desc.date) == "2008-09-20T12:47:05.809521 UTC"
@@ -208,12 +208,12 @@ def test_sensitivity(ephem):
         subephem = ephem.ephem(start=ephem.start + offset, step=step)
         assert subephem.start == ephem.start + offset
 
-        asc = find_event('Asc Node', subephem.iter(listeners=NodeListener()))
-        desc = find_event('Desc Node', subephem.iter(listeners=NodeListener()))
+        asc = find_event(subephem.iter(listeners=NodeListener()), 'Asc Node')
+        desc = find_event(subephem.iter(listeners=NodeListener()), 'Desc Node')
         assert abs(ref_asc.date - asc.date) <= timedelta.resolution, offset
         assert abs(ref_desc.date - desc.date) <= timedelta.resolution, offset
 
-        apo = find_event('Apoapsis', subephem.iter(listeners=ApsideListener()))
-        peri = find_event('Periapsis', subephem.iter(listeners=ApsideListener()))
+        apo = find_event(subephem.iter(listeners=ApsideListener()), 'Apoapsis')
+        peri = find_event(subephem.iter(listeners=ApsideListener()), 'Periapsis')
         assert abs(ref_apo.date - apo.date) <= timedelta(microseconds=6), offset
         assert abs(ref_peri.date - peri.date) <= timedelta(microseconds=6), offset
