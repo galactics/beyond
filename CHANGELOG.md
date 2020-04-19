@@ -3,7 +3,7 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
-## [Unreleased]
+## [v0.6.9] - 2020-04-19
 
 ### Added
 
