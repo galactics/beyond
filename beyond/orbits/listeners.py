@@ -1,3 +1,11 @@
+"""Listeners allow to watch for state transition during the propagation of an orbit.
+For example, the :abbr:`AOS (Acquisition Of Signal)` and :abbr:`LOS (Loss Of Signal)` of
+a satellite as seen from a station.
+
+Each time a propagator (a subclass of :py:class:`Speaker`) detects a state transition, it
+creates an Orbit instance at the date of the event, and add an ``event`` attribute which
+is an :py:class:`Event` instance.
+"""
 import numpy as np
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
@@ -33,6 +41,8 @@ class Speaker(metaclass=ABCMeta):
 
     @classmethod
     def clear_listeners(cls, listeners):
+        """Clear Listeners in order to do a propagation with a clean state
+        """
         if isinstance(listeners, Listener):
             listeners = [listeners]
 
@@ -122,10 +132,15 @@ class Listener(metaclass=ABCMeta):
         pass
 
     def clear(self):
+        """Clear the state of the listener, in order to make a new iteration
+        """
         self.prev = None
 
 
 class Event:
+    """An instance of this class, or its subclass, is added as attribute to the Orbit
+    instance each time a state change is detected.
+    """
     def __init__(self, listener, info):
         self.listener = listener
         self.info = info
@@ -376,11 +391,11 @@ class AnomalyListener(Listener):
     def attr(self):
         return self._anomaly[1]
 
-    def diff(self, orb):
-        return (self.convert(orb) - self.value + np.pi) % (2 * np.pi) - np.pi
+    def _diff(self, orb):
+        return (self._convert(orb) - self.value + np.pi) % (2 * np.pi) - np.pi
 
     def check(self, orb):
-        return abs(self.diff(orb)) < 2 and super().check(orb)
+        return abs(self._diff(orb)) < 2 and super().check(orb)
 
     def info(self, orb):
         # breakpoint()
@@ -390,14 +405,14 @@ class AnomalyListener(Listener):
             txt = "{} Anomaly".format(self.anomaly.title())
 
         return AnomalyEvent(
-            self, "{} = {:.2f}".format(txt, np.degrees(self.convert(orb)))
+            self, "{} = {:.2f}".format(txt, np.degrees(self._convert(orb)))
         )
 
-    def convert(self, orb):
+    def _convert(self, orb):
         return getattr(orb.copy(frame=self.frame, form=self.form), self.attr)
 
     def __call__(self, orb):
-        return self.diff(orb)
+        return self._diff(orb)
 
 
 class SignalEvent(Event):  # pragma: no cover
@@ -560,10 +575,17 @@ class RadialVelocityListener(Listener):
 def stations_listeners(stations):
     """Function for creating listeners for a a list of station
 
+    Each station will have the following Listeners attached:
+
+        - :py:class:`StationSignalListener`
+        - :py:class:`StationMaxListener`
+        - :py:class:`StationMaskListener` if the station has a mask defined
+          (see :py:func:`~beyond.frames.stations.create_station` for details)
+
     Args:
         stations (iterable): List of TopocentricFrame
     Return:
-        list of Listener
+        list of Listeners
     """
     stations = stations if isinstance(stations, (list, tuple)) else [stations]
 
@@ -582,11 +604,11 @@ def find_event(iterator, event, offset=0):
     """Find an specific event in a extropolation
 
     Args:
-        event (str or Event)
-        iterator ():
-        offset (int):
+        iterator (Iterable[Orbit]): Itertator in which to look for the event
+        event (str or Event): Event to look for
+        offset (int): The function will return the Nth event detected
     Return:
-        Orb
+        Orbit
     """
 
     if isinstance(event, Event):  # pragma: no cover
@@ -605,7 +627,7 @@ def events_iterator(iterator, *events):
     """Iterate only over the listed events
 
     Args:
-        iterator :
+        iterator (Iterable[Orbit])
         events (List[str]):
     Yield:
         Orbit:
