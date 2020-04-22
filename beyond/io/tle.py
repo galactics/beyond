@@ -66,6 +66,8 @@ def _float(text):
     -6.0129e-05
     >>> _float('+45871-4')
     4.5871e-05
+    >>> _float('24814+0')
+    0.24814
     """
 
     text = text.strip()
@@ -99,6 +101,8 @@ def _unfloat(flt, precision=5):
     '-60129-4'
     >>> _unfloat(4.5871e-05)
     '45871-4'
+    >>> _unfloat(0.24814)
+    '24814+0'
     """
 
     if flt == 0.0:
@@ -108,7 +112,7 @@ def _unfloat(flt, precision=5):
     exp = int(exp)
     num = num.replace(".", "")
 
-    return "%s%d" % (num, exp + 1)
+    return "%s%+d" % (num, exp + 1)
 
 
 class Tle:
