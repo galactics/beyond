@@ -2,7 +2,7 @@ import logging
 import numpy as np
 from abc import ABCMeta, abstractmethod
 
-from ..frames.local import to_qsw, to_tnw
+from ..frames.local import to_local, to_tnw
 
 log = logging.getLogger(__name__)
 
@@ -69,10 +69,8 @@ class ImpulsiveMan(Man):
 
         orb = orb.copy(form="cartesian")
 
-        if self.frame == "QSW":
-            mat = to_qsw(orb).T
-        elif self.frame == "TNW":
-            mat = to_tnw(orb).T
+        if self.frame in ("QSW", "TNW"):
+            mat = to_local(self.frame, orb, expanded=False).T
         else:
             mat = np.identity(3)
 
@@ -221,10 +219,8 @@ class ContinuousMan(Man):
 
         orb = orb.copy(form="cartesian")
 
-        if self.frame == "QSW":
-            mat = to_qsw(orb).T
-        elif self.frame == "TNW":
-            mat = to_tnw(orb).T
+        if self.frame in ("QSW", "TNW"):
+            mat = to_local(self.frame, orb, expanded=False).T
         else:
             mat = np.identity(3)
 

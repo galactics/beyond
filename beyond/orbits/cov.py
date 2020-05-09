@@ -1,7 +1,6 @@
 import numpy as np
 
-from ..utils.matrix import expand
-from ..frames.local import to_tnw, to_qsw
+from ..frames.local import to_local
 
 
 class Cov(np.ndarray):
@@ -76,22 +75,17 @@ class Cov(np.ndarray):
         if frame not in ("TNW", "QSW", self.PARENT_FRAME):
             raise ValueError("Unknown covariance frame : {}".format(frame))
 
-        if self._frame == "TNW":
-            m1 = to_tnw(self.orb).T
-        elif self._frame == "QSW":
-            m1 = to_qsw(self.orb).T
+        if self._frame in ("TNW", "QSW"):
+            m1 = to_local(self._frame, self.orb).T
         else:
-            m1 = np.identity(3)
+            m1 = np.identity(6)
 
-        if frame == "TNW":
-            m2 = to_tnw(self.orb)
-        elif frame == "QSW":
-            m2 = to_qsw(self.orb)
+        if frame in ("TNW", "QSW"):
+            m2 = to_local(frame, self.orb)
         else:
-            m2 = np.identity(3)
+            m2 = np.identity(6)
 
-        m = m2 @ m1
-        M = expand(m, m)
+        M = m2 @ m1
 
         # https://robotics.stackexchange.com/questions/2556/how-to-rotate-covariance
         cov = M @ self.base @ M.T

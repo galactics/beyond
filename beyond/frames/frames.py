@@ -50,7 +50,7 @@ from ..constants import Earth
 from ..utils.matrix import rot3, expand
 from ..utils.node import Node
 from . import iau1980, iau2010
-from .local import to_qsw, to_tnw
+from .local import to_local
 
 CIO = ["ITRF", "TIRF", "CIRF", "GCRF"]
 IAU1980 = ["TOD", "MOD"]
@@ -334,8 +334,7 @@ def orbit2frame(name, ref_orbit, orientation=None, center=None, bypass=False):
     reference frame of the Orbit and move along with the orbit.
     Other acceptable values are ``"QSW"`` (and its aliases "LVLH" and "RSW") or ``"TNW"``.
 
-    See :py:func:`~beyond.frames.local.to_qsw` and :py:func:`~beyond.frames.local.to_tnw`
-    for informations regarding these orientations.
+    See :py:mod:`~beyond.frames.local` for informations regarding these orientations.
     """
 
     if orientation is None:
@@ -359,11 +358,9 @@ def orbit2frame(name, ref_orbit, orientation=None, center=None, bypass=False):
             # converted orbit
             orb = ref_orbit.propagate(self.date)
 
-            m = to_qsw(orb) if orientation.upper() == "QSW" else to_tnw(orb)
-
             # we transpose the matrix because it represents the conversion
             # from inertial to local frame, and we'd like the other way around
-            rotation = expand(m).T
+            rotation = to_local(orientation, orb).T
         else:
             # The orientation is the same as the parent reference frame
             rotation = np.identity(6)
