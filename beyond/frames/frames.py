@@ -47,7 +47,7 @@ import numpy as np
 from ..config import config
 from ..errors import UnknownFrameError, UnknownBodyError
 from ..constants import Earth
-from ..utils.matrix import rot3
+from ..utils.matrix import rot3, expand
 from ..utils.node import Node
 from . import iau1980, iau2010
 from .local import to_qsw, to_tnw
@@ -152,17 +152,6 @@ class Frame(metaclass=_MetaFrame):
     def __repr__(self):  # pragma: no cover
         return "<Frame obj '{}'>".format(self.__class__.__name__)
 
-    @classmethod
-    def _convert(cls, x=None, y=None):
-        m = np.identity(6)
-
-        if x is not None:
-            m[:3, :3] = x
-        if y is not None:
-            m[3:, 3:] = y
-
-        return m
-
     def transform(self, new_frame):
         """Change the frame of the orbit
 
@@ -214,7 +203,7 @@ class TEME(Frame):
             self.date, eop_correction=False, terms=4, kinematic=False
         )
         m = rot3(-np.deg2rad(equin))
-        return self._convert(m, m), np.zeros(6)
+        return expand(m), np.zeros(6)
 
 
 class GTOD(Frame):
@@ -241,7 +230,7 @@ class PEF(Frame):
         m = iau1980.sideral(self.date, model="apparent", eop_correction=False)
         offset = np.zeros(6)
         offset[3:] = np.cross(iau1980.rate(self.date), self.orbit[:3])
-        return self._convert(m, m), offset
+        return expand(m), offset
 
 
 class TOD(Frame):
@@ -251,7 +240,7 @@ class TOD(Frame):
 
     def _to_MOD(self):
         m = iau1980.nutation(self.date, eop_correction=False)
-        return self._convert(m, m), np.zeros(6)
+        return expand(m), np.zeros(6)
 
 
 class MOD(Frame):
@@ -261,7 +250,7 @@ class MOD(Frame):
 
     def _to_EME2000(self):
         m = iau1980.precesion(self.date)
-        return self._convert(m, m), np.zeros(6)
+        return expand(m), np.zeros(6)
 
 
 class EME2000(Frame):
@@ -277,11 +266,11 @@ class ITRF(Frame):
 
     def _to_PEF(self):
         m = iau1980.earth_orientation(self.date)
-        return self._convert(m, m), np.zeros(6)
+        return expand(m), np.zeros(6)
 
     def _to_TIRF(self):
         m = iau2010.earth_orientation(self.date)
-        return self._convert(m, m), np.zeros(6)
+        return expand(m), np.zeros(6)
 
 
 class TIRF(Frame):
@@ -293,7 +282,7 @@ class TIRF(Frame):
         m = iau2010.sideral(self.date)
         offset = np.zeros(6)
         offset[3:] = np.cross(iau2010.rate(self.date), self.orbit[:3])
-        return self._convert(m, m), offset
+        return expand(m), offset
 
 
 class CIRF(Frame):
@@ -303,7 +292,7 @@ class CIRF(Frame):
 
     def _to_GCRF(self):
         m = iau2010.precesion_nutation(self.date)
-        return self._convert(m, m), np.zeros(6)
+        return expand(m), np.zeros(6)
 
 
 class GCRF(Frame):
@@ -326,7 +315,7 @@ class G50(Frame):
             [0.0048590037723143, -0.0000271702937440, 0.9999881946023742],
         ]
 
-        return self._convert(m, m), np.zeros(6)
+        return expand(m), np.zeros(6)
 
 
 def orbit2frame(name, ref_orbit, orientation=None, center=None, bypass=False):
@@ -374,7 +363,7 @@ def orbit2frame(name, ref_orbit, orientation=None, center=None, bypass=False):
 
             # we transpose the matrix because it represents the conversion
             # from inertial to local frame, and we'd like the other way around
-            rotation = Frame._convert(m, m).T
+            rotation = expand(m).T
         else:
             # The orientation is the same as the parent reference frame
             rotation = np.identity(6)

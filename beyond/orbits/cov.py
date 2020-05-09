@@ -1,6 +1,6 @@
 import numpy as np
 
-from ..frames.frames import Frame
+from ..utils.matrix import expand
 from ..frames.local import to_tnw, to_qsw
 
 
@@ -91,7 +91,7 @@ class Cov(np.ndarray):
             m2 = np.identity(3)
 
         m = m2 @ m1
-        M = Frame._convert(m, m)
+        M = expand(m, m)
 
         # https://robotics.stackexchange.com/questions/2556/how-to-rotate-covariance
         cov = M @ self.base @ M.T

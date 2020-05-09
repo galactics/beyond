@@ -2,7 +2,7 @@ import numpy as np
 
 from .frames import Frame, WGS84, _MetaFrame
 from ..constants import Earth
-from ..utils.matrix import rot2, rot3
+from ..utils.matrix import rot2, rot3, expand
 
 
 class TopocentricFrame(Frame):
@@ -77,7 +77,7 @@ class TopocentricFrame(Frame):
         m = rot3(-lon) @ rot2(lat - np.pi / 2.0) @ rot3(self.heading)
         offset = np.zeros(6)
         offset[:3] = self.coordinates
-        return self._convert(m, m), offset
+        return expand(m), offset
 
     @classmethod
     def _geodetic_to_cartesian(cls, lat, lon, alt):
