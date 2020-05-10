@@ -215,7 +215,7 @@ class ContinuousMan(Man):
     def check(self, date):
         return self.start <= date < self.stop
 
-    def accel(self, orb, step):
+    def accel(self, orb):
 
         orb = orb.copy(form="cartesian")
 
@@ -228,7 +228,7 @@ class ContinuousMan(Man):
 
         log.debug(
             "{} accel_{}={} accel_{}={} norm={}".format(
-                orb.date + step,
+                orb.date,
                 self.frame,
                 self._accel.tolist(),
                 orb.propagator.frame,
@@ -247,9 +247,9 @@ class KeplerianContinuousMan(ContinuousMan):
         self.delta_angle = kwargs.pop("delta_i", 0)
         super().__init__(date, duration, np.zeros(3), **kwargs)
 
-    def accel(self, orb, step):
+    def accel(self, orb):
         self._dv = dkep2dv(orb, delta_a=self.delta_a, delta_angle=self.delta_angle)
-        return super().accel(orb, step)
+        return super().accel(orb)
 
 
 def dkep2dv(orb, *, delta_a=0, delta_angle=0):

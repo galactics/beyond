@@ -120,18 +120,16 @@ class KeplerNum(NumericalPropagator):
     def butcher(self):
         return self.BUTCHER[self.method]
 
-    def _newton(self, orb, step):
+    def _accel(self, orb):
         """Newton's Law of Universal Gravitation
         """
-
-        date = orb.date + step
 
         new_body = zeros(6)
         new_body[:3] = orb[3:]
 
         for body in self.bodies:
             # retrieve the position of the body at the given date
-            orb_body = body.propagate(date)
+            orb_body = body.propagate(orb.date)
             orb_body.frame = orb.frame
 
             # Compute induced attraction to the object of interest
@@ -140,8 +138,8 @@ class KeplerNum(NumericalPropagator):
             new_body[3:] += body.µ * diff / norm
 
         for man in self.orbit.maneuvers:
-            if isinstance(man, ContinuousMan) and man.check(date):
-                new_body[3:] += man.accel(orb, step)
+            if isinstance(man, ContinuousMan) and man.check(orb.date):
+                new_body[3:] += man.accel(orb)
 
         return new_body
 
@@ -150,6 +148,7 @@ class KeplerNum(NumericalPropagator):
         """
 
         aa, bb, cc = self.butcher["a"], self.butcher["b"], self.butcher["c"]
+        b_star = self.butcher.get("b_star")
 
         y_n = orb.copy()
 
@@ -157,17 +156,18 @@ class KeplerNum(NumericalPropagator):
 
         for i in range(MAX_ITER):
 
-            ks = [self._newton(y_n, timedelta(0))]
+            ks = [self._accel(y_n)]
             i += 1
             for a, c in zip(aa[1:], cc[1:]):
-                k_plus1 = self._newton(y_n + a @ ks * step.total_seconds(), step * c)
-                ks.append(k_plus1)
+                y_n_prime = y_n + a @ ks * step.total_seconds()
+                y_n_prime.date += step * c
+                ks.append(self._accel(y_n_prime))
 
             y_n_1 = y_n + step.total_seconds() * bb @ ks
             y_n_1.date = y_n.date + step
 
             # Error estimation, in cases where adaptive stepsize methods are used
-            if "b_star" not in self.butcher:
+            if b_star is None:
                 # This is not an adaptive stepsize method, there is no need to iterate
                 # here
                 break
