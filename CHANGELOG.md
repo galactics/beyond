@@ -3,6 +3,12 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [Unreleased]
+
+### Added
+
+- Clohessy-Wiltshire propagator for relative motion
+
 ## [v0.7] - 2020-08-11
 
 ### Added

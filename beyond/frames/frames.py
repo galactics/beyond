@@ -18,7 +18,7 @@ from .local import to_local
 
 CIO = ["ITRF", "TIRF", "CIRF", "GCRF"]
 IAU1980 = ["TOD", "MOD"]
-OTHER = ["EME2000", "TEME", "WGS84", "PEF", "G50"]
+OTHER = ["EME2000", "TEME", "WGS84", "PEF", "G50", "Hill"]
 
 __all__ = CIO + IAU1980 + OTHER + ["get_frame"]
 
@@ -149,6 +149,38 @@ GCRF = Frame("GCRF", orient.GCRF, center.Earth)
 
 G50 = Frame("G50", orient.G50, center.Earth)
 """Gamma 50 Reference Frame"""
+
+
+class HillFrame(Frame):
+    """Hill frame
+
+    Specific frame used by the Clohessy-Wiltshire propagator
+    """
+
+    DEFAULT_ORIENTATION = "QSW"
+
+    def __init__(self, orientation=DEFAULT_ORIENTATION, center=center.Earth):
+
+        self.name = f"Hill{orientation}"
+        self.orientation = orientation
+        self.center = center
+
+        dynamic["Hill"] = self
+
+    def transform(self, orbit, new_frame):
+        """We volontarily disable transformation between the Hill
+        frame and others
+        """
+        raise RuntimeError("Hill frame is untransformable")
+
+
+Hill = HillFrame()
+"""Hill frame, for the :class:`Clohessy-Wiltshire propagator <beyond.propagators.cw.ClohessyWiltshire>`.
+This frame is curvilinear along it's tangential axis and can't be transformed
+into an other frame.
+It's orientation (see :mod:`beyond.frames.local`) depends on the
+one used by the propagator.
+"""
 
 
 def orbit2frame(name, ref_orbit, orientation=None, parent=EME2000, exists_warning=True):

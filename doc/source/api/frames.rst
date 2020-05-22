@@ -53,6 +53,8 @@ Both are a simple shortcut to the :py:func:`~beyond.frames.frames.orbit2frame` f
 .. automodule:: beyond.frames.local
     :members:
 
+.. autodata:: beyond.frames.frames.Hill
+
 
 Ground Stations
 ---------------
