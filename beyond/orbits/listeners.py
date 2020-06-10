@@ -214,8 +214,8 @@ class LightListener(Listener):
         # This should be the real way to compute alpha_umb and alpha_pen, but the
         # benefit is not that great, as the angles don't change a lot throughout
         # the year.
-        alpha_umb = np.arcsin((sun.r - orb.frame.center.r) / norm_x_sun)
-        alpha_pen = np.arcsin((sun.r - orb.frame.center.r) / norm_x_sun)
+        alpha_umb = np.arcsin((sun.r - orb.frame.center.body.r) / norm_x_sun)
+        alpha_pen = np.arcsin((sun.r - orb.frame.center.body.r) / norm_x_sun)
 
         # Fixed values of angles, for a simplified computation
         # alpha_umb = np.radians(0.264121687)
@@ -227,7 +227,7 @@ class LightListener(Listener):
             sat_horiz = norm_x_sat * np.cos(zeta)
             sat_vert = norm_x_sat * np.sin(zeta)
 
-            x = orb.frame.center.r / np.sin(alpha_pen)
+            x = orb.frame.center.body.r / np.sin(alpha_pen)
             pen_vert = np.tan(alpha_pen) * (x + sat_horiz)
 
             if sat_vert <= pen_vert:
@@ -237,7 +237,7 @@ class LightListener(Listener):
                     return -1
                 else:
 
-                    y = orb.frame.center.r / np.sin(alpha_umb)
+                    y = orb.frame.center.body.r / np.sin(alpha_umb)
                     umb_vert = np.tan(alpha_umb) * (y - sat_horiz)
 
                     if sat_vert <= umb_vert:

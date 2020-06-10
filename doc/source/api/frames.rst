@@ -7,50 +7,36 @@ Frames
 
 .. image:: /_static/frames.png
 
-.. autoclass:: beyond.frames.frames.Frame
-    :members:
-
 CIO Based Frames
 ----------------
 
-.. autoclass:: beyond.frames.frames.GCRF
-    :members:
+.. autodata:: beyond.frames.frames.GCRF
 
-.. autoclass:: beyond.frames.frames.CIRF
-    :members:
+.. autodata:: beyond.frames.frames.CIRF
 
-.. autoclass:: beyond.frames.frames.TIRF
-    :members:
+.. autodata:: beyond.frames.frames.TIRF
 
-.. autoclass:: beyond.frames.frames.ITRF
-    :members:
+.. autodata:: beyond.frames.frames.ITRF
 
 IAU1980 based Frames
 --------------------
 
-.. autoclass:: beyond.frames.frames.EME2000
-    :members:
+.. autodata:: beyond.frames.frames.EME2000
 
-.. autoclass:: beyond.frames.frames.MOD
-    :members:
+.. autodata:: beyond.frames.frames.MOD
 
-.. autoclass:: beyond.frames.frames.TOD
-    :members:
+.. autodata:: beyond.frames.frames.TOD
 
-.. autoclass:: beyond.frames.frames.PEF
-    :members:
+.. autodata:: beyond.frames.frames.PEF
 
-.. autoclass:: beyond.frames.frames.TEME
-    :members:
+.. autodata:: beyond.frames.frames.TEME
 
 Others
 ------
 
-.. autoclass:: beyond.frames.frames.G50
-    :members:
+.. autodata:: beyond.frames.frames.G50
 
-.. autoclass:: beyond.frames.frames.WGS84
-    :members:
+.. autodata:: beyond.frames.frames.WGS84
 
 Local Orbital Reference Frame
 -----------------------------
@@ -65,8 +51,9 @@ Both are a simple shortcut to the :py:func:`~beyond.frames.frames.orbit2frame` f
 .. automodule:: beyond.frames.local
     :members:
 
+
 Ground Stations
-===============
+---------------
 
 A ground station may be created using the :py:func:`~beyond.frames.stations.create_station` function. This
 will ensure correct frames conversions.
@@ -75,6 +62,27 @@ will ensure correct frames conversions.
 
 .. autoclass:: beyond.frames.stations.TopocentricFrame
     :members:
+
+Creating new frames
+-------------------
+
+Creating new frames is done by creating :py:class:`~beyond.frames.center.Center` and :py:class:`~beyond.frames.orient.Orientation` objects, and feeding them to :py:class:`~beyond.frames.frames.Frame`.
+
+.. autoclass:: beyond.frames.frames.Frame
+    :members:
+
+.. autoclass:: beyond.frames.center.Center
+    :members:
+
+.. autoclass:: beyond.frames.orient.Orientation
+    :members:
+
+.. autoclass:: beyond.frames.orient.LocalOrbitalOrientation
+    :members:
+
+.. autoclass:: beyond.frames.orient.TopocentricOrientation
+    :members:
+
 
 Earth Orientation Parameters
 ============================

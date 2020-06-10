@@ -126,7 +126,7 @@ def detect2dump(data, **kwargs):
     elif isinstance(data, Orbit):
         if (
             isinstance(data.propagator, AnalyticalPropagator)
-            and issubclass(data.frame, TEME)
+            and data.frame == TEME
             and data.form is TLE
         ):
             type = "omm"
@@ -266,7 +266,7 @@ TIME_SYSTEM          = {timesystem}
         name=kwargs.get("name", getattr(data, "name", "N/A")),
         cospar_id=kwargs.get("cospar_id", getattr(data, "cospar_id", "N/A")),
         center=data.frame.center.name.upper(),
-        frame=data.frame.orientation.upper(),
+        frame=data.frame.orientation.name.upper(),
         timesystem=data.date.scale.name
         if isinstance(data, Orbit)
         else data.start.scale.name,
@@ -297,7 +297,7 @@ def dump_xml_meta_odm(segment, data, **kwargs):
     center.text = data.frame.center.name.upper()
 
     frame = ET.SubElement(metadata, "REF_FRAME")
-    frame.text = data.frame.orientation.upper()
+    frame.text = data.frame.orientation.name.upper()
 
     timescale = ET.SubElement(metadata, "TIME_SYSTEM")
     if isinstance(data, Orbit):

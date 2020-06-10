@@ -11,6 +11,9 @@ class Propagator(metaclass=ABCMeta):
 
     orbit = None
 
+    def __repr__(self):
+        return "<{} at {}>".format(self.__class__.__name__, hex(id(self)))
+
     @abstractmethod
     def iter(self, **kwargs):
         pass

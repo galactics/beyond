@@ -249,7 +249,7 @@ GM                   = {gm:11.4f} [km**3/s**2]
         kep_a=kep.a / units.km,
         kep_e=kep.e,
         angles=np.degrees(kep[2:]),
-        gm=kep.frame.center.mu / (units.km ** 3),
+        gm=kep.frame.center.body.mu / (units.km ** 3),
         dfmt=DATE_FMT_DEFAULT,
     )
 
@@ -352,7 +352,7 @@ def _dumps_xml(data, **kwargs):
         x.text = "{:0.6}".format(np.degrees(getattr(kep, v)))
 
     gm = ET.SubElement(keplerian, "GM", units="km**3/s**2")
-    gm.text = "{:11.4f}".format(kep.frame.center.mu / (units.km ** 3))
+    gm.text = "{:11.4f}".format(kep.frame.center.body.mu / (units.km ** 3))
 
     if cart.cov.any():
         cov = ET.SubElement(data_tag, "covarianceMatrix")

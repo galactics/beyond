@@ -35,7 +35,7 @@ def test_create(ephem, start):
     assert ephem.stop == start + stop
     assert len(ephem) == stop // step + 1
 
-    assert ephem.frame.__name__ == "TEME"
+    assert ephem.frame.name == "TEME"
 
 
 def test_interpolate(ephem):

@@ -255,7 +255,7 @@ class KeplerianContinuousMan(ContinuousMan):
 def dkep2dv(orb, *, delta_a=0, delta_angle=0):
     """Convert a increment in keplerian elements to a delta v in TNW
     """
-    dv_a = orb.frame.center.mu * delta_a / (2 * orb.infos.v * orb.infos.kep.a ** 2)
+    dv_a = orb.frame.center.body.mu * delta_a / (2 * orb.infos.v * orb.infos.kep.a ** 2)
 
     v_final = orb.infos.v + dv_a
 

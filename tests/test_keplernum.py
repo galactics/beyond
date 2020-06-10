@@ -319,7 +319,7 @@ def test_man_impulsive(molniya_kepler):
     eccentricity = []
     dates = []
     for p in molniya_kepler.iter(stop=timedelta(hours=36)):
-        altitude.append(p.copy(form='spherical').r - p.frame.center.r)
+        altitude.append(p.copy(form='spherical').r - p.frame.center.body.r)
         eccentricity.append(p.copy(form="keplerian").e)
         dates.append(p.date.datetime)
 
@@ -354,7 +354,7 @@ def test_man_delta_a(molniya_kepler):
     altitude = []
     dates = []
     for p in molniya_kepler.iter(stop=timedelta(hours=26)):
-        altitude.append(p.copy(form='spherical').r - p.frame.center.r)
+        altitude.append(p.copy(form='spherical').r - p.frame.center.body.r)
         dates.append(p.date.datetime)
 
     # plot_delta_a(dates, altitude)
@@ -408,7 +408,7 @@ def test_man_continuous(method, molniya_kepler):
     eccentricity = []
     dates = []
     for p in molniya_kepler.iter(stop=timedelta(hours=26)):
-        altitude.append(p.copy(form='spherical').r - p.frame.center.r)
+        altitude.append(p.copy(form='spherical').r - p.frame.center.body.r)
         eccentricity.append(p.copy(form="keplerian").e)
         dates.append(p.date.datetime)
 

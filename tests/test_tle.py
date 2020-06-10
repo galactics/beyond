@@ -74,7 +74,7 @@ def test_convert_to_orbit(tle_txt):
     tle = Tle(tle_txt)
     orb = tle.orbit()
 
-    assert repr(orb.frame) == "<Frame 'TEME'>"
+    assert orb.frame.name == "TEME"
     assert repr(orb.form) == "<Form 'tle'>"
     assert repr(orb.date) == "<Date '2008-09-20T12:25:40.104192 UTC'>"
     assert orb['i'] == np.deg2rad(51.6416)

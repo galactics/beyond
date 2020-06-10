@@ -1,18 +1,23 @@
 import numpy as np
 
-from .frames import Frame, WGS84, _MetaFrame
+from . import frames, center, orient
 from ..constants import Earth
 from ..utils.matrix import rot2, rot3, expand
 
 
-class TopocentricFrame(Frame):
+class TopocentricFrame(frames.Frame):
     """Base class for ground station
     """
 
-    _rotation_before_translation = True
+    def __init__(self, name, orientation, center, mask=None):
+        self.mask = np.asarray(mask) if mask else None
+        super().__init__(name, orientation, center)
 
-    @classmethod
-    def visibility(cls, orb, **kwargs):
+    @property
+    def latlonalt(self):
+        return self.orientation.latlonalt
+
+    def visibility(self, orb, **kwargs):
         """Visibility from a topocentric frame
 
         see :py:meth:`Propagator.iter() <beyond.propagators.base.Propagator.iter>`
@@ -51,7 +56,7 @@ class TopocentricFrame(Frame):
             elif isinstance(events, (list, tuple)):
                 listeners.extend(events)
 
-            sta_list = stations_listeners(cls)
+            sta_list = stations_listeners(self)
             listeners.extend(sta_list)
 
             # Only the events present in the `event_classes` list will be yielded
@@ -61,7 +66,7 @@ class TopocentricFrame(Frame):
             event_classes = tuple(listener.event for listener in sta_list)
 
         for point in orb.iter(**kwargs):
-            point.frame = cls
+            point.frame = self
             point.form = "spherical"
 
             # Not very clean !
@@ -69,15 +74,6 @@ class TopocentricFrame(Frame):
                 continue
 
             yield point
-
-    def _to_parent_frame(self, *args, **kwargs):
-        """Conversion from Topocentric Frame to parent frame
-        """
-        lat, lon, _ = self.latlonalt
-        m = rot3(-lon) @ rot2(lat - np.pi / 2.0) @ rot3(self.heading)
-        offset = np.zeros(6)
-        offset[:3] = self.coordinates
-        return expand(m), offset
 
     @classmethod
     def _geodetic_to_cartesian(cls, lat, lon, alt):
@@ -99,30 +95,29 @@ class TopocentricFrame(Frame):
 
         norm = np.sqrt(r_d ** 2 + r_k ** 2)
         return norm * np.array(
-            [np.cos(lat) * np.cos(lon), np.cos(lat) * np.sin(lon), np.sin(lat)]
+            [np.cos(lat) * np.cos(lon), np.cos(lat) * np.sin(lon), np.sin(lat), 0, 0, 0]
         )
 
-    @classmethod
-    def get_mask(cls, azim):
+    def get_mask(self, azim):
         """Linear interpolation between two points of the mask
         """
 
-        if cls.mask is None:
-            raise ValueError("No mask defined for the station {}".format(cls.name))
+        if self.mask is None:
+            raise ValueError("No mask defined for the station {}".format(self.name))
 
         azim %= 2 * np.pi
 
-        if azim in cls.mask[0, :]:
-            return cls.mask[1, np.where(azim == cls.mask[0, :])[0][0]]
+        if azim in self.mask[0, :]:
+            return self.mask[1, np.where(azim == self.mask[0, :])[0][0]]
 
-        for next_i, mask_azim in enumerate(cls.mask[0, :]):
+        for next_i, mask_azim in enumerate(self.mask[0, :]):
             if mask_azim > azim:
                 break
         else:
             next_i = 0
 
-        x0, y0 = cls.mask[:, next_i - 1]
-        x1, y1 = cls.mask[:, next_i]
+        x0, y0 = self.mask[:, next_i - 1]
+        x1, y1 = self.mask[:, next_i]
 
         if next_i - 1 == -1:
             x0 = 0
@@ -130,7 +125,9 @@ class TopocentricFrame(Frame):
         return y0 + (y1 - y0) * (azim - x0) / (x1 - x0)
 
 
-def create_station(name, latlonalt, parent_frame=WGS84, orientation="N", mask=None):
+def create_station(
+    name, latlonalt, parent_frame=frames.WGS84, mask=None, equatorial=False
+):
     """Create a ground station instance
 
     Args:
@@ -153,27 +150,23 @@ def create_station(name, latlonalt, parent_frame=WGS84, orientation="N", mask=No
         TopocentricFrame
     """
 
-    if isinstance(orientation, str):
-        orient = {"N": np.pi, "S": 0.0, "E": np.pi / 2.0, "W": 3 * np.pi / 2.0}
-        heading = orient[orientation]
-    else:
-        heading = orientation
-
     latlonalt = list(latlonalt)
     latlonalt[:2] = np.radians(latlonalt[:2])
     coordinates = TopocentricFrame._geodetic_to_cartesian(*latlonalt)
 
-    mtd = "_to_%s" % parent_frame.__name__
-    dct = {
-        mtd: TopocentricFrame._to_parent_frame,
-        "latlonalt": latlonalt,
-        "coordinates": coordinates,
-        "parent_frame": parent_frame,
-        "heading": heading,
-        "orientation": orientation,
-        "mask": np.array(mask) if mask else None,
-    }
-    cls = _MetaFrame(name, (TopocentricFrame,), dct)
-    cls + parent_frame
+    c = center.Center(name, body=parent_frame.center.body)
+    c.add_link(
+        parent_frame.center, parent_frame.orientation, coordinates,
+    )
 
-    return cls
+    if equatorial:
+        o = orient.EME2000
+    else:
+        o = orient.TopocentricOrientation(
+            name, latlonalt, parent=parent_frame.orientation
+        )
+        mtd = "{}_to_{}".format(name, parent_frame.orientation.name)
+        setattr(orient.Orientation, mtd, o._to_parent)
+        o + parent_frame.orientation
+
+    return TopocentricFrame(name, o, c, mask=mask)

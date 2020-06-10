@@ -281,7 +281,7 @@ Orbit =
         if new_frame != self.frame:
             self.form = "cartesian"
             try:
-                new_coord = self.frame(self.date, self).transform(new_frame.name)
+                new_coord = self.frame.transform(self, new_frame)
                 self.base.setfield(new_coord, dtype=float)
                 self._frame = new_frame
             finally:
@@ -407,7 +407,7 @@ class OrbitInfos:
 
     @property
     def mu(self):
-        return self.orb.frame.center.mu
+        return self.orb.frame.center.body.mu
 
     @property
     def type(self):

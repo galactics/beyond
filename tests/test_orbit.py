@@ -149,7 +149,7 @@ def test_pickle(ref_orbit):
 
     assert all(ref_orbit == orb)
     assert ref_orbit.date == orb.date
-    assert ref_orbit.frame == orb.frame
+    assert ref_orbit.frame.name == orb.frame.name
     assert ref_orbit.form.name == orb.form.name
     assert ref_orbit.propagator.__class__ == orb.propagator.__class__
     assert ref_orbit.complements == orb.complements
