@@ -264,7 +264,7 @@ class KeplerNum(NumericalPropagator):
             ephem_iter = ephem.iter(dates=dates, step=step, listeners=listeners)
 
         for orb in ephem_iter:
-            yield orb
+            yield orb.as_orbit(self.copy())
 
 
 SOI = namedtuple("SOI", "radius frame")

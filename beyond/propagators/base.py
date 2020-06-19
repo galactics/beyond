@@ -32,6 +32,9 @@ class Propagator(metaclass=ABCMeta):
     def copy(self):
         return self.__class__()
 
+    def __repr__(self):
+        return "<Propagator {} at {}>".format(self.__class__.__name__, hex(id(self)))
+
 
 class AnalyticalPropagator(Speaker, Propagator):
     """Base class for analytical propagators (SGP4, Eckstein-Heschler, etc.)

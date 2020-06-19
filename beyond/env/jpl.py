@@ -325,7 +325,7 @@ class JplPropagator(AnalyticalPropagator):
         else:
             raise JplError("Unknown state vector format")
 
-        return Orbit(date, sign * pv * 1000, "cartesian", self.frame, self)
+        return Orbit(sign * pv * 1000, date, "cartesian", self.frame, self)
 
 
 class JplCenter(center.Center):

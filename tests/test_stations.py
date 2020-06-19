@@ -36,9 +36,9 @@ def test_station(station):
     # assert False
 
     orb = Orbit(
-        Date(2016, 2, 7, 16, 55),
         [4225679.11976, 2789527.13836, 4497182.71156,
          -5887.93077439, 3748.50929999, 3194.45322378],
+        Date(2016, 2, 7, 16, 55),
         'cartesian', 'TEME', 'Sgp4'
     )
     archive = orb.copy()

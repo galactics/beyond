@@ -2,7 +2,7 @@ import numpy as np
 import lxml.etree as ET
 
 from ...utils import units
-from ...orbits import Orbit, Ephem
+from ...orbits import Ephem, StateVector
 
 from .commons import (
     parse_date,
@@ -97,7 +97,7 @@ def _loads_kvn(string):
             # and discard acceleration if present
             state_vector = np.array([float(x) for x in state_vector[:6]]) * units.km
 
-            orb = Orbit(date, state_vector, "cartesian", ephem["REF_FRAME"], None)
+            orb = StateVector(state_vector, date, "cartesian", ephem["REF_FRAME"])
             ephem["orbits"].append(orb)
             ephem["orbit_mapping"][date] = orb
         elif mode == "covariance":
@@ -191,8 +191,7 @@ def _loads_xml(string):
             ephem = []
             orbit_mapping = {}
             for statevector in data_tag["stateVector"]:
-                orb = Orbit(
-                    parse_date(statevector["EPOCH"].text, metadata["TIME_SYSTEM"].text),
+                orb = StateVector(
                     [
                         decode_unit(statevector, "X", units.km),
                         decode_unit(statevector, "Y", units.km),
@@ -201,9 +200,9 @@ def _loads_xml(string):
                         decode_unit(statevector, "Y_DOT", units.km),
                         decode_unit(statevector, "Z_DOT", units.km),
                     ],
+                    parse_date(statevector["EPOCH"].text, metadata["TIME_SYSTEM"].text),
                     "cartesian",
                     ref_frame,
-                    None,
                 )
                 ephem.append(orb)
                 orbit_mapping[orb.date] = orb

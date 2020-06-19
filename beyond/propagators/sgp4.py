@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from .base import AnalyticalPropagator
 from ..io.tle import Tle
+from ..orbits.statevector import StateVector
 
 from sgp4.earth_gravity import wgs72
 from sgp4.io import twoline2rv
@@ -54,11 +55,9 @@ class Sgp4(AnalyticalPropagator):
         # Convert from km to meters
         result = [x * 1000 for x in p + v]
 
-        return self.orbit.__class__(
-            date,
-            result,
-            "cartesian",
-            "TEME",
-            self.__class__(),
-            **self.orbit.complements
-        )
+        res_dict = self.orbit._data.copy()
+        res_dict["date"] = date
+        res_dict["form"] = "cartesian"
+        res_dict.pop("propagator")
+
+        return StateVector(result, **res_dict)

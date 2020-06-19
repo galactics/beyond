@@ -4,6 +4,7 @@
 import numpy as np
 from datetime import timedelta
 
+from .statevector import StateVector
 from .listeners import Speaker
 from ..frames.frames import orbit2frame
 
@@ -191,7 +192,7 @@ class Ephem(Speaker):
 
         orb = ephem[0]
 
-        return orb.__class__(date, result, orb.form, orb.frame, orb.propagator)
+        return StateVector(result, date, orb.form, orb.frame)
 
     def propagate(self, date):
         """Alias of :py:meth:`interpolate`

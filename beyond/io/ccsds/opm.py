@@ -2,7 +2,7 @@ import numpy as np
 import lxml.etree as ET
 
 from ...dates import timedelta
-from ...orbits import Orbit
+from ...orbits import Orbit, StateVector
 from ...orbits.man import ImpulsiveMan, ContinuousMan
 from ...utils import units
 
@@ -81,7 +81,7 @@ def _loads_kvn(string):
     except KeyError as e:
         raise CcsdsError("Missing mandatory parameter {}".format(e))
 
-    orb = Orbit(date, [x, y, z, vx, vy, vz], "cartesian", frame, None)
+    orb = StateVector([x, y, z, vx, vy, vz], date, "cartesian", frame)
     orb.name = name
     orb.cospar_id = cospar_id
 
@@ -124,7 +124,7 @@ def _loads_kvn(string):
 
     for k in data.keys():
         if k.startswith("USER_DEFINED"):
-            ud = orb.complements.setdefault("ccsds_user_defined", {})
+            ud = orb._data.setdefault("ccsds_user_defined", {})
             ud[k[13:]] = data[k].text
 
     return orb
@@ -163,7 +163,7 @@ def _loads_xml(string):
     except KeyError as e:
         raise CcsdsError("Missing mandatory parameter {}".format(e))
 
-    orb = Orbit(date, [x, y, z, vx, vy, vz], "cartesian", frame, None)
+    orb = Orbit([x, y, z, vx, vy, vz], date, "cartesian", frame, None)
     orb.name = name
     orb.cospar_id = cospar_id
 
@@ -213,7 +213,7 @@ def _loads_xml(string):
     ud_dict = data["body"]["segment"]["data"].get("userDefinedParameters", {})
 
     for field in ud_dict.get("USER_DEFINED", []):
-        ud = orb.complements.setdefault("ccsds_user_defined", {})
+        ud = orb._data.setdefault("ccsds_user_defined", {})
         ud[field.attrib["parameter"]] = field.text
 
     return orb
@@ -288,9 +288,9 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
                 dfmt=DATE_FMT_DEFAULT,
             )
 
-    if "ccsds_user_defined" in data.complements:
+    if "ccsds_user_defined" in data._data:
         text += "\n"
-        for k, v in data.complements["ccsds_user_defined"].items():
+        for k, v in data._data["ccsds_user_defined"].items():
             text += "USER_DEFINED_{} = {}\n".format(k, v)
 
     return header + "\n" + meta + text
@@ -402,9 +402,9 @@ def _dumps_xml(data, **kwargs):
                 x = ET.SubElement(mans, "MAN_DV_{}".format(i + 1), units="km/s")
                 x.text = "{:.6f}".format(man._dv[i] / units.km)
 
-    if "ccsds_user_defined" in data.complements:
+    if "ccsds_user_defined" in data._data:
         ud = ET.SubElement(data_tag, "userDefinedParameters")
-        for k, v in data.complements["ccsds_user_defined"].items():
+        for k, v in data._data["ccsds_user_defined"].items():
             el = ET.SubElement(ud, "USER_DEFINED", parameter=k)
             el.text = v
 

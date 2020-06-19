@@ -24,18 +24,25 @@ Available forms are
 .. autodata:: beyond.orbits.forms.KEPL_E
 
 
+StateVector
+-----------
+
+.. autoclass:: beyond.orbits.statevector.StateVector
+    :members:
+    :special-members: __new__
+    :show-inheritance:
+
 Orbit
 -----
 
 .. autoclass:: beyond.orbits.orbit.Orbit
     :members:
-    :special-members: __new__
     :show-inheritance:
 
 OrbitInfos
 ----------
 
-.. autoclass:: beyond.orbits.orbit.OrbitInfos
+.. autoclass:: beyond.orbits.statevector.Infos
     :members:
 
 Ephem

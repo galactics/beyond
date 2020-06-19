@@ -12,6 +12,7 @@ from beyond.errors import UnknownFrameError
 from beyond.dates import Date
 from beyond.dates.eop import Eop
 from beyond.orbits.orbit import Orbit
+from beyond.orbits.statevector import StateVector
 from beyond.io.tle import Tle
 from beyond.frames.frames import *
 
@@ -34,8 +35,8 @@ def model_correction():
 @fixture
 def ref_orbit(date):
     return Orbit(
-        date,
         [-1033479.383, 7901295.2754, 6380356.5958, -3225.636520, -2872.451450, 5531.924446],
+        date,
         'cartesian',
         'ITRF',
         None
@@ -44,9 +45,9 @@ def ref_orbit(date):
 
 def assert_vector(ref, pv, precision=(4, 6)):
 
-    if isinstance(ref, Orbit):
+    if isinstance(ref, StateVector):
         ref = ref.base
-    if isinstance(pv, Orbit):
+    if isinstance(pv, StateVector):
         pv = pv.base
 
     assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
@@ -192,9 +193,9 @@ def test_change_tle():
         )
 
         tle = Orbit(
-            Date(2000, 6, 30, 18, 50, 19, 733568),
             [-9060473.7357, 4658709.52502, 813686.731536,
              -2232.83278274, -4110.45348994, -3157.34543346],
+            Date(2000, 6, 30, 18, 50, 19, 733568),
             "cartesian", "TEME", None
         )
         tle.frame = 'EME2000'

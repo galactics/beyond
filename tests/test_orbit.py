@@ -33,7 +33,7 @@ def ref_date():
 
 @fixture
 def ref_orbit(ref_date):
-    return Orbit(ref_date, ref_coord, ref_form, ref_frame, ref_propagator)
+    return Orbit(ref_coord, ref_date, ref_form, ref_frame, ref_propagator)
 
 
 def test_coord_init(ref_date, ref_orbit):
@@ -46,17 +46,17 @@ def test_coord_init(ref_date, ref_orbit):
     assert ref_orbit['M'] == 3.043341444376126
 
     with raises(UnknownFormError) as e:
-        Orbit(ref_date, ref_coord, "Dummy", ref_frame, ref_propagator)
+        Orbit(ref_coord, ref_date, "Dummy", ref_frame, ref_propagator)
 
     assert str(e.value) == "Unknown form 'Dummy'"
 
     with raises(OrbitError) as e:
-        Orbit(ref_date, ref_coord[:-1], ref_form, ref_frame, ref_propagator)
+        Orbit(ref_coord[:-1], ref_date, ref_form, ref_frame, ref_propagator)
     assert str(e.value) == "Should be 6 in length"
 
 
 def test_init_cart(ref_date):
-    a = Orbit(ref_date, ref_cart, CART.name, ref_frame, ref_propagator)
+    a = Orbit(ref_cart, ref_date, CART.name, ref_frame, ref_propagator)
     assert a.form == CART
 
 
@@ -152,7 +152,6 @@ def test_pickle(ref_orbit):
     assert ref_orbit.frame.name == orb.frame.name
     assert ref_orbit.form.name == orb.form.name
     assert ref_orbit.propagator.__class__ == orb.propagator.__class__
-    assert ref_orbit.complements == orb.complements
 
 
 def test_orbit_infos(ref_orbit):

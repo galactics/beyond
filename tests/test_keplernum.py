@@ -178,24 +178,26 @@ def test_propagate_dopri(orbit_kepler):
 
 def test_iter(orbit_kepler):
 
-    data = []
-    for p in orbit_kepler.iter(stop=timedelta(minutes=120)):
-        data.append(p)
+    data = [p for p in orbit_kepler.iter(stop=timedelta(minutes=120))]
 
     assert len(data) == 121
     assert min(data, key=lambda x: x.date).date == orbit_kepler.date
     assert max(data, key=lambda x: x.date).date == orbit_kepler.date + timedelta(minutes=120)
 
-    data2 = []
-    for p in orbit_kepler.iter(stop=timedelta(minutes=120)):
-        data2.append(p)
+    for p in data:
+        # Check that no created Orbit object has an initialized propagator
+        # i.e. that the propagation is done only by the propagator of orbit_kepler
+        # This happened during development when dealing with listeners and should not happen
+        # again due to the use of Ephem inside KeplerNum
+        assert p.propagator.orbit is None
+
+    data2 = [p for p in orbit_kepler.iter(stop=timedelta(minutes=120))]
 
     assert data[0].date == data2[0].date
     assert all(data[0] == data2[0])
     assert data[0] is not data2[0]
 
-    # Test retropolation then extrapolation
-
+    # TODO Test retropolation then extrapolation
     # same but with step interpolation
 
 
@@ -211,6 +213,9 @@ def test_iter_on_dates(orbit_kepler):
     assert ephem.start == start
     assert ephem.stop == start + stop
     assert ephem[1].date - ephem[0].date == step
+
+    for p in ephem:
+        assert p.propagator.orbit is None
 
 
 def test_duty_cycle(orbit_kepler):
@@ -473,7 +478,7 @@ MAN_DV_3             = 0.000000 [km/s]
     central = jpl.get_body('Sun')
     planets = jpl.get_body('Earth')
 
-    opm.propagator = SOIPropagator(solar_step, planetary_step, central, planets)
+    opm = opm.as_orbit(SOIPropagator(solar_step, planetary_step, central, planets))
 
     frames = set()
     for orb in opm.iter(stop=timedelta(5)):

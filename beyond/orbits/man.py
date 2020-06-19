@@ -77,17 +77,6 @@ class ImpulsiveMan(Man):
         # velocity increment in the same reference frame as the orbit
         projected_dv = mat @ self._dv
 
-        log.debug(
-            "{} dv_{}={} dv_{}={} norm={}".format(
-                orb.date,
-                self.frame,
-                self._dv.tolist(),
-                orb.propagator.frame,
-                projected_dv.tolist(),
-                np.linalg.norm(self._dv),
-            )
-        )
-
         return projected_dv
 
 

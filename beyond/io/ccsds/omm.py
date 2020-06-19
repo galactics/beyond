@@ -101,14 +101,14 @@ def _loads_kvn(string):
             "Unknown OMM theory '{}'".format(data["MEAN_ELEMENT_THEORY"].text)
         )
 
-    orb = Orbit(date, elements, form, frame, propagator, **kwargs)
+    orb = Orbit(elements, date, form, frame, propagator, **kwargs)
 
     if "CX_X" in data:
         orb.cov = load_cov(orb, data)
 
     for k in data.keys():
         if k.startswith("USER_DEFINED"):
-            ud = orb.complements.setdefault("ccsds_user_defined", {})
+            ud = orb._data.setdefault("ccsds_user_defined", {})
             ud[k[13:]] = data[k].text
 
     return orb
@@ -172,7 +172,7 @@ def _loads_xml(string):
             "Unknown OMM theory '{}'".format(data["MEAN_ELEMENT_THEORY"].text)
         )
 
-    orb = Orbit(date, elements, form, frame, propagator, **kwargs)
+    orb = Orbit(elements, date, form, frame, propagator, **kwargs)
     orb.name = name
     orb.cospar_id = cospar_id
 
@@ -182,7 +182,7 @@ def _loads_xml(string):
     ud_dict = data["body"]["segment"]["data"].get("userDefinedParameters", {})
 
     for field in ud_dict.get("USER_DEFINED", []):
-        ud = orb.complements.setdefault("ccsds_user_defined", {})
+        ud = orb._data.setdefault("ccsds_user_defined", {})
         ud[field.attrib["parameter"]] = field.text
 
     return orb
@@ -236,9 +236,9 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
     if data.cov.any():
         text += dump_cov(data.cov)
 
-    if "ccsds_user_defined" in data.complements:
+    if "ccsds_user_defined" in data._data:
         text += "\n"
-        for k, v in data.complements["ccsds_user_defined"].items():
+        for k, v in data._data["ccsds_user_defined"].items():
             text += "USER_DEFINED_{} = {}\n".format(k, v)
 
     return header + "\n" + meta + text
@@ -321,9 +321,9 @@ def _dumps_xml(data, **kwargs):
                 x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
                 x.text = "{:0.16e}".format(data.cov[i, j] / 1e6)
 
-    if "ccsds_user_defined" in data.complements:
+    if "ccsds_user_defined" in data._data:
         ud = ET.SubElement(data_tag, "userDefinedParameters")
-        for k, v in data.complements["ccsds_user_defined"].items():
+        for k, v in data._data["ccsds_user_defined"].items():
             el = ET.SubElement(ud, "USER_DEFINED", parameter=k)
             el.text = v
 

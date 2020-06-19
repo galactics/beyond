@@ -155,7 +155,7 @@ def loads(text):
             elif desc == "vel":
                 vector[3:] = rotation @ [float(x) * vel_unit for x in line]
 
-        orbs.append(Orbit(date, vector, "cartesian", frame, None))
+        orbs.append(Orbit(vector, date, "cartesian", frame, None))
 
     ephem = Ephem(orbs)
     ephem.name = name
