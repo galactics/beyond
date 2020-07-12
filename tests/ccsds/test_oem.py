@@ -1,6 +1,5 @@
-from pytest import raises, fixture
+from pytest import raises, fixture, mark
 
-from beyond.env.jpl import create_frames
 from beyond.io.ccsds import dumps, loads, CcsdsError
 from beyond.dates import timedelta
 
@@ -39,9 +38,9 @@ def test_dump_oem_linear(ephem, ccsds_format):
             assert "LINEAR" in line
 
 
+@mark.jpl
 def test_dump_oem_interplanetary(jplfiles, ephem, ccsds_format, datafile, helper):
 
-    create_frames("Mars")
     ephem.frame = "Mars"
 
     ref = datafile("oem_interplanetary")
@@ -113,9 +112,8 @@ def test_load_oem_cov_tnw(ephem_cov, datafile, helper):
     helper.assert_ephem(ephem_cov, data, cov_eps=1e-12)
 
 
+@mark.jpl
 def test_load_oem_interplanetary(jplfiles, ephem, datafile, helper):
-
-    create_frames(until="Mars")
 
     ephem.frame = "Mars"
 

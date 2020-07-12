@@ -10,7 +10,7 @@ from beyond.io.tle import Tle
 from beyond.propagators.keplernum import KeplerNum
 from beyond.dates import Date, timedelta
 from beyond.env.solarsystem import get_body
-
+from beyond.env import jpl
 
 np.set_printoptions(linewidth=200)
 
@@ -96,6 +96,8 @@ def jplfiles():
         str(Path(__file__).parent / "data" / "jpl" / "gm_de431.tpc"),
     ])
 
+    jpl.create_frames()
+
 
 def _skip_if_no_mpl():
     """Specific for dynamically skipping the test if matplotlib is not present
@@ -115,6 +117,9 @@ def pytest_configure(config):
     """
     config.addinivalue_line(
         "markers", "skip_if_no_mpl: skip if matplotlib is not installed"
+    )
+    config.addinivalue_line(
+        "markers", "jpl: Test using beyond.env.jpl functions and classes"
     )
 
 

@@ -1,16 +1,17 @@
 
 import numpy as np
-from pytest import fixture, raises
+from pytest import fixture, raises, mark
 
 from beyond.errors import UnknownFrameError, UnknownBodyError
 from beyond.config import config
-from beyond.env.jpl import get_orbit, list_bodies, create_frames
+from beyond.env.jpl import get_orbit, list_frames, create_frames
 from beyond.dates import Date
 from beyond.orbits import Orbit
 from beyond.utils.units import AU
 from beyond.frames import get_frame
 
 
+@mark.jpl
 def test_get(jplfiles):
 
     mars = get_orbit('Mars', Date(2018, 1, 14))
@@ -20,7 +21,7 @@ def test_get(jplfiles):
     assert abs(32.184313430881999806842941325158 + mars.date._offset) <= np.finfo(float).eps
     assert mars.date.change_scale("UTC") == Date(2018, 1, 14)
     assert str(mars.frame) == "MarsBarycenter"
-    assert mars.frame.center.name == "Mars Barycenter"
+    assert mars.frame.center.name == "MarsBarycenter"
     assert str(mars.form) == "cartesian"
 
     # Check if conversion to other frame works as espected
@@ -35,6 +36,7 @@ def test_get(jplfiles):
         get_orbit('Jupiter', Date(2018, 1, 14))
 
 
+@mark.jpl
 def test_propagate(jplfiles):
     venus = get_orbit('VenusBarycenter', Date(2018, 1, 14))
     venus = venus.propagate(Date(2018, 1, 15, 12, 27))
@@ -48,37 +50,31 @@ def test_propagate(jplfiles):
     ])
 
 
+@mark.jpl
 def test_transform(jplfiles):
 
     mars = get_orbit('Mars', Date(2018, 2, 25))
     mars.frame = "SolarSystemBarycenter"
     mars.form = "keplerian"
 
-    assert mars.frame.center.name == "Sun"
-    assert mars.frame.center.m > 1.9e30
+    assert mars.frame.center.body.name == "Sun"
+    assert mars.frame.center.body.m > 1.9e30
 
     assert 1.3 * AU <= mars.a <= 1.7 * AU
 
 
+@mark.jpl
 def test_list(jplfiles):
 
-    l = list(list_bodies())
-    assert len(l) == 15
+    l = list(list_frames())
+    assert len(l) == 16
 
 
+@mark.jpl
 def test_create_frames(jplfiles):
-    create_frames(until='Mars')
 
     mars = get_frame('Mars')
     assert mars.name == "Mars"
-
-    # The frame for Venus is not yet created, due to the use of the 'until' keyword in the
-    # create_frame call
-    with raises(UnknownFrameError):
-        get_frame("Venus")
-
-    # Create all the frames available in the .bsp files
-    create_frames()
 
     venus = get_frame('Venus')
     assert venus.name == "Venus"

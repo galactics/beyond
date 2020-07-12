@@ -57,9 +57,9 @@ plt.figure()
 data = np.array(ephem)
 dates = [x.date for x in ephem]
 # Altitude in km
-alt = (np.linalg.norm(data[:, :3], axis=1) - orb.frame.center.r) / 1000
+alt = (np.linalg.norm(data[:, :3], axis=1) - orb.frame.center.body.r) / 1000
 events_dates = [perigee.date, apogee.date]
-events_alt = (np.linalg.norm([perigee[:3], apogee[:3]], axis=1) - orb.frame.center.r) / 1000
+events_alt = (np.linalg.norm([perigee[:3], apogee[:3]], axis=1) - orb.frame.center.body.r) / 1000
 
 plt.plot(dates, alt)
 plt.plot([events_dates[0]], [events_alt[0]], 'ro', label="perigee")

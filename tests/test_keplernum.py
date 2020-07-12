@@ -423,6 +423,7 @@ def test_man_continuous(method, molniya_kepler):
     assert 8100000 < after - before < 8200000
 
 
+@mark.jpl
 def test_soi(jplfiles):
 
     opm = ccsds.loads("""CCSDS_OPM_VERS = 2.0
