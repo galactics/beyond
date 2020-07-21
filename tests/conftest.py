@@ -116,7 +116,7 @@ def pytest_configure(config):
     This has no actual effect on the tests
     """
     config.addinivalue_line(
-        "markers", "skip_if_no_mpl: skip if matplotlib is not installed"
+        "markers", "mpl: Test using matplotlib. Skipped if matplotlib not available"
     )
     config.addinivalue_line(
         "markers", "jpl: Test using beyond.env.jpl functions and classes"
@@ -127,5 +127,5 @@ def pytest_runtest_setup(item):
     """This function is called for each test case.
     It looks if the test case has the skip_if_no_mpl decorator. If so, skip the test case
     """
-    if _skip_if_no_mpl() and list(item.iter_markers(name="skip_if_no_mpl")):
+    if _skip_if_no_mpl() and list(item.iter_markers(name="mpl")):
         skip("matplotlib not installed")

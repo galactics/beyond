@@ -14,7 +14,7 @@ def cases(request):
     return folder / (request.param + ".py")
 
 
-@mark.skip_if_no_mpl
+@mark.mpl
 def test_doc(cases):
 
     p = run(["python", cases, "no-display"])
