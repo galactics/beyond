@@ -67,7 +67,7 @@ Orbit =
         )
 
         # Add covariance to the repr
-        if self.cov.any():
+        if self.cov is not None:
             fmt += indent(repr(self.cov), " " * 2)
 
         # Add man to the repr if there is some

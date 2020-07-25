@@ -1,15 +1,14 @@
 import numpy as np
 
 from ..frames.local import to_local
+from ..frames.frames import get_frame
 
 
 class Cov(np.ndarray):
     """Covariance matrix
     """
 
-    PARENT_FRAME = "parent"
-
-    def __new__(cls, orb, values, frame=PARENT_FRAME):
+    def __new__(cls, orb, values, frame):
         """Create a covariance matrix
 
         Args:
@@ -23,8 +22,10 @@ class Cov(np.ndarray):
             values = values.base
 
         obj = np.ndarray.__new__(cls, (6, 6), buffer=np.array(values), dtype=float)
+        obj._data = {}
         obj._frame = frame
-        obj.orb = orb.copy(form="cartesian")
+        obj.orb = orb
+        obj._orb_frame = orb.frame
 
         return obj
 
@@ -32,8 +33,7 @@ class Cov(np.ndarray):
         cols = "x,y,z,vx,vy,vz".split(",")
 
         txt = "Cov =\n"
-        if self.frame is not self.PARENT_FRAME:
-            txt += "  frame = {}\n".format(self.frame)
+        txt += "  frame = {}\n".format(self.frame)
         txt += " " * 7
         txt += "".join([" {:^9} ".format(x) for x in cols])
         txt += "\n"
@@ -55,33 +55,76 @@ class Cov(np.ndarray):
         if obj is None:
             return
 
-        self._frame = obj._frame
-        self.orb = obj.orb
+        self._data = obj._data.copy()
 
     @property
     def frame(self):
         """Frame of the covariance
 
         When this value is changed, the covariance is converted
-        Accepted frames are 'TNW', 'QSW' and 'parent'
+        Accepted frames are regular frames (defined in 
+        :ref:`frames`) and 'TNW' or 'QSW'.
+
+        If the frame of this covariance is the same as its parent statevector/orbit,
+        a change of its parent frame will trigger a change of this covariance frame
+        as well.
+
+        .. code-block:: python
+
+            orb.frame.name      # "EME2000"
+            orb.cov.frame.name  # "EME2000"
+            orb.frame = "ITRF"
+            orb.frame.name      # "ITRF"
+            orb.cov.frame.name  # "ITRF"
+        
+        It it possible to untangle them by switching only the covariance to an other
+        frame
+
+        .. code-block:: python
+
+            orb.frame.name      # "EME2000"
+            orb.cov.frame.name  # "EME2000"
+            orb.cov.frame = "ITRF"
+            orb.frame.name      # "EME2000"
+            orb.cov.frame.name  # "ITRF"
         """
-        return self._frame
+        return self._data["frame"]
 
     @frame.setter
     def frame(self, frame):
-        if frame == self._frame:
+
+        _local = ("TNW", "QSW")
+
+        if isinstance(frame, str) and frame not in _local:
+            frame = get_frame(frame)
+
+        if frame == self.frame:
+            # The frame is the same as the current one
             return
 
-        if frame not in ("TNW", "QSW", self.PARENT_FRAME):
-            raise ValueError("Unknown covariance frame : {}".format(frame))
+        # Here we use a two step method
+        # First we compute the matrix m1, which represents the
+        # rotation from the current frame to the parent frame
+        # Second we compute the matrix m2 which represents the
+        # rotation from the parent frame to the target frame
 
-        if self._frame in ("TNW", "QSW"):
-            m1 = to_local(self._frame, self.orb).T
+        # Handle previous frame to parent frame conversion
+        if self.frame in ("TNW", "QSW"):
+            m1 = to_local(self.frame, self.orb).T
+        elif self.frame != self._orb_frame:
+            m1 = self.frame.orientation.convert_to(
+                self.orb.date, self._orb_frame.orientation
+            )
         else:
             m1 = np.identity(6)
 
+        # handle parent frame to target frame conversion
         if frame in ("TNW", "QSW"):
             m2 = to_local(frame, self.orb)
+        elif self._orb_frame != frame:
+            m2 = self._orb_frame.orientation.convert_to(
+                self.orb.date, frame.orientation
+            )
         else:
             m2 = np.identity(6)
 
@@ -91,4 +134,27 @@ class Cov(np.ndarray):
         cov = M @ self.base @ M.T
 
         self.base.setfield(cov, dtype=float)
-        self._frame = frame
+        self._data["frame"] = frame
+        if frame not in ("TNW", "QSW"):
+            self.orb.frame = frame
+
+    @property
+    def _frame(self):
+        """Allow to set the frame without triggering a computation
+        """
+        return self._data["frame"]
+
+    @_frame.setter
+    def _frame(self, value):
+        self._data["frame"] = value
+
+    @property
+    def orb(self):
+        return self._data["orb"]
+
+    @orb.setter
+    def orb(self, value):
+        orb = value.copy(form="cartesian")
+        if orb.cov is not None:
+            del orb.cov
+        self._data["orb"] = orb

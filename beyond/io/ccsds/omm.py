@@ -233,7 +233,7 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
         dfmt=DATE_FMT_DEFAULT,
     )
 
-    if data.cov.any():
+    if data.cov is not None:
         text += dump_cov(data.cov)
 
     if "ccsds_user_defined" in data._data:
@@ -304,10 +304,10 @@ def _dumps_xml(data, **kwargs):
         ndotdot = ET.SubElement(tle_params, "MEAN_MOTION_DDOT")
         ndotdot.text = "{:.1f}".format(data.ndotdot)
 
-    if data.cov.any():
+    if data.cov is not None:
         cov = ET.SubElement(data_tag, "covarianceMatrix")
 
-        if data.cov.frame != data.cov.PARENT_FRAME:
+        if data.cov.frame != data.frame:
             frame = data.cov.frame
             if frame == "QSW":
                 frame = "RSW"

@@ -8,7 +8,7 @@ def load_cov(orb, data):
     if "COV_REF_FRAME" in data:
         frame = data["COV_REF_FRAME"].text
     else:
-        frame = orb.cov.PARENT_FRAME
+        frame = orb.frame
 
     if frame in ("RSW", "RTN"):
         frame = "QSW"
@@ -64,15 +64,14 @@ def load_cov(orb, data):
         ],
     ]
 
-    cov = Cov(orb, np.array(values).astype(np.float) * 1e6)
-    cov._frame = frame
+    cov = Cov(orb, np.array(values).astype(np.float) * 1e6, frame)
 
     return cov
 
 
 def dump_cov(cov):
     text = "\n"
-    if cov.frame != cov.PARENT_FRAME:
+    if cov.frame != cov.orb.frame:
         frame = cov.frame
         if frame == "QSW":
             frame = "RSW"

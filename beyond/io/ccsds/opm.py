@@ -254,7 +254,7 @@ GM                   = {gm:11.4f} [km**3/s**2]
     )
 
     # Covariance handling
-    if cart.cov.any():
+    if cart.cov is not None:
         text += dump_cov(cart.cov)
 
     if cart.maneuvers:
@@ -354,10 +354,10 @@ def _dumps_xml(data, **kwargs):
     gm = ET.SubElement(keplerian, "GM", units="km**3/s**2")
     gm.text = "{:11.4f}".format(kep.frame.center.body.mu / (units.km ** 3))
 
-    if cart.cov.any():
+    if cart.cov is not None:
         cov = ET.SubElement(data_tag, "covarianceMatrix")
 
-        if cart.cov.frame != cart.cov.PARENT_FRAME:
+        if cart.cov.frame != cart.frame:
             frame = cart.cov.frame
             if frame == "QSW":
                 frame = "RSW"

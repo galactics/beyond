@@ -2,6 +2,8 @@
 Reference Frames
 ****************
 
+.. _frames:
+
 Frames
 ======
 

@@ -265,7 +265,7 @@ def _dumps_kvn(data, **kwargs):
                 )
             )
 
-            if orb.cov.any():
+            if orb.cov is not None:
                 cov_text = []
 
                 if cov:
@@ -275,7 +275,7 @@ def _dumps_kvn(data, **kwargs):
                     "EPOCH = {date:{dfmt}}".format(date=orb.date, dfmt=DATE_FMT_DEFAULT)
                 )
 
-                if orb.cov.frame != orb.cov.PARENT_FRAME:
+                if orb.cov.frame != orb.frame:
                     frame = orb.cov.frame
                     if frame == "QSW":
                         frame = "RSW"
@@ -340,13 +340,13 @@ def _dumps_xml(data, **kwargs):
                 x.text = "{:0.6f}".format(getattr(el, v) / units.km)
 
         for el in data:
-            if el.cov.any():
+            if el.cov is not None:
                 cov = ET.SubElement(data_tag, "covarianceMatrix")
 
                 cov_date = ET.SubElement(cov, "EPOCH")
                 cov_date.text = el.date.strftime(DATE_FMT_DEFAULT)
 
-                if el.cov.frame != el.cov.PARENT_FRAME:
+                if el.cov.frame != el.frame:
                     frame = el.cov.frame
                     if frame == "QSW":
                         frame = "RSW"

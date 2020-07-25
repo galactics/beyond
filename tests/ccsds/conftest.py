@@ -4,6 +4,7 @@ import numpy as np
 from pytest import fixture
 from itertools import product
 
+from beyond.orbits.cov import Cov
 from beyond.orbits.man import ImpulsiveMan, ContinuousMan
 from beyond.io.tle import Tle
 from beyond.dates import Date, timedelta
@@ -45,7 +46,7 @@ def orbit(tle):
 @fixture
 def orbit_cov(orbit):
     orbit = orbit.copy()
-    orbit.cov = [
+    cov = [
         [
             3.331349476038534e2,
             4.618927349220216e2,
@@ -95,6 +96,8 @@ def orbit_cov(orbit):
             6.224444338635500e-4,
         ],
     ]
+
+    orbit.cov = Cov(orbit, cov, orbit.frame)
 
     return orbit
 
@@ -189,7 +192,7 @@ class Helper:
         assert abs(orb1[4] - orb2[4]) < 1e-3
         assert abs(orb1[5] - orb2[5]) < 1e-3
 
-        if orb1.cov.any() and orb2.cov.any():
+        if orb1.cov is not None and orb2.cov is not None:
             elems = "X Y Z X_DOT Y_DOT Z_DOT".split()
             for i, j in product(range(6), repeat=2):
                 assert abs(orb1.cov[i,j] - orb2.cov[i,j]) < cov_eps, "C{}_{}".format(elems[i], elems[j])

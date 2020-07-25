@@ -151,7 +151,7 @@ StateVector =
         )
 
         # Add covariance to the repr
-        if self.cov.any():
+        if self.cov is not None:
             fmt += indent(repr(self.cov), " " * 2)
 
         return fmt
@@ -174,17 +174,29 @@ StateVector =
 
     @property
     def cov(self):
-        """:py:class:`~beyond.orbits.cov.Cov`: 6x6 Matrix
+        """:py:class:`~beyond.orbits.cov.Cov`: 6x6 Covariance matrix
+
+        If a statevector and its covariance are expressed in the same frame,
+        changing the frame of the statevector will trigger the change of its
+        covariance frame.
         """
-        return self._data.get("cov", Cov(self, np.zeros((6, 6))))
+        if "cov" not in self._data.keys():
+            self._data["cov"] = None
+
+        return self._data["cov"]
 
     @cov.setter
     def cov(self, value):
-        self._data["cov"] = Cov(self, value)
+
+        if not isinstance(value, Cov):
+            raise TypeError("Unknwon covariance type : ".format(type(value)))
+
+        self._data["cov"] = value
+        self._data["cov"].orb = self
 
     @cov.deleter
     def cov(self):
-        del self._data["cov"]
+        self._data["cov"] = None
 
     @property
     def maneuvers(self):
@@ -251,6 +263,7 @@ StateVector =
     @frame.setter
     def frame(self, new_frame):
         old_form = self.form
+        old_frame = self.frame
 
         if isinstance(new_frame, str):
             new_frame = get_frame(new_frame)
@@ -263,6 +276,9 @@ StateVector =
                 self._data["frame"] = new_frame
             finally:
                 self.form = old_form
+
+        if self.cov is not None and self.cov.frame == old_frame:
+            self.cov.frame = new_frame
 
     def as_frame(self, name, **kwargs):  # pragma: no cover
         """Register the orbit as frame.
