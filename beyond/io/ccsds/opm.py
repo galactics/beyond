@@ -2,7 +2,7 @@ import numpy as np
 import lxml.etree as ET
 
 from ...dates import timedelta
-from ...orbits import Orbit, StateVector
+from ...orbits import StateVector
 from ...orbits.man import ImpulsiveMan, ContinuousMan
 from ...utils import units
 
@@ -29,7 +29,7 @@ def loads(string, fmt):
         string (str): Text containing the OPM in KVN or XML format
         fmt (str): format of the file to read
     Return:
-        Orbit:
+        StateVector:
     """
 
     if fmt == "kvn":
@@ -163,7 +163,7 @@ def _loads_xml(string):
     except KeyError as e:
         raise CcsdsError("Missing mandatory parameter {}".format(e))
 
-    orb = Orbit([x, y, z, vx, vy, vz], date, "cartesian", frame, None)
+    orb = StateVector([x, y, z, vx, vy, vz], date, "cartesian", frame)
     orb.name = name
     orb.cospar_id = cospar_id
 
