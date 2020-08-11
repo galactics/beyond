@@ -53,3 +53,30 @@ def rot3(theta):
             [0, 0, 1],
         ]
     )
+
+
+def expand(m):
+    """Duplicate a 3x3 matrix diagonaly into a 6x6 matrix
+
+    Args:
+        m1 (numpy.ndarray) : 3x3 matrix
+    Return:
+        numpy.ndarray : 6x6
+
+    Example:
+
+    >>> m = np.array([[0, -1, 0], [-1, 0, 0], [0, 0, 1]])
+    >>> print(expand(m))
+    [[ 0. -1.  0.  0.  0.  0.]
+     [-1.  0.  0.  0.  0.  0.]
+     [ 0.  0.  1.  0.  0.  0.]
+     [ 0.  0.  0.  0. -1.  0.]
+     [ 0.  0.  0. -1.  0.  0.]
+     [ 0.  0.  0.  0.  0.  1.]]
+    """
+
+    out = np.identity(6)
+    out[:3, :3] = m
+    out[3:, 3:] = m
+
+    return out

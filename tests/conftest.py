@@ -10,7 +10,7 @@ from beyond.io.tle import Tle
 from beyond.propagators.keplernum import KeplerNum
 from beyond.dates import Date, timedelta
 from beyond.env.solarsystem import get_body
-
+from beyond.env import jpl
 
 np.set_printoptions(linewidth=200)
 
@@ -19,12 +19,7 @@ np.set_printoptions(linewidth=200)
 def config_override():
     """Create a dummy config dict containing basic data
     """
-
-    config.update({
-        "eop": {
-            "missing_policy": "pass",
-        }
-    })
+    config.set("eop", "missing_policy", "pass")
 
 
 @fixture
@@ -95,13 +90,13 @@ def molniya(request, molniya_tle):
 
 @fixture
 def jplfiles():
-    config['env'] = {
-        'jpl': [
-            str(Path(__file__).parent / "data" / "jpl" / "de403_2000-2020.bsp"),
-            str(Path(__file__).parent / "data" / "jpl" / "pck00010.tpc"),
-            str(Path(__file__).parent / "data" / "jpl" / "gm_de431.tpc"),
-        ]
-    }
+    config.set('env', 'jpl', 'files', [
+        str(Path(__file__).parent / "data" / "jpl" / "de403_2000-2020.bsp"),
+        str(Path(__file__).parent / "data" / "jpl" / "pck00010.tpc"),
+        str(Path(__file__).parent / "data" / "jpl" / "gm_de431.tpc"),
+    ])
+
+    jpl.create_frames()
 
 
 def _skip_if_no_mpl():
@@ -121,7 +116,10 @@ def pytest_configure(config):
     This has no actual effect on the tests
     """
     config.addinivalue_line(
-        "markers", "skip_if_no_mpl: skip if matplotlib is not installed"
+        "markers", "mpl: Test using matplotlib. Skipped if matplotlib not available"
+    )
+    config.addinivalue_line(
+        "markers", "jpl: Test using beyond.env.jpl functions and classes"
     )
 
 
@@ -129,5 +127,5 @@ def pytest_runtest_setup(item):
     """This function is called for each test case.
     It looks if the test case has the skip_if_no_mpl decorator. If so, skip the test case
     """
-    if _skip_if_no_mpl() and list(item.iter_markers(name="skip_if_no_mpl")):
+    if _skip_if_no_mpl() and list(item.iter_markers(name="mpl")):
         skip("matplotlib not installed")

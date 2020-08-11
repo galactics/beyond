@@ -83,7 +83,7 @@ class Sgp4Beta:
 
         i0, Ω0, e0, ω0, M0, n0 = self.tle
         n0 *= 60  # conversion to min⁻¹
-        bstar = self.tle.complements["bstar"]
+        bstar = self.tle.bstar
 
         j2 = self.gravity.j2
         j3 = self.gravity.j3
@@ -297,7 +297,7 @@ class Sgp4Beta:
         else:
             raise TypeError("Unhandled type for 'date': %s" % type(date))
 
-        bstar = self.tle.complements["bstar"]
+        bstar = self.tle.bstar
         µ = self.gravity.µ_e
         r_e = self.gravity.r_e
         k_e = self.gravity.k_e
@@ -451,6 +451,9 @@ class Sgp4Beta:
 
         vector = np.concatenate((vR, vRdot)) * 1000  # conversion to meters
 
-        return self.tle.__class__(
-            date, vector, "cartesian", "TEME", self.__class__(), **self.tle.complements
-        )
+        data = self.tle._data.copy()
+        data["date"] = date
+        data["form"] = "cartesian"
+        data["propagator"] = self.__class__()
+
+        return self.tle.__class__(vector, **data)

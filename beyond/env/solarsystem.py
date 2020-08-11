@@ -36,7 +36,7 @@ class EarthPropagator(AnalyticalPropagator):
 
     @classmethod
     def propagate(cls, date):
-        return Orbit(date, [0] * 6, "cartesian", "EME2000", cls())
+        return Orbit([0] * 6, date, "cartesian", "EME2000", cls())
 
 
 class MoonPropagator(AnalyticalPropagator):
@@ -127,7 +127,7 @@ class MoonPropagator(AnalyticalPropagator):
             ]
         )
 
-        return Orbit(date, state_vector, "cartesian", "EME2000", cls())
+        return Orbit(state_vector, date, "cartesian", "EME2000", cls())
 
 
 class SunPropagator(AnalyticalPropagator):
@@ -193,7 +193,7 @@ class SunPropagator(AnalyticalPropagator):
             * AU
         )
 
-        return Orbit(date, pv, "cartesian", "MOD", cls())
+        return Orbit(pv, date, "cartesian", "MOD", cls())
 
 
 _bodies = {

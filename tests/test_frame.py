@@ -12,6 +12,7 @@ from beyond.errors import UnknownFrameError
 from beyond.dates import Date
 from beyond.dates.eop import Eop
 from beyond.orbits.orbit import Orbit
+from beyond.orbits.statevector import StateVector
 from beyond.io.tle import Tle
 from beyond.frames.frames import *
 
@@ -34,8 +35,8 @@ def model_correction():
 @fixture
 def ref_orbit(date):
     return Orbit(
-        date,
         [-1033479.383, 7901295.2754, 6380356.5958, -3225.636520, -2872.451450, 5531.924446],
+        date,
         'cartesian',
         'ITRF',
         None
@@ -44,9 +45,9 @@ def ref_orbit(date):
 
 def assert_vector(ref, pv, precision=(4, 6)):
 
-    if isinstance(ref, Orbit):
+    if isinstance(ref, StateVector):
         ref = ref.base
-    if isinstance(pv, Orbit):
+    if isinstance(pv, StateVector):
         pv = pv.base
 
     assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
@@ -86,35 +87,35 @@ def test_unit_iau1980(ref_orbit, model_correction):
     The MOD transformation seems to be problematic
     """
 
-    pv = ITRF(ref_orbit.date, ref_orbit).transform('PEF')
+    pv = ITRF.transform(ref_orbit, PEF)
     assert_vector(pef_ref, pv)
 
     # Going back to ITRF
-    pv2 = PEF(ref_orbit.date, pv).transform('ITRF')
+    pv2 = PEF.transform(pv, ITRF)
     assert_vector(ref_orbit, pv2)
 
     # PEF to TOD
-    pv = PEF(ref_orbit.date, pv).transform('TOD')
+    pv = PEF.transform(pv, TOD)
     assert_vector(tod_ref, pv)
 
     # Going back to PEF
-    pv2 = TOD(ref_orbit.date, pv).transform("PEF")
+    pv2 = TOD.transform(pv, PEF)
     assert_vector(pef_ref, pv2)
 
     # TOD to MOD
-    pv = TOD(ref_orbit.date, pv).transform('MOD')
+    pv = TOD.transform(pv, MOD)
     # assert_vector(mod_ref, pv)
 
     # Back to TOD
-    pv2 = MOD(ref_orbit.date, pv).transform('TOD')
+    pv2 = MOD.transform(pv, TOD)
     assert_vector(tod_ref, pv2)
 
     # MOD to EME2000
-    pv = MOD(ref_orbit.date, pv).transform('EME2000')
+    pv = MOD.transform(pv, EME2000)
     assert_vector(eme_ref, pv)
 
     # Back to MOD
-    pv2 = EME2000(ref_orbit.date, pv).transform('MOD')
+    pv2 = EME2000.transform(pv, MOD)
     # assert_vector(mod_ref, pv2)
 
 
@@ -122,49 +123,51 @@ def test_unit_iau2010(ref_orbit, model_correction):
 
     date = ref_orbit.date
 
-    tirf = ITRF(date, ref_orbit).transform('TIRF')
+    tirf = ITRF.transform(ref_orbit, TIRF)
     assert_vector(tirf_ref, tirf)
 
     # Going back to ITRF
-    itrf = TIRF(date, tirf).transform('ITRF')
+    itrf = TIRF.transform(tirf, ITRF)
     assert_vector(ref_orbit, itrf)
 
     # TIRF to CIRF
-    cirf = TIRF(date, tirf).transform('CIRF')
+    cirf = TIRF.transform(tirf, CIRF)
     assert_vector(cirf_ref, cirf)
 
     # Back to TIRF
-    tirf = CIRF(date, cirf).transform('TIRF')
+    tirf = CIRF.transform(cirf, TIRF)
     assert_vector(tirf_ref, tirf)
 
     # CIRF to GCRF
-    gcrf = CIRF(date, cirf).transform('GCRF')
+    gcrf = CIRF.transform(cirf, GCRF)
     assert_vector(gcrf_ref, gcrf)
 
     # Back to CIRF
-    cirf = GCRF(date, gcrf).transform('CIRF')
+    cirf = GCRF.transform(gcrf, CIRF)
     assert_vector(cirf_ref, cirf)
 
 
 def test_unit_g50(ref_orbit, model_correction):
 
-    g50 = EME2000(ref_orbit.date, eme_ref).transform('G50')
+    ref_orbit.frame = EME2000
+
+    g50 = EME2000.transform(ref_orbit, G50)
     assert_vector(g50_ref, g50)
 
     # back to EME2000
-    eme = G50(ref_orbit.date, g50).transform('EME2000')
+    eme = G50.transform(g50, EME2000)
     assert_vector(eme_ref, eme)
 
 
 def test_global_change(ref_orbit, model_correction):
 
-    pv = ITRF(ref_orbit.date, ref_orbit).transform('GCRF')
+    pv = ITRF.transform(ref_orbit, GCRF)
     assert_vector(gcrf_ref, pv)
 
-    pv = ITRF(ref_orbit.date, ref_orbit).transform('EME2000')
+    pv = ITRF.transform(ref_orbit, EME2000)
     assert_vector(eme_ref, pv)
 
-    pv = EME2000(ref_orbit.date, pv).transform('ITRF')
+    pv = EME2000.transform(pv, ITRF)
     assert_vector(ref_orbit, pv)
 
 
@@ -190,9 +193,9 @@ def test_change_tle():
         )
 
         tle = Orbit(
-            Date(2000, 6, 30, 18, 50, 19, 733568),
             [-9060473.7357, 4658709.52502, 813686.731536,
              -2232.83278274, -4110.45348994, -3157.34543346],
+            Date(2000, 6, 30, 18, 50, 19, 733568),
             "cartesian", "TEME", None
         )
         tle.frame = 'EME2000'
@@ -226,9 +229,9 @@ def test_orbit2frame():
     qsw = iss.as_frame('iss_qsw', orientation='QSW')
     tnw = iss.as_frame('iss_tnw', orientation='TNW')
 
-    assert inert.orientation == "TEME"
-    assert qsw.orientation == "QSW"
-    assert tnw.orientation == "TNW"
+    assert inert.orientation.name == "TEME"
+    assert qsw.orientation.orient == "QSW"
+    assert tnw.orientation.orient == "TNW"
 
     s1 = soyouz.copy(frame='iss_inert')
     assert_vector(s1, np.array([70.5889585, 73.6584008, -62.5406308, 0.0521557, 0.0998631, -0.0423856]))

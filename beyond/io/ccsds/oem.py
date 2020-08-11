@@ -2,7 +2,7 @@ import numpy as np
 import lxml.etree as ET
 
 from ...utils import units
-from ...orbits import Orbit, Ephem
+from ...orbits import Ephem, StateVector
 
 from .commons import (
     parse_date,
@@ -97,7 +97,7 @@ def _loads_kvn(string):
             # and discard acceleration if present
             state_vector = np.array([float(x) for x in state_vector[:6]]) * units.km
 
-            orb = Orbit(date, state_vector, "cartesian", ephem["REF_FRAME"], None)
+            orb = StateVector(state_vector, date, "cartesian", ephem["REF_FRAME"])
             ephem["orbits"].append(orb)
             ephem["orbit_mapping"][date] = orb
         elif mode == "covariance":
@@ -191,8 +191,7 @@ def _loads_xml(string):
             ephem = []
             orbit_mapping = {}
             for statevector in data_tag["stateVector"]:
-                orb = Orbit(
-                    parse_date(statevector["EPOCH"].text, metadata["TIME_SYSTEM"].text),
+                orb = StateVector(
                     [
                         decode_unit(statevector, "X", units.km),
                         decode_unit(statevector, "Y", units.km),
@@ -201,9 +200,9 @@ def _loads_xml(string):
                         decode_unit(statevector, "Y_DOT", units.km),
                         decode_unit(statevector, "Z_DOT", units.km),
                     ],
+                    parse_date(statevector["EPOCH"].text, metadata["TIME_SYSTEM"].text),
                     "cartesian",
                     ref_frame,
-                    None,
                 )
                 ephem.append(orb)
                 orbit_mapping[orb.date] = orb
@@ -266,7 +265,7 @@ def _dumps_kvn(data, **kwargs):
                 )
             )
 
-            if orb.cov.any():
+            if orb.cov is not None:
                 cov_text = []
 
                 if cov:
@@ -276,7 +275,7 @@ def _dumps_kvn(data, **kwargs):
                     "EPOCH = {date:{dfmt}}".format(date=orb.date, dfmt=DATE_FMT_DEFAULT)
                 )
 
-                if orb.cov.frame != orb.cov.PARENT_FRAME:
+                if orb.cov.frame != orb.frame:
                     frame = orb.cov.frame
                     if frame == "QSW":
                         frame = "RSW"
@@ -341,13 +340,13 @@ def _dumps_xml(data, **kwargs):
                 x.text = "{:0.6f}".format(getattr(el, v) / units.km)
 
         for el in data:
-            if el.cov.any():
+            if el.cov is not None:
                 cov = ET.SubElement(data_tag, "covarianceMatrix")
 
                 cov_date = ET.SubElement(cov, "EPOCH")
                 cov_date.text = el.date.strftime(DATE_FMT_DEFAULT)
 
-                if el.cov.frame != el.cov.PARENT_FRAME:
+                if el.cov.frame != el.frame:
                     frame = el.cov.frame
                     if frame == "QSW":
                         frame = "RSW"

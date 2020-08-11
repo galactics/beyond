@@ -3,6 +3,30 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [Unreleased]
+
+### Added
+
+- Optional dynamic interplanetary frame via the `env.jpl.dynamic_frames` configuration variable
+- Single function to retrieve local orbital reference frame rotation matrix
+- Creation of the `StateVector`  class as parent of the `Orbit` class. It has
+  the same behavior as `Orbit` but can't be extrapolated.
+
+### Modified
+
+- The list of `bsp` and `tpc` files to read for the `beyond.env.jpl` module to work
+  should be provided to the `env.jpl.files` configuration variable, instead of the previous
+  `env.jpl`.
+- The `beyond.utils.matrix.expand()` function now takes a single argument.
+- Refactoring of `beyond.propagator.keplernum` and `beyond.orbits.man` to remove unused method argument
+- Refactoring of `beyond.frames.frames` to avoid using metaclasses. This has huge code repercussions
+  and affected a large number of files.
+
+### Fixed
+
+- Wrong assumption on the config dict structure now leads to a ``ConfigError``
+- The BSTAR drag term of the TLE format can be above 1e-1
+
 ## [v0.6.9] - 2020-04-19
 
 ### Added

@@ -36,24 +36,24 @@ def test_station(station):
     # assert False
 
     orb = Orbit(
-        Date(2016, 2, 7, 16, 55),
         [4225679.11976, 2789527.13836, 4497182.71156,
          -5887.93077439, 3748.50929999, 3194.45322378],
+        Date(2016, 2, 7, 16, 55),
         'cartesian', 'TEME', 'Sgp4'
     )
     archive = orb.copy()
 
-    assert station.orientation == "N"
+    assert station.orientation.name == "Toulouse"
 
     orb.frame = station
     orb.form = 'spherical'
 
     # azimuth
-    assert abs(-np.degrees(orb.theta) - 159.75001561831209) <= 1e-9
+    assert np.isclose(-np.degrees(orb.theta), 159.75001561831209)
     # elevation
-    assert abs(np.degrees(orb.phi) - 57.894234049230583) <= 1e-9
+    assert np.isclose(np.degrees(orb.phi), 57.894234049230583)
     # range
-    assert abs(orb.r - 471467.65510239213) <= 1e-9
+    assert np.isclose(orb.r, 471467.65510239213)
 
     orb.frame = archive.frame
     orb.form = archive.form

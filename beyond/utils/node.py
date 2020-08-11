@@ -126,6 +126,10 @@ class Node:
         Return:
             list of Node
         """
+
+        if isinstance(goal, Node):
+            goal = goal.name
+
         if goal == self.name:
             return [self]
 
@@ -158,4 +162,6 @@ class Node:
         return self.name
 
     def __repr__(self):  # pragma: no cover
-        return "<{} '{}'>".format(self.__class__.__name__, self.name)
+        return "<{} '{}' at '{}'>".format(
+            self.__class__.__name__, self.name, hex(id(self))
+        )

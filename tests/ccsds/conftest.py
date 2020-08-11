@@ -4,6 +4,7 @@ import numpy as np
 from pytest import fixture
 from itertools import product
 
+from beyond.orbits.cov import Cov
 from beyond.orbits.man import ImpulsiveMan, ContinuousMan
 from beyond.io.tle import Tle
 from beyond.dates import Date, timedelta
@@ -45,7 +46,7 @@ def orbit(tle):
 @fixture
 def orbit_cov(orbit):
     orbit = orbit.copy()
-    orbit.cov = [
+    cov = [
         [
             3.331349476038534e2,
             4.618927349220216e2,
@@ -95,6 +96,8 @@ def orbit_cov(orbit):
             6.224444338635500e-4,
         ],
     ]
+
+    orbit.cov = Cov(orbit, cov, orbit.frame)
 
     return orbit
 
@@ -189,24 +192,27 @@ class Helper:
         assert abs(orb1[4] - orb2[4]) < 1e-3
         assert abs(orb1[5] - orb2[5]) < 1e-3
 
-        if orb1.cov.any() and orb2.cov.any():
+        if orb1.cov is not None and orb2.cov is not None:
             elems = "X Y Z X_DOT Y_DOT Z_DOT".split()
             for i, j in product(range(6), repeat=2):
                 assert abs(orb1.cov[i,j] - orb2.cov[i,j]) < cov_eps, "C{}_{}".format(elems[i], elems[j])
 
-        assert len(orb1.maneuvers) == len(orb2.maneuvers)
+        if hasattr(orb1, "maneuvers") and hasattr(orb2, "maneuvers"):
+            assert len(orb1.maneuvers) == len(orb2.maneuvers)
 
-        # Check for maneuvers if there is some
-        for i, (o1_man, o2_man) in enumerate(zip(orb1.maneuvers, orb2.maneuvers)):
-            assert o1_man.date == o2_man.date
+            # Check for maneuvers if there is some
+            for i, (o1_man, o2_man) in enumerate(zip(orb1.maneuvers, orb2.maneuvers)):
+                assert o1_man.date == o2_man.date
 
-            if isinstance(o1_man, ContinuousMan):
-                assert isinstance(o2_man, ContinuousMan)
-                assert o1_man.duration == o2_man.duration
+                if isinstance(o1_man, ContinuousMan):
+                    assert isinstance(o2_man, ContinuousMan)
+                    assert o1_man.duration == o2_man.duration
 
-            assert o1_man._dv.tolist() == o2_man._dv.tolist()
-            assert o1_man.frame == o2_man.frame
-            assert o1_man.comment == o2_man.comment
+                assert o1_man._dv.tolist() == o2_man._dv.tolist()
+                assert o1_man.frame == o2_man.frame
+                assert o1_man.comment == o2_man.comment
+        elif hasattr(orb1, "maneuvers") != hasattr(orb2, "maneuvers"):
+            assert False, "Incoherent structures"
 
     @classmethod
     def assert_ephem(cls, ephem1, ephem2, cov_eps=None):

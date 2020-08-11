@@ -269,7 +269,7 @@ def test_pickle():
     assert date1.change_scale('UT1') == date2.change_scale('UT1')
 
 
-@mark.skip_if_no_mpl
+@mark.mpl
 def test_plot():
     # This test is ran only if matplotlib is installed
 

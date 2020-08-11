@@ -2,7 +2,7 @@ import numpy as np
 import lxml.etree as ET
 
 from ...dates import timedelta
-from ...orbits import Orbit
+from ...orbits import StateVector
 from ...orbits.man import ImpulsiveMan, ContinuousMan
 from ...utils import units
 
@@ -29,7 +29,7 @@ def loads(string, fmt):
         string (str): Text containing the OPM in KVN or XML format
         fmt (str): format of the file to read
     Return:
-        Orbit:
+        StateVector:
     """
 
     if fmt == "kvn":
@@ -81,7 +81,7 @@ def _loads_kvn(string):
     except KeyError as e:
         raise CcsdsError("Missing mandatory parameter {}".format(e))
 
-    orb = Orbit(date, [x, y, z, vx, vy, vz], "cartesian", frame, None)
+    orb = StateVector([x, y, z, vx, vy, vz], date, "cartesian", frame)
     orb.name = name
     orb.cospar_id = cospar_id
 
@@ -124,7 +124,7 @@ def _loads_kvn(string):
 
     for k in data.keys():
         if k.startswith("USER_DEFINED"):
-            ud = orb.complements.setdefault("ccsds_user_defined", {})
+            ud = orb._data.setdefault("ccsds_user_defined", {})
             ud[k[13:]] = data[k].text
 
     return orb
@@ -163,7 +163,7 @@ def _loads_xml(string):
     except KeyError as e:
         raise CcsdsError("Missing mandatory parameter {}".format(e))
 
-    orb = Orbit(date, [x, y, z, vx, vy, vz], "cartesian", frame, None)
+    orb = StateVector([x, y, z, vx, vy, vz], date, "cartesian", frame)
     orb.name = name
     orb.cospar_id = cospar_id
 
@@ -213,7 +213,7 @@ def _loads_xml(string):
     ud_dict = data["body"]["segment"]["data"].get("userDefinedParameters", {})
 
     for field in ud_dict.get("USER_DEFINED", []):
-        ud = orb.complements.setdefault("ccsds_user_defined", {})
+        ud = orb._data.setdefault("ccsds_user_defined", {})
         ud[field.attrib["parameter"]] = field.text
 
     return orb
@@ -249,12 +249,12 @@ GM                   = {gm:11.4f} [km**3/s**2]
         kep_a=kep.a / units.km,
         kep_e=kep.e,
         angles=np.degrees(kep[2:]),
-        gm=kep.frame.center.mu / (units.km ** 3),
+        gm=kep.frame.center.body.mu / (units.km ** 3),
         dfmt=DATE_FMT_DEFAULT,
     )
 
     # Covariance handling
-    if cart.cov.any():
+    if cart.cov is not None:
         text += dump_cov(cart.cov)
 
     if cart.maneuvers:
@@ -288,9 +288,9 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
                 dfmt=DATE_FMT_DEFAULT,
             )
 
-    if "ccsds_user_defined" in data.complements:
+    if "ccsds_user_defined" in data._data:
         text += "\n"
-        for k, v in data.complements["ccsds_user_defined"].items():
+        for k, v in data._data["ccsds_user_defined"].items():
             text += "USER_DEFINED_{} = {}\n".format(k, v)
 
     return header + "\n" + meta + text
@@ -352,12 +352,12 @@ def _dumps_xml(data, **kwargs):
         x.text = "{:0.6}".format(np.degrees(getattr(kep, v)))
 
     gm = ET.SubElement(keplerian, "GM", units="km**3/s**2")
-    gm.text = "{:11.4f}".format(kep.frame.center.mu / (units.km ** 3))
+    gm.text = "{:11.4f}".format(kep.frame.center.body.mu / (units.km ** 3))
 
-    if cart.cov.any():
+    if cart.cov is not None:
         cov = ET.SubElement(data_tag, "covarianceMatrix")
 
-        if cart.cov.frame != cart.cov.PARENT_FRAME:
+        if cart.cov.frame != cart.frame:
             frame = cart.cov.frame
             if frame == "QSW":
                 frame = "RSW"
@@ -402,9 +402,9 @@ def _dumps_xml(data, **kwargs):
                 x = ET.SubElement(mans, "MAN_DV_{}".format(i + 1), units="km/s")
                 x.text = "{:.6f}".format(man._dv[i] / units.km)
 
-    if "ccsds_user_defined" in data.complements:
+    if "ccsds_user_defined" in data._data:
         ud = ET.SubElement(data_tag, "userDefinedParameters")
-        for k, v in data.complements["ccsds_user_defined"].items():
+        for k, v in data._data["ccsds_user_defined"].items():
             el = ET.SubElement(ud, "USER_DEFINED", parameter=k)
             el.text = v
 

@@ -11,7 +11,9 @@ from beyond.constants import Earth
 from beyond.dates.date import Date
 from beyond.io.tle import Tle
 from beyond.orbits.orbit import Orbit
+from beyond.orbits.cov import Cov
 from beyond.orbits.forms import Form, CART, KEPL_M, KEPL, TLE
+from beyond.frames.frames import ITRF, MOD, EME2000
 
 ref_coord = [
     7192631.11295, 0.00218439, np.deg2rad(98.50639978),
@@ -33,7 +35,7 @@ def ref_date():
 
 @fixture
 def ref_orbit(ref_date):
-    return Orbit(ref_date, ref_coord, ref_form, ref_frame, ref_propagator)
+    return Orbit(ref_coord, ref_date, ref_form, ref_frame, ref_propagator)
 
 
 def test_coord_init(ref_date, ref_orbit):
@@ -46,17 +48,17 @@ def test_coord_init(ref_date, ref_orbit):
     assert ref_orbit['M'] == 3.043341444376126
 
     with raises(UnknownFormError) as e:
-        Orbit(ref_date, ref_coord, "Dummy", ref_frame, ref_propagator)
+        Orbit(ref_coord, ref_date, "Dummy", ref_frame, ref_propagator)
 
     assert str(e.value) == "Unknown form 'Dummy'"
 
     with raises(OrbitError) as e:
-        Orbit(ref_date, ref_coord[:-1], ref_form, ref_frame, ref_propagator)
+        Orbit(ref_coord[:-1], ref_date, ref_form, ref_frame, ref_propagator)
     assert str(e.value) == "Should be 6 in length"
 
 
 def test_init_cart(ref_date):
-    a = Orbit(ref_date, ref_cart, CART.name, ref_frame, ref_propagator)
+    a = Orbit(ref_cart, ref_date, CART.name, ref_frame, ref_propagator)
     assert a.form == CART
 
 
@@ -149,10 +151,9 @@ def test_pickle(ref_orbit):
 
     assert all(ref_orbit == orb)
     assert ref_orbit.date == orb.date
-    assert ref_orbit.frame == orb.frame
+    assert ref_orbit.frame.name == orb.frame.name
     assert ref_orbit.form.name == orb.form.name
     assert ref_orbit.propagator.__class__ == orb.propagator.__class__
-    assert ref_orbit.complements == orb.complements
 
 
 def test_orbit_infos(ref_orbit):
@@ -169,6 +170,7 @@ def test_orbit_infos(ref_orbit):
     assert np.allclose(ref_orbit.infos.pericenter, ref_pericenter)
     assert ref_orbit.infos.apocenter > ref_orbit.infos.pericenter
 
+
 def test_cov(ref_orbit):
 
     cov = np.array([
@@ -179,8 +181,7 @@ def test_cov(ref_orbit):
         [-2.30899159e+01, 5.94453113e+03, -3.15835320e+01, -6.68934414e+00, 7.51789642e-02, 7.12271449e-02],
         [-5.24016849e+01, 9.79109455e+02, -5.61469192e+01, -1.06654468e+00, 7.12271449e-02, 1.85992455e-01]
     ])
-    ref_orbit.cov = cov
-    ref_orbit.cov._frame = "QSW"
+    ref_orbit.cov = Cov(ref_orbit, cov, "QSW")
 
     assert np.allclose(ref_orbit.cov, cov)
 
@@ -195,8 +196,8 @@ def test_cov(ref_orbit):
     ref_orbit.cov.frame = "QSW"
     assert np.allclose(ref_orbit.cov, cov)
 
-    # conversion into same frame as orbit.frame
-    ref_orbit.cov.frame = "parent"
+    # conversion into same frame as ref_orbit.frame
+    ref_orbit.cov.frame = ref_orbit.frame
     # assert np.linalg.norm(ref_orbit.cov) == np.linalg.norm(cov)
 
     ref_orbit.cov.frame = "QSW"
@@ -206,10 +207,42 @@ def test_cov(ref_orbit):
     ref_orbit.cov.frame = "TNW"
     assert np.allclose(cov_tnw, ref_orbit.cov)
 
-    cov_parent = ref_orbit.cov.copy(frame="parent")
-    ref_orbit.cov.frame = "parent"
+    cov_parent = ref_orbit.cov.copy(frame=ref_orbit.frame)
+    ref_orbit.cov.frame = ref_orbit.frame
     assert np.allclose(cov_parent, ref_orbit.cov)
 
     ref_orbit.cov = cov_parent
     assert np.allclose(ref_orbit.cov, cov_parent)
-    assert ref_orbit.cov is not cov_parent
+
+
+def test_cov_frame(ref_orbit):
+
+    cov = np.array([
+        [2.06425972e+04, -2.17645124e+05, 2.09095698e+04, 2.32394582e+02, -2.30899159e+01, -5.24016849e+01],
+        [-2.17645124e+05, 7.82259109e+08, -1.09026368e+06, -8.82448779e+05, 5.94453113e+03, 9.79109455e+02],
+        [ 2.09095698e+04, -1.09026368e+06, 2.48261626e+04, 1.21445858e+03, -3.15835320e+01, -5.61469192e+01],
+        [ 2.32394582e+02, -8.82448779e+05, 1.21445858e+03, 9.95481364e+02, -6.68934414e+00, -1.06654468e+00],
+        [-2.30899159e+01, 5.94453113e+03, -3.15835320e+01, -6.68934414e+00, 7.51789642e-02, 7.12271449e-02],
+        [-5.24016849e+01, 9.79109455e+02, -5.61469192e+01, -1.06654468e+00, 7.12271449e-02, 1.85992455e-01]
+    ])
+    ref_cov = Cov(ref_orbit, cov, "QSW")
+    cov = ref_cov.copy()
+
+    # Check if no transformation are done when copying
+    assert np.allclose(ref_cov, cov)
+
+    cov.frame = "TNW"
+    cov.frame = "QSW"
+    assert np.allclose(ref_cov, cov)
+
+    cov_eme = cov.copy(frame=EME2000)
+    cov.frame = "ITRF"
+    cov.frame = EME2000
+
+    assert np.allclose(cov_eme, cov)
+
+    # Covariance attached to an orbit object follows its frame change
+    ref_orbit.cov = ref_cov.copy(frame=ref_orbit.frame)
+    ref_orbit.frame = "ITRF"
+
+    assert ref_orbit.frame == ref_orbit.cov.frame

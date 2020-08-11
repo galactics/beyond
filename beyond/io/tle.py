@@ -66,6 +66,8 @@ def _float(text):
     -6.0129e-05
     >>> _float('+45871-4')
     4.5871e-05
+    >>> _float('24814+0')
+    0.24814
     """
 
     text = text.strip()
@@ -99,6 +101,8 @@ def _unfloat(flt, precision=5):
     '-60129-4'
     >>> _unfloat(4.5871e-05)
     '45871-4'
+    >>> _unfloat(0.24814)
+    '24814+0'
     """
 
     if flt == 0.0:
@@ -108,7 +112,7 @@ def _unfloat(flt, precision=5):
     exp = int(exp)
     num = num.replace(".", "")
 
-    return "%s%d" % (num, exp + 1)
+    return "%s%+d" % (num, exp + 1)
 
 
 class Tle:
@@ -232,7 +236,7 @@ class Tle:
             "revolutions": self.revolutions,
             "type": self.type,
         }
-        return Orbit(self.epoch, self.to_list(), "TLE", "TEME", "Sgp4", **data)
+        return Orbit(self.to_list(), self.epoch, "TLE", "TEME", "Sgp4", **data)
 
     @classmethod
     def from_orbit(cls, orbit, name=None, norad_id=None, cospar_id=None):
@@ -269,9 +273,9 @@ class Tle:
             + date.minute / 1440
             + date.second / 86400
             + date.microsecond / 86400000000.0,
-            ndot="{: 0.8f}".format(orbit.complements["ndot"] / 2).replace("0.", "."),
-            ndotdot=_unfloat(orbit.complements["ndotdot"] / 6),
-            bstar=_unfloat(orbit.complements["bstar"]),
+            ndot="{: 0.8f}".format(orbit.ndot / 2).replace("0.", "."),
+            ndotdot=_unfloat(orbit.ndotdot / 6),
+            bstar=_unfloat(orbit.bstar),
         )
         line2 = "2 {norad_id} {i:8.4f} {Ω:8.4f} {e} {ω:8.4f} {M:8.4f} {n:11.8f}99999".format(
             norad_id=norad_id,

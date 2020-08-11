@@ -5,9 +5,45 @@ from numpy.linalg import norm
 
 import numpy as np
 
+from ..utils.matrix import expand
+
 
 def _split(orbit):
     return orbit[:3], orbit[3:]
+
+
+def to_local(frame, orbit, expanded=True):
+    """Provide the transformation matrix to convert a vector from an inertial frame
+    to a local orbital reference frame of choice
+
+    Args:
+        frame (str): Name of the local orbital frame ('QSW' or 'TNW')
+        orbit (List[float]) : cartesian coordinates (length 6)
+        expanded (bool) : If ``True`` the returned matrix is 6x6, 3x3 otherwise
+    Return:
+        numpy.ndarray : Transformation matrix
+
+    >>> delta_tnw = [1, 0, 0]
+    >>> p = [-6142438.668, 3492467.560, -25767.25680]
+    >>> v = [505.8479685, 942.7809215, 7435.922231]
+    >>> pv = p + v
+    >>> mat = to_local("TNW", pv, expanded=False).T
+    >>> delta_inert = mat @ delta_tnw
+    >>> all(delta_inert == v / norm(v))
+    True
+    """
+
+    if frame.upper() == "QSW":
+        m = to_qsw(orbit)
+    elif frame.upper() == "TNW":
+        m = to_tnw(orbit)
+    else:
+        raise ValueError("Unknown local orbital frame : {}".format(frame))
+
+    if expanded:
+        m = expand(m)
+
+    return m
 
 
 def to_tnw(orbit):

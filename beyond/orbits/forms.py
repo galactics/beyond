@@ -56,7 +56,7 @@ class Form(Node):
 
                 coord = getattr(
                     self, "_{}_to_{}".format(a.name.lower(), b.name.lower())
-                )(coord, orbit.frame.center)
+                )(coord, orbit.frame.center.body)
 
         return coord
 

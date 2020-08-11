@@ -1,10 +1,10 @@
-"""This module allow to extract data from .BSP files (provided by JPL)
+"""This module allow to extract data from .bsp files (provided by JPL)
 and integrate them in the frames stack.
 
 See the `NAIF website <https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/>`__
 for more informations about the format and content of these files.
 
-For the module to work properly, the .bsp files should be sourced via the `env.jpl.bsp`
+For the module to work properly, the .bsp files should be sourced via the `env.jpl.files`
 configuration variable.
 
 The following configuration will provide access to the Solar System, Mars, Jupiter, Saturn and
@@ -14,20 +14,32 @@ their respective major satellites
 
     from beyond.config import config
 
-    config.update({
-        "env": {
-            "jpl": [
-                "/path/to/de430.bsp",
-                "/path/to/mar097.bsp",
-                "/path/to/jup310.bsp",
-                "/path/to/sat360xl.bsp"
-            ]
-        }
-    })
+    config.set("env", "jpl", "files", [
+        "/path/to/de430.bsp",
+        "/path/to/mar097.bsp",
+        "/path/to/jup310.bsp",
+        "/path/to/sat360xl.bsp"
+    ])
 
-This module rely heavily on the jplephem library, which parse the binary .BSP format
+This module rely heavily on the jplephem library, which parse the binary .bsp format
 
-In addition to .BSP files, you can provide files in the
+In order to use a reference frame of a celestial object, one has to create it first.
+For example, to compute the Orbit of the ISS with respect to the reference frame of
+Mars (because, why not !)
+
+.. code-block:: python
+
+    from beyond.env.jpl import create_frames
+
+    iss.frame = "Mars"  # would fail
+    
+    create_frames()
+    iss.frame = "Mars"  # would succeed
+
+Alternatively, it is possible to set the ``env.jpl.dynamic_frames`` configuration variable
+to ``True`` to force the frame creation when needed. By default this is disabled.
+
+In addition to .bsp files, you can provide files in the
 `PCK text format <https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/>`__ (generally with a
 ``.tpc`` extension), which contain informations about masses and dimensions of most of the solar
 system bodies.
@@ -37,18 +49,14 @@ These files allows to convert to keplerian elements with correct physical consta
 
 .. code-block:: python
 
-    config.update({
-        "env": {
-            "jpl": [
-                "/path/to/de430.bsp",
-                "/path/to/mar097.bsp",
-                "/path/to/jup310.bsp",
-                "/path/to/sat360xl.bsp",
-                "/path/to/pck00010.tpc",
-                "/path/to/gm_de431.tpc"
-            ]
-        }
-    })
+    config.set("env", "jpl", "files", [
+        "/path/to/de430.bsp",
+        "/path/to/mar097.bsp",
+        "/path/to/jup310.bsp",
+        "/path/to/sat360xl.bsp",
+        "/path/to/pck00010.tpc",
+        "/path/to/gm_de431.tpc"
+    ])
 
 Examples of both .bsp and .tcp files are available in the ``tests/data/jpl`` folder.
 
@@ -57,67 +65,25 @@ To display the content of a .bsp file you can use::
     $ python -m beyond.env.jpl <file>...
 """
 
+import logging
 import numpy as np
 from pathlib import Path
 
 from ..config import config
 from ..errors import UnknownBodyError, JplConfigError, JplError
 from ..orbits import Orbit
-from ..utils.node import Node
 from ..propagators.base import AnalyticalPropagator
-from ..dates import Date
-from ..constants import Body as ConstantBody, G
-from .solarsystem import EarthPropagator
+from ..constants import Body, G
+from ..frames import center, frames
 
 from jplephem.spk import SPK, S_PER_DAY
 from jplephem.names import target_names
 
-__all__ = ["get_body", "get_orbit", "list_bodies", "create_frames"]
+__all__ = ["get_orbit", "list_bodies", "create_frames"]
+log = logging.getLogger(__name__)
 
 
-class Body(ConstantBody):
-    """
-    """
-
-    def propagate(self, date):
-        return get_orbit(self.name, date)
-
-
-class Target(Node):
-    """Class representing the relations between the different segments
-    of .bsp files
-
-    It helps dynamically build the Frames objects
-    """
-
-    def __init__(self, name, index):
-        super().__init__(name.title().replace(" ", ""))
-        self.full_name = name
-        self.index = index
-
-
-class GenericBspPropagator(AnalyticalPropagator):
-    """Generic propagator
-    """
-
-    BASE_FRAME = "EME2000"
-
-    @classmethod
-    def propagate(cls, date):
-
-        frame_name = cls.src.name
-        if frame_name == "Earth":
-            frame_name = cls.BASE_FRAME
-
-        date = date.change_scale("TDB")
-
-        return Orbit(
-            date,
-            Bsp().get(cls.src, cls.dst, date),
-            form="cartesian",
-            frame=frame_name,
-            propagator=cls(),
-        )
+BASE_FRAME = frames.EME2000
 
 
 class Bsp:
@@ -132,95 +98,48 @@ class Bsp:
 
         if cls._instance is None:
             cls._instance = super().__new__(cls, *args, **kwargs)
-            cls._instance.open()
 
         return cls._instance
 
-    def open(self):
-        """Open the files
-        """
+    @property
+    def spk(self):
+        if not hasattr(self, "_spk"):
+            self._spk = []
+
+            files = config.get("env", "jpl", "files", fallback=[])
+
+            if not files:
+                raise JplConfigError("No JPL file defined")
+
+            # Extraction of segments from each .bsp file
+            for filepath in files:
+
+                filepath = Path(filepath)
+
+                if filepath.suffix.lower() != ".bsp":
+                    continue
+
+                if not filepath.exists():
+                    log.warning("File not found : {}".format(filepath))
+                    continue
+
+                self._spk.append(SPK.open(str(filepath)))
+
+        return self._spk
+
+    @property
+    def segments(self):
         segments = []
+        for s in self.spk:
+            segments.extend(s.segments)
+        return segments
 
-        files = config.get("env", "jpl", fallback=[])
-
-        if not files:
-            raise JplConfigError("No JPL file defined")
-
-        # Extraction of segments from each .bsp file
-        for filepath in files:
-
-            filepath = Path(filepath)
-
-            if filepath.suffix.lower() != ".bsp":
-                continue
-
-            segments.extend(SPK.open(str(filepath)).segments)
-
-        if not segments:
-            raise JplError("No segment loaded")
-
-        # list of available segments
-        self.segments = dict(((s.center, s.target), s) for s in segments)
-
-        # This variable will contain the Target of reference from which
-        # all relations between frames are linked
-        targets = {}
-
-        for center_id, target_id in self.segments.keys():
-
-            center_name = target_names.get(center_id, "Unknown")
-            target_name = target_names.get(target_id, "Unknown")
-
-            # Retrieval of the Target object representing the center if it exists
-            # or creation of said object if it doesn't.
-            center = targets.setdefault(center_id, Target(center_name, center_id))
-            target = targets.setdefault(target_id, Target(target_name, target_id))
-
-            # Link between the Target objects (see Node2)
-            center + target
-
-        # We take the Earth target and make it the top of the structure.
-        # That way, it is easy to link it to the already declared earth-centered reference frames
-        # from the `frames.frame` module.
-        self.top = targets[399]
-
-    def get(self, center, target, date):
-        """Retrieve the position and velocity of a target with respect to a center
-
-        Args:
-            center (Target):
-            target (Target):
-            date (Date):
-        Return:
-            numpy.array: length-6 array position and velocity (in m and m/s) of the
-                target, with respect to the center
-        """
-
-        if (center.index, target.index) in self.segments:
-            pos, vel = self.segments[
-                center.index, target.index
-            ].compute_and_differentiate(date.jd)
-            sign = 1
-        else:
-            # When we wish to get a segment that is not available in the files (such as
-            # EarthBarycenter with respect to the Moon, for example), we take the segment
-            # representing the inverse vector if available and reverse it
-            pos, vel = self.segments[
-                target.index, center.index
-            ].compute_and_differentiate(date.jd)
-            sign = -1
-
-        # In some cases, the pos vector contains both position and velocity
-        if len(pos) == 3:
-            # The velocity is given in km/days, so we convert to km/s
-            # see: https://github.com/brandon-rhodes/python-jplephem/issues/19 for clarifications
-            pv = np.concatenate((pos, vel / S_PER_DAY))
-        elif len(pos) == 6:
-            pv = np.array(pos)
-        else:
-            raise JplError("Unknown state vector format")
-
-        return sign * pv * 1000
+    @property
+    def pairs(self):
+        pairs = {}
+        for s in self.spk:
+            pairs.update(s.pairs)
+        return pairs
 
 
 class Pck(dict):
@@ -248,12 +167,21 @@ class Pck(dict):
 
         self.clear()
 
+        files = config.get("env", "jpl", "files", fallback=[])
+
+        if not files:
+            raise JplConfigError("No JPL file defined")
+
         # Parsing of multiple files provided in the configuration variable
-        for filepath in config["env"]["jpl"]:
+        for filepath in files:
 
             filepath = Path(filepath)
 
             if filepath.suffix.lower() != ".tpc":
+                continue
+
+            if not filepath.exists():
+                log.warning("File not found : {}".format(filepath))
                 continue
 
             with filepath.open() as fp:
@@ -316,13 +244,16 @@ class Pck(dict):
         If not, use default values of 0
         """
 
-        if name == "Solar System Barycenter":
-            name = "Sun"
+        if name == "SOLAR SYSTEM BARYCENTER":
+            name = "SUN"
 
         try:
-            obj = super().__getitem__(name)
-        except KeyError:
-            obj = {}
+            obj = super().__getitem__(name.title())
+        except KeyError as e:
+            if name in target_names.values():
+                obj = {}
+            else:
+                raise UnknownBodyError(name)
 
         kwargs = {
             "name": name.title(),
@@ -342,109 +273,183 @@ class Pck(dict):
         return Body(**kwargs)
 
 
+class JplPropagator(AnalyticalPropagator):
+    """Propagator
+    """
+
+    def __init__(self, obj, frame):
+        self.name = obj.name
+        self.obj = obj
+        self.frame = frame
+
+    def __repr__(self):
+        return "<{} '{}' at {}>".format(
+            self.__class__.__name__, self.name, hex(id(self))
+        )
+
+    def copy(self):
+        return self.__class__(self.obj, self.frame)
+
+    def propagate(self, date):
+        """Compute center position
+
+        Args:
+            date (Date):
+        Return:
+            numpy.array: length-6 array position and velocity (in m and m/s) of the
+                target, with respect to the center
+        """
+
+        date = date.change_scale("TDB")
+
+        if (self.obj.index, self.frame.center.index) in Bsp().pairs.keys():
+            segment = Bsp().pairs[self.obj.index, self.frame.center.index]
+            sign = -1
+        else:
+            # When we wish to get a segment that is not available in the files (such as
+            # EarthBarycenter with respect to the Moon, for example), we take the segment
+            # representing the inverse vector if available and reverse it
+            segment = Bsp().pairs[self.frame.center.index, self.obj.index]
+            sign = 1
+
+        pos, vel = segment.compute_and_differentiate(date.jd)
+
+        # In some cases, the pos vector contains both position and velocity
+        if len(pos) == 3:
+            # The velocity is given in km/days, so we convert to km/s
+            # see: https://github.com/brandon-rhodes/python-jplephem/issues/19 for clarifications
+            pv = np.concatenate((pos, vel / S_PER_DAY))
+        elif len(pos) == 6:
+            # TODO : Isn't the velocity also in km/days here, as for the previous case ?
+            pv = np.array(pos)
+        else:
+            raise JplError("Unknown state vector format")
+
+        return Orbit(sign * pv * 1000, date, "cartesian", self.frame, self)
+
+
+class JplCenter(center.Center):
+    """Class representing the relations between the different segments
+    of .bsp files
+    """
+
+    def __init__(self, name, index, body=None):
+        short_name = name.title().replace(" ", "")
+        super().__init__(short_name, body=body)
+        self.full_name = name
+        self.index = index
+
+    def add_link(self, linked, propagator):
+        super().add_link(linked, BASE_FRAME.orientation, propagator)
+        self.link = linked
+
+
+class JplFrame(frames.Frame):
+    """Class for Frames from .bsp files
+    """
+
+    def __init__(self, center):
+        super().__init__(center.name, BASE_FRAME.orientation, center)
+
+
 # Cache containing all the propagators used
+_frame_cache = {}
 _propagator_cache = {}
 
 
-def get_orbit(name, date):
-    """Retrieve the orbit of a solar system object
-
-    Args:
-        name (str): The name of the body desired. For exact nomenclature, see
-            :py:func:`list_bodies`
-        date (Date): Date at which the state vector will be extracted
-    Return:
-        Orbit: Orbit of the desired object, in the reference frame in which it is declared in
-            the .bsp file
+def create_frames():
+    """Create all frames available from the .bsp files
     """
 
-    # On-demand Propagator and Frame generation
+    # This variable will contain the Target of reference from which
+    # all relations between frames are linked
+    centers = {}
 
-    if name not in [x.name for x in Bsp().top.list]:
-        raise UnknownBodyError(name)
+    for center_id, target_id in Bsp().pairs:
 
-    for a, b in Bsp().top.steps(name):
-        if b.name not in _propagator_cache:
+        center_name = target_names.get(center_id, "Unknown")
+        target_name = target_names.get(target_id, "Unknown")
 
-            # Creation of the specific propagator class
-            propagator = type(
-                "%sBspPropagator" % b.name,
-                (GenericBspPropagator,),
-                {"src": a, "dst": b},
+        if center_id not in centers:
+            center_body = Pck()[center_name]
+            center = centers[center_id] = JplCenter(
+                center_name, center_id, body=center_body
+            )
+        else:
+            center = centers[center_id]
+
+        if target_id not in centers:
+            target_body = Pck()[target_name]
+            target = centers[target_id] = JplCenter(
+                target_name, target_id, body=target_body
+            )
+        else:
+            target = centers[target_id]
+
+        if center.name not in _frame_cache:
+            _frame_cache[center.name] = JplFrame(center)
+        if target.name not in _frame_cache:
+            _frame_cache[target.name] = JplFrame(target)
+
+        if target.name not in _propagator_cache:
+            _propagator_cache[target.name] = JplPropagator(
+                target, _frame_cache[center.name]
             )
 
-            # Retrieve informations for the central body. If unavailable, create a virtual body with
-            # dummy values
-            center = Pck()[b.full_name.title()]
+        # Link between the JplCenter objects (see beyond.frames.center)
+        target.add_link(center, _propagator_cache[target.name])
 
-            # Register the Orbit as a frame
-            propagator.propagate(date).as_frame(b.name, center=center)
-            _propagator_cache[b.name] = propagator
-
-    if Bsp().top not in _propagator_cache:
-        _propagator_cache[Bsp().top.name] = EarthPropagator()
-
-    return _propagator_cache[name].propagate(date)
-
-
-def list_bodies():
-    """List bodies provided by the .bsp files
-
-    Yield:
-        Target
-    """
-    for x in Bsp().top.list[:-1]:
-        yield x
-
-
-def create_frames(until=None):
-    """Create frames available in the JPL files
-
-    Args:
-        until (str): Name of the body you want to create the frame of, and all frames in between.
-                     If ``None`` all the frames available in the .bsp files will be created
-
-    Example:
-
-    .. code-block:: python
-
-        # All frames between Earth and Mars are created (Earth, EarthBarycenter,
-        # SolarSystemBarycenter, MarsBarycenter and Mars)
-        create_frames(until='Mars')
-
-        # All frames between Earth and Phobos are created (Earth, EarthBarycenter,
-        # SolarSystemBarycenter, MarsBarycenter and Phobos)
-        create_frames(until='Phobos')
-
-        # All frames available in the .bsp files are created
-        create_frames()
-
-    """
-
-    now = Date.now()
-
-    if until:
-        get_orbit(until, now)
-    else:
-        for body in list_bodies():
-            get_orbit(body.name, now)
+    # We take the Earth JplCenter and attach it to the existing Earth center
+    # (defined in beyond.frames.center)
+    first_frame = _frame_cache["Earth"]
+    BASE_FRAME.center.add_link(first_frame.center, BASE_FRAME.orientation, np.zeros(6))
 
 
 def get_body(name):
-    """Retrieve the Body structure of a JPL .bsp file object
-
-    Args:
-        name (str)
-    Return:
-        :py:class:`~beyond.constants.Body`
+    """Retrieve a body instance for a given object
     """
+    body = Pck()[name]
+    body.propagate = get_propagator(name).propagate
+    return body
 
-    return Pck()[name]
+
+def get_propagator(name):
+    """Retrieve a propagator object by its name
+    """
+    if name not in _propagator_cache.keys():
+        raise UnknownBodyError(name)
+
+    return _propagator_cache[name]
+
+
+def get_orbit(name, date):
+    """Get an Orbit object of a celestial body at a given date
+    """
+    return get_propagator(name).propagate(date)
+
+
+def get_frame(name):
+    """Get the frame attached to a celestial body
+    """
+    return _frame_cache[name]
+
+
+def list_frames():
+    """List frames available through .bsp files
+    """
+    return list(_frame_cache.values())
+
+
+def list_bodies():
+    """List bodies available through .tpc files
+    """
+    return [Pck()[k] for k in Pck().keys()]
 
 
 if __name__ == "__main__":  # pragma: no cover
 
     import sys
+    from beyond.dates import Date
 
     config.update({"eop": {"missing_policy": "pass"}})
 

@@ -191,7 +191,7 @@
         </stateVector>
         <stateVector>
           <EPOCH>2008-09-20T13:22:40.104192</EPOCH>
-          <X units="km">344492550.953994</X>
+          <X units="km">344492550.953995</X>
           <Y units="km">120553188.314398</Y>
           <Z units="km">50171749.680043</Z>
           <X_DOT units="km/s">-12.738669</X_DOT>

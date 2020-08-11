@@ -21,18 +21,18 @@ def ref_kepl_m(ref_date):
     ref_form = KEPL_M
     ref_frame = "EME2000"
     ref_propagator = 'Sgp4'
-    return Orbit(ref_date, ref_coord, ref_form, ref_frame, ref_propagator)
+    return Orbit(ref_coord, ref_date, ref_form, ref_frame, ref_propagator)
 
 
 @fixture
 def ref_kepl(ref_date):
 
     return Orbit(
-        ref_date,
         [
             7192631.11295, 0.00218439, 1.71926101045,
             5.51044449998, 1.17890601985, 3.04376883055,
         ],
+        ref_date,
         KEPL,
         "EME2000",
         "Sgp4"
@@ -42,11 +42,11 @@ def ref_kepl(ref_date):
 @fixture
 def ref_cart(ref_date):
     return Orbit(
-        ref_date,
         [
             -1.77079285e+06, 3.04066799e+06, -6.29108469e+06,
             5.05386814e+03, -4.20539932e+03, -3.45695948e+03
         ],
+        ref_date,
         CART,
         "EME2000",
         "Sgp4"
@@ -56,11 +56,11 @@ def ref_cart(ref_date):
 @fixture
 def ref_sphe(ref_date):
     return Orbit(
-        ref_date,
         [
             7.20826718e+06, 2.09815148e+00, -1.06082733e+00,
             1.58820333e+00, -6.39690485e-04, -9.82054932e-04
         ],
+        ref_date,
         SPHE,
         "EME2000",
         "Sgp4"
@@ -70,11 +70,11 @@ def ref_sphe(ref_date):
 @fixture
 def ref_kepl_c(ref_date):
     return Orbit(
-        ref_date,
         [
             7.19263111e+06, 8.34297391e-04, 2.01878863e-03,
             1.71926101e+00, 5.51044450e+00, 4.22224746e+00
         ],
+        ref_date,
         KEPL_C,
         "EME2000",
         "Sgp4"
@@ -84,11 +84,11 @@ def ref_kepl_c(ref_date):
 @fixture
 def ref_tle(ref_date):
     return Orbit(
-        ref_date,
         [
             1.71926101e+00, 5.51044450e+00, 2.18439000e-03,
             1.17890602e+00, 3.04334144e+00, 1.03499315e-03
         ],
+        ref_date,
         TLE,
         "EME2000",
         "Sgp4"
@@ -98,11 +98,11 @@ def ref_tle(ref_date):
 @fixture
 def ref_kepl_hyper(ref_date):
     return Orbit(
-        ref_date,
         [
             -7192631.11295, 1.00218439, 1.71926101045,
             5.51044449998, 1.17890601985, 0.1,
         ],
+        ref_date,
         KEPL,
         "EME2000",
         None
@@ -227,8 +227,8 @@ def test_hyperbolic(ref_kepl_hyper):
 
     def to_orbit(arr, form):
         return Orbit(
-            ref_kepl_hyper.date,
             arr,
+            ref_kepl_hyper.date,
             form,
             ref_kepl_hyper.frame,
             None

@@ -47,13 +47,29 @@ env
 ^^^
 
 jpl
+"""
+
+files
     This variable is optional and is only needed if you wish to track planets or
     other solar system bodies.
 
-    Defines a list of BSP files in which to look solar system bodies (planets,
+    It should be a list of BSP files in which to look for solar system bodies (planets,
     moons, comets, etc.). de430.bsp, mar097.bsp, jup310.bsp, sat360xl.bsp
 
     More information in the :py:mod:`beyond.env.jpl` module.
+
+dynamic_frames
+    This variable is optional and if set to ``True``, allows to create solar system celestial
+    bodies reference frame dynamically, whitout the need to call
+    :py:func:`~beyond.env.jpl.create_frames`.
+    By default, this variable is ``False``.
+
+.. code-block:: python
+
+    from beyond.config import config
+
+    config.set("env", "jpl", "files", ["/path/to/de430.bsp"])
+    config.set("env", "jpl", "dynamic_frames", True)
 
 API
 ---

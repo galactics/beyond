@@ -2,7 +2,7 @@ import logging
 import numpy as np
 from abc import ABCMeta, abstractmethod
 
-from ..frames.local import to_qsw, to_tnw
+from ..frames.local import to_local, to_tnw
 
 log = logging.getLogger(__name__)
 
@@ -69,26 +69,13 @@ class ImpulsiveMan(Man):
 
         orb = orb.copy(form="cartesian")
 
-        if self.frame == "QSW":
-            mat = to_qsw(orb).T
-        elif self.frame == "TNW":
-            mat = to_tnw(orb).T
+        if self.frame in ("QSW", "TNW"):
+            mat = to_local(self.frame, orb, expanded=False).T
         else:
             mat = np.identity(3)
 
         # velocity increment in the same reference frame as the orbit
         projected_dv = mat @ self._dv
-
-        log.debug(
-            "{} dv_{}={} dv_{}={} norm={}".format(
-                orb.date,
-                self.frame,
-                self._dv.tolist(),
-                orb.propagator.frame,
-                projected_dv.tolist(),
-                np.linalg.norm(self._dv),
-            )
-        )
 
         return projected_dv
 
@@ -217,14 +204,12 @@ class ContinuousMan(Man):
     def check(self, date):
         return self.start <= date < self.stop
 
-    def accel(self, orb, step):
+    def accel(self, orb):
 
         orb = orb.copy(form="cartesian")
 
-        if self.frame == "QSW":
-            mat = to_qsw(orb).T
-        elif self.frame == "TNW":
-            mat = to_tnw(orb).T
+        if self.frame in ("QSW", "TNW"):
+            mat = to_local(self.frame, orb, expanded=False).T
         else:
             mat = np.identity(3)
 
@@ -232,7 +217,7 @@ class ContinuousMan(Man):
 
         log.debug(
             "{} accel_{}={} accel_{}={} norm={}".format(
-                orb.date + step,
+                orb.date,
                 self.frame,
                 self._accel.tolist(),
                 orb.propagator.frame,
@@ -251,15 +236,15 @@ class KeplerianContinuousMan(ContinuousMan):
         self.delta_angle = kwargs.pop("delta_i", 0)
         super().__init__(date, duration, np.zeros(3), **kwargs)
 
-    def accel(self, orb, step):
+    def accel(self, orb):
         self._dv = dkep2dv(orb, delta_a=self.delta_a, delta_angle=self.delta_angle)
-        return super().accel(orb, step)
+        return super().accel(orb)
 
 
 def dkep2dv(orb, *, delta_a=0, delta_angle=0):
     """Convert a increment in keplerian elements to a delta v in TNW
     """
-    dv_a = orb.frame.center.mu * delta_a / (2 * orb.infos.v * orb.infos.kep.a ** 2)
+    dv_a = orb.frame.center.body.mu * delta_a / (2 * orb.infos.v * orb.infos.kep.a ** 2)
 
     v_final = orb.infos.v + dv_a
 

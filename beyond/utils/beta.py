@@ -49,4 +49,4 @@ def beta_limit(orb):
         float : Angle in radians
     """
 
-    return np.arccos(np.sqrt(1 - (orb.frame.center.r / orb.infos.r) ** 2))
+    return np.arccos(np.sqrt(1 - (orb.frame.center.body.r / orb.infos.r) ** 2))

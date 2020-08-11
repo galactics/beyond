@@ -1,7 +1,6 @@
 
-from pytest import raises
+from pytest import raises, mark
 
-from beyond.env.jpl import create_frames
 from beyond.io.ccsds import dumps, loads, CcsdsError
 
 
@@ -50,8 +49,8 @@ def test_dump_opm_man_continuous(orbit_continuous_man, datafile, ccsds_format, h
     helper.assert_string(ref, txt, ignore="MAN_DURATION")
 
 
+@mark.jpl
 def test_dump_opm_interplanetary(jplfiles, orbit, ccsds_format, datafile, helper):
-    create_frames("Mars")
     orbit.frame = "Mars"
 
     txt = dumps(orbit, fmt=ccsds_format)
@@ -60,7 +59,7 @@ def test_dump_opm_interplanetary(jplfiles, orbit, ccsds_format, datafile, helper
 
 def test_dump_opm_user_defined(orbit, ccsds_format, datafile, helper):
 
-    subdict = orbit.complements["ccsds_user_defined"] = {}
+    subdict = orbit._data["ccsds_user_defined"] = {}
 
     subdict["FOO"] = "foo enters"
     subdict["BAR"] = "a bar"
@@ -179,9 +178,9 @@ def test_load_opm_man_continuous(orbit_continuous_man, datafile, ccsds_format, h
     helper.assert_orbit(orbit_continuous_man, data_continuous_man)
 
 
+@mark.jpl
 def test_load_interplanetary(jplfiles, orbit, datafile, helper):
 
-    create_frames(until="Mars")
     orbit.frame = "Mars"
 
     data_opm = loads(datafile("opm_interplanetary"))
@@ -195,7 +194,7 @@ def test_load_user_defined(orbit, datafile, helper):
 
     helper.assert_orbit(orbit, data_opm)
 
-    assert "ccsds_user_defined" in data_opm.complements
-    subdict = data_opm.complements["ccsds_user_defined"]
+    assert "ccsds_user_defined" in data_opm._data
+    subdict = data_opm._data["ccsds_user_defined"]
     assert subdict["FOO"] == "foo enters"
     assert subdict["BAR"] == "a bar"
