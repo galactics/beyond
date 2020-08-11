@@ -3,7 +3,7 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
-## [Unreleased]
+## [v0.7] - 2020-08-11
 
 ### Added
 
@@ -11,6 +11,7 @@ Each release is linked to a git commit.
 - Single function to retrieve local orbital reference frame rotation matrix
 - Creation of the `StateVector`  class as parent of the `Orbit` class. It has
   the same behavior as `Orbit` but can't be extrapolated.
+- Covariance matrix can now be expressed in a reference frame independent of its orbit.
 
 ### Modified
 
@@ -21,6 +22,7 @@ Each release is linked to a git commit.
 - Refactoring of `beyond.propagator.keplernum` and `beyond.orbits.man` to remove unused method argument
 - Refactoring of `beyond.frames.frames` to avoid using metaclasses. This has huge code repercussions
   and affected a large number of files.
+- The `skip_if_no_mpl` test decorator is replaced by `mpl`
 
 ### Fixed
 
