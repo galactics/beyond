@@ -41,7 +41,7 @@ class TopocentricFrame(frames.Frame):
                 in the frame of the station and in spherical form.
         """
 
-        from ..orbits.listeners import stations_listeners, Listener
+        from ..propagators.listeners import stations_listeners, Listener
 
         listeners = kwargs.setdefault("listeners", [])
         events = kwargs.pop("events", None)

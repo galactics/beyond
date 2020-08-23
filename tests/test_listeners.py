@@ -5,7 +5,7 @@ from pytest import raises, mark, fixture
 from beyond.orbits import Ephem
 from beyond.io.tle import Tle
 from beyond.dates import Date, timedelta
-from beyond.orbits.listeners import *
+from beyond.propagators.listeners import *
 
 
 def iter_listeners(orb, listeners, mode, **kwargs):

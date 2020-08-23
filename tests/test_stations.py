@@ -8,7 +8,7 @@ from pytest import fixture, raises
 from beyond.dates import Date, timedelta
 from beyond.orbits import Orbit
 from beyond.io.tle import Tle
-from beyond.orbits.listeners import SignalEvent, MaxEvent, MaskEvent, stations_listeners
+from beyond.propagators.listeners import SignalEvent, MaxEvent, MaskEvent, stations_listeners
 
 
 def assert_vector(ref, pv, precision=(4, 6)):

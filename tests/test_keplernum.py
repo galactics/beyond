@@ -9,7 +9,7 @@ from beyond.dates import Date, timedelta
 from beyond.io.tle import Tle
 from beyond.propagators.keplernum import KeplerNum, SOIPropagator
 from beyond.env.solarsystem import get_body
-from beyond.orbits.listeners import LightListener, NodeListener, find_event, ApsideListener
+from beyond.propagators.listeners import LightListener, NodeListener, find_event, ApsideListener
 from beyond.orbits.man import ImpulsiveMan, KeplerianImpulsiveMan, ContinuousMan, KeplerianContinuousMan
 
 import beyond.env.jpl as jpl

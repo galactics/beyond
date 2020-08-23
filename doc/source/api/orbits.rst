@@ -51,14 +51,6 @@ Ephem
 .. automodule:: beyond.orbits.ephem
     :members:
 
-
-Listeners
----------
-
-.. automodule:: beyond.orbits.listeners
-    :members:
-    :special-members: __init__
-
 Maneuvers
 ---------
 

@@ -5,7 +5,7 @@ import numpy as np
 from datetime import timedelta
 
 from .statevector import StateVector
-from .listeners import Speaker
+from ..propagators.listeners import Speaker
 from ..frames.frames import orbit2frame
 
 

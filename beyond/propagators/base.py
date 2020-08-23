@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 
 from ..dates import Date
-from ..orbits.listeners import Speaker
+from .listeners import Speaker
 
 
 class Propagator(metaclass=ABCMeta):
