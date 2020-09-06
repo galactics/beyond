@@ -15,8 +15,7 @@ __all__ = ["Date", "timedelta"]
 
 
 class Timescale(Node):
-    """Definition of a time scale and its interactions with others
-    """
+    """Definition of a time scale and its interactions with others"""
 
     def __repr__(self):  # pragma: no cover
         return "<Scale '%s'>" % self.name
@@ -25,28 +24,23 @@ class Timescale(Node):
         return self.name
 
     def _scale_ut1_minus_utc(self, mjd, eop):
-        """Definition of Universal Time relatively to Coordinated Universal Time
-        """
+        """Definition of Universal Time relatively to Coordinated Universal Time"""
         return eop.ut1_utc
 
     def _scale_tai_minus_utc(self, mjd, eop):
-        """Definition of International Atomic Time relatively to Coordinated Universal Time
-        """
+        """Definition of International Atomic Time relatively to Coordinated Universal Time"""
         return eop.tai_utc
 
     def _scale_tt_minus_tai(self, mjd, eop):
-        """Definition of Terrestrial Time relatively to International Atomic Time
-        """
+        """Definition of Terrestrial Time relatively to International Atomic Time"""
         return 32.184
 
     def _scale_tai_minus_gps(self, mjd, eop):
-        """Definition of International Atomic Time relatively to GPS time
-        """
+        """Definition of International Atomic Time relatively to GPS time"""
         return 19.0
 
     def _scale_tdb_minus_tt(self, mjd, eop):
-        """Definition of the Barycentric Dynamic Time scale relatively to Terrestrial Time
-        """
+        """Definition of the Barycentric Dynamic Time scale relatively to Terrestrial Time"""
         jd = mjd + Date.JD_MJD
         jj = Date._julian_century(jd)
         m = radians(357.5277233 + 35999.05034 * jj)
@@ -346,8 +340,7 @@ class Date:
 
     @classmethod
     def strptime(cls, data, format, scale=DEFAULT_SCALE):  # pragma: no cover
-        """Convert a string representation of a date to a Date object
-        """
+        """Convert a string representation of a date to a Date object"""
         return cls(datetime.strptime(data, format), scale=scale)
 
     @classmethod
@@ -361,8 +354,7 @@ class Date:
         return cls(datetime.utcnow()).change_scale(scale)
 
     def strftime(self, fmt):  # pragma: no cover
-        """Format the date following the given format
-        """
+        """Format the date following the given format"""
         return self.datetime.strftime(fmt)
 
     def change_scale(self, new_scale):
@@ -438,8 +430,7 @@ class Date:
         """
 
         def sign(x):
-            """Inner function for determining the sign of a float
-            """
+            """Inner function for determining the sign of a float"""
             return (-1, 1)[x >= 0]
 
         if not step:

@@ -17,8 +17,7 @@ from .cov import Cov
 
 
 class StateVector(np.ndarray):
-    """Coordinate representation
-    """
+    """Coordinate representation"""
 
     def __new__(cls, coord, date, form, frame, **kwargs):
         """
@@ -147,7 +146,10 @@ StateVector =
   form = {form}
   frame = {frame}
   coord =\n{coord}\n""".format(
-            date=self.date, coord=coord_str, form=self.form, frame=self.frame,
+            date=self.date,
+            coord=coord_str,
+            form=self.form,
+            frame=self.frame,
         )
 
         # Add covariance to the repr
@@ -296,16 +298,14 @@ StateVector =
 
     @property
     def infos(self):
-        """:py:class:`Infos` object of ``self``
-        """
+        """:py:class:`Infos` object of ``self``"""
         if not hasattr(self, "_infos"):
             self._data["infos"] = Infos(self)
         return self._data["infos"]
 
 
 class Infos:
-    """Compute additional informations on an orbit
-    """
+    """Compute additional informations on an orbit"""
 
     def __init__(self, orb):
         self.orb = orb
@@ -334,38 +334,32 @@ class Infos:
 
     @property
     def elliptic(self):
-        """True if the orbit it elliptic
-        """
+        """True if the orbit it elliptic"""
         return self.kep.e < 1
 
     @property
     def parabolic(self):
-        """True if the orbit it parabolic
-        """
+        """True if the orbit it parabolic"""
         return self.kep.e == 1
 
     @property
     def hyperbolic(self):
-        """True if the orbit it hyperbolic
-        """
+        """True if the orbit it hyperbolic"""
         return self.kep.e > 1
 
     @property
     def energy(self):
-        """Mechanical energy of the orbit
-        """
+        """Mechanical energy of the orbit"""
         return -self.mu / (2 * self.kep.a)
 
     @property
     def n(self):
-        """Mean motion
-        """
+        """Mean motion"""
         return np.sqrt(self.mu / abs(self.kep.a) ** 3)
 
     @property
     def period(self):
-        """Period of the orbit as a timedelta
-        """
+        """Period of the orbit as a timedelta"""
         if not self.elliptic:
             raise ValueError("period undefined : orbit is hyperbolic")
 
@@ -373,8 +367,7 @@ class Infos:
 
     @property
     def apocenter(self):
-        """Radius of the apocenter
-        """
+        """Radius of the apocenter"""
         if not self.elliptic:
             raise ValueError("apocenter undefined : orbit is hyperbolic")
 
@@ -382,38 +375,32 @@ class Infos:
 
     @property
     def pericenter(self):
-        """Radius of the pericenter
-        """
+        """Radius of the pericenter"""
         return self.kep.a * (1 - self.kep.e)
 
     @property
     def r(self):
-        """Instantaneous radius
-        """
+        """Instantaneous radius"""
         return self.sphe.r
 
     @property
     def ra(self):
-        """Radius of the apocenter
-        """
+        """Radius of the apocenter"""
         return self.apocenter
 
     @property
     def rp(self):
-        """Radius of the pericenter
-        """
+        """Radius of the pericenter"""
         return self.pericenter
 
     @property
     def v(self):
-        """Instantaneous velocity
-        """
+        """Instantaneous velocity"""
         return np.sqrt(self.mu * (2 / self.r - 1 / self.kep.a))
 
     @property
     def va(self):
-        """Velocity at apocenter
-        """
+        """Velocity at apocenter"""
         if not self.elliptic:
             raise ValueError("va undefined : orbit not elliptic")
 
@@ -421,22 +408,19 @@ class Infos:
 
     @property
     def vp(self):
-        """Velocity at pericenter
-        """
+        """Velocity at pericenter"""
         return np.sqrt(self.mu * (2 / (self.rp) - 1 / self.kep.a))
 
     @property
     def vinf(self):
-        """Hyperbolic excess velocity
-        """
+        """Hyperbolic excess velocity"""
         if not self.hyperbolic:
             raise ValueError("vinf undefined : orbit not hyperbolic")
         return np.sqrt(self.mu / abs(self.kep.a))
 
     @property
     def dinf(self):
-        """Distance between the focus and the asymptote
-        """
+        """Distance between the focus and the asymptote"""
         if not self.hyperbolic:
             raise ValueError("dinf undefined : orbit not hyperbolic")
 
@@ -461,8 +445,7 @@ class Infos:
 
     @property
     def fpa(self):
-        """Flight path angle
-        """
+        """Flight path angle"""
         return np.arctan2(self.sin_fpa, self.cos_fpa)
 
     @property

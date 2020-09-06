@@ -16,8 +16,7 @@ __all__ = ["Sgp4Beta"]
 
 
 class WGS72Old:
-    """Constants for WGS72 old model
-    """
+    """Constants for WGS72 old model"""
 
     µ_e = 3.9860079964e5  # in km³.s⁻²
     r_e = 6378.135  # km
@@ -28,8 +27,7 @@ class WGS72Old:
 
 
 class WGS72:
-    """Constants for WGS72 model
-    """
+    """Constants for WGS72 model"""
 
     µ_e = 3.986008e5  # in km³.s⁻²
     r_e = 6378.135  # km
@@ -40,8 +38,7 @@ class WGS72:
 
 
 class WGS84:
-    """Constants for WGS84 model
-    """
+    """Constants for WGS84 model"""
 
     µ_e = 3.986005e5  # in km³.s⁻²
     r_e = 6378.137  # in km
@@ -52,8 +49,7 @@ class WGS84:
 
 
 class Init:
-    """This class is used as a cache mechanism
-    """
+    """This class is used as a cache mechanism"""
 
     pass
 

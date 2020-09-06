@@ -70,8 +70,7 @@ def get_frame(frame):
 
 
 class Frame:
-    """Frame base class
-    """
+    """Frame base class"""
 
     center = Earth
 
@@ -185,7 +184,9 @@ def orbit2frame(name, ref_orbit, orientation=None, parent=EME2000, exists_warnin
 
     center_obj = center.Center(name, body=parent.center.body)
     center_obj.add_link(
-        ref_orbit.frame.center, ref_orbit.frame.orientation, ref_orbit,
+        ref_orbit.frame.center,
+        ref_orbit.frame.orientation,
+        ref_orbit,
     )
 
     return Frame(name, orientation, center_obj, exists_warning)

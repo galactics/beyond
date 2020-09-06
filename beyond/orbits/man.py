@@ -8,8 +8,7 @@ log = logging.getLogger(__name__)
 
 
 class Man(metaclass=ABCMeta):
-    """Abstract Maneuver class
-    """
+    """Abstract Maneuver class"""
 
     @abstractmethod
     def check(self):
@@ -17,8 +16,7 @@ class Man(metaclass=ABCMeta):
 
 
 class ImpulsiveMan(Man):
-    """Impulsive maneuver
-    """
+    """Impulsive maneuver"""
 
     def __init__(self, date, dv, frame=None, comment=None):
         """
@@ -120,8 +118,7 @@ class KeplerianImpulsiveMan(ImpulsiveMan):
 
 
 class ContinuousMan(Man):
-    """Continuous thrust
-    """
+    """Continuous thrust"""
 
     def __init__(
         self,
@@ -242,8 +239,7 @@ class KeplerianContinuousMan(ContinuousMan):
 
 
 def dkep2dv(orb, *, delta_a=0, delta_angle=0):
-    """Convert a increment in keplerian elements to a delta v in TNW
-    """
+    """Convert a increment in keplerian elements to a delta v in TNW"""
     dv_a = orb.frame.center.body.mu * delta_a / (2 * orb.infos.v * orb.infos.kep.a ** 2)
 
     v_final = orb.infos.v + dv_a

@@ -6,8 +6,7 @@ from ..dates import timedelta
 
 
 class Kepler(AnalyticalPropagator):
-    """Analytical propagator only taking the evolution of the Mean anomaly
-    """
+    """Analytical propagator only taking the evolution of the Mean anomaly"""
 
     @property
     def orbit(self):

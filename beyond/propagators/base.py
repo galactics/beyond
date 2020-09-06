@@ -6,8 +6,7 @@ from ..orbits.listeners import Speaker
 
 
 class Propagator(metaclass=ABCMeta):
-    """Base class for propagators
-    """
+    """Base class for propagators"""
 
     orbit = None
 
@@ -37,8 +36,7 @@ class Propagator(metaclass=ABCMeta):
 
 
 class AnalyticalPropagator(Speaker, Propagator):
-    """Base class for analytical propagators (SGP4, Eckstein-Heschler, etc.)
-    """
+    """Base class for analytical propagators (SGP4, Eckstein-Heschler, etc.)"""
 
     def iter(self, **kwargs):
         """Compute a range of orbits between two dates
@@ -119,8 +117,7 @@ class AnalyticalPropagator(Speaker, Propagator):
 
 
 class NumericalPropagator(Propagator):
-    """Base class for numerical propagators (e.g. Cowell)
-    """
+    """Base class for numerical propagators (e.g. Cowell)"""
 
     def iter(self, **kwargs):
         if "dates" not in kwargs:

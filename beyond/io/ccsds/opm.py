@@ -104,7 +104,10 @@ def _loads_kvn(string):
         if man["duration"].total_seconds() == 0:
             orb.maneuvers.append(
                 ImpulsiveMan(
-                    man["date"], man["dv"], frame=man["frame"], comment=man["comment"],
+                    man["date"],
+                    man["dv"],
+                    frame=man["frame"],
+                    comment=man["comment"],
                 )
             )
         else:

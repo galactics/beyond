@@ -153,8 +153,7 @@ class Finals(Finals2000A):
 
 
 class Eop:
-    """Earth Orientation Parameters
-    """
+    """Earth Orientation Parameters"""
 
     def __init__(self, **kwargs):
         self.x = kwargs["x"]

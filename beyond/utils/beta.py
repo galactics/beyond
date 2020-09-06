@@ -15,7 +15,7 @@ def beta(orb, ref="Sun"):
     """Compute beta angle
 
     Args:
-        orb (Orbit) : Orbit of the primary spacecraft, expressed in a 
+        orb (Orbit) : Orbit of the primary spacecraft, expressed in a
             reference frame whose centre is the obscuring body.
         ref (str or Orbit or Ephem) : Secondary object
     Return
@@ -43,7 +43,7 @@ def beta_limit(orb):
     all its orbit.
 
     Args:
-        orb (Orbit) : Orbit of the primary spacecraft, expressed in a 
+        orb (Orbit) : Orbit of the primary spacecraft, expressed in a
             reference frame whose centre is the obscuring body.
     Return
         float : Angle in radians

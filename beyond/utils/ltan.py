@@ -29,8 +29,7 @@ def orb2ltan(orb, type="mean"):
 
 
 def _mean_sun_raan(date):
-    """Mean Sun RAAN in EME2000
-    """
+    """Mean Sun RAAN in EME2000"""
     # Not so sure about the UT1 thing
     return (
         np.radians(_sideral(date))

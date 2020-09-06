@@ -57,20 +57,17 @@ class Ephem(Speaker):
 
     @property
     def start(self):
-        """Date of the first element
-        """
+        """Date of the first element"""
         return self._orbits[0].date
 
     @property
     def stop(self):
-        """Date of the last element
-        """
+        """Date of the last element"""
         return self._orbits[-1].date
 
     @property
     def dates(self):
-        """Generator yielding Dates of each Orbit object of the ephem
-        """
+        """Generator yielding Dates of each Orbit object of the ephem"""
         return (o.date for o in self)
 
     # @property
@@ -81,27 +78,23 @@ class Ephem(Speaker):
 
     @property
     def frame(self):
-        """Get the frame of the first point
-        """
+        """Get the frame of the first point"""
         return self._orbits[0].frame
 
     @frame.setter
     def frame(self, frame):  # pragma: no cover
-        """Change the frames of all points
-        """
+        """Change the frames of all points"""
         for orb in self:
             orb.frame = frame
 
     @property
     def form(self):  # pragma: no cover
-        """Get the form of the first point
-        """
+        """Get the form of the first point"""
         return self._orbits[0].form
 
     @form.setter
     def form(self, form):  # pragma: no cover
-        """Change the form of all points
-        """
+        """Change the form of all points"""
         for orb in self:
             orb.form = form
 
@@ -195,8 +188,7 @@ class Ephem(Speaker):
         return StateVector(result, date, orb.form, orb.frame)
 
     def propagate(self, date):
-        """Alias of :py:meth:`interpolate`
-        """
+        """Alias of :py:meth:`interpolate`"""
         return self.interpolate(date)
 
     def iter(
@@ -355,8 +347,7 @@ class Ephem(Speaker):
         return self.__class__(self.ephemeris(*args, **kwargs))
 
     def copy(self, *, form=None, frame=None):  # pragma: no cover
-        """Create a deep copy of the ephemeris, and allow frame and form changing
-        """
+        """Create a deep copy of the ephemeris, and allow frame and form changing"""
         new = self.ephem()
         if frame:
             new.frame = frame

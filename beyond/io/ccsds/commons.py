@@ -41,16 +41,14 @@ DEFAULT_FMT = "kvn"
 
 
 def get_format(**kwargs):
-    """retrieve the format to dump the file into
-    """
+    """retrieve the format to dump the file into"""
     return kwargs.get(
         "fmt", config.get("io", "ccsds_default_format", fallback=DEFAULT_FMT)
     )
 
 
 def decode_unit(data, name, default=None):
-    """Conversion of state vector field, with automatic unit handling
-    """
+    """Conversion of state vector field, with automatic unit handling"""
 
     value = data[name].text
     unit = data[name].attrib.get("units", default)
@@ -62,8 +60,7 @@ def decode_unit(data, name, default=None):
 
 
 def code_unit(data, name, unit):
-    """Convert the value in SI to a specific unit
-    """
+    """Convert the value in SI to a specific unit"""
 
     if unit not in units_dict:
         raise CcsdsError("Unknown unit '{}' for the field {}".format(unit, name))
@@ -72,8 +69,7 @@ def code_unit(data, name, unit):
 
 
 def parse_date(string, scale):
-    """Parse a date formated as described in the CCSDS Blue Books
-    """
+    """Parse a date formated as described in the CCSDS Blue Books"""
 
     try:
         out = Date.strptime(string, DATE_FMT_DEFAULT, scale=scale)

@@ -143,8 +143,7 @@ class Bsp:
 
 
 class Pck(dict):
-    """Parser of PCK file containing orientation and shape models for solar system bodies
-    """
+    """Parser of PCK file containing orientation and shape models for solar system bodies"""
 
     def __new__(cls, *args, **kwargs):
 
@@ -274,8 +273,7 @@ class Pck(dict):
 
 
 class JplPropagator(AnalyticalPropagator):
-    """Propagator
-    """
+    """Propagator"""
 
     def __init__(self, obj, frame):
         self.name = obj.name
@@ -345,8 +343,7 @@ class JplCenter(center.Center):
 
 
 class JplFrame(frames.Frame):
-    """Class for Frames from .bsp files
-    """
+    """Class for Frames from .bsp files"""
 
     def __init__(self, center):
         super().__init__(center.name, BASE_FRAME.orientation, center)
@@ -358,8 +355,7 @@ _propagator_cache = {}
 
 
 def create_frames():
-    """Create all frames available from the .bsp files
-    """
+    """Create all frames available from the .bsp files"""
 
     # This variable will contain the Target of reference from which
     # all relations between frames are linked
@@ -406,16 +402,14 @@ def create_frames():
 
 
 def get_body(name):
-    """Retrieve a body instance for a given object
-    """
+    """Retrieve a body instance for a given object"""
     body = Pck()[name]
     body.propagate = get_propagator(name).propagate
     return body
 
 
 def get_propagator(name):
-    """Retrieve a propagator object by its name
-    """
+    """Retrieve a propagator object by its name"""
     if name not in _propagator_cache.keys():
         raise UnknownBodyError(name)
 
@@ -423,26 +417,22 @@ def get_propagator(name):
 
 
 def get_orbit(name, date):
-    """Get an Orbit object of a celestial body at a given date
-    """
+    """Get an Orbit object of a celestial body at a given date"""
     return get_propagator(name).propagate(date)
 
 
 def get_frame(name):
-    """Get the frame attached to a celestial body
-    """
+    """Get the frame attached to a celestial body"""
     return _frame_cache[name]
 
 
 def list_frames():
-    """List frames available through .bsp files
-    """
+    """List frames available through .bsp files"""
     return list(_frame_cache.values())
 
 
 def list_bodies():
-    """List bodies available through .tpc files
-    """
+    """List bodies available through .tpc files"""
     return [Pck()[k] for k in Pck().keys()]
 
 

@@ -50,10 +50,10 @@ class Center:
         Args:
             date (Date) :
             new_center (Center or str) :
-            orientation (Orientation) : 
+            orientation (Orientation) :
         Return:
             numpy.ndarray : cartesian coordinates of the center relative
-                to the new_center. 
+                to the new_center.
         """
 
         if isinstance(new_center, Center):
@@ -61,7 +61,7 @@ class Center:
 
         out = np.zeros(6)
 
-        for a, b, in self.node.steps(new_center):
+        for a, b in self.node.steps(new_center):
             direct = f"{a}_to_{b}"
             reverse = f"{b}_to_{a}"
 

@@ -6,8 +6,7 @@ from . import iau1980, iau2010, local
 
 
 class Orientation(Node):
-    """Rotation matrix generator for frame transformation handling
-    """
+    """Rotation matrix generator for frame transformation handling"""
 
     def convert_to(self, date, new_orient):
         """Provide the rotation matrix to transform a vector in a given orientation (self)
@@ -49,8 +48,7 @@ class Orientation(Node):
         return m
 
     def _rate2mat(self, rate):
-        """Create a 3x3 matrix from a rate vector
-        """
+        """Create a 3x3 matrix from a rate vector"""
 
         # Each line of the rotation matrix is constructed by computing the cross product
         # of the rate vector by the unit vector, which gives
@@ -151,8 +149,7 @@ ITRF + TIRF + CIRF + GCRF
 
 
 class TopocentricOrientation(Orientation):
-    """Orientation for handling topocentric frames i.e. ground stations
-    """
+    """Orientation for handling topocentric frames i.e. ground stations"""
 
     def __init__(self, name, latlonalt, parent=ITRF):
         super().__init__(name)
@@ -172,8 +169,7 @@ class TopocentricOrientation(Orientation):
 
 
 class LocalOrbitalOrientation(Orientation):
-    """Local Orbital Orientation
-    """
+    """Local Orbital Orientation"""
 
     def __init__(self, name, statevector, orient, parent):
         super().__init__(name)

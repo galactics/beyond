@@ -14,8 +14,7 @@ __all__ = ["sideral", "precesion_nutation", "earth_orientation", "rate"]
 
 @memoize
 def _tab():
-    """Extraction and caching of IAU2000 nutation coefficients
-    """
+    """Extraction and caching of IAU2000 nutation coefficients"""
 
     elements = ["tab5.2a.txt", "tab5.2b.txt", "tab5.2d.txt"]  # x  # y  # s
 
@@ -51,8 +50,7 @@ def _tab():
 
 
 def _earth_orientation(date):
-    """Earth orientation parameters in degrees
-    """
+    """Earth orientation parameters in degrees"""
 
     ttt = date.change_scale("TT").julian_century
     # a_a = 0.12
@@ -64,29 +62,25 @@ def _earth_orientation(date):
 
 
 def earth_orientation(date):
-    """Earth orientation as a rotating matrix
-    """
+    """Earth orientation as a rotating matrix"""
 
     x_p, y_p, s_prime = np.deg2rad(_earth_orientation(date))
     return rot3(-s_prime) @ rot2(x_p) @ rot1(y_p)
 
 
 def _sideral(date):
-    """Sideral time in radians
-    """
+    """Sideral time in radians"""
     jd = date.change_scale("UT1").jd
     return 2 * np.pi * (0.779057273264 + 1.00273781191135448 * (jd - date.J2000))
 
 
 def sideral(date):
-    """Sideral time as a rotation matrix
-    """
+    """Sideral time as a rotation matrix"""
     return rot3(-_sideral(date))
 
 
 def rate(date):
-    """Return the rotation rate vector of the earth for a given date
-    """
+    """Return the rotation rate vector of the earth for a given date"""
     lod = date.eop.lod / 1000.0
     return np.array([0, 0, 7.292115146706979e-5 * (1 - lod / 86400.0)])
 
@@ -260,18 +254,20 @@ def _xys(date):
 
 
 def precesion_nutation(date):
-    """Precession/nutation joint rotation matrix for the IAU2010 model
-    """
+    """Precession/nutation joint rotation matrix for the IAU2010 model"""
 
     X, Y, s = _xys(date)
 
     d = np.arctan(np.sqrt((X ** 2 + Y ** 2) / (1 - X ** 2 - Y ** 2)))
     a = 1 / (1 + np.cos(d))
 
-    return np.array(
-        [
-            [1 - a * X ** 2, -a * X * Y, X],
-            [-a * X * Y, 1 - a * Y ** 2, Y],
-            [-X, -Y, 1 - a * (X ** 2 + Y ** 2)],
-        ]
-    ) @ rot3(s)
+    return (
+        np.array(
+            [
+                [1 - a * X ** 2, -a * X * Y, X],
+                [-a * X * Y, 1 - a * Y ** 2, Y],
+                [-X, -Y, 1 - a * (X ** 2 + Y ** 2)],
+            ]
+        )
+        @ rot3(s)
+    )
