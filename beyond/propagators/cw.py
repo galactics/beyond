@@ -23,6 +23,9 @@ class ClohessyWiltshire(AnalyticalPropagator):
 
     This analytical propagator is able to propagate through impulsive and
     continuous maneuvers.
+
+    You can use :py:class:`~beyond.utils.cwhelper.CWHelper` for
+    intilisation and maneuvers
     """
 
     # Define the rotation matrix to pass from QSW to TNW, this transformation

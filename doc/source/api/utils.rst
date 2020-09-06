@@ -46,3 +46,9 @@ Lambert's problem
 
 .. automodule:: beyond.utils.lambert
     :members:
+
+Relative Motion Helper
+----------------------
+
+.. automodule:: beyond.utils.cwhelper
+    :members:
