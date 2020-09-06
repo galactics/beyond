@@ -122,3 +122,19 @@ Maneuvers
 .. image:: _static/hohmann_1.png
 
 .. image:: _static/hohmann_2.png
+
+.. _docking:
+
+Docking
+-------
+
+.. literalinclude:: _static/docking.py
+
+.. code-block:: text
+
+    Final position
+    Q =   0.000
+    S =   0.000
+    W =   0.000
+
+.. image:: _static/docking.png
