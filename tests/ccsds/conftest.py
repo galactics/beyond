@@ -174,9 +174,9 @@ class Helper:
         return filepath.read_text()
 
     @staticmethod
-    def assert_orbit(orb1, orb2, form="cartesian", cov_eps=None):
+    def assert_orbit(orb1, orb2, form="cartesian"):
 
-        cov_eps = np.finfo(float).eps if cov_eps is None else cov_eps
+        cov_eps = 1e-10
 
         orb1.form = form
         orb2.form = form
@@ -215,7 +215,7 @@ class Helper:
             assert False, "Incoherent structures"
 
     @classmethod
-    def assert_ephem(cls, ephem1, ephem2, cov_eps=None):
+    def assert_ephem(cls, ephem1, ephem2):
 
         assert len(ephem1) == len(ephem2)
 
@@ -226,7 +226,7 @@ class Helper:
         assert ephem1.order == ephem2.order
 
         for e1, e2 in zip(ephem1, ephem2):
-            cls.assert_orbit(e1, e2, cov_eps=cov_eps)
+            cls.assert_orbit(e1, e2)
 
     @staticmethod
     def assert_string(str1, str2, ignore=[]):

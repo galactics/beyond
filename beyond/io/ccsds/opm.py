@@ -372,7 +372,7 @@ def _dumps_xml(data, **kwargs):
         for i, a in enumerate(elems):
             for j, b in enumerate(elems[: i + 1]):
                 x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
-                x.text = "{:0.16e}".format(cart.cov[i, j] / 1e6)
+                x.text = "{:0.12e}".format(cart.cov[i, j] / 1e6)
 
     if cart.maneuvers:
         for man in cart.maneuvers:

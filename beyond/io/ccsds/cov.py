@@ -82,6 +82,6 @@ def dump_cov(cov):
         for j, b in enumerate(elems[: i + 1]):
             txt = "{a}_{b}".format(a=a, b=b)
 
-            text += "C{txt:<19} = {v: 0.16e}\n".format(txt=txt, v=cov[i, j] / 1e6)
+            text += "C{txt:<19} = {v: 0.12e}\n".format(txt=txt, v=cov[i, j] / 1e6)
 
     return text
