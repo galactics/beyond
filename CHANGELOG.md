@@ -3,11 +3,16 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
-## [Unreleased]
+## [v0.7.1] - 2020-09-13
 
 ### Added
 
 - Clohessy-Wiltshire propagator for relative motion
+
+### Modified
+
+- Listeners are now part of the `beyond.propagators` subpackage
+- Diminished precision on covariance ccsds output, for increased tests reliability
 
 ## [v0.7] - 2020-08-11
 
