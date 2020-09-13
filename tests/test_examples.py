@@ -7,7 +7,7 @@ from pathlib import Path
 from subprocess import run
 
 
-@fixture(params=['ground-track', 'hohmann', 'listeners', 'station'])
+@fixture(params=['docking', 'ground-track', 'hohmann', 'listeners', 'station'])
 def cases(request):
 
     folder = Path(__file__).parent.parent / "doc" / "source" / "_static"

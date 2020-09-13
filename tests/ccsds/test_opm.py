@@ -116,7 +116,7 @@ def test_load_opm_cov_qsw(orbit_cov, datafile, helper):
     data_opm = loads(datafile("opm_cov_qsw"))
     orbit_cov.cov.frame = "QSW"
 
-    helper.assert_orbit(orbit_cov, data_opm, cov_eps=1e-12)
+    helper.assert_orbit(orbit_cov, data_opm)
 
 
 def test_load_opm_man_impulsive(orbit_man, datafile, helper, ccsds_format):

@@ -40,8 +40,7 @@ class EarthPropagator(AnalyticalPropagator):
 
 
 class MoonPropagator(AnalyticalPropagator):
-    """Dummy propagator for moon position
-    """
+    """Dummy propagator for moon position"""
 
     orbit = None
 
@@ -131,8 +130,7 @@ class MoonPropagator(AnalyticalPropagator):
 
 
 class SunPropagator(AnalyticalPropagator):
-    """Dummy propagator for Sun position
-    """
+    """Dummy propagator for Sun position"""
 
     orbit = None
 

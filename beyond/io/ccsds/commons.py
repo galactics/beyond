@@ -6,7 +6,7 @@ from collections.abc import Iterable
 
 from ...utils import units
 from ...dates import Date
-from ...orbits import Orbit, Ephem
+from ...orbits import StateVector, Orbit, Ephem
 from ...errors import ParseError
 from ...utils.measures import Measure
 from ...propagators.base import AnalyticalPropagator
@@ -41,16 +41,14 @@ DEFAULT_FMT = "kvn"
 
 
 def get_format(**kwargs):
-    """retrieve the format to dump the file into
-    """
+    """retrieve the format to dump the file into"""
     return kwargs.get(
         "fmt", config.get("io", "ccsds_default_format", fallback=DEFAULT_FMT)
     )
 
 
 def decode_unit(data, name, default=None):
-    """Conversion of state vector field, with automatic unit handling
-    """
+    """Conversion of state vector field, with automatic unit handling"""
 
     value = data[name].text
     unit = data[name].attrib.get("units", default)
@@ -62,8 +60,7 @@ def decode_unit(data, name, default=None):
 
 
 def code_unit(data, name, unit):
-    """Convert the value in SI to a specific unit
-    """
+    """Convert the value in SI to a specific unit"""
 
     if unit not in units_dict:
         raise CcsdsError("Unknown unit '{}' for the field {}".format(unit, name))
@@ -72,8 +69,7 @@ def code_unit(data, name, unit):
 
 
 def parse_date(string, scale):
-    """Parse a date formated as described in the CCSDS Blue Books
-    """
+    """Parse a date formated as described in the CCSDS Blue Books"""
 
     try:
         out = Date.strptime(string, DATE_FMT_DEFAULT, scale=scale)
@@ -112,7 +108,7 @@ def detect2dump(data, **kwargs):
     file to generate
 
     Args:
-        data (Ephem or List[Ephem] or Orbit or MeasureSet)
+        data (Ephem or List[Ephem] or StateVector or MeasureSet)
     Return:
         str: type of data (e.g. "oem", "opm", "omm", etc.)
     Raise:
@@ -123,9 +119,10 @@ def detect2dump(data, **kwargs):
         isinstance(data, Iterable) and all(isinstance(x, Ephem) for x in data)
     ):
         type = "oem"
-    elif isinstance(data, Orbit):
+    elif isinstance(data, StateVector):
         if (
-            isinstance(data.propagator, AnalyticalPropagator)
+            isinstance(data, Orbit)
+            and isinstance(data.propagator, AnalyticalPropagator)
             and data.frame == TEME
             and data.form is TLE
         ):
@@ -268,7 +265,7 @@ TIME_SYSTEM          = {timesystem}
         center=data.frame.center.name.upper(),
         frame=data.frame.orientation.name.upper(),
         timesystem=data.date.scale.name
-        if isinstance(data, Orbit)
+        if isinstance(data, StateVector)
         else data.start.scale.name,
     )
 
@@ -300,7 +297,7 @@ def dump_xml_meta_odm(segment, data, **kwargs):
     frame.text = data.frame.orientation.name.upper()
 
     timescale = ET.SubElement(metadata, "TIME_SYSTEM")
-    if isinstance(data, Orbit):
+    if isinstance(data, StateVector):
         timescale.text = data.date.scale.name
     else:
         timescale.text = data.start.scale.name

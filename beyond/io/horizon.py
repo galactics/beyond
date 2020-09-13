@@ -17,7 +17,7 @@ class HorizonParseError(ParseError):
 
 def load(fp):
     """Read Horizon format ephemeris from a file
-    
+
     Args:
         fp: file descriptor of a Horizon file
     Return:
@@ -31,7 +31,7 @@ def load(fp):
 
 def loads(text):
     """Read Horizon format ephemeris from a text
-    
+
     Args:
         text (str): text in Horizon format
     Return:

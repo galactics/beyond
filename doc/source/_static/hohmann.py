@@ -15,7 +15,7 @@ from beyond.dates import timedelta
 from beyond.propagators.keplernum import KeplerNum
 from beyond.env.solarsystem import get_body
 from beyond.orbits.man import ImpulsiveMan
-from beyond.orbits.listeners import ApsideListener, find_event
+from beyond.propagators.listeners import ApsideListener, find_event
 
 
 orb = Tle("""ISS (ZARYA)

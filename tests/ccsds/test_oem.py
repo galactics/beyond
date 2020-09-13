@@ -103,13 +103,13 @@ def test_load_oem_cov(ephem_cov, datafile, helper):
 def test_load_oem_cov_qsw(ephem_cov, datafile, helper):
     ephem_cov[0].cov.frame = "QSW"
     data = loads(datafile("oem_cov_qsw"))
-    helper.assert_ephem(ephem_cov, data, cov_eps=1e-12)
+    helper.assert_ephem(ephem_cov, data)
 
 
 def test_load_oem_cov_tnw(ephem_cov, datafile, helper):
     ephem_cov[0].cov.frame = "TNW"
     data = loads(datafile("oem_cov_tnw"))
-    helper.assert_ephem(ephem_cov, data, cov_eps=1e-12)
+    helper.assert_ephem(ephem_cov, data)
 
 
 @mark.jpl

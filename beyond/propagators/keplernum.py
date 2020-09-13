@@ -121,8 +121,7 @@ class KeplerNum(NumericalPropagator):
         return self.BUTCHER[self.method]
 
     def _accel(self, orb):
-        """Newton's Law of Universal Gravitation
-        """
+        """Newton's Law of Universal Gravitation"""
 
         new_body = zeros(6)
         new_body[:3] = orb[3:]
@@ -144,8 +143,7 @@ class KeplerNum(NumericalPropagator):
         return new_body
 
     def _make_step(self, orb, step):
-        """Compute the next step with the selected method
-        """
+        """Compute the next step with the selected method"""
 
         aa, bb, cc = self.butcher["a"], self.butcher["b"], self.butcher["c"]
         b_star = self.butcher.get("b_star")

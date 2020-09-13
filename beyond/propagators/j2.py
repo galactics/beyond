@@ -6,8 +6,7 @@ from ..dates import timedelta
 
 
 class J2(AnalyticalPropagator):
-    """Analytical propagator taking only the Earth-J2 effect into account
-    """
+    """Analytical propagator taking only the Earth-J2 effect into account"""
 
     @property
     def orbit(self):

@@ -116,8 +116,7 @@ def _unfloat(flt, precision=5):
 
 
 class Tle:
-    """TLE parsing
-    """
+    """TLE parsing"""
 
     def __init__(self, text, **kwargs):
         """

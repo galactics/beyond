@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from beyond.dates import Date
 from beyond.io.tle import Tle
-from beyond.orbits.listeners import find_event, NodeListener, ApsideListener
+from beyond.propagators.listeners import find_event, NodeListener, ApsideListener
 
 from pytest import raises, fixture
 

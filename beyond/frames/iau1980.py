@@ -14,8 +14,7 @@ from ..utils.memoize import memoize
 
 @memoize
 def _tab(max_i=None):
-    """Extraction and caching of IAU1980 nutation coefficients
-    """
+    """Extraction and caching of IAU1980 nutation coefficients"""
 
     filepath = Path(__file__).parent / "data" / "tab5.1.txt"
 
@@ -39,28 +38,24 @@ def _tab(max_i=None):
 
 
 def rate(date):
-    """Return the rotation rate vector of the earth for a given date
-    """
+    """Return the rotation rate vector of the earth for a given date"""
     lod = date.eop.lod / 1000.0
     return np.array([0, 0, 7.292115146706979e-5 * (1 - lod / 86400.0)])
 
 
 def _earth_orientation(date):
-    """Earth Orientation Parameters in degrees
-    """
+    """Earth Orientation Parameters in degrees"""
     return date.eop.x / 3600.0, date.eop.y / 3600.0
 
 
 def earth_orientation(date):  # pragma: no cover
-    """Earth Orientation as a rotation matrix
-    """
+    """Earth Orientation as a rotation matrix"""
     x_p, y_p = np.deg2rad(_earth_orientation(date))
     return rot1(y_p) @ rot2(x_p)
 
 
 def _precesion(date):
-    """Precession in degrees
-    """
+    """Precession in degrees"""
 
     t = date.change_scale("TT").julian_century
 
@@ -73,8 +68,7 @@ def _precesion(date):
 
 
 def precesion(date):  # pragma: no cover
-    """Precession as a rotation matrix
-    """
+    """Precession as a rotation matrix"""
     zeta, theta, z = np.deg2rad(_precesion(date))
     return rot3(zeta) @ rot2(-theta) @ rot3(z)
 
@@ -169,8 +163,7 @@ def _nutation(date, eop_correction=True, terms=106):
 
 
 def nutation(date, eop_correction=True, terms=106):  # pragma: no cover
-    """Nutation as a rotation matrix
-    """
+    """Nutation as a rotation matrix"""
     epsilon_bar, delta_psi, delta_eps = np.deg2rad(
         _nutation(date, eop_correction, terms)
     )
@@ -180,8 +173,7 @@ def nutation(date, eop_correction=True, terms=106):  # pragma: no cover
 
 
 def equinox(date, eop_correction=True, terms=106, kinematic=True):
-    """Equinox equation in degrees
-    """
+    """Equinox equation in degrees"""
     epsilon_bar, delta_psi, delta_eps = _nutation(date, eop_correction, terms)
 
     equin = delta_psi * 3600.0 * np.cos(np.deg2rad(epsilon_bar))
@@ -247,7 +239,6 @@ def _sideral(date, longitude=0.0, model="mean", eop_correction=True, terms=106):
 def sideral(
     date, longitude=0.0, model="mean", eop_correction=True, terms=106
 ):  # pragma: no cover
-    """Sideral time as a rotation matrix
-    """
+    """Sideral time as a rotation matrix"""
     theta = _sideral(date, longitude, model, eop_correction, terms)
     return rot3(np.deg2rad(-theta))

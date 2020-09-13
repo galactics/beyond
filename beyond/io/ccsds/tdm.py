@@ -17,8 +17,7 @@ from .commons import (
 
 
 def loads(string, fmt="kvn"):
-    """Read CCSDS TDM format and convert it to a MeasureSet
-    """
+    """Read CCSDS TDM format and convert it to a MeasureSet"""
 
     if fmt == "kvn":
         measures = _loads_kvn(string)

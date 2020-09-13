@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <opm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd" id="CCSDS_OPM_VERS" version="2.0">
   <header>
-    <CREATION_DATE>2019-11-29T23:57:55</CREATION_DATE>
+    <CREATION_DATE>2020-09-10T18:16:25.114844</CREATION_DATE>
     <ORIGINATOR>N/A</ORIGINATOR>
   </header>
   <body>
@@ -34,27 +34,27 @@
         </keplerianElements>
         <covarianceMatrix>
           <COV_REF_FRAME>TNW</COV_REF_FRAME>
-          <CX_X>9.9880451167965161e-04</CX_X>
-          <CY_X>1.8437346057938915e-04</CY_X>
-          <CY_Y>5.7868137072326758e-05</CY_Y>
-          <CZ_X>-4.8795288045946602e-04</CZ_X>
-          <CZ_Y>-1.1099719520287708e-04</CZ_Y>
-          <CZ_Z>2.7789761647228466e-04</CZ_Z>
-          <CX_DOT_X>-4.7573232068550994e-07</CX_DOT_X>
-          <CX_DOT_Y>-5.2364326447464493e-08</CX_DOT_Y>
-          <CX_DOT_Z>2.3648700930908497e-07</CX_DOT_Z>
-          <CX_DOT_X_DOT>3.4291358620935171e-10</CX_DOT_X_DOT>
-          <CY_DOT_X>7.5887344810486043e-07</CY_DOT_X>
-          <CY_DOT_Y>1.5799355106807309e-07</CY_DOT_Y>
-          <CY_DOT_Z>-3.5445200167746379e-07</CY_DOT_Z>
-          <CY_DOT_X_DOT>-2.7484969299773428e-10</CY_DOT_X_DOT>
-          <CY_DOT_Y_DOT>6.4883278243222926e-10</CY_DOT_Y_DOT>
-          <CZ_DOT_X>-6.4298893957297031e-08</CZ_DOT_X>
-          <CZ_DOT_Y>-7.3820247443762763e-08</CZ_DOT_Y>
-          <CZ_DOT_Z>5.0414636669024323e-08</CZ_DOT_Z>
-          <CZ_DOT_X_DOT>-1.2836366472435056e-10</CZ_DOT_X_DOT>
-          <CZ_DOT_Y_DOT>-1.5936716583964860e-10</CZ_DOT_Y_DOT>
-          <CZ_DOT_Z_DOT>2.3705169051094249e-10</CZ_DOT_Z_DOT>
+          <CX_X>9.988045116797e-04</CX_X>
+          <CY_X>1.843734605794e-04</CY_X>
+          <CY_Y>5.786813707233e-05</CY_Y>
+          <CZ_X>-4.879528804595e-04</CZ_X>
+          <CZ_Y>-1.109971952029e-04</CZ_Y>
+          <CZ_Z>2.778976164723e-04</CZ_Z>
+          <CX_DOT_X>-4.757323206855e-07</CX_DOT_X>
+          <CX_DOT_Y>-5.236432644746e-08</CX_DOT_Y>
+          <CX_DOT_Z>2.364870093091e-07</CX_DOT_Z>
+          <CX_DOT_X_DOT>3.429135862094e-10</CX_DOT_X_DOT>
+          <CY_DOT_X>7.588734481049e-07</CY_DOT_X>
+          <CY_DOT_Y>1.579935510681e-07</CY_DOT_Y>
+          <CY_DOT_Z>-3.544520016775e-07</CY_DOT_Z>
+          <CY_DOT_X_DOT>-2.748496929977e-10</CY_DOT_X_DOT>
+          <CY_DOT_Y_DOT>6.488327824322e-10</CY_DOT_Y_DOT>
+          <CZ_DOT_X>-6.429889395730e-08</CZ_DOT_X>
+          <CZ_DOT_Y>-7.382024744376e-08</CZ_DOT_Y>
+          <CZ_DOT_Z>5.041463666902e-08</CZ_DOT_Z>
+          <CZ_DOT_X_DOT>-1.283636647244e-10</CZ_DOT_X_DOT>
+          <CZ_DOT_Y_DOT>-1.593671658396e-10</CZ_DOT_Y_DOT>
+          <CZ_DOT_Z_DOT>2.370516905109e-10</CZ_DOT_Z_DOT>
         </covarianceMatrix>
       </data>
     </segment>

@@ -9,8 +9,7 @@ class BeyondError(Exception):
 
 
 class _Unknown(BeyondError):
-    """Generic error for unknown argument
-    """
+    """Generic error for unknown argument"""
 
     def __init__(self, name):
         self.name = name
@@ -24,29 +23,25 @@ class _Unknown(BeyondError):
 
 
 class UnknownBodyError(_Unknown):
-    """Unknown Body (Earth, Moon, Sun, etc.)
-    """
+    """Unknown Body (Earth, Moon, Sun, etc.)"""
 
     pass
 
 
 class UnknownFrameError(_Unknown):
-    """Unknown frame (ITRF, EME2000, etc.)
-    """
+    """Unknown frame (ITRF, EME2000, etc.)"""
 
     pass
 
 
 class UnknownFormError(_Unknown):
-    """Unknown form (keplerian, cartesian)
-    """
+    """Unknown form (keplerian, cartesian)"""
 
     pass
 
 
 class UnknownPropagatorError(_Unknown):
-    """Unknown propagator (sgp4, kepler)
-    """
+    """Unknown propagator (sgp4, kepler)"""
 
     pass
 
@@ -77,15 +72,13 @@ class DateError(BeyondError):
 
 
 class UnknownScaleError(_Unknown):
-    """Unknown scale (UTC, TAI, UT1, GPS, etc.)
-    """
+    """Unknown scale (UTC, TAI, UT1, GPS, etc.)"""
 
     pass
 
 
 class EopError(BeyondError):
-    """Eart Orientation Parameters error (lack of data)
-    """
+    """Eart Orientation Parameters error (lack of data)"""
 
     pass
 

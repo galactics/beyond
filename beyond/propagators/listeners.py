@@ -41,8 +41,7 @@ class Speaker(metaclass=ABCMeta):
 
     @classmethod
     def clear_listeners(cls, listeners):
-        """Clear Listeners in order to do a propagation with a clean state
-        """
+        """Clear Listeners in order to do a propagation with a clean state"""
         if isinstance(listeners, Listener):
             listeners = [listeners]
 
@@ -100,8 +99,7 @@ class Speaker(metaclass=ABCMeta):
 
 
 class Listener(metaclass=ABCMeta):
-    """Base class for listeners
-    """
+    """Base class for listeners"""
 
     prev = None
 
@@ -132,8 +130,7 @@ class Listener(metaclass=ABCMeta):
         pass
 
     def clear(self):
-        """Clear the state of the listener, in order to make a new iteration
-        """
+        """Clear the state of the listener, in order to make a new iteration"""
         self.prev = None
 
 
@@ -141,6 +138,7 @@ class Event:
     """An instance of this class, or its subclass, is added as attribute to the Orbit
     instance each time a state change is detected.
     """
+
     def __init__(self, listener, info):
         self.listener = listener
         self.info = info
@@ -261,8 +259,7 @@ class TerminatorListener(Listener):
     _frame_name = "SunFrame"
 
     def __init__(self):
-        """
-        """
+        """"""
 
         from ..env.solarsystem import get_body
 
@@ -298,8 +295,7 @@ class NodeEvent(Event):
 
 
 class NodeListener(Listener):
-    """Listener for Ascending and Descending Node detection
-    """
+    """Listener for Ascending and Descending Node detection"""
 
     event = NodeEvent
 
@@ -325,8 +321,7 @@ class ApsideEvent(Event):
 
 
 class ApsideListener(Listener):
-    """Listener for Periapside and Apoapside detection
-    """
+    """Listener for Periapside and Apoapside detection"""
 
     event = ApsideEvent
 
@@ -353,8 +348,7 @@ class AnomalyEvent(Event):
 
 
 class AnomalyListener(Listener):
-    """Listener for anomaly (in the orbital sense)
-    """
+    """Listener for anomaly (in the orbital sense)"""
 
     event = AnomalyEvent
 
@@ -429,8 +423,7 @@ class SignalEvent(Event):  # pragma: no cover
 
 
 class StationSignalListener(Listener):
-    """Listener for AOS and LOS of a given station
-    """
+    """Listener for AOS and LOS of a given station"""
 
     event = SignalEvent
 
@@ -502,8 +495,7 @@ class MaxEvent(Event):  # pragma: no cover
 
 
 class StationMaxListener(Listener):
-    """Listener for max elevation of a pass over a station
-    """
+    """Listener for max elevation of a pass over a station"""
 
     event = MaxEvent
 

@@ -79,3 +79,18 @@ This propagator is able do handle maneuvers, as exposed in the :ref:`maneuvers` 
     :members:
     :special-members: __init__
     :show-inheritance:
+
+ClohessyWiltshire
+-----------------
+
+.. automodule:: beyond.propagators.cw
+    :members:
+    :special-members: __init__
+    :show-inheritance:
+
+Listeners
+=========
+
+.. automodule:: beyond.propagators.listeners
+    :members:
+    :special-members: __init__

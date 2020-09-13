@@ -20,8 +20,7 @@ G = 6.6740831e-11
 
 
 class Body:
-    """Generic class for the description of physical characteristics of celestial body
-    """
+    """Generic class for the description of physical characteristics of celestial body"""
 
     def __init__(self, name, mass, equatorial_radius, *, flattening=1, **kwargs):
         self.name = name
@@ -56,19 +55,16 @@ class Body:
 
     @property
     def mu(self):
-        """Standard gravitational parameter of the body
-        """
+        """Standard gravitational parameter of the body"""
         return self.mass * G
 
     @property
     def eccentricity(self):
-        """Eccentricity of the body
-        """
+        """Eccentricity of the body"""
         return sqrt(self.f * 2 - self.f ** 2)
 
     def polar_radius(self):
-        """Polar radius of the body
-        """
+        """Polar radius of the body"""
         return self.r * (1 - self.f)
 
 

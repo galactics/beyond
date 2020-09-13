@@ -112,8 +112,7 @@ Orbit =
         return self.propagator.propagate(date)
 
     def iter(self, **kwargs):
-        """see :py:meth:`Propagator.iter() <beyond.propagators.base.Propagator.iter>`
-        """
+        """see :py:meth:`Propagator.iter() <beyond.propagators.base.Propagator.iter>`"""
         if self.propagator.orbit is not self:
             self.propagator.orbit = self
 

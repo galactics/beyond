@@ -5,8 +5,7 @@ from ..frames.frames import get_frame
 
 
 class Cov(np.ndarray):
-    """Covariance matrix
-    """
+    """Covariance matrix"""
 
     def __new__(cls, orb, values, frame):
         """Create a covariance matrix
@@ -62,7 +61,7 @@ class Cov(np.ndarray):
         """Frame of the covariance
 
         When this value is changed, the covariance is converted
-        Accepted frames are regular frames (defined in 
+        Accepted frames are regular frames (defined in
         :ref:`frames`) and 'TNW' or 'QSW'.
 
         If the frame of this covariance is the same as its parent statevector/orbit,
@@ -76,7 +75,7 @@ class Cov(np.ndarray):
             orb.frame = "ITRF"
             orb.frame.name      # "ITRF"
             orb.cov.frame.name  # "ITRF"
-        
+
         It it possible to untangle them by switching only the covariance to an other
         frame
 
@@ -140,8 +139,7 @@ class Cov(np.ndarray):
 
     @property
     def _frame(self):
-        """Allow to set the frame without triggering a computation
-        """
+        """Allow to set the frame without triggering a computation"""
         return self._data["frame"]
 
     @_frame.setter

@@ -14,8 +14,7 @@ from ..utils.node import Node
 
 
 class Form(Node):
-    """Base class for orbital form definition
-    """
+    """Base class for orbital form definition"""
 
     alt = {
         "theta": "θ",
@@ -53,15 +52,13 @@ class Form(Node):
         coord = orbit.copy()
         if new_form != orbit.form.name:
             for a, b in self.steps(new_form):
-
-                coord = getattr(
-                    self, "_{}_to_{}".format(a.name.lower(), b.name.lower())
-                )(coord, orbit.frame.center.body)
+                name = "_{}_to_{}".format(a.name.lower(), b.name.lower())
+                coord = getattr(self, name)(coord, orbit.frame.center.body)
 
         return coord
 
     @classmethod
-    def _cartesian_to_keplerian(cls, coord, center):
+    def _cartesian_to_keplerian(cls, coord, body):
         """Conversion from cartesian (position and velocity) to keplerian
 
         The keplerian form is
@@ -80,29 +77,28 @@ class Form(Node):
         r_norm = np.linalg.norm(r)
         v_norm = np.linalg.norm(v)
 
-        K = v_norm ** 2 / 2 - center.µ / r_norm  # specific energy
-        a = -center.µ / (2 * K)  # semi-major axis
-        e = sqrt(1 - h_norm ** 2 / (a * center.µ))  # eccentricity
+        K = v_norm ** 2 / 2 - body.µ / r_norm  # specific energy
+        a = -body.µ / (2 * K)  # semi-major axis
+        e = sqrt(1 - h_norm ** 2 / (a * body.µ))  # eccentricity
         p = a * (1 - e ** 2)  # semi parameter
         i = arccos(h[2] / h_norm)  # inclination
         Ω = arctan2(h[0], -h[1]) % (2 * np.pi)  # right ascension of the ascending node
 
         ω_ν = arctan2(r[2] / sin(i), r[0] * cos(Ω) + r[1] * sin(Ω))
-        ν = arctan2(sqrt(p / center.µ) * np.dot(v, r), p - r_norm) % (2 * np.pi)
+        ν = arctan2(sqrt(p / body.µ) * np.dot(v, r), p - r_norm) % (2 * np.pi)
         ω = (ω_ν - ν) % (2 * np.pi)  # argument of the perigee
 
         return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
     @classmethod
-    def _keplerian_to_cartesian(cls, coord, center):
-        """Conversion from Keplerian to Cartesian coordinates
-        """
+    def _keplerian_to_cartesian(cls, coord, body):
+        """Conversion from Keplerian to Cartesian coordinates"""
 
         a, e, i, Ω, ω, ν = coord
 
         p = a * (1 - e ** 2)
         r = p / (1 + e * cos(ν))
-        h = sqrt(center.µ * p)
+        h = sqrt(body.µ * p)
         x = r * (cos(Ω) * cos(ω + ν) - sin(Ω) * sin(ω + ν) * cos(i))
         y = r * (sin(Ω) * cos(ω + ν) + cos(Ω) * sin(ω + ν) * cos(i))
         z = r * sin(i) * sin(ω + ν)
@@ -117,9 +113,8 @@ class Form(Node):
         return np.array([x, y, z, vx, vy, vz], dtype=float)
 
     @classmethod
-    def _keplerian_to_keplerian_eccentric(cls, coord, center):
-        """Conversion from Keplerian to Keplerian Eccentric
-        """
+    def _keplerian_to_keplerian_eccentric(cls, coord, body):
+        """Conversion from Keplerian to Keplerian Eccentric"""
 
         a, e, i, Ω, ω, ν = coord
         if e < 1:
@@ -136,9 +131,8 @@ class Form(Node):
         return np.array([a, e, i, Ω, ω, E], dtype=float)
 
     @classmethod
-    def _keplerian_eccentric_to_keplerian_mean(cls, coord, center):
-        """Conversion from Keplerian Eccentric to Keplerian Mean
-        """
+    def _keplerian_eccentric_to_keplerian_mean(cls, coord, body):
+        """Conversion from Keplerian Eccentric to Keplerian Mean"""
         a, e, i, Ω, ω, E = coord
 
         if e < 1:
@@ -150,18 +144,16 @@ class Form(Node):
         return np.array([a, e, i, Ω, ω, M], dtype=float)
 
     @classmethod
-    def _keplerian_mean_to_keplerian_eccentric(cls, coord, center):
-        """Conversion from Mean Keplerian to Keplerian Eccentric
-        """
+    def _keplerian_mean_to_keplerian_eccentric(cls, coord, body):
+        """Conversion from Mean Keplerian to Keplerian Eccentric"""
         a, e, i, Ω, ω, M = coord
         E = cls.M2E(e, M)
 
         return np.array([a, e, i, Ω, ω, E], dtype=float)
 
     @classmethod
-    def _keplerian_eccentric_to_keplerian(cls, coord, center):
-        """Conversion from Mean Keplerian to True Keplerian
-        """
+    def _keplerian_eccentric_to_keplerian(cls, coord, body):
+        """Conversion from Mean Keplerian to True Keplerian"""
 
         a, e, i, Ω, ω, E = coord
 
@@ -181,7 +173,7 @@ class Form(Node):
     def M2E(cls, e, M):
         """Conversion from Mean Anomaly to Eccentric anomaly,
         or Hyperbolic anomaly.
-    
+
         from Vallado
         """
 
@@ -240,9 +232,8 @@ class Form(Node):
         return x
 
     @classmethod
-    def _keplerian_circular_to_keplerian(cls, coord, center):
-        """Conversion from Keplerian near-circular elements to Mean Keplerian
-        """
+    def _keplerian_circular_to_keplerian(cls, coord, body):
+        """Conversion from Keplerian near-circular elements to Mean Keplerian"""
         a, ex, ey, i, Ω, u = coord
 
         e = sqrt(ex ** 2 + ey ** 2)
@@ -252,9 +243,8 @@ class Form(Node):
         return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
     @classmethod
-    def _keplerian_to_keplerian_circular(cls, coord, center):
-        """Conversion from Mean Keplerian to Keplerian near-circular elements
-        """
+    def _keplerian_to_keplerian_circular(cls, coord, body):
+        """Conversion from Mean Keplerian to Keplerian near-circular elements"""
         a, e, i, Ω, ω, ν = coord
 
         ex = e * cos(ω)
@@ -264,27 +254,26 @@ class Form(Node):
         return np.array([a, ex, ey, i, Ω, u], dtype=float)
 
     @classmethod
-    def _tle_to_keplerian_mean(cls, coord, center):
+    def _tle_to_keplerian_mean(cls, coord, body):
         """Conversion from the TLE standard format to the Mean Keplerian
 
         see :py:class:`Tle` for more information.
         """
         i, Ω, e, ω, M, n = coord
-        a = (center.µ / n ** 2) ** (1 / 3)
+        a = (body.µ / n ** 2) ** (1 / 3)
 
         return np.array([a, e, i, Ω, ω, M], dtype=float)
 
     @classmethod
-    def _keplerian_mean_to_tle(cls, coord, center):
-        """Mean Keplerian to TLE format conversion
-        """
+    def _keplerian_mean_to_tle(cls, coord, body):
+        """Mean Keplerian to TLE format conversion"""
         a, e, i, Ω, ω, M = coord
-        n = sqrt(center.µ / a ** 3)
+        n = sqrt(body.µ / a ** 3)
 
         return np.array([i, Ω, e, ω, M, n], dtype=float)
 
     @classmethod
-    def _cartesian_to_spherical(cls, coord, center):
+    def _cartesian_to_spherical(cls, coord, body):
         """Cartesian to Spherical conversion
 
         .. warning:: The spherical form is equatorial, not zenithal
@@ -303,9 +292,8 @@ class Form(Node):
         return np.array([r, theta, phi, r_dot, theta_dot, phi_dot], dtype=float)
 
     @classmethod
-    def _spherical_to_cartesian(cls, coord, center):
-        """Spherical to cartesian conversion
-        """
+    def _spherical_to_cartesian(cls, coord, body):
+        """Spherical to cartesian conversion"""
         r, theta, phi, r_dot, theta_dot, phi_dot = coord
         x = r * cos(phi) * cos(theta)
         y = r * cos(phi) * sin(theta)

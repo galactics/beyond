@@ -6,8 +6,7 @@ from ..utils.matrix import rot2, rot3, expand
 
 
 class TopocentricFrame(frames.Frame):
-    """Base class for ground station
-    """
+    """Base class for ground station"""
 
     def __init__(self, name, orientation, center, mask=None):
         self.mask = np.asarray(mask) if mask else None
@@ -42,7 +41,7 @@ class TopocentricFrame(frames.Frame):
                 in the frame of the station and in spherical form.
         """
 
-        from ..orbits.listeners import stations_listeners, Listener
+        from ..propagators.listeners import stations_listeners, Listener
 
         listeners = kwargs.setdefault("listeners", [])
         events = kwargs.pop("events", None)
@@ -99,8 +98,7 @@ class TopocentricFrame(frames.Frame):
         )
 
     def get_mask(self, azim):
-        """Linear interpolation between two points of the mask
-        """
+        """Linear interpolation between two points of the mask"""
 
         if self.mask is None:
             raise ValueError("No mask defined for the station {}".format(self.name))
@@ -156,7 +154,9 @@ def create_station(
 
     c = center.Center(name, body=parent_frame.center.body)
     c.add_link(
-        parent_frame.center, parent_frame.orientation, coordinates,
+        parent_frame.center,
+        parent_frame.orientation,
+        coordinates,
     )
 
     if equatorial:

@@ -286,7 +286,7 @@ def _dumps_kvn(data, **kwargs):
                 for i in range(6):
                     line = []
                     for j in range(i + 1):
-                        line.append("{: 0.16e}".format(orb.cov[i, j] / 1e6))
+                        line.append("{: 0.12e}".format(orb.cov[i, j] / 1e6))
                     cov_text.append(" ".join(line))
 
                 cov.append("\n".join(cov_text))
@@ -358,7 +358,7 @@ def _dumps_xml(data, **kwargs):
                 for i, a in enumerate(elems):
                     for j, b in enumerate(elems[: i + 1]):
                         x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
-                        x.text = "{:0.16e}".format(el.cov[i, j] / 1e6)
+                        x.text = "{:0.12e}".format(el.cov[i, j] / 1e6)
 
     return ET.tostring(
         top, pretty_print=True, xml_declaration=True, encoding="UTF-8"
