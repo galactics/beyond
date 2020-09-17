@@ -97,7 +97,14 @@ def _loads_kvn(string):
             # and discard acceleration if present
             state_vector = np.array([float(x) for x in state_vector[:6]]) * units.km
 
-            orb = StateVector(state_vector, date, "cartesian", ephem["REF_FRAME"])
+            orb = StateVector(
+                state_vector,
+                date,
+                "cartesian",
+                ephem["REF_FRAME"],
+                name=ephem["OBJECT_NAME"],
+                cospar_id=ephem["OBJECT_ID"],
+            )
             ephem["orbits"].append(orb)
             ephem["orbit_mapping"][date] = orb
         elif mode == "covariance":
@@ -203,6 +210,8 @@ def _loads_xml(string):
                     parse_date(statevector["EPOCH"].text, metadata["TIME_SYSTEM"].text),
                     "cartesian",
                     ref_frame,
+                    name=metadata["OBJECT_NAME"].text,
+                    cospar_id=metadata["OBJECT_ID"].text,
                 )
                 ephem.append(orb)
                 orbit_mapping[orb.date] = orb

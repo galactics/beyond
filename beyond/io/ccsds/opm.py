@@ -81,9 +81,9 @@ def _loads_kvn(string):
     except KeyError as e:
         raise CcsdsError("Missing mandatory parameter {}".format(e))
 
-    orb = StateVector([x, y, z, vx, vy, vz], date, "cartesian", frame)
-    orb.name = name
-    orb.cospar_id = cospar_id
+    orb = StateVector(
+        [x, y, z, vx, vy, vz], date, "cartesian", frame, name=name, cospar_id=cospar_id
+    )
 
     for raw_man in data.get("maneuvers", []):
         man = {}
@@ -166,9 +166,9 @@ def _loads_xml(string):
     except KeyError as e:
         raise CcsdsError("Missing mandatory parameter {}".format(e))
 
-    orb = StateVector([x, y, z, vx, vy, vz], date, "cartesian", frame)
-    orb.name = name
-    orb.cospar_id = cospar_id
+    orb = StateVector(
+        [x, y, z, vx, vy, vz], date, "cartesian", frame, name=name, cospar_id=cospar_id
+    )
 
     if maneuvers:
         for raw_man in maneuvers:

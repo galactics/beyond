@@ -181,6 +181,9 @@ class Helper:
         orb1.form = form
         orb2.form = form
 
+        assert orb1.name == orb2.name
+        assert orb1.cospar_id == orb2.cospar_id
+
         assert orb1.frame == orb2.frame
         assert orb1.date == orb2.date
 
