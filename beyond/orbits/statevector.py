@@ -191,7 +191,7 @@ StateVector =
     def cov(self, value):
 
         if not isinstance(value, Cov):
-            raise TypeError("Unknwon covariance type : ".format(type(value)))
+            raise TypeError("Unknwon covariance type : {}".format(type(value)))
 
         self._data["cov"] = value
         self._data["cov"].orb = self
