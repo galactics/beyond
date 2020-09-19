@@ -6,7 +6,7 @@ from numpy.testing import assert_almost_equal
 from beyond.dates import Date
 from beyond.io.horizon import load, HorizonParseError
 
-folder = Path(__file__).parent / "data" / "io" / "horizon"
+folder = Path(__file__).parent / "data" 
 
 def test_load():
 
