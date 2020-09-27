@@ -24,18 +24,17 @@ class ImpulsiveMan(Man):
             date (Date): Date of application of the maneuver
             dv (list): Vector of length 3 describing the velocity increment
             frame (str): Which frame is used for applying the increment : ``'TNW'``,
-                ``'QSW'`` (or its aliases 'RSW' and 'LVLH') or ``None``.
-                If ``frame = None`` the same frame as the orbit is used
+                ``'QSW'`` or ``None``. If ``frame = None`` the same frame as
+                the orbit is used
             comment (str): Free text to give context on a given maneuver
                 ('apogee maneuver', 'inclination correction')
         """
 
         if len(dv) != 3:
             raise ValueError("dv should be 3 in length")
+
         if isinstance(frame, str):
             frame = frame.upper()
-        if frame in ("RSW", "LVLH", "QSW"):
-            frame = "QSW"
 
         self.date = date
         self._dv = np.array(dv)
