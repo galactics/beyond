@@ -269,7 +269,13 @@ GM                   = {gm:11.4f} [km**3/s**2]
         for i, man in enumerate(cart.maneuvers):
             comment = "\nCOMMENT  {}".format(man.comment) if man.comment else ""
 
-            frame = cart.frame if man.frame is None else man.frame
+            if man.frame is None:
+                frame = cart.frame
+            elif man.frame == "QSW":
+                frame = "RSW"
+            else:
+                frame = man.frame
+
             if isinstance(man, ContinuousMan):
                 date = man.start
                 duration = man.duration.total_seconds()
@@ -387,7 +393,12 @@ def _dumps_xml(data, **kwargs):
                 com = ET.SubElement(mans, "COMMENT")
                 com.text = man.comment
 
-            frame = cart.frame if man.frame is None else man.frame
+            if man.frame is None:
+                frame = cart.frame
+            elif man.frame == "QSW":
+                frame = "RSW"
+            else:
+                frame = man.frame
 
             if isinstance(man, ContinuousMan):
                 date = man.start

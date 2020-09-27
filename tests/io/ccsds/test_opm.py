@@ -1,5 +1,6 @@
-
 from pytest import raises, mark
+
+import numpy as np
 
 from beyond.io.ccsds import dumps, loads, CcsdsError
 
@@ -36,17 +37,36 @@ def test_dump_opm_cov(orbit_cov, datafile, ccsds_format, helper):
 
 def test_dump_opm_man_impulsive(orbit_man, datafile, ccsds_format, helper):
 
-    ref = datafile("opm_impulsive_man")
+    ref = datafile("opm_impulsive_man_tnw")
+    txt = dumps(orbit_man, fmt=ccsds_format)
+    helper.assert_string(ref, txt)
+
+    ref = datafile("opm_impulsive_man_qsw")
+
+    for man in orbit_man.maneuvers:
+        man.frame = "QSW"
+        man._dv = np.array([man._dv[1], man._dv[0], man._dv[2]])
+
     txt = dumps(orbit_man, fmt=ccsds_format)
 
     helper.assert_string(ref, txt)
 
 
 def test_dump_opm_man_continuous(orbit_continuous_man, datafile, ccsds_format, helper):
-    ref = datafile("opm_impulsive_man")
+    ref = datafile("opm_continuous_man_tnw")
     txt = dumps(orbit_continuous_man, fmt=ccsds_format)
 
-    helper.assert_string(ref, txt, ignore="MAN_DURATION")
+    helper.assert_string(ref, txt)
+
+    ref = datafile("opm_continuous_man_qsw")
+
+    for man in orbit_continuous_man.maneuvers:
+        man.frame = "QSW"
+        man._dv = np.array([man._dv[1], man._dv[0], man._dv[2]])
+
+    txt = dumps(orbit_continuous_man, fmt=ccsds_format)
+
+    helper.assert_string(ref, txt)
 
 
 @mark.jpl
@@ -121,7 +141,7 @@ def test_load_opm_cov_qsw(orbit_cov, datafile, helper):
 
 def test_load_opm_man_impulsive(orbit_man, datafile, helper, ccsds_format):
 
-    str_data_opm_man = datafile("opm_impulsive_man")
+    str_data_opm_man = datafile("opm_impulsive_man_tnw")
     data_opm_man = loads(str_data_opm_man)
 
     helper.assert_orbit(orbit_man, data_opm_man)
@@ -164,7 +184,7 @@ def test_load_opm_man_impulsive(orbit_man, datafile, helper, ccsds_format):
 def test_load_opm_man_continuous(orbit_continuous_man, datafile, ccsds_format, helper):
 
     # Tweak the reference to convert impulsive maneuvers into continuous ones
-    data_continuous_man = datafile("opm_impulsive_man").splitlines()
+    data_continuous_man = datafile("opm_impulsive_man_tnw").splitlines()
 
     for i, line in enumerate(data_continuous_man):
         if "MAN_DURATION" in line:
