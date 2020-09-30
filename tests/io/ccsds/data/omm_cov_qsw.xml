@@ -31,8 +31,8 @@
           <NORAD_CAT_ID>25544</NORAD_CAT_ID>
           <ELEMENT_SET_NO>292</ELEMENT_SET_NO>
           <REV_AT_EPOCH>56353</REV_AT_EPOCH>
-          <BSTAR>-0.0000</BSTAR>
-          <MEAN_MOTION_DOT>-0.00004364</MEAN_MOTION_DOT>
+          <BSTAR>-0.000011606</BSTAR>
+          <MEAN_MOTION_DOT>-0.00002182</MEAN_MOTION_DOT>
           <MEAN_MOTION_DDOT>0.0</MEAN_MOTION_DDOT>
         </tleParameters>
         <covarianceMatrix>

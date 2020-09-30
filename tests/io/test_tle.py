@@ -89,9 +89,11 @@ def test_to_and_from(both):
 
     tle = Tle(both)
     orb = tle.orbit()
+    orb2 = orb.copy()
+    del orb2._data["cospar_id"]
 
     tle2 = Tle.from_orbit(orb, name=tle.name, norad_id=tle.norad_id, cospar_id=tle.cospar_id)
-    tle3 = Tle.from_orbit(orb, name=tle.name, norad_id=tle.norad_id)
+    tle3 = Tle.from_orbit(orb2, name=tle.name, norad_id=tle.norad_id)
 
     assert tle2.cospar_id == tle.cospar_id
     assert tle3.cospar_id == ""

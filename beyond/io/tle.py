@@ -249,11 +249,24 @@ class Tle:
             str: TLE representation
         """
 
-        name = "0 %s\n" % name if name is not None else ""
-        norad_id = norad_id if norad_id is not None else "99999"
+        if name is not None:
+            name = f"0 {name}\n"
+        elif hasattr(orbit, "name"):
+            name = f"0 {orbit.name}\n"
+        else:
+            name = ""
+
+        if norad_id is None:
+            if hasattr(orbit, "norad_id"):
+                norad_id = orbit.norad_id
+            else:
+                norad_id = "99999"
 
         if cospar_id is not None:
             y, _, i = cospar_id.partition("-")
+            cospar_id = y[2:] + i
+        elif hasattr(orbit, "cospar_id"):
+            y, _, i = orbit.cospar_id.partition("-")
             cospar_id = y[2:] + i
         else:
             cospar_id = ""
@@ -263,7 +276,7 @@ class Tle:
         date = orbit.date.datetime
         i, Ω, e, ω, M, n = orbit
 
-        line1 = "1 {norad_id}U {cospar_id:<8} {date:%y}{day:012.8f} {ndot:>10} {ndotdot:>8} {bstar:>8} 0  999".format(
+        line1 = "1 {norad_id}U {cospar_id:<8} {date:%y}{day:012.8f} {ndot:>10} {ndotdot:>8} {bstar:>8} 0 {elnb:>4}".format(
             norad_id=norad_id,
             cospar_id=cospar_id,
             date=date,
@@ -275,8 +288,9 @@ class Tle:
             ndot="{: 0.8f}".format(orbit.ndot / 2).replace("0.", "."),
             ndotdot=_unfloat(orbit.ndotdot / 6),
             bstar=_unfloat(orbit.bstar),
+            elnb=orbit.element_nb,
         )
-        line2 = "2 {norad_id} {i:8.4f} {Ω:8.4f} {e} {ω:8.4f} {M:8.4f} {n:11.8f}99999".format(
+        line2 = "2 {norad_id} {i:8.4f} {Ω:8.4f} {e} {ω:8.4f} {M:8.4f} {n:11.8f}{revolutions:>5}".format(
             norad_id=norad_id,
             i=np.degrees(i),
             Ω=np.degrees(Ω),
@@ -284,6 +298,7 @@ class Tle:
             ω=np.degrees(ω),
             M=np.degrees(M),
             n=n * 86400 / (2 * np.pi),
+            revolutions=orbit.revolutions,
         )
 
         line1 += str(cls._checksum(line1))

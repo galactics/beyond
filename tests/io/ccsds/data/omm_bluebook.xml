@@ -31,8 +31,8 @@
           <NORAD_CAT_ID>23581</NORAD_CAT_ID>
           <ELEMENT_SET_NO>925</ELEMENT_SET_NO>
           <REV_AT_EPOCH>4316</REV_AT_EPOCH>
-          <BSTAR>0.0001</BSTAR>
-          <MEAN_MOTION_DOT>-0.00000226</MEAN_MOTION_DOT>
+          <BSTAR>0.000100000</BSTAR>
+          <MEAN_MOTION_DOT>-0.00000113</MEAN_MOTION_DOT>
           <MEAN_MOTION_DDOT>0.0</MEAN_MOTION_DDOT>
         </tleParameters>
       </data>
