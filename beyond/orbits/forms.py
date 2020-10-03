@@ -501,9 +501,13 @@ CART + CYL
 _cache = {
     "tle": TLE,
     "keplerian_circular": KEPL_C,
+    "circular": KEPL_C,
     "keplerian_mean": KEPL_M,
+    "mean": KEPL_M,
     "keplerian_mean_circular": KEPL_MC,
+    "mean_circular": KEPL_MC,
     "keplerian_eccentric": KEPL_E,
+    "eccentric": KEPL_E,
     "keplerian": KEPL,
     "spherical": SPHE,
     "cartesian": CART,
