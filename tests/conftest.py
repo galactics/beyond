@@ -120,11 +120,16 @@ class Helper:
 
         cov_eps = 1e-10
 
-        orb1.form = form
-        orb2.form = form
+        orb1 = orb1.copy(form=form)
+        orb2 = orb2.copy(form=form)
 
-        assert orb1.name == orb2.name
-        assert orb1.cospar_id == orb2.cospar_id
+        assert hasattr(orb1, "name") == hasattr(orb2, "name")
+        if hasattr(orb1, "name") and hasattr(orb2, "name"):
+            assert orb1.name == orb2.name
+
+        assert hasattr(orb1, "cospar_id") == hasattr(orb2, "cospar_id")
+        if hasattr(orb1, "cospar_id") and hasattr(orb2, "cospar_id"):
+            assert orb1.cospar_id == orb2.cospar_id
 
         assert orb1.frame == orb2.frame
         assert orb1.date == orb2.date

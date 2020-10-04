@@ -104,6 +104,15 @@ There is two propagators handling `Sphere of Influence <https://en.wikipedia.org
     :special-members: __init__
     :show-inheritance:
 
+Eckstein-Hechler
+----------------
+
+.. automodule:: beyond.propagators.eh
+    :members:
+    :special-members: __init__
+    :show-inheritance:
+    
+
 Listeners
 =========
 

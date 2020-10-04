@@ -8,13 +8,22 @@ from beyond.dates import Date, timedelta
 from beyond.orbits import MeanOrbit
 from beyond.orbits.cov import Cov
 from beyond.io.tle import Tle
-from beyond.io.ccsds import dumps, loads, CcsdsError
+from beyond.io.ccsds import dump, dumps, loads, CcsdsError
+from beyond.propagators.eh import EcksteinHechler
+
 
 @fixture
 def orbit_cov(tle, cov):
     orbit = tle.copy()
     orbit.cov = Cov(orbit, cov, orbit.frame)
     return orbit
+
+
+@fixture
+def ref_eh(tle):
+    orb = tle.copy(form="mean_circular", frame="CIRF")
+    orb.propagator = EcksteinHechler()
+    return orb
 
 
 def test_dump_omm(tle, datafile, ccsds_format, helper):
@@ -71,6 +80,11 @@ def test_dump_omm_user_defined(tle, ccsds_format, datafile, helper):
     txt = dumps(tle, fmt=ccsds_format)
 
     helper.assert_string(datafile("omm_user_defined"), txt)
+
+
+def test_dump_omm_eh(ref_eh, ccsds_format, datafile, helper):
+    txt = dumps(ref_eh, fmt=ccsds_format)
+    helper.assert_string(datafile("omm_eh"), txt)
 
 
 def test_load_omm(tle, datafile, helper):
@@ -161,6 +175,11 @@ def test_load_user_defined(tle, datafile, helper):
     subdict = data_omm._data["ccsds_user_defined"]
     assert subdict["FOO"] == "foo enters"
     assert subdict["BAR"] == "a bar"
+
+
+def test_load_omm_eh(ref_eh, datafile, helper):
+    orb = loads(datafile("omm_eh"))
+    helper.assert_orbit(ref_eh, orb, form="mean_circular")
 
 
 def test_tle(tle, ccsds_format):

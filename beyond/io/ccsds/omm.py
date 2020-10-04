@@ -3,6 +3,7 @@ import lxml.etree as ET
 
 from ...orbits import MeanOrbit
 from ...propagators.sgp4 import Sgp4, wgs72
+from ...propagators.eh import EcksteinHechler
 
 from .cov import load_cov, dump_cov
 from .commons import (
@@ -102,6 +103,20 @@ def _loads_kvn(string):
 
         except KeyError as e:
             raise CcsdsError(f"Missing mandatory parameter {e}")
+    elif data["MEAN_ELEMENT_THEORY"].text == "ECKSTEIN-HECHLER":
+        sma = decode_unit(data, "SEMI_MAJOR_AXIS", "km")
+        e = float(data["ECCENTRICITY"].text)
+        i = decode_unit(data, "INCLINATION", "deg")
+        Omega = decode_unit(data, "RA_OF_ASC_NODE", "deg")
+        omega = decode_unit(data, "ARG_OF_PERICENTER", "deg")
+        M = decode_unit(data, "MEAN_ANOMALY", "deg")
+
+        elements = [sma, e, i, Omega, omega, M]
+        form = "keplerian_mean"
+        propagator = EcksteinHechler()
+
+        kwargs = {"cospar_id": cospar_id, "name": name}
+
     else:  # pragma: no cover
         raise CcsdsError(f"Unknown OMM theory '{data['MEAN_ELEMENT_THEORY'].text}'")
 
@@ -127,7 +142,6 @@ def _loads_xml(string):
 
     metadata = data["body"]["segment"]["metadata"]
     mean_elements = data["body"]["segment"]["data"]["meanElements"]
-    tle_params = data["body"]["segment"]["data"]["tleParameters"]
     cov = data["body"]["segment"]["data"].get("covarianceMatrix")
 
     try:
@@ -140,6 +154,7 @@ def _loads_xml(string):
         raise CcsdsError(f"Missing mandatory parameter {e}")
 
     if metadata["MEAN_ELEMENT_THEORY"].text in ("SGP/SGP4", "SGP4"):
+        tle_params = data["body"]["segment"]["data"]["tleParameters"]
         try:
             n = decode_unit(mean_elements, "MEAN_MOTION", "rev/day")
             e = float(mean_elements["ECCENTRICITY"].text)
@@ -178,6 +193,20 @@ def _loads_xml(string):
 
         except KeyError as e:
             raise CcsdsError(f"Missing mandatory parameter {e}")
+    elif metadata["MEAN_ELEMENT_THEORY"].text == "ECKSTEIN-HECHLER":
+        sma = decode_unit(mean_elements, "SEMI_MAJOR_AXIS", "km")
+        e = float(mean_elements["ECCENTRICITY"].text)
+        i = decode_unit(mean_elements, "INCLINATION", "deg")
+        Omega = decode_unit(mean_elements, "RA_OF_ASC_NODE", "deg")
+        omega = decode_unit(mean_elements, "ARG_OF_PERICENTER", "deg")
+        M = decode_unit(mean_elements, "MEAN_ANOMALY", "deg")
+
+        elements = [sma, e, i, Omega, omega, M]
+        form = "keplerian_mean"
+        propagator = EcksteinHechler()
+
+        kwargs = {}
+
     else:  # pragma: no cover
         raise CcsdsError(f"Unknown OMM theory '{data['MEAN_ELEMENT_THEORY'].text}'")
 
@@ -202,6 +231,8 @@ def _dumps_kvn(data, **kwargs):
 
     if isinstance(data.propagator, Sgp4):
         theory = "SGP/SGP4"
+    elif isinstance(data.propagator, EcksteinHechler):
+        theory = "ECKSTEIN-HECHLER"
     else:  # pragma: no cover
         raise CcsdsError(f"Unknown propagator type '{data.propagator}' for OMM")
 
@@ -209,7 +240,8 @@ def _dumps_kvn(data, **kwargs):
         data, meta_tag=False, extras={"MEAN_ELEMENT_THEORY": theory}, **kwargs
     )
 
-    text = """
+    if theory == "SGP/SGP4":
+        text = """
 EPOCH                = {tle.date:{dfmt}}
 MEAN_MOTION          = {n: 12.8f} [rev/day]
 ECCENTRICITY         = {tle.e: 11.7f}
@@ -228,18 +260,41 @@ BSTAR                = {bstar:6.9f} [1/ER]
 MEAN_MOTION_DOT      = {ndot: 10.8f} [rev/day**2]
 MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
 """.format(
-        n=code_unit(data, "n", "rev/day"),
-        i=code_unit(data, "i", "deg"),
-        Omega=code_unit(data, "Omega", "deg"),
-        omega=code_unit(data, "omega", "deg"),
-        M=code_unit(data, "M", "deg"),
-        tle=data,
-        bstar=code_unit(data, "bstar", "1/ER"),
-        ndot=code_unit(data, "ndot", "rev/day**2") / 2,
-        ndotdot=code_unit(data, "ndotdot", "rev/day**3") / 6,
-        mu=wgs72.mu,  # this is already in km**3/s**2
-        dfmt=DATE_FMT_DEFAULT,
-    )
+            n=code_unit(data, "n", "rev/day"),
+            i=code_unit(data, "i", "deg"),
+            Omega=code_unit(data, "Omega", "deg"),
+            omega=code_unit(data, "omega", "deg"),
+            M=code_unit(data, "M", "deg"),
+            tle=data,
+            bstar=code_unit(data, "bstar", "1/ER"),
+            ndot=code_unit(data, "ndot", "rev/day**2") / 2,
+            ndotdot=code_unit(data, "ndotdot", "rev/day**3") / 6,
+            mu=wgs72.mu,  # this is already in km**3/s**2
+            dfmt=DATE_FMT_DEFAULT,
+        )
+
+    elif theory == "ECKSTEIN-HECHLER":
+        data.form = "keplerian_mean"
+
+        text = """
+EPOCH                = {orb.date:{dfmt}}
+SEMI_MAJOR_AXIS      = {a: 12.6f} [km]
+ECCENTRICITY         = {orb.e: 11.7f}
+INCLINATION          = {i: 8.4f} [deg]
+RA_OF_ASC_NODE       = {Omega:8.4f} [deg]
+ARG_OF_PERICENTER    = {omega:8.4f} [deg]
+MEAN_ANOMALY         = {M:8.4f} [deg]
+GM                   = {mu:0.1f} [km**3/s**2]
+""".format(
+            orb=data,
+            a=code_unit(data, "a", "km"),
+            i=code_unit(data, "i", "deg"),
+            Omega=code_unit(data, "Omega", "deg"),
+            omega=code_unit(data, "omega", "deg"),
+            M=code_unit(data, "M", "deg") % 360,
+            mu=data.propagator.mu * 1e-9,
+            dfmt=DATE_FMT_DEFAULT,
+        )
 
     if data.cov is not None:
         text += dump_cov(data.cov)
@@ -260,6 +315,8 @@ def _dumps_xml(data, **kwargs):
 
     if isinstance(data.propagator, Sgp4):
         theory = "SGP/SGP4"
+    elif isinstance(data.propagator, EcksteinHechler):
+        theory = "ECKSTEIN-HECHLER"
     else:  # pragma: no cover
         raise CcsdsError(f"Unknown propagator type '{data.propagator}' for OMM")
 
@@ -272,25 +329,24 @@ def _dumps_xml(data, **kwargs):
     epoch = ET.SubElement(meanelements, "EPOCH")
     epoch.text = data.date.strftime(DATE_FMT_DEFAULT)
 
-    sma = ET.SubElement(meanelements, "MEAN_MOTION", units="rev/day")
-    sma.text = f"{code_unit(data, 'n', 'rev/day'):0.8f}"
-    ecc = ET.SubElement(meanelements, "ECCENTRICITY")
-    ecc.text = f"{data.e:0.7f}"
-
-    elems = {
-        "INCLINATION": "i",
-        "RA_OF_ASC_NODE": "Omega",
-        "ARG_OF_PERICENTER": "omega",
-        "MEAN_ANOMALY": "M",
-    }
-    for k, v in elems.items():
-        x = ET.SubElement(meanelements, k, units="deg")
-        x.text = f"{np.degrees(getattr(data, v)):0.4f}"
-
-    gm = ET.SubElement(meanelements, "GM", units="km**3/s**2")
-    gm.text = f"{wgs72.mu:0.1f}"
-
     if theory == "SGP/SGP4":  # pragma: no branch
+        mean_motion = ET.SubElement(meanelements, "MEAN_MOTION", units="rev/day")
+        mean_motion.text = f"{code_unit(data, 'n', 'rev/day'):0.8f}"
+        ecc = ET.SubElement(meanelements, "ECCENTRICITY")
+        ecc.text = f"{data.e:0.7f}"
+
+        elems = {
+            "INCLINATION": "i",
+            "RA_OF_ASC_NODE": "Omega",
+            "ARG_OF_PERICENTER": "omega",
+            "MEAN_ANOMALY": "M",
+        }
+        for k, v in elems.items():
+            x = ET.SubElement(meanelements, k, units="deg")
+            x.text = f"{np.degrees(getattr(data, v) % (2 * np.pi)):0.4f}"
+
+        gm = ET.SubElement(meanelements, "GM", units="km**3/s**2")
+        gm.text = f"{wgs72.mu:0.1f}"
         tle_params = ET.SubElement(data_tag, "tleParameters")
         ephemeris_type = ET.SubElement(tle_params, "EPHEMERIS_TYPE")
         ephemeris_type.text = "0"
@@ -311,6 +367,23 @@ def _dumps_xml(data, **kwargs):
 
         ndotdot = ET.SubElement(tle_params, "MEAN_MOTION_DDOT")
         ndotdot.text = f"{data.ndotdot / 6:.1f}"
+    elif theory == "ECKSTEIN-HECHLER":
+        data = data.copy(form="keplerian_mean")
+        sma = ET.SubElement(meanelements, "SEMI_MAJOR_AXIS", units="km")
+        sma.text = f"{code_unit(data, 'a', 'km'):0.6f}"
+        ecc = ET.SubElement(meanelements, "ECCENTRICITY")
+        ecc.text = f"{data.e:0.7f}"
+        elems = {
+            "INCLINATION": "i",
+            "RA_OF_ASC_NODE": "Omega",
+            "ARG_OF_PERICENTER": "omega",
+            "MEAN_ANOMALY": "M",
+        }
+        for k, v in elems.items():
+            x = ET.SubElement(meanelements, k, units="deg")
+            x.text = f"{np.degrees(getattr(data, v) % (2 * np.pi)):0.4f}"
+        gm = ET.SubElement(meanelements, "GM", units="km**3/s**2")
+        gm.text = f"{data.propagator.mu * 1e-9:0.1f}"
 
     if data.cov is not None:
         cov = ET.SubElement(data_tag, "covarianceMatrix")

@@ -20,6 +20,7 @@ def get_propagator(name):
     from .none import NonePropagator
     from .sgp4 import Sgp4
     from .sgp4beta import Sgp4Beta
+    from .eh import EcksteinHechler
 
     scope = {
         "J2": J2,
@@ -28,6 +29,7 @@ def get_propagator(name):
         "NonePropagator": NonePropagator,
         "Sgp4": Sgp4,
         "Sgp4Beta": Sgp4Beta,
+        "EcksteinHechler": EcksteinHechler,
     }
 
     if name not in scope:

@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<omm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd" id="CCSDS_OMM_VERS" version="2.0">
+  <header>
+    <CREATION_DATE>2023-07-01T16:57:13.422643</CREATION_DATE>
+    <ORIGINATOR>N/A</ORIGINATOR>
+  </header>
+  <body>
+    <segment>
+      <metadata>
+        <OBJECT_NAME>ISS (ZARYA)</OBJECT_NAME>
+        <OBJECT_ID>1998-067A</OBJECT_ID>
+        <CENTER_NAME>EARTH</CENTER_NAME>
+        <REF_FRAME>CIRF</REF_FRAME>
+        <TIME_SYSTEM>UTC</TIME_SYSTEM>
+        <MEAN_ELEMENT_THEORY>ECKSTEIN-HECHLER</MEAN_ELEMENT_THEORY>
+      </metadata>
+      <data>
+        <meanElements>
+          <EPOCH>2008-09-20T12:25:40.104192</EPOCH>
+          <SEMI_MAJOR_AXIS units="km">6730.963463</SEMI_MAJOR_AXIS>
+          <ECCENTRICITY>0.0006703</ECCENTRICITY>
+          <INCLINATION units="deg">51.6416</INCLINATION>
+          <RA_OF_ASC_NODE units="deg">247.3510</RA_OF_ASC_NODE>
+          <ARG_OF_PERICENTER units="deg">130.5360</ARG_OF_PERICENTER>
+          <MEAN_ANOMALY units="deg">325.0288</MEAN_ANOMALY>
+          <GM units="km**3/s**2">398600.4</GM>
+        </meanElements>
+      </data>
+    </segment>
+  </body>
+</omm>
