@@ -399,9 +399,9 @@ TLE = Form("tle", ["i", "Ω", "e", "ω", "M", "n"])
 """TLE special form
 
     * i : inclination
-    * Ω : right-ascension of ascending node
+    * Ω : right-ascension of ascending node (aliases: Omega, raan)
     * e : eccentricity
-    * ω : argument of perigee
+    * ω : argument of perigee (alias : omega)
     * M : mean anomaly
     * n : mean motion
 
@@ -415,8 +415,8 @@ KEPL_C = Form("keplerian_circular", ["a", "ex", "ey", "i", "Ω", "u"])
     * ex : e * cos(ω)
     * ey : e * sin(ω)
     * i : inclination
-    * Ω : right-ascension of ascending node
-    * u : true argument of latitude (ω + ν)
+    * Ω : right-ascension of ascending node (aliases : Omega, raan)
+    * u : true argument of latitude u = ω + ν (alias : aol)
 """
 
 KEPL_E = Form("keplerian_eccentric", ["a", "e", "i", "Ω", "ω", "E"])
@@ -435,9 +435,9 @@ KEPL = Form("keplerian", ["a", "e", "i", "Ω", "ω", "ν"])
     * a : semi-major axis
     * e : eccentricity
     * i : inclination
-    * Ω : right-ascension of ascending node
-    * ω : Argument of perigee
-    * ν : True anomaly
+    * Ω : right-ascension of ascending node (aliases : Omega, raan)
+    * ω : Argument of perigee (alias : omega)
+    * ν : True anomaly (alias : nu)
 
 see `wikipedia <https://en.wikipedia.org/wiki/Orbital_elements>`__ for details
 """
@@ -446,11 +446,11 @@ SPHE = Form("spherical", ["r", "θ", "φ", "r_dot", "θ_dot", "φ_dot"])
 """Spherical form
 
     * r : radial distance / altitude
-    * θ : azimuth / longitude
-    * φ : elevation / latitude
+    * θ : azimuth / longitude (alias : theta)
+    * φ : elevation / latitude (alias : phi)
     * r_dot : first derivative of radial distance / altitude
-    * θ_dot : first derivative of azimuth / longitude
-    * φ_dot : first derivative of elevation / latitude
+    * θ_dot : first derivative of azimuth / longitude (alias : theta_dot)
+    * φ_dot : first derivative of elevation / latitude (alias : phi_dot)
 """
 
 CART = Form("cartesian", ["x", "y", "z", "vx", "vy", "vz"])
@@ -474,10 +474,10 @@ CYL = Form("cylindrical", ["r", "theta", "z", "r_dot", "theta_dot", "vz"])
 """Cylindrical form
 
     * r : radial distance
-    * θ : azimuth
+    * θ : azimuth (alias : theta)
     * z : height
     * r_dot : first derivative of radial distance / altitude
-    * θ_dot : first derivative of azimuth / longitude
+    * θ_dot : first derivative of azimuth / longitude (alias : theta_dot)
     * vz : velocity along z
 """
 
@@ -488,8 +488,8 @@ KEPL_MC = Form("keplerian_mean_circular", ["a", "ex", "ey", "i", "Ω", "α"])
     * ex : e * cos(ω)
     * ey : e * sin(ω)
     * i : inclination
-    * Ω : right-ascension of ascending node
-    * α : mean argument of latitude (ω + M)
+    * Ω : right-ascension of ascending node (aliases : Omega, raan)
+    * α : mean argument of latitude α = ω + M (aliases : alpha, maol)
 """
 
 SPHE + CART + KEPL + KEPL_E + KEPL_M + TLE

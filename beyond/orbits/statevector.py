@@ -235,8 +235,8 @@ StateVector =
 
             orbit.form = "cartesian"
             # is equivalent to
-            from beyond.orbits.forms import FormTransform
-            orbit.form = FormTransform.CART
+            from beyond.orbits.forms import CART
+            orbit.form = CART
         """
         return self._data["form"]
 
