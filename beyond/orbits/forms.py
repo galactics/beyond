@@ -39,6 +39,9 @@ class Form(Node):
         "phi_dot": "φ_dot",
         "aol": "u",
         "H": "E",  # The hyperbolic anomaly is available under the eccentric anomaly
+        "x_dot": "vx",
+        "y_dot": "vy",
+        "z_dot": "vz",
     }
 
     def __init__(self, name, param_names):
@@ -343,6 +346,30 @@ class Form(Node):
 
         return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
+    @classmethod
+    def _cartesian_to_cylindrical(cls, coord, body):
+        """Conversion from Cartesian to Cylindrical"""
+        x, y, z, vx, vy, vz = coord
+
+        r = sqrt(x ** 2 + y ** 2)
+        θ = arctan2(y, x)
+        r_dot = (x * vx + y * vy) / r
+        θ_dot = (x * vy - y * vx) / (x ** 2 + y ** 2)
+
+        return np.array([r, θ, z, r_dot, θ_dot, vz], dtype=float)
+
+    @classmethod
+    def _cylindrical_to_cartesian(cls, coord, body):
+        """Conversion from Cylindrical to Cartesian"""
+        r, θ, z, r_dot, θ_dot, vz = coord
+
+        x = r * cos(θ)
+        y = r * sin(θ)
+        vx = r_dot * cos(θ) - r * sin(θ) * θ_dot
+        vy = r_dot * sin(θ) + r * cos(θ) * θ_dot
+
+        return np.array([x, y, z, vx, vy, vz], dtype=float)
+
 
 TLE = Form("tle", ["i", "Ω", "e", "ω", "M", "n"])
 """TLE special form
@@ -419,8 +446,20 @@ This form is not subject to ambiguity when the orbit is circular and/or
 equatorial like the keplerian form is (on ω and Ω, respectively)
 """
 
+CYL = Form("cylindrical", ["r", "theta", "z", "r_dot", "theta_dot", "vz"])
+"""Cylindrical form
+
+    * r : radial distance
+    * θ : azimuth
+    * z : height
+    * r_dot : first derivative of radial distance / altitude
+    * θ_dot : first derivative of azimuth / longitude
+    * vz : velocity along z
+"""
+
 SPHE + CART + KEPL + KEPL_E + KEPL_M + TLE
 EQUI + KEPL + KEPL_C
+CART + CYL
 
 
 _cache = {
@@ -432,6 +471,7 @@ _cache = {
     "spherical": SPHE,
     "cartesian": CART,
     "equinoctial": EQUI,
+    "cylindrical": CYL,
 }
 
 

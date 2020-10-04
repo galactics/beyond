@@ -4,7 +4,7 @@ import numpy as np
 
 from beyond.dates import Date
 from beyond.orbits import StateVector
-from beyond.orbits.forms import TLE, KEPL_E, KEPL_C, KEPL_M, KEPL, SPHE, CART, EQUI
+from beyond.orbits.forms import TLE, KEPL_E, KEPL_C, KEPL_M, KEPL, SPHE, CART, EQUI, CYL
 
 
 @fixture
@@ -102,6 +102,7 @@ def ref_kepl_hyper(ref_date):
         "EME2000"
     )
 
+
 @fixture
 def ref_equi(ref_date):
     return StateVector(
@@ -111,6 +112,19 @@ def ref_equi(ref_date):
         ],
         ref_date,
         EQUI,
+        "EME2000"
+    )
+
+
+@fixture
+def ref_cyl(ref_date):
+    return StateVector(
+        [
+            3.51871697e+06,  2.09815148e+00, -6.29108469e+06,
+            -6.17741547e+03, -6.39690485e-04, -3.45695948e+03
+        ],
+        ref_date,
+        CYL,
         "EME2000"
     )
 
@@ -280,3 +294,12 @@ def test_equinoctial(ref_kepl, ref_equi):
 
     kepl = EQUI(ref_equi, KEPL)
     assert np.allclose(ref_kepl, kepl)
+
+
+def test_cylindrical(ref_cart, ref_cyl):
+
+    cyl = CART(ref_cart, CYL)
+    assert np.allclose(ref_cyl, cyl)
+
+    cart = CYL(ref_cyl, CART)
+    assert np.allclose(ref_cart, cart)
