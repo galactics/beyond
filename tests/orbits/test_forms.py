@@ -4,7 +4,7 @@ import numpy as np
 
 from beyond.dates import Date
 from beyond.orbits import StateVector
-from beyond.orbits.forms import TLE, KEPL_E, KEPL_C, KEPL_M, KEPL, SPHE, CART, EQUI, CYL
+from beyond.orbits.forms import TLE, KEPL_E, KEPL_C, KEPL_M, KEPL, SPHE, CART, EQUI, CYL, KEPL_MC
 
 
 @fixture
@@ -125,6 +125,19 @@ def ref_cyl(ref_date):
         ],
         ref_date,
         CYL,
+        "EME2000"
+    )
+
+
+@fixture
+def ref_kepl_mc(ref_date):
+    return StateVector(
+        [
+            7.19263111e+06, 8.34297391e-04, 2.01878863e-03,
+            1.71926101e+00, 5.51044450e+00, 4.22224746e+00
+        ],
+        ref_date,
+        KEPL_MC,
         "EME2000"
     )
 
@@ -303,3 +316,12 @@ def test_cylindrical(ref_cart, ref_cyl):
 
     cart = CYL(ref_cyl, CART)
     assert np.allclose(ref_cart, cart)
+
+
+def test_keplerian_mean_circular(ref_kepl_m, ref_kepl_mc):
+
+    kepl_mc = KEPL_M(ref_kepl_m, KEPL_MC)
+    assert np.allclose(ref_kepl_mc, kepl_mc)
+
+    kepl_m = KEPL_MC(ref_kepl_mc, KEPL_M)
+    assert np.allclose(ref_kepl_m, kepl_m)

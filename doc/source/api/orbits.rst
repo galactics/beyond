@@ -23,6 +23,8 @@ Available forms are
 
 .. autodata:: beyond.orbits.forms.KEPL_E
 
+.. autodata:: beyond.orbits.forms.KEPL_MC
+
 .. autodata:: beyond.orbits.forms.EQUI
 
 .. autodata:: beyond.orbits.forms.CYL

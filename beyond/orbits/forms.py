@@ -42,6 +42,8 @@ class Form(Node):
         "x_dot": "vx",
         "y_dot": "vy",
         "z_dot": "vz",
+        "alpha": "α",
+        "maol": "α",
     }
 
     def __init__(self, name, param_names):
@@ -370,6 +372,28 @@ class Form(Node):
 
         return np.array([x, y, z, vx, vy, vz], dtype=float)
 
+    @classmethod
+    def _keplerian_mean_to_keplerian_mean_circular(cls, coord, body):
+        """Conversion from Keplerian Mean to Keplerian Mean Circular"""
+        a, e, i, Ω, ω, M = coord
+
+        ex = e * cos(ω)
+        ey = e * sin(ω)
+        α = (ω + M) % (2 * np.pi)
+
+        return np.array([a, ex, ey, i, Ω, α], dtype=float)
+
+    @classmethod
+    def _keplerian_mean_circular_to_keplerian_mean(cls, coord, body):
+        """Conversion from Keplerian Mean Circula to Keplerian Mean"""
+        a, ex, ey, i, Ω, α = coord
+
+        e = sqrt(ex ** 2 + ey ** 2)
+        ω = arctan2(ey / e, ex / e)
+        M = α - ω
+
+        return np.array([a, e, i, Ω, ω, M], dtype=float)
+
 
 TLE = Form("tle", ["i", "Ω", "e", "ω", "M", "n"])
 """TLE special form
@@ -392,7 +416,7 @@ KEPL_C = Form("keplerian_circular", ["a", "ex", "ey", "i", "Ω", "u"])
     * ey : e * sin(ω)
     * i : inclination
     * Ω : right-ascension of ascending node
-    * u : argument of latitude (ω + ν)
+    * u : true argument of latitude (ω + ν)
 """
 
 KEPL_E = Form("keplerian_eccentric", ["a", "e", "i", "Ω", "ω", "E"])
@@ -457,8 +481,20 @@ CYL = Form("cylindrical", ["r", "theta", "z", "r_dot", "theta_dot", "vz"])
     * vz : velocity along z
 """
 
+KEPL_MC = Form("keplerian_mean_circular", ["a", "ex", "ey", "i", "Ω", "α"])
+"""Same as Circular but with mean argument of latitude
+
+    * a : semi-major axis
+    * ex : e * cos(ω)
+    * ey : e * sin(ω)
+    * i : inclination
+    * Ω : right-ascension of ascending node
+    * α : mean argument of latitude (ω + M)
+"""
+
 SPHE + CART + KEPL + KEPL_E + KEPL_M + TLE
 EQUI + KEPL + KEPL_C
+KEPL_M + KEPL_MC
 CART + CYL
 
 
@@ -466,6 +502,7 @@ _cache = {
     "tle": TLE,
     "keplerian_circular": KEPL_C,
     "keplerian_mean": KEPL_M,
+    "keplerian_mean_circular": KEPL_MC,
     "keplerian_eccentric": KEPL_E,
     "keplerian": KEPL,
     "spherical": SPHE,
