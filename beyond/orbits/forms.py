@@ -5,7 +5,19 @@
 and their conversions
 """
 
-from numpy import cos, arccos, sin, arcsin, arctan2, sqrt, arctanh, sinh, cosh
+from numpy import (
+    cos,
+    arccos,
+    sin,
+    arcsin,
+    tan,
+    arctan,
+    arctan2,
+    sqrt,
+    arctanh,
+    sinh,
+    cosh,
+)
 
 import numpy as np
 
@@ -131,6 +143,24 @@ class Form(Node):
         return np.array([a, e, i, Ω, ω, E], dtype=float)
 
     @classmethod
+    def _keplerian_eccentric_to_keplerian(cls, coord, body):
+        """Conversion from Mean Keplerian to True Keplerian"""
+
+        a, e, i, Ω, ω, E = coord
+
+        if e < 1:
+            cos_ν = (cos(E) - e) / (1 - e * cos(E))
+            sin_ν = (sin(E) * sqrt(1 - e ** 2)) / (1 - e * cos(E))
+        else:
+            # Hyperbolic case, E usually marked as H
+            cos_ν = (cosh(E) - e) / (1 - e * cosh(E))
+            sin_ν = -(sinh(E) * sqrt(e ** 2 - 1)) / (1 - e * cosh(E))
+
+        ν = arctan2(sin_ν, cos_ν) % (np.pi * 2)
+
+        return np.array([a, e, i, Ω, ω, ν], dtype=float)
+
+    @classmethod
     def _keplerian_eccentric_to_keplerian_mean(cls, coord, body):
         """Conversion from Keplerian Eccentric to Keplerian Mean"""
         a, e, i, Ω, ω, E = coord
@@ -150,24 +180,6 @@ class Form(Node):
         E = cls.M2E(e, M)
 
         return np.array([a, e, i, Ω, ω, E], dtype=float)
-
-    @classmethod
-    def _keplerian_eccentric_to_keplerian(cls, coord, body):
-        """Conversion from Mean Keplerian to True Keplerian"""
-
-        a, e, i, Ω, ω, E = coord
-
-        if e < 1:
-            cos_ν = (cos(E) - e) / (1 - e * cos(E))
-            sin_ν = (sin(E) * sqrt(1 - e ** 2)) / (1 - e * cos(E))
-        else:
-            # Hyperbolic case, E usually marked as H
-            cos_ν = (cosh(E) - e) / (1 - e * cosh(E))
-            sin_ν = -(sinh(E) * sqrt(e ** 2 - 1)) / (1 - e * cosh(E))
-
-        ν = arctan2(sin_ν, cos_ν) % (np.pi * 2)
-
-        return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
     @classmethod
     def M2E(cls, e, M):
@@ -305,6 +317,32 @@ class Form(Node):
 
         return np.array([x, y, z, vx, vy, vz], dtype=float)
 
+    @classmethod
+    def _keplerian_to_equinoctial(cls, coord, body):
+        """Conversion from Keplerian to Equinoctial"""
+        a, e, i, Ω, ω, ν = coord
+
+        ex = e * cos(Ω + ω)
+        ey = e * sin(Ω + ω)
+        ix = tan(i / 2) * cos(Ω)
+        iy = tan(i / 2) * sin(Ω)
+        l = Ω + ω + ν
+
+        return np.array([a, ex, ey, ix, iy, l], dtype=float)
+
+    @classmethod
+    def _equinoctial_to_keplerian(cls, coord, body):
+        """Conversion from Equinoctial to Keplerian"""
+        a, ex, ey, ix, iy, l = coord
+
+        Ω = arctan2(iy, ix) % (2 * np.pi)
+        ω = (arctan2(ey, ex) - Ω) % (2 * np.pi)
+        ν = (l - Ω - ω) % (2 * np.pi)
+        e = sqrt(ex ** 2 + ey ** 2)
+        i = 2 * arctan(sqrt(ix ** 2 + iy ** 2))
+
+        return np.array([a, e, i, Ω, ω, ν], dtype=float)
+
 
 TLE = Form("tle", ["i", "Ω", "e", "ω", "M", "n"])
 """TLE special form
@@ -367,9 +405,22 @@ SPHE = Form("spherical", ["r", "θ", "φ", "r_dot", "θ_dot", "φ_dot"])
 CART = Form("cartesian", ["x", "y", "z", "vx", "vy", "vz"])
 """Cartesian form"""
 
+EQUI = Form("equinoctial", ["a", "ex", "ey", "ix", "iy", "l"])
+"""The Equinoctial form is
+
+    * a  : semi-major axis
+    * ex : first element of the eccentricity vector
+    * ey : second element of the eccentricity vector
+    * ix : first element of the inclination vector
+    * iy : second element of the inclination vector
+    * l  : argument of longitude
+
+This form is not subject to ambiguity when the orbit is circular and/or
+equatorial like the keplerian form is (on ω and Ω, respectively)
+"""
 
 SPHE + CART + KEPL + KEPL_E + KEPL_M + TLE
-KEPL + KEPL_C
+EQUI + KEPL + KEPL_C
 
 
 _cache = {
@@ -380,6 +431,7 @@ _cache = {
     "keplerian": KEPL,
     "spherical": SPHE,
     "cartesian": CART,
+    "equinoctial": EQUI,
 }
 
 

@@ -23,6 +23,7 @@ Available forms are
 
 .. autodata:: beyond.orbits.forms.KEPL_E
 
+.. autodata:: beyond.orbits.forms.EQUI
 
 StateVector
 -----------
