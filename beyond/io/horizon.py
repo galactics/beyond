@@ -40,7 +40,7 @@ def loads(text):
         HorizonParseError: The text is not a recognizable Horizon format
     """
 
-    frames = {"ICRF/J2000.0": "EME2000", "FK4/B1950.0": "G50"}
+    frames = {"ICRF/J2000.0": "EME2000", "FK4/B1950.0": "G50", "ICRF": "EME2000"}
 
     formats = {
         "1 (position only)": ("date", "pos"),
@@ -104,7 +104,7 @@ def loads(text):
 
     frame = header["Reference frame"]
     if frame not in frames:
-        raise HorizonParseError("Unknown frame")
+        raise HorizonParseError("Unknown frame : {}".format(frame))
     frame = frames[frame.strip()]
 
     if frame == "EME2000":
@@ -113,7 +113,7 @@ def loads(text):
         if center != "Earth (399)":
             frame = center.partition("(")[0].strip()
 
-    coord = header["Coordinate systm"]
+    coord = header.get("Coordinate systm", "equatorial")
     if coord == "Earth Mean Equator and Equinox of Reference Epoch":
         coord = "equatorial"
     elif coord == "Ecliptic and Mean Equinox of Reference Epoch":
