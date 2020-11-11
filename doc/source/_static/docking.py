@@ -110,7 +110,7 @@ plt.figure(figsize=(12.8, 4.8))
 ax = plt.subplot(111)
 
 # Approach sphere (2 km)
-circle = mpatches.Circle((0, 0), 2000, ec="none", fc="#aaaaaa60")
+circle = mpatches.Ellipse((0, 0), 4000, 2000, ec="none", fc="#aaaaaa60")
 ax.add_patch(circle)
 
 # Keep out sphere (200 m) with corridors
@@ -121,7 +121,7 @@ ax.add_patch(w1)
 ax.add_patch(w2)
 ax.add_patch(w3)
 
-plt.text(0, -1500, "Approach ellipse", ha="center")
+plt.text(0, -750, "Approach ellipse", ha="center")
 plt.text(0, 200, "Keep-out sphere", ha="center")
 
 plt.plot(chaser_ephem[:, 1], chaser_ephem[:, 0])
