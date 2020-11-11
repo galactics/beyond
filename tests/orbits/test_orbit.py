@@ -131,15 +131,14 @@ def test_orbit_change_form(ref_orbit):
     assert np.allclose(ref_orbit, ref_cart)
 
 
-def test_tle_back_and_fro():
+def test_tle_to_and_from():
 
     txt = """1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927
 2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537"""
     orb = Tle(txt).orbit()
     new_txt = Tle.from_orbit(orb, norad_id=25544, cospar_id='1998-067A')
 
-    assert str(new_txt) == """1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  9991
-2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391999990"""
+    assert str(new_txt) == txt
 
 
 def test_pickle(ref_orbit):

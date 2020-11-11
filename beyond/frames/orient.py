@@ -172,6 +172,15 @@ class LocalOrbitalOrientation(Orientation):
     """Local Orbital Orientation"""
 
     def __init__(self, name, statevector, orient, parent):
+        """
+        Args:
+            name (str) : Name of the frame
+            statevector (StateVector) : Point in space and time to which the
+                local orbital frame is attached
+            orient (str) : Orientation of the local orbital frame (QSW or TNW)
+            parent (Frame) : Inertial frame (such as EME2000)
+        """
+
         super().__init__(name)
         self.statevector = statevector
         self.orient = orient

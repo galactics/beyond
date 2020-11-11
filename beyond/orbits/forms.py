@@ -5,7 +5,19 @@
 and their conversions
 """
 
-from numpy import cos, arccos, sin, arcsin, arctan2, sqrt, arctanh, sinh, cosh
+from numpy import (
+    cos,
+    arccos,
+    sin,
+    arcsin,
+    tan,
+    arctan,
+    arctan2,
+    sqrt,
+    arctanh,
+    sinh,
+    cosh,
+)
 
 import numpy as np
 
@@ -27,6 +39,11 @@ class Form(Node):
         "phi_dot": "φ_dot",
         "aol": "u",
         "H": "E",  # The hyperbolic anomaly is available under the eccentric anomaly
+        "x_dot": "vx",
+        "y_dot": "vy",
+        "z_dot": "vz",
+        "alpha": "α",
+        "maol": "α",
     }
 
     def __init__(self, name, param_names):
@@ -131,6 +148,24 @@ class Form(Node):
         return np.array([a, e, i, Ω, ω, E], dtype=float)
 
     @classmethod
+    def _keplerian_eccentric_to_keplerian(cls, coord, body):
+        """Conversion from Mean Keplerian to True Keplerian"""
+
+        a, e, i, Ω, ω, E = coord
+
+        if e < 1:
+            cos_ν = (cos(E) - e) / (1 - e * cos(E))
+            sin_ν = (sin(E) * sqrt(1 - e ** 2)) / (1 - e * cos(E))
+        else:
+            # Hyperbolic case, E usually marked as H
+            cos_ν = (cosh(E) - e) / (1 - e * cosh(E))
+            sin_ν = -(sinh(E) * sqrt(e ** 2 - 1)) / (1 - e * cosh(E))
+
+        ν = arctan2(sin_ν, cos_ν) % (np.pi * 2)
+
+        return np.array([a, e, i, Ω, ω, ν], dtype=float)
+
+    @classmethod
     def _keplerian_eccentric_to_keplerian_mean(cls, coord, body):
         """Conversion from Keplerian Eccentric to Keplerian Mean"""
         a, e, i, Ω, ω, E = coord
@@ -150,24 +185,6 @@ class Form(Node):
         E = cls.M2E(e, M)
 
         return np.array([a, e, i, Ω, ω, E], dtype=float)
-
-    @classmethod
-    def _keplerian_eccentric_to_keplerian(cls, coord, body):
-        """Conversion from Mean Keplerian to True Keplerian"""
-
-        a, e, i, Ω, ω, E = coord
-
-        if e < 1:
-            cos_ν = (cos(E) - e) / (1 - e * cos(E))
-            sin_ν = (sin(E) * sqrt(1 - e ** 2)) / (1 - e * cos(E))
-        else:
-            # Hyperbolic case, E usually marked as H
-            cos_ν = (cosh(E) - e) / (1 - e * cosh(E))
-            sin_ν = -(sinh(E) * sqrt(e ** 2 - 1)) / (1 - e * cosh(E))
-
-        ν = arctan2(sin_ν, cos_ν) % (np.pi * 2)
-
-        return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
     @classmethod
     def M2E(cls, e, M):
@@ -305,14 +322,86 @@ class Form(Node):
 
         return np.array([x, y, z, vx, vy, vz], dtype=float)
 
+    @classmethod
+    def _keplerian_to_equinoctial(cls, coord, body):
+        """Conversion from Keplerian to Equinoctial"""
+        a, e, i, Ω, ω, ν = coord
+
+        ex = e * cos(Ω + ω)
+        ey = e * sin(Ω + ω)
+        ix = tan(i / 2) * cos(Ω)
+        iy = tan(i / 2) * sin(Ω)
+        l = Ω + ω + ν
+
+        return np.array([a, ex, ey, ix, iy, l], dtype=float)
+
+    @classmethod
+    def _equinoctial_to_keplerian(cls, coord, body):
+        """Conversion from Equinoctial to Keplerian"""
+        a, ex, ey, ix, iy, l = coord
+
+        Ω = arctan2(iy, ix) % (2 * np.pi)
+        ω = (arctan2(ey, ex) - Ω) % (2 * np.pi)
+        ν = (l - Ω - ω) % (2 * np.pi)
+        e = sqrt(ex ** 2 + ey ** 2)
+        i = 2 * arctan(sqrt(ix ** 2 + iy ** 2))
+
+        return np.array([a, e, i, Ω, ω, ν], dtype=float)
+
+    @classmethod
+    def _cartesian_to_cylindrical(cls, coord, body):
+        """Conversion from Cartesian to Cylindrical"""
+        x, y, z, vx, vy, vz = coord
+
+        r = sqrt(x ** 2 + y ** 2)
+        θ = arctan2(y, x)
+        r_dot = (x * vx + y * vy) / r
+        θ_dot = (x * vy - y * vx) / (x ** 2 + y ** 2)
+
+        return np.array([r, θ, z, r_dot, θ_dot, vz], dtype=float)
+
+    @classmethod
+    def _cylindrical_to_cartesian(cls, coord, body):
+        """Conversion from Cylindrical to Cartesian"""
+        r, θ, z, r_dot, θ_dot, vz = coord
+
+        x = r * cos(θ)
+        y = r * sin(θ)
+        vx = r_dot * cos(θ) - r * sin(θ) * θ_dot
+        vy = r_dot * sin(θ) + r * cos(θ) * θ_dot
+
+        return np.array([x, y, z, vx, vy, vz], dtype=float)
+
+    @classmethod
+    def _keplerian_mean_to_keplerian_mean_circular(cls, coord, body):
+        """Conversion from Keplerian Mean to Keplerian Mean Circular"""
+        a, e, i, Ω, ω, M = coord
+
+        ex = e * cos(ω)
+        ey = e * sin(ω)
+        α = (ω + M) % (2 * np.pi)
+
+        return np.array([a, ex, ey, i, Ω, α], dtype=float)
+
+    @classmethod
+    def _keplerian_mean_circular_to_keplerian_mean(cls, coord, body):
+        """Conversion from Keplerian Mean Circula to Keplerian Mean"""
+        a, ex, ey, i, Ω, α = coord
+
+        e = sqrt(ex ** 2 + ey ** 2)
+        ω = arctan2(ey / e, ex / e)
+        M = α - ω
+
+        return np.array([a, e, i, Ω, ω, M], dtype=float)
+
 
 TLE = Form("tle", ["i", "Ω", "e", "ω", "M", "n"])
 """TLE special form
 
     * i : inclination
-    * Ω : right-ascension of ascending node
+    * Ω : right-ascension of ascending node (aliases: Omega, raan)
     * e : eccentricity
-    * ω : argument of perigee
+    * ω : argument of perigee (alias : omega)
     * M : mean anomaly
     * n : mean motion
 
@@ -326,8 +415,8 @@ KEPL_C = Form("keplerian_circular", ["a", "ex", "ey", "i", "Ω", "u"])
     * ex : e * cos(ω)
     * ey : e * sin(ω)
     * i : inclination
-    * Ω : right-ascension of ascending node
-    * u : argument of latitude (ω + ν)
+    * Ω : right-ascension of ascending node (aliases : Omega, raan)
+    * u : true argument of latitude u = ω + ν (alias : aol)
 """
 
 KEPL_E = Form("keplerian_eccentric", ["a", "e", "i", "Ω", "ω", "E"])
@@ -346,9 +435,9 @@ KEPL = Form("keplerian", ["a", "e", "i", "Ω", "ω", "ν"])
     * a : semi-major axis
     * e : eccentricity
     * i : inclination
-    * Ω : right-ascension of ascending node
-    * ω : Argument of perigee
-    * ν : True anomaly
+    * Ω : right-ascension of ascending node (aliases : Omega, raan)
+    * ω : Argument of perigee (alias : omega)
+    * ν : True anomaly (alias : nu)
 
 see `wikipedia <https://en.wikipedia.org/wiki/Orbital_elements>`__ for details
 """
@@ -357,29 +446,73 @@ SPHE = Form("spherical", ["r", "θ", "φ", "r_dot", "θ_dot", "φ_dot"])
 """Spherical form
 
     * r : radial distance / altitude
-    * θ : azimuth / longitude
-    * φ : elevation / latitude
+    * θ : azimuth / longitude (alias : theta)
+    * φ : elevation / latitude (alias : phi)
     * r_dot : first derivative of radial distance / altitude
-    * θ_dot : first derivative of azimuth / longitude
-    * φ_dot : first derivative of elevation / latitude
+    * θ_dot : first derivative of azimuth / longitude (alias : theta_dot)
+    * φ_dot : first derivative of elevation / latitude (alias : phi_dot)
 """
 
 CART = Form("cartesian", ["x", "y", "z", "vx", "vy", "vz"])
 """Cartesian form"""
 
+EQUI = Form("equinoctial", ["a", "ex", "ey", "ix", "iy", "l"])
+"""The Equinoctial form is
+
+    * a  : semi-major axis
+    * ex : first element of the eccentricity vector
+    * ey : second element of the eccentricity vector
+    * ix : first element of the inclination vector
+    * iy : second element of the inclination vector
+    * l  : argument of longitude
+
+This form is not subject to ambiguity when the orbit is circular and/or
+equatorial like the keplerian form is (on ω and Ω, respectively)
+"""
+
+CYL = Form("cylindrical", ["r", "theta", "z", "r_dot", "theta_dot", "vz"])
+"""Cylindrical form
+
+    * r : radial distance
+    * θ : azimuth (alias : theta)
+    * z : height
+    * r_dot : first derivative of radial distance / altitude
+    * θ_dot : first derivative of azimuth / longitude (alias : theta_dot)
+    * vz : velocity along z
+"""
+
+KEPL_MC = Form("keplerian_mean_circular", ["a", "ex", "ey", "i", "Ω", "α"])
+"""Same as Circular but with mean argument of latitude
+
+    * a : semi-major axis
+    * ex : e * cos(ω)
+    * ey : e * sin(ω)
+    * i : inclination
+    * Ω : right-ascension of ascending node (aliases : Omega, raan)
+    * α : mean argument of latitude α = ω + M (aliases : alpha, maol)
+"""
 
 SPHE + CART + KEPL + KEPL_E + KEPL_M + TLE
-KEPL + KEPL_C
+EQUI + KEPL + KEPL_C
+KEPL_M + KEPL_MC
+CART + CYL
 
 
 _cache = {
     "tle": TLE,
     "keplerian_circular": KEPL_C,
+    "circular": KEPL_C,
     "keplerian_mean": KEPL_M,
+    "mean": KEPL_M,
+    "keplerian_mean_circular": KEPL_MC,
+    "mean_circular": KEPL_MC,
     "keplerian_eccentric": KEPL_E,
+    "eccentric": KEPL_E,
     "keplerian": KEPL,
     "spherical": SPHE,
     "cartesian": CART,
+    "equinoctial": EQUI,
+    "cylindrical": CYL,
 }
 
 

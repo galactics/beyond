@@ -216,7 +216,7 @@ CLASSIFICATION_TYPE  = {tle.tle.classification:}
 NORAD_CAT_ID         = {tle.tle.norad_id}
 ELEMENT_SET_NO       = {tle.tle.element_nb}
 REV_AT_EPOCH         = {tle.tle.revolutions}
-BSTAR                = {bstar:6.4f} [1/ER]
+BSTAR                = {bstar:6.9f} [1/ER]
 MEAN_MOTION_DOT      = {ndot: 10.8f} [rev/day**2]
 MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
 """.format(
@@ -296,13 +296,13 @@ def _dumps_xml(data, **kwargs):
         revolutions.text = str(data.revolutions)
 
         bstar = ET.SubElement(tle_params, "BSTAR")
-        bstar.text = "{:.4f}".format(data.bstar)
+        bstar.text = "{:.9f}".format(data.bstar)
 
         ndot = ET.SubElement(tle_params, "MEAN_MOTION_DOT")
-        ndot.text = "{:.8f}".format(data.ndot)
+        ndot.text = "{:.8f}".format(data.ndot / 2)
 
         ndotdot = ET.SubElement(tle_params, "MEAN_MOTION_DDOT")
-        ndotdot.text = "{:.1f}".format(data.ndotdot)
+        ndotdot.text = "{:.1f}".format(data.ndotdot / 6)
 
     if data.cov is not None:
         cov = ET.SubElement(data_tag, "covarianceMatrix")

@@ -5,6 +5,7 @@ from ...dates import timedelta
 from ...orbits import StateVector
 from ...orbits.man import ImpulsiveMan, ContinuousMan
 from ...utils import units
+from ...frames.orient import G50, EME2000, GCRF, MOD, TEME, TOD, CIRF
 
 from .cov import load_cov, dump_cov
 from .commons import (
@@ -81,9 +82,9 @@ def _loads_kvn(string):
     except KeyError as e:
         raise CcsdsError("Missing mandatory parameter {}".format(e))
 
-    orb = StateVector([x, y, z, vx, vy, vz], date, "cartesian", frame)
-    orb.name = name
-    orb.cospar_id = cospar_id
+    orb = StateVector(
+        [x, y, z, vx, vy, vz], date, "cartesian", frame, name=name, cospar_id=cospar_id
+    )
 
     for raw_man in data.get("maneuvers", []):
         man = {}
@@ -166,9 +167,9 @@ def _loads_xml(string):
     except KeyError as e:
         raise CcsdsError("Missing mandatory parameter {}".format(e))
 
-    orb = StateVector([x, y, z, vx, vy, vz], date, "cartesian", frame)
-    orb.name = name
-    orb.cospar_id = cospar_id
+    orb = StateVector(
+        [x, y, z, vx, vy, vz], date, "cartesian", frame, name=name, cospar_id=cospar_id
+    )
 
     if maneuvers:
         for raw_man in maneuvers:
@@ -238,7 +239,13 @@ Z                    = {cartesian.z: 12.6f} [km]
 X_DOT                = {cartesian.vx: 12.6f} [km/s]
 Y_DOT                = {cartesian.vy: 12.6f} [km/s]
 Z_DOT                = {cartesian.vz: 12.6f} [km/s]
+""".format(
+        cartesian=cart / units.km,
+        dfmt=DATE_FMT_DEFAULT,
+    )
 
+    if cart.frame.orientation in (G50, EME2000, GCRF, MOD, TOD, TEME, CIRF):
+        text += """
 COMMENT  Keplerian elements
 SEMI_MAJOR_AXIS      = {kep_a: 12.6f} [km]
 ECCENTRICITY         = {kep_e: 12.6f}
@@ -248,13 +255,11 @@ ARG_OF_PERICENTER    = {angles[2]: 12.6f} [deg]
 TRUE_ANOMALY         = {angles[3]: 12.6f} [deg]
 GM                   = {gm:11.4f} [km**3/s**2]
 """.format(
-        cartesian=cart / units.km,
-        kep_a=kep.a / units.km,
-        kep_e=kep.e,
-        angles=np.degrees(kep[2:]),
-        gm=kep.frame.center.body.mu / (units.km ** 3),
-        dfmt=DATE_FMT_DEFAULT,
-    )
+            kep_a=kep.a / units.km,
+            kep_e=kep.e,
+            angles=np.degrees(kep[2:]),
+            gm=kep.frame.center.body.mu / (units.km ** 3),
+        )
 
     # Covariance handling
     if cart.cov is not None:
@@ -264,7 +269,13 @@ GM                   = {gm:11.4f} [km**3/s**2]
         for i, man in enumerate(cart.maneuvers):
             comment = "\nCOMMENT  {}".format(man.comment) if man.comment else ""
 
-            frame = cart.frame if man.frame is None else man.frame
+            if man.frame is None:
+                frame = cart.frame
+            elif man.frame == "QSW":
+                frame = "RSW"
+            else:
+                frame = man.frame
+
             if isinstance(man, ContinuousMan):
                 date = man.start
                 duration = man.duration.total_seconds()
@@ -336,26 +347,27 @@ def _dumps_xml(data, **kwargs):
         x = ET.SubElement(statevector, k, units="km" if "DOT" not in k else "km/s")
         x.text = "{:0.6f}".format(getattr(cart, v) / units.km)
 
-    keplerian = ET.SubElement(data_tag, "keplerianElements")
+    if cart.frame.orientation in (G50, EME2000, GCRF, MOD, TOD, TEME, CIRF):
+        keplerian = ET.SubElement(data_tag, "keplerianElements")
 
-    sma = ET.SubElement(keplerian, "SEMI_MAJOR_AXIS", units="km")
-    sma.text = "{:0.6}".format(kep.a / units.km)
-    ecc = ET.SubElement(keplerian, "ECCENTRICITY")
-    ecc.text = "{:0.6}".format(kep.e)
+        sma = ET.SubElement(keplerian, "SEMI_MAJOR_AXIS", units="km")
+        sma.text = "{:0.6}".format(kep.a / units.km)
+        ecc = ET.SubElement(keplerian, "ECCENTRICITY")
+        ecc.text = "{:0.6}".format(kep.e)
 
-    elems = {
-        "INCLINATION": "i",
-        "RA_OF_ASC_NODE": "Omega",
-        "ARG_OF_PERICENTER": "omega",
-        "TRUE_ANOMALY": "nu",
-    }
+        elems = {
+            "INCLINATION": "i",
+            "RA_OF_ASC_NODE": "Omega",
+            "ARG_OF_PERICENTER": "omega",
+            "TRUE_ANOMALY": "nu",
+        }
 
-    for k, v in elems.items():
-        x = ET.SubElement(keplerian, k, units="deg")
-        x.text = "{:0.6}".format(np.degrees(getattr(kep, v)))
+        for k, v in elems.items():
+            x = ET.SubElement(keplerian, k, units="deg")
+            x.text = "{:0.6}".format(np.degrees(getattr(kep, v)))
 
-    gm = ET.SubElement(keplerian, "GM", units="km**3/s**2")
-    gm.text = "{:11.4f}".format(kep.frame.center.body.mu / (units.km ** 3))
+        gm = ET.SubElement(keplerian, "GM", units="km**3/s**2")
+        gm.text = "{:11.4f}".format(kep.frame.center.body.mu / (units.km ** 3))
 
     if cart.cov is not None:
         cov = ET.SubElement(data_tag, "covarianceMatrix")
@@ -381,7 +393,12 @@ def _dumps_xml(data, **kwargs):
                 com = ET.SubElement(mans, "COMMENT")
                 com.text = man.comment
 
-            frame = cart.frame if man.frame is None else man.frame
+            if man.frame is None:
+                frame = cart.frame
+            elif man.frame == "QSW":
+                frame = "RSW"
+            else:
+                frame = man.frame
 
             if isinstance(man, ContinuousMan):
                 date = man.start

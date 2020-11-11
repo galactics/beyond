@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd" id="CCSDS_OPM_VERS" version="2.0">
+  <header>
+    <CREATION_DATE>2019-11-21T21:41:41</CREATION_DATE>
+    <ORIGINATOR>N/A</ORIGINATOR>
+  </header>
+  <body>
+    <segment>
+      <metadata>
+        <OBJECT_NAME>ISS (ZARYA)</OBJECT_NAME>
+        <OBJECT_ID>1998-067A</OBJECT_ID>
+        <CENTER_NAME>EARTH</CENTER_NAME>
+        <REF_FRAME>TEME</REF_FRAME>
+        <TIME_SYSTEM>UTC</TIME_SYSTEM>
+      </metadata>
+      <data>
+        <stateVector>
+          <EPOCH>2008-09-20T12:25:40.104192</EPOCH>
+          <X units="km">4086.147180</X>
+          <Y units="km">-994.936814</Y>
+          <Z units="km">5250.678791</Z>
+          <X_DOT units="km/s">2.511071</X_DOT>
+          <Y_DOT units="km/s">7.255240</Y_DOT>
+          <Z_DOT units="km/s">-0.583165</Z_DOT>
+        </stateVector>
+        <keplerianElements>
+          <SEMI_MAJOR_AXIS units="km">6730.96</SEMI_MAJOR_AXIS>
+          <ECCENTRICITY>0.0006703</ECCENTRICITY>
+          <INCLINATION units="deg">51.6416</INCLINATION>
+          <RA_OF_ASC_NODE units="deg">247.463</RA_OF_ASC_NODE>
+          <ARG_OF_PERICENTER units="deg">130.536</ARG_OF_PERICENTER>
+          <TRUE_ANOMALY units="deg">324.985</TRUE_ANOMALY>
+          <GM units="km**3/s**2">398600.9368</GM>
+        </keplerianElements>
+        <maneuverParameters>
+          <COMMENT>Maneuver 1</COMMENT>
+          <MAN_EPOCH_IGNITION>2008-09-20T12:41:09.984493</MAN_EPOCH_IGNITION>
+          <MAN_DURATION units="s">180.000</MAN_DURATION>
+          <MAN_DELTA_MASS units="kg">-0.001</MAN_DELTA_MASS>
+          <MAN_REF_FRAME>TNW</MAN_REF_FRAME>
+          <MAN_DV_1 units="km/s">0.280000</MAN_DV_1>
+          <MAN_DV_2 units="km/s">0.000000</MAN_DV_2>
+          <MAN_DV_3 units="km/s">0.000000</MAN_DV_3>
+        </maneuverParameters>
+        <maneuverParameters>
+          <MAN_EPOCH_IGNITION>2008-09-20T13:33:11.374985</MAN_EPOCH_IGNITION>
+          <MAN_DURATION units="s">180.000</MAN_DURATION>
+          <MAN_DELTA_MASS units="kg">-0.001</MAN_DELTA_MASS>
+          <MAN_REF_FRAME>TNW</MAN_REF_FRAME>
+          <MAN_DV_1 units="km/s">0.270000</MAN_DV_1>
+          <MAN_DV_2 units="km/s">0.000000</MAN_DV_2>
+          <MAN_DV_3 units="km/s">0.000000</MAN_DV_3>
+        </maneuverParameters>
+      </data>
+    </segment>
+  </body>
+</opm>

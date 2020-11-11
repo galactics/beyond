@@ -85,7 +85,7 @@ class CWHelper:
             List[Man]
         """
 
-        dv = (self._mat3 @ [0, 1, 0]) * self.coelliptic_velocity(radial) / 6
+        dv = (self._mat3 @ [0, 1, 0]) * radial * self.n / 4
 
         if continuous:
             mans = [ContinuousMan(date, self.period, dv=2 * dv)]

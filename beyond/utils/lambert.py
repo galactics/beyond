@@ -80,7 +80,7 @@ def lambert(orb0, orb1, prograde=True):
     orb0 = orb0.copy(form="cartesian")
     orb1 = orb1.copy(frame=orb0.frame, form="cartesian")
     duration = orb1.date - orb0.date
-    mu = orb0.frame.center.mu
+    mu = orb0.frame.center.body.mu
 
     r0, r1 = np.asarray(orb0[:3]), np.asarray(orb1[:3])
 
@@ -145,7 +145,7 @@ def _lambert(r0, r1, duration, mu, prograde=True):
         z -= ratio
         if abs(ratio) > tol:
             break
-    else:
+    else:  # pragma: no cover
         log.warning("Max iteration exceeded")
 
     f = 1 - _y(nr0, nr1, A, z) / nr0

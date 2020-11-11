@@ -24,6 +24,6 @@ CLASSIFICATION_TYPE  = U
 NORAD_CAT_ID         = 23581
 ELEMENT_SET_NO       = 925
 REV_AT_EPOCH         = 4316
-BSTAR                = 0.0001 [1/ER]
+BSTAR                = 0.000100000 [1/ER]
 MEAN_MOTION_DOT      = -0.00000113 [rev/day**2]
 MEAN_MOTION_DDOT     = 0.0 [rev/day**3]

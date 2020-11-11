@@ -4,6 +4,7 @@ from pytest import raises
 
 import numpy as np
 
+from beyond.dates import Date
 from beyond.io.tle import Tle
 from beyond.io.ccsds import dumps, loads, CcsdsError
 
@@ -125,3 +126,16 @@ def test_load_user_defined(tle, datafile, helper):
     subdict = data_omm._data["ccsds_user_defined"]
     assert subdict["FOO"] == "foo enters"
     assert subdict["BAR"] == "a bar"
+
+
+def test_tle(tle, ccsds_format):
+    # Check that a TLE and its OMM representation are the same
+
+    txt = dumps(tle, fmt=ccsds_format)
+    orb = loads(txt)
+    new_tle = Tle.from_orbit(orb)
+    assert str(tle.tle) == str(new_tle)
+
+    assert all(tle == orb)
+    date = Date(2020, 9, 30)
+    assert all(tle.propagate(date) == orb.propagate(date))

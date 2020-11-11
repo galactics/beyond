@@ -63,6 +63,10 @@ def to_tnw(orbit):
     >>> delta_inert = mat @ delta_tnw
     >>> all(delta_inert == v / norm(v))
     True
+
+    .. image:: /_static/tnw.svg
+        :align: center
+        :width: 30%
     """
 
     pos, vel = _split(orbit)
@@ -94,6 +98,10 @@ def to_qsw(orbit):
     >>> delta_inert = mat @ delta_qsw
     >>> all(delta_inert == p / norm(p))
     True
+
+    .. image:: /_static/qsw.svg
+        :align: center
+        :width: 30%
     """
 
     pos, vel = _split(orbit)
