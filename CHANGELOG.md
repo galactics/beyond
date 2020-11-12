@@ -3,13 +3,17 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
-## [Unreleased]
+## [v0.7.2] - 2020-11-11
 
 ### Added
 
 - equinoctial, cylindrical and mean circular forms
 - OMM in SGP and TLE formats are compatibles
 - A lot of small additions to the documentation of existing functions/methods
+
+### Modified
+
+- Following horizon format changes
 
 ### Removed
 
