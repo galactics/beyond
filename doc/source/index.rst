@@ -15,6 +15,11 @@ observations with ease.
    api/index
    examples
 
+Licenses
+========
+
+The library sources, as well as example scripts, are released under the `MIT license <https://opensource.org/licenses/MIT>`__.
+All images, schematics and graphs in this documentation are released under the `CC-BY license <https://creativecommons.org/use-remix/>`__
 
 Indices and tables
 ==================
