@@ -52,21 +52,25 @@ def get_frame(frame):
     Args:
         frame (str): name of the desired frame
     Return:
-        ~beyond.frames.frames.Frame
+        Frame: the object representing the frame demanded
+    Raise:
+        ~beyond.frames.frames.UnknownFrameError
     """
 
-    if frame not in dynamic.keys():
-        if config.get("env", "jpl", "dynamic_frames", fallback=False):
-            from ..env.jpl import create_frames, JplConfigError
+    if frame not in dynamic.keys() and config.get(
+        "env", "jpl", "dynamic_frames", fallback=False
+    ):
+        from ..env.jpl import create_frames, JplConfigError
 
-            try:
-                create_frames()
-            except (JplConfigError, UnknownBodyError) as e:
-                raise UnknownFrameError(frame) from e
-        else:
-            raise UnknownFrameError(frame)
+        try:
+            create_frames()
+        except (JplConfigError, UnknownBodyError) as e:
+            raise UnknownFrameError(frame) from e
 
-    return dynamic[frame]
+    try:
+        return dynamic[frame]
+    except KeyError:
+        raise UnknownFrameError(frame)
 
 
 class Frame:

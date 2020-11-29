@@ -9,6 +9,12 @@ Frames
 
 .. image:: /_static/frames.png
 
+The preferred way to retrieve a frame is by using the :py:func:`~beyond.frames.frames.get_frame` function.
+
+.. autofunction:: beyond.frames.frames.get_frame
+
+However, in some cases this is done for you. See :py:attr:`StateVector.frame <beyond.orbits.statevector.StateVector.frame>` for example.
+
 CIO Based Frames
 ----------------
 
