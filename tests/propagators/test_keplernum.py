@@ -352,7 +352,7 @@ def test_man_impulsive(molniya_kepler):
 def test_man_delta_a(molniya_kepler):
 
     apo = find_event(molniya_kepler.iter(stop=timedelta(hours=26), listeners=ApsideListener()), 'Apoapsis', offset=1)
-    man1 = KeplerianImpulsiveMan(apo.date, delta_a=5900000)
+    man1 = KeplerianImpulsiveMan(apo.date, da=5900000)
 
     molniya_kepler.maneuvers = man1
 
@@ -376,7 +376,7 @@ def test_man_delta_a(molniya_kepler):
 def test_man_delta_i(orbit_kepler):
 
     asc = find_event(orbit_kepler.iter(stop=timedelta(minutes=200), listeners=NodeListener()), "Asc Node")
-    man = KeplerianImpulsiveMan(asc.date, delta_angle=np.radians(5))
+    man = KeplerianImpulsiveMan(asc.date, di=np.radians(5))
     orbit_kepler.maneuvers = man
 
     inclination, dates = [], []
