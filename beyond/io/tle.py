@@ -193,10 +193,23 @@ class Tle:
         ):
             raise TleParseError("Line number check failed")
 
-        for line in text:
+        for i, line in enumerate(text):
             line = line.strip()
-            if str(cls._checksum(line)) != line[-1]:
-                raise TleParseError("Checksum validation failed")
+
+            if len(line) != 69:
+                raise TleParseError(
+                    "Invalid TLE size on line {}. Expected {}, got {}.".format(
+                        i + 1, 69, len(line)
+                    )
+                )
+
+            check = str(cls._checksum(line))
+            if check != line[68]:
+                raise TleParseError(
+                    "TLE checksum validation failed on line {}. Expected {}, got {}.".format(
+                        i + 1, check, line[68]
+                    )
+                )
 
     @classmethod
     def _checksum(cls, line):
@@ -336,11 +349,10 @@ class Tle:
                 try:
                     yield cls("\n".join(cache))
                 except ValueError as e:
-                    if error in ("raise", "warn"):
-                        if error == "raise":
-                            raise TleParseError(str(e))
-                        else:
-                            log.warning(str(e))
+                    if error == "raise":
+                        raise TleParseError(str(e))
+                    elif error == "warn":
+                        log.warning(str(e))
 
                 cache = []
             else:

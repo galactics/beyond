@@ -119,7 +119,7 @@ def test_generator(caplog):
 
     assert len(caplog.records) == 1
     assert caplog.record_tuples == [
-        ('beyond.io.tle', logging.WARNING, "invalid literal for int() with base 10: '  '")
+        ('beyond.io.tle', logging.WARNING, "Invalid TLE size on line 1. Expected 69, got 1.")
     ]
 
     caplog.clear()
