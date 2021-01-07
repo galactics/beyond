@@ -55,13 +55,16 @@ def rot3(theta):
     )
 
 
-def expand(m):
-    """Duplicate a 3x3 matrix diagonaly into a 6x6 matrix
+def expand(m, rate=None):
+    """Transform a 3x3 rotation matrix into a 6x6 rotation matrix
 
     Args:
-        m1 (numpy.ndarray) : 3x3 matrix
+        m (numpy.ndarray) : 3x3 matrix transforming a position vector
+            from frame1 to frame2
+        rate (numpy.array) : 1D 3 elements vector rate of frame2
+            expressed in frame1
     Return:
-        numpy.ndarray : 6x6
+        numpy.ndarray : 6x6 rotation matrix
 
     Example:
 
@@ -73,10 +76,23 @@ def expand(m):
      [ 0.  0.  0.  0. -1.  0.]
      [ 0.  0.  0. -1.  0.  0.]
      [ 0.  0.  0.  0.  0.  1.]]
+    >>> print(expand(m, rate=[1,2,3]))
+    [[ 0. -1.  0.  0.  0.  0.]
+     [-1.  0.  0.  0.  0.  0.]
+     [ 0.  0.  1.  0.  0.  0.]
+     [-3.  0. -2.  0. -1.  0.]
+     [ 0.  3.  1. -1.  0.  0.]
+     [ 1. -2.  0.  0.  0.  1.]]
     """
 
-    out = np.identity(6)
+    out = np.zeros((6, 6))
     out[:3, :3] = m
     out[3:, 3:] = m
+
+    if rate is not None:
+        R = np.array(
+            [[0, -rate[2], rate[1]], [rate[2], 0, -rate[0]], [-rate[1], rate[0], 0]]
+        )
+        out[3:, :3] = -R @ m
 
     return out
