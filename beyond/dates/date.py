@@ -3,8 +3,7 @@
 """Date module
 """
 
-from numpy import sin, radians
-from collections import namedtuple
+from numpy import sin, radians, ceil
 from datetime import datetime, timedelta, date
 
 from ..errors import DateError, UnknownScaleError
@@ -411,11 +410,82 @@ class Date:
         return self.d + self.s / 86400.0
 
     @classmethod
-    def range(cls, start=None, stop=None, step=None, inclusive=False):
-        return DateRange(start, stop, step, inclusive)
+    def range(cls, *args, **kwargs):
+        """See :py:class:`DateRange` for arguments and documentation"""
+        return DateRange(*args, **kwargs)
+
+
+class DateRange:
+    """Object representing a range of Date objects
+
+    Allow for manipulation of the range before any computation.
+    It has a lenght, can be used as an iterable, and be checked against
+    for membership.
+
+    Example:
+
+        >>> start = Date(2021, 2, 9, 23, 35, 58)
+        >>> stop = timedelta(hours=1, minutes=1)
+        >>> step = timedelta(minutes=15)
+        >>> r = Date.range(start, stop, step)
+        >>> len(r)
+        5
+        >>> for d in r:  # iterable
+        ...     print(d)
+        ... 
+        2021-02-09T23:35:58 UTC
+        2021-02-09T23:50:58 UTC
+        2021-02-10T00:05:58 UTC
+        2021-02-10T00:20:58 UTC
+        2021-02-10T00:35:58 UTC
+        >>> Date(2021, 2, 9, 23, 45) in r  # membership test
+        True
+    """
+
+    def __init__(self, start, stop, step, *, inclusive=False):
+        """
+
+        Args:
+            start (Date): Begining of the range
+            stop (Date or datetime.timedelta): End of the range
+            step (timedelta): step size
+            inclusive (bool): If ``False``, the stopping date is not included.
+                This is the same behavior as the built-in :py:func:`range`.
+        """
+
+        # Convert stop from timedelta to Date object
+        if isinstance(stop, timedelta):
+            stop = start + stop
+
+        if not step:
+            raise ValueError("Null step")
+
+        if self._sign((stop - start)) != self._sign(step):
+            raise ValueError("start/stop order not coherent with step")
+
+        self.start = start
+        """Date : Begining of the range"""
+
+        self.stop = stop
+        """Date : End of the range"""
+
+        self.step = step
+        """timedelta : Step size, can be positive or negative"""
+
+        self.inclusive = inclusive
+        """bool : inclusive flag"""
+
+    @property
+    def dur(self):
+        """timedelta : duration of the DateRange object"""
+        return self.stop - self.start
 
     @classmethod
-    def _range(cls, start=None, stop=None, step=None, inclusive=False):
+    def _sign(cls, x):
+        """Inner function for determining the sign of a float"""
+        return (-1, 1)[x.total_seconds() >= 0]
+
+    def __iter__(self):
         """Generator of a date range
 
         Args:
@@ -429,74 +499,30 @@ class Date:
             Date:
         """
 
-        def sign(x):
-            """Inner function for determining the sign of a float"""
-            return (-1, 1)[x >= 0]
+        date = self.start
 
-        if not step:
-            raise ValueError("Null step")
-
-        # Convert stop from timedelta to Date object
-        if isinstance(stop, timedelta):
-            stop = start + stop
-
-        if sign((stop - start).total_seconds()) != sign(step.total_seconds()):
-            raise ValueError("start/stop order not coherent with step")
-
-        date = start
-
-        if step.total_seconds() > 0:
-            oper = "__le__" if inclusive else "__lt__"
+        if self.step.total_seconds() > 0:
+            oper = "__le__" if self.inclusive else "__lt__"
         else:
-            oper = "__ge__" if inclusive else "__gt__"
+            oper = "__ge__" if self.inclusive else "__gt__"
 
-        while getattr(date, oper)(stop):
+        while getattr(date, oper)(self.stop):
             yield date
-            date += step
-
-
-class DateRange:
-    """Object representing a Date.range call
-
-    Allow for manipulation of the range before any compytation
-    """
-
-    _descriptor = namedtuple("range_descriptor", "start stop step inclusive")
-
-    def __init__(self, start, stop, step, inclusive):
-        """
-
-        Args:
-            start (Date):
-            stop (Date or datetime.timedelta):
-            step (timedelta):
-            inclusive (bool): If ``False``, the stopping date is not included.
-                This is the same behavior as the built-in :py:func:`range`.
-        """
-
-        if isinstance(stop, timedelta):
-            stop = start + stop
-
-        self._range = self._descriptor(start, stop, step, inclusive)
-
-    def __iter__(self):
-        for d in Date._range(*self._range):
-            yield d
+            date += self.step
 
     def __contains__(self, date):
-        return self.start <= date <= self.stop
+        if self.inclusive:
+            return self.start <= date <= self.stop
+        else:
+            return self.start <= date < self.stop
 
-    @property
-    def start(self):
-        return self._range.start
+    def __len__(self):
+        if self.inclusive and self.dur % self.step == timedelta(0):
+            plus = 1
+        else:
+            plus = 0
 
-    @property
-    def stop(self):
-        return self._range.stop
-
-    @property
-    def step(self):
-        return self._range.step
+        return int(ceil(self.dur / self.step)) + plus
 
 
 # This part is here to allow matplotlib to display Date objects directly
