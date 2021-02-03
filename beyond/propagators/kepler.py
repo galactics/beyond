@@ -29,6 +29,6 @@ class Kepler(AnalyticalPropagator):
 
         new = self.orbit.copy()
         new.date = date
-        new[5] = (self.orbit[5] + delta) % (2 * np.pi)
+        new[5] = self.orbit[5] + delta
 
         return new.copy(form="cartesian")
