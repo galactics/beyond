@@ -160,7 +160,7 @@ class Ephem(Speaker):
             result = np.zeros(6)
 
             if len(subset) < order:
-                raise ValueError("len(ephem) < order : impossible to interpolate")
+                raise ValueError(f"len={len(ephem)} < order={order} : impossible to interpolate")
 
             # Everything is on wikipedia
             #        k
