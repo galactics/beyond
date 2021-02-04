@@ -76,14 +76,34 @@ class StateVector(np.ndarray):
         super().__setstate__(state["basestate"])
         self._data = state["data"]
 
-    def copy(self, *, frame=None, form=None):
-        """Provide a new instance of the same point in space-time
+    def copy(self, *, frame=None, form=None, same=None):
+        """Provide a new object of the same point in space-time. Optionally,
+        allow for frame and form conversion
 
         Keyword Args:
             frame (str or Frame): Frame to convert the new instance into
             form (str or Form): Form to convert the new instance into
+            same (StateVector): A statevector from which to copy the frame and form
         Return:
-            Orbit:
+            StateVector :
+
+        If the argument *same* is used, it overwrites *frame* and *form*.
+
+        Example:
+
+        .. code-block:: python
+
+            # New instance of the same statevector
+            sv1 = sv.copy()
+
+            # statevector converted into spherical form
+            sv2 = sv.copy(form="spherical")
+
+            # statevector converted into EME2000 frame, keplerian form
+            sv3 = sv.copy(form="keplerian", frame="EME2000")
+
+            # statevector in the same frame and form as sv3 (EME2000, keplerian)
+            sv4 = sv.copy(same=sv3)
 
         Override :py:meth:`numpy.ndarray.copy()` to include additional
         fields
@@ -94,6 +114,13 @@ class StateVector(np.ndarray):
             new_compl[k] = v.copy() if hasattr(v, "copy") else v
 
         new_obj = self.__class__(self.base, **new_compl)
+
+        if same is not None:
+            if hasattr(same, "frame") and hasattr(same, "form"):
+                frame = same.frame
+                form = same.form
+            else:
+                raise TypeError("'same' does not have a frame and/or a form attribute")
 
         if frame and frame != self.frame:
             new_obj.frame = frame
