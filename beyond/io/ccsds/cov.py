@@ -64,7 +64,7 @@ def load_cov(orb, data):
         ],
     ]
 
-    cov = Cov(orb, np.array(values).astype(np.float) * 1e6, frame)
+    cov = Cov(orb, np.array(values).astype(np.float64) * 1e6, frame)
 
     return cov
 
