@@ -55,7 +55,7 @@ def loads(text):
     elif type == "omm":
         func = omm.loads
     else:  # pragma: no cover
-        raise CcsdsError("Unknown CCSDS type : {}".format(type))
+        raise CcsdsError(f"Unknown CCSDS type : {type}")
 
     return func(text, fmt=fmt)
 
@@ -104,6 +104,6 @@ def dumps(data, **kwargs):
     elif type == "tdm":
         content = tdm.dumps(data, **kwargs)
     else:  # pragma: no cover
-        raise CcsdsError("Unknown object type for CCSDS : {}".format(type))
+        raise CcsdsError(f"Unknown object type for CCSDS : {type}")
 
     return content

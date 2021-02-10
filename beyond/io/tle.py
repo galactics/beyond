@@ -73,17 +73,15 @@ def _float(text):
     text = text.strip()
 
     if text[0] in ("-", "+"):
-        text = "%s.%s" % (text[0], text[1:])
+        text = f"{text[0]}.{text[1:]}"
     else:
-        text = "+.%s" % text
+        text = f"+.{text}"
 
     if "+" in text[1:] or "-" in text[1:]:
         value, exp_sign, expo = (
             text.rpartition("+") if "+" in text[1:] else text.rpartition("-")
         )
-        v = float(
-            "{value}e{exp_sign}{expo}".format(value=value, exp_sign=exp_sign, expo=expo)
-        )
+        v = float(f"{value}e{exp_sign}{expo}")
     else:
         v = float(text)
 
@@ -106,13 +104,13 @@ def _unfloat(flt, precision=5):
     """
 
     if flt == 0.0:
-        return "{}-0".format("0" * precision)
+        return f"{'0' * precision}-0"
 
-    num, _, exp = "{:.{}e}".format(flt, precision - 1).partition("e")
+    num, _, exp = f"{flt:.{precision - 1}e}".partition("e")
     exp = int(exp)
     num = num.replace(".", "")
 
-    return "%s%+d" % (num, exp + 1)
+    return f"{num}{exp+1:+d}"
 
 
 class Tle:
@@ -146,7 +144,7 @@ class Tle:
         if first[9:17].strip():
             year = int(first[9:11])
             year += 1900 if year >= 57 else 2000  # This condition works until 2057
-            self.cospar_id = "%d-%s" % (year, first[11:17].strip())
+            self.cospar_id = f"{year}-{first[11:17].strip()}"
         else:
             self.cospar_id = ""
 
@@ -198,9 +196,7 @@ class Tle:
 
             if len(line) != 69:
                 raise TleParseError(
-                    "Invalid TLE size on line {}. Expected {}, got {}.".format(
-                        i + 1, 69, len(line)
-                    )
+                    f"Invalid TLE size on line {i + 1}. Expected {69}, got {len(line)}."
                 )
 
             check = str(cls._checksum(line))
@@ -298,7 +294,7 @@ class Tle:
             + date.minute / 1440
             + date.second / 86400
             + date.microsecond / 86400000000.0,
-            ndot="{: 0.8f}".format(orbit.ndot / 2).replace("0.", "."),
+            ndot=f"{orbit.ndot / 2: 0.8f}".replace("0.", "."),
             ndotdot=_unfloat(orbit.ndotdot / 6),
             bstar=_unfloat(orbit.bstar),
             elnb=orbit.element_nb,
@@ -317,7 +313,7 @@ class Tle:
         line1 += str(cls._checksum(line1))
         line2 += str(cls._checksum(line2))
 
-        return cls("%s%s\n%s" % (name, line1, line2))
+        return cls(f"{name}{line1}\n{line2}")
 
     @classmethod
     def from_string(cls, text, comments="#", error="warn"):

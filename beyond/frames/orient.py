@@ -132,7 +132,7 @@ class TopocentricOrientation(Orientation):
         self.parent = parent
         self.latlonalt = latlonalt
 
-        mtd = "{}_to_{}".format(name, parent.name)
+        mtd = f"{name}_to_{parent.name}"
         setattr(self, mtd, self._to_parent)
 
         self.parent + self
@@ -162,7 +162,7 @@ class LocalOrbitalOrientation(Orientation):
         self.orient = orient
         self.parent = parent
 
-        mtd = "{}_to_{}".format(name, parent.orientation.name)
+        mtd = f"{name}_to_{parent.orientation.name}"
         setattr(Orientation, mtd, self._to_parent)
 
         self.parent.orientation + self

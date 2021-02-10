@@ -11,7 +11,7 @@ class Propagator(metaclass=ABCMeta):
     orbit = None
 
     def __repr__(self):
-        return "<{} at {}>".format(self.__class__.__name__, hex(id(self)))
+        return f"<{self.__class__.__name__} at {hex(id(self))}>"
 
     @abstractmethod
     def iter(self, **kwargs):
@@ -32,7 +32,7 @@ class Propagator(metaclass=ABCMeta):
         return self.__class__()
 
     def __repr__(self):
-        return "<Propagator {} at {}>".format(self.__class__.__name__, hex(id(self)))
+        return f"<Propagator {self.__class__.__name__} at {hex(id(self))}>"
 
 
 class AnalyticalPropagator(Speaker, Propagator):

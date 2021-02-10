@@ -28,7 +28,7 @@ def loads(string, fmt):
     elif fmt == "xml":
         orb = _loads_xml(string)
     else:  # pragma: no cover
-        raise CcsdsError("Unknown format '{}'".format(fmt))
+        raise CcsdsError(f"Unknown format '{fmt}'")
 
     return orb
 
@@ -43,7 +43,7 @@ def dumps(data, **kwargs):
     elif fmt == "xml":
         string = _dumps_xml(data, **kwargs)
     else:  # pragma: no cover
-        raise CcsdsError("Unknown format '{}'".format(fmt))
+        raise CcsdsError(f"Unknown format '{fmt}'")
 
     return string
 
@@ -62,7 +62,7 @@ def _loads_kvn(string):
         frame = data["REF_FRAME"].text
         date = parse_date(data["EPOCH"].text, scale)
     except KeyError as e:
-        raise CcsdsError("Missing mandatory parameter {}".format(e))
+        raise CcsdsError(f"Missing mandatory parameter {e}")
 
     if data["MEAN_ELEMENT_THEORY"].text in ("SGP/SGP4", "SGP4"):
         try:
@@ -95,11 +95,9 @@ def _loads_kvn(string):
             }
 
         except KeyError as e:
-            raise CcsdsError("Missing mandatory parameter {}".format(e))
+            raise CcsdsError(f"Missing mandatory parameter {e}")
     else:  # pragma: no cover
-        raise CcsdsError(
-            "Unknown OMM theory '{}'".format(data["MEAN_ELEMENT_THEORY"].text)
-        )
+        raise CcsdsError(f"Unknown OMM theory '{data['MEAN_ELEMENT_THEORY'].text}'")
 
     orb = Orbit(elements, date, form, frame, propagator, **kwargs)
 
@@ -134,7 +132,7 @@ def _loads_xml(string):
         frame = metadata["REF_FRAME"].text
         date = parse_date(mean_elements["EPOCH"].text, scale)
     except KeyError as e:
-        raise CcsdsError("Missing mandatory parameter {}".format(e))
+        raise CcsdsError(f"Missing mandatory parameter {e}")
 
     if metadata["MEAN_ELEMENT_THEORY"].text in ("SGP/SGP4", "SGP4"):
         try:
@@ -166,11 +164,9 @@ def _loads_xml(string):
             }
 
         except KeyError as e:
-            raise CcsdsError("Missing mandatory parameter {}".format(e))
+            raise CcsdsError(f"Missing mandatory parameter {e}")
     else:  # pragma: no cover
-        raise CcsdsError(
-            "Unknown OMM theory '{}'".format(data["MEAN_ELEMENT_THEORY"].text)
-        )
+        raise CcsdsError(f"Unknown OMM theory '{data['MEAN_ELEMENT_THEORY'].text}'")
 
     orb = Orbit(elements, date, form, frame, propagator, **kwargs)
     orb.name = name
@@ -195,7 +191,7 @@ def _dumps_kvn(data, **kwargs):
     if isinstance(data.propagator, Sgp4):
         theory = "SGP/SGP4"
     else:  # pragma: no cover
-        raise CcsdsError("Unknown propagator type '{}' for OMM".format(data.propagator))
+        raise CcsdsError(f"Unknown propagator type '{data.propagator}' for OMM")
 
     meta = dump_kvn_meta_odm(
         data, meta_tag=False, extras={"MEAN_ELEMENT_THEORY": theory}, **kwargs
@@ -239,7 +235,7 @@ MEAN_MOTION_DDOT     = {ndotdot:0.1f} [rev/day**3]
     if "ccsds_user_defined" in data._data:
         text += "\n"
         for k, v in data._data["ccsds_user_defined"].items():
-            text += "USER_DEFINED_{} = {}\n".format(k, v)
+            text += f"USER_DEFINED_{k} = {v}\n"
 
     return header + "\n" + meta + text
 
@@ -253,7 +249,7 @@ def _dumps_xml(data, **kwargs):
     if isinstance(data.propagator, Sgp4):
         theory = "SGP/SGP4"
     else:  # pragma: no cover
-        raise CcsdsError("Unknown propagator type '{}' for OMM".format(data.propagator))
+        raise CcsdsError(f"Unknown propagator type '{data.propagator}' for OMM")
 
     dump_xml_meta_odm(segment, data, extras={"MEAN_ELEMENT_THEORY": theory}, **kwargs)
 
@@ -265,9 +261,9 @@ def _dumps_xml(data, **kwargs):
     epoch.text = data.date.strftime(DATE_FMT_DEFAULT)
 
     sma = ET.SubElement(meanelements, "MEAN_MOTION", units="rev/day")
-    sma.text = "{:0.8f}".format(code_unit(data, "n", "rev/day"))
+    sma.text = f"{code_unit(data, 'n', 'rev/day'):0.8f}"
     ecc = ET.SubElement(meanelements, "ECCENTRICITY")
-    ecc.text = "{:0.7f}".format(data.e)
+    ecc.text = f"{data.e:0.7f}"
 
     elems = {
         "INCLINATION": "i",
@@ -277,10 +273,10 @@ def _dumps_xml(data, **kwargs):
     }
     for k, v in elems.items():
         x = ET.SubElement(meanelements, k, units="deg")
-        x.text = "{:0.4f}".format(np.degrees(getattr(data, v)))
+        x.text = f"{np.degrees(getattr(data, v)):0.4f}"
 
     gm = ET.SubElement(meanelements, "GM", units="km**3/s**2")
-    gm.text = "{:0.1f}".format(wgs72.mu)
+    gm.text = f"{wgs72.mu:0.1f}"
 
     if theory == "SGP/SGP4":  # pragma: no branch
         tle_params = ET.SubElement(data_tag, "tleParameters")
@@ -296,13 +292,13 @@ def _dumps_xml(data, **kwargs):
         revolutions.text = str(data.revolutions)
 
         bstar = ET.SubElement(tle_params, "BSTAR")
-        bstar.text = "{:.9f}".format(data.bstar)
+        bstar.text = f"{data.bstar:.9f}"
 
         ndot = ET.SubElement(tle_params, "MEAN_MOTION_DOT")
-        ndot.text = "{:.8f}".format(data.ndot / 2)
+        ndot.text = f"{data.ndot / 2:.8f}"
 
         ndotdot = ET.SubElement(tle_params, "MEAN_MOTION_DDOT")
-        ndotdot.text = "{:.1f}".format(data.ndotdot / 6)
+        ndotdot.text = f"{data.ndotdot / 6:.1f}"
 
     if data.cov is not None:
         cov = ET.SubElement(data_tag, "covarianceMatrix")
@@ -313,13 +309,13 @@ def _dumps_xml(data, **kwargs):
                 frame = "RSW"
 
             cov_frame = ET.SubElement(cov, "COV_REF_FRAME")
-            cov_frame.text = "{frame}".format(frame=frame)
+            cov_frame.text = f"{frame}"
 
         elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
         for i, a in enumerate(elems):
             for j, b in enumerate(elems[: i + 1]):
-                x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
-                x.text = "{:0.12e}".format(data.cov[i, j] / 1e6)
+                x = ET.SubElement(cov, f"C{a}_{b}")
+                x.text = f"{data.cov[i, j] / 1000000.0:0.12e}"
 
     if "ccsds_user_defined" in data._data:
         ud = ET.SubElement(data_tag, "userDefinedParameters")

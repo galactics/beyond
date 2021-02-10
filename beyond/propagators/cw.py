@@ -45,7 +45,7 @@ class ClohessyWiltshire(AnalyticalPropagator):
             frame = get_frame(frame)
 
         if not isinstance(frame, HillFrame):  # pragma: no cover
-            raise TypeError("Incompatible frame type : {}".format(orientation))
+            raise TypeError(f"Incompatible frame type : {orientation}")
 
         self.sma = sma
         self.frame = frame

@@ -391,4 +391,4 @@ class SOIPropagator(KeplerNum):
             self.orbit = orb
 
             if start < stop:
-                log.debug("SOI change {} => {} at {}".format(current, soi, orb.date))
+                log.debug(f"SOI change {current} => {soi} at {orb.date}")

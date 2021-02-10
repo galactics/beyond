@@ -32,14 +32,14 @@ class Cov(np.ndarray):
         cols = "x,y,z,vx,vy,vz".split(",")
 
         txt = "Cov =\n"
-        txt += "  frame = {}\n".format(self.frame)
+        txt += f"  frame = {self.frame}\n"
         txt += " " * 7
         txt += "".join([" {:^9} ".format(x) for x in cols])
         txt += "\n"
         for i in range(6):
-            txt += " {:>4} ".format(cols[i])
+            txt += f" {cols[i]:>4} "
             for j in range(i + 1):
-                txt += " {: 0.2e} ".format(self[i, j])
+                txt += f" {self[i, j]: 0.2e} "
             txt += "\n"
         return txt
 

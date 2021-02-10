@@ -33,7 +33,7 @@ def loads(string, fmt):
     elif fmt == "xml":
         ephem = _loads_xml(string)
     else:  # pragma: no cover
-        raise CcsdsError("Unknown format '{}'".format(fmt))
+        raise CcsdsError(f"Unknown format '{fmt}'")
 
     return ephem
 
@@ -50,7 +50,7 @@ def dumps(data, **kwargs):
     elif fmt == "xml":
         string = _dumps_xml(data, **kwargs)
     else:  # pragma: no cover
-        raise CcsdsError("Unknown format '{}'".format(fmt))
+        raise CcsdsError(f"Unknown format '{fmt}'")
 
     return string
 
@@ -75,7 +75,7 @@ def _loads_kvn(string):
             # Check for required fields
             for k in required:
                 if k not in ephem:
-                    raise CcsdsError("Missing mandatory parameter '{}'".format(k))
+                    raise CcsdsError(f"Missing mandatory parameter '{k}'")
 
             # Conversion to be compliant with beyond.env.jpl dynamic reference
             # frames naming convention.
@@ -235,7 +235,7 @@ def _loads_xml(string):
             ephem.cospar_id = metadata["OBJECT_ID"].text
             ephems.append(ephem)
     except KeyError as e:
-        raise CcsdsError("Missing mandatory parameter {}".format(e))
+        raise CcsdsError(f"Missing mandatory parameter {e}")
 
     if len(ephems) == 1:
         ephems = ephems[0]
@@ -258,7 +258,7 @@ def _dumps_kvn(data, **kwargs):
             "INTERPOLATION": data.method.upper(),
         }
         if data.method != data.LINEAR:
-            extras["INTERPOLATION_DEGREE"] = "{}".format(data.order - 1)
+            extras["INTERPOLATION_DEGREE"] = f"{data.order - 1}"
 
         meta = dump_kvn_meta_odm(data, extras=extras, **kwargs)
 
@@ -288,14 +288,14 @@ def _dumps_kvn(data, **kwargs):
                     frame = orb.cov.frame
                     if frame == "QSW":
                         frame = "RSW"
-                    cov_text.append("COV_REF_FRAME = {}".format(frame))
+                    cov_text.append(f"COV_REF_FRAME = {frame}")
 
                 elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
 
                 for i in range(6):
                     line = []
                     for j in range(i + 1):
-                        line.append("{: 0.12e}".format(orb.cov[i, j] / 1e6))
+                        line.append(f"{orb.cov[i, j] / 1000000.0: 0.12e}")
                     cov_text.append(" ".join(line))
 
                 cov.append("\n".join(cov_text))
@@ -346,7 +346,7 @@ def _dumps_xml(data, **kwargs):
                 x = ET.SubElement(
                     statevector, k, units="km" if "DOT" not in k else "km/s"
                 )
-                x.text = "{:0.6f}".format(getattr(el, v) / units.km)
+                x.text = f"{getattr(el, v) / units.km:0.6f}"
 
         for el in data:
             if el.cov is not None:
@@ -361,13 +361,13 @@ def _dumps_xml(data, **kwargs):
                         frame = "RSW"
 
                     cov_frame = ET.SubElement(cov, "COV_REF_FRAME")
-                    cov_frame.text = "{frame}".format(frame=frame)
+                    cov_frame.text = f"{frame}"
 
                 elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
                 for i, a in enumerate(elems):
                     for j, b in enumerate(elems[: i + 1]):
-                        x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
-                        x.text = "{:0.12e}".format(el.cov[i, j] / 1e6)
+                        x = ET.SubElement(cov, f"C{a}_{b}")
+                        x.text = f"{el.cov[i, j] / 1000000.0:0.12e}"
 
     return ET.tostring(
         top, pretty_print=True, xml_declaration=True, encoding="UTF-8"

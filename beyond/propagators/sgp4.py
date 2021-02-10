@@ -49,7 +49,7 @@ class Sgp4(AnalyticalPropagator):
             date = self.orbit.date + date
 
         # Convert the date to a tuple usable by the sgp4 library
-        _date = [float(x) for x in "{:%Y %m %d %H %M %S.%f}".format(date).split()]
+        _date = [float(x) for x in f"{date:%Y %m %d %H %M %S.%f}".split()]
         p, v = self.tle.propagate(*_date)
 
         # Convert from km to meters

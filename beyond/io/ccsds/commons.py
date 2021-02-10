@@ -54,7 +54,7 @@ def decode_unit(data, name, default=None):
     unit = data[name].attrib.get("units", default)
 
     if unit not in units_dict:
-        raise CcsdsError("Unknown unit '{}' for the field {}".format(unit, name))
+        raise CcsdsError(f"Unknown unit '{unit}' for the field {name}")
 
     return float(value) * units_dict[unit]
 
@@ -63,7 +63,7 @@ def code_unit(data, name, unit):
     """Convert the value in SI to a specific unit"""
 
     if unit not in units_dict:
-        raise CcsdsError("Unknown unit '{}' for the field {}".format(unit, name))
+        raise CcsdsError(f"Unknown unit '{unit}' for the field {name}")
 
     return data[name] / units_dict[unit]
 
@@ -96,7 +96,7 @@ def detect2load(string):
     if m and m.group(1) in ["OPM", "OMM", "OEM", "TDM"]:
         type = m.group(1).lower()
     elif m:
-        raise CcsdsError("Unknown CCSDS type : {}".format(m))
+        raise CcsdsError(f"Unknown CCSDS type : {m}")
     else:
         raise CcsdsError("Unknown CCSDS type")
 
@@ -233,7 +233,7 @@ def dump_xml_header(data, ccsds_type, version="1.0", **kwargs):
 
     attrib = {
         "{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation": "http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd",
-        "id": "CCSDS_{}_VERS".format(ccsds_type.upper()),
+        "id": f"CCSDS_{ccsds_type.upper()}_VERS",
         "version": version,
     }
 
@@ -270,7 +270,7 @@ TIME_SYSTEM          = {timesystem}
     )
 
     for k, v in extras.items():
-        meta += "{:<20} = {}\n".format(k, v)
+        meta += f"{k:<20} = {v}\n"
 
     if meta_tag:
         meta += "META_STOP\n"

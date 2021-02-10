@@ -17,7 +17,7 @@ class Timescale(Node):
     """Definition of a time scale and its interactions with others"""
 
     def __repr__(self):  # pragma: no cover
-        return "<Scale '%s'>" % self.name
+        return f"<Scale '{self.name}'>"
 
     def __str__(self):
         return self.name
@@ -61,15 +61,15 @@ class Timescale(Node):
             one = one.name.lower()
             two = two.name.lower()
             # find the operation
-            oper = "_scale_{}_minus_{}".format(two, one)
+            oper = f"_scale_{two}_minus_{one}"
             # find the reverse operation
-            roper = "_scale_{}_minus_{}".format(one, two)
+            roper = f"_scale_{one}_minus_{two}"
             if hasattr(self, oper):
                 delta += getattr(self, oper)(mjd, eop)
             elif hasattr(self, roper):
                 delta -= getattr(self, roper)(mjd, eop)
             else:  # pragma: no cover
-                raise DateError("Unknown convertion {} => {}".format(one, two))
+                raise DateError(f"Unknown convertion {one} => {two}")
 
         return delta
 
@@ -175,7 +175,7 @@ class Date:
                     d = int(arg)
                     s = (arg - d) * 86400
             else:
-                raise TypeError("Unknown type '{}'".format(type(arg)))
+                raise TypeError(f"Unknown type '{type(arg)}'")
         elif len(args) == 2 and (
             isinstance(args[0], int) and isinstance(args[1], (int, float))
         ):
@@ -188,7 +188,7 @@ class Date:
             d, s = self._convert_dt(dt)
         else:
             raise TypeError(
-                "Unknown type sequence {}".format(", ".join(str(type(x)) for x in args))
+                f"Unknown type sequence {', '.join(str(type(x)) for x in args)}"
             )
 
         mjd = d + s / 86400.0
@@ -241,7 +241,7 @@ class Date:
         if isinstance(other, timedelta):
             days, sec = divmod(other.total_seconds() + self.s, 86400)
         else:
-            raise TypeError("Unknown operation with {}".format(type(other)))
+            raise TypeError(f"Unknown operation with {type(other)}")
 
         return self.__class__(self.d + int(days), sec, scale=self.scale)
 
@@ -253,7 +253,7 @@ class Date:
         elif isinstance(other, Date):
             return self._datetime - other._datetime
         else:
-            raise TypeError("Unknown operation with {}".format(type(other)))
+            raise TypeError(f"Unknown operation with {type(other)}")
 
         return self.__add__(other)
 
@@ -273,11 +273,11 @@ class Date:
         return self._mjd == other._mjd
 
     def __repr__(self):  # pragma: no cover
-        return "<{} '{}'>".format(self.__class__.__name__, self)
+        return f"<{self.__class__.__name__} '{self}'>"
 
     def __str__(self):  # pragma: no cover
         if "str" not in self._cache.keys():
-            self._cache["str"] = "{} {}".format(self.datetime.isoformat(), self.scale)
+            self._cache["str"] = f"{self.datetime.isoformat()} {self.scale}"
         return self._cache["str"]
 
     def __format__(self, fmt):  # pragma: no cover
@@ -432,7 +432,7 @@ class DateRange:
         5
         >>> for d in r:  # iterable
         ...     print(d)
-        ... 
+        ...
         2021-02-09T23:35:58 UTC
         2021-02-09T23:50:58 UTC
         2021-02-10T00:05:58 UTC

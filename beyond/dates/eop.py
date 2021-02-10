@@ -217,7 +217,7 @@ class EopDb:
         dbname = dbname or config.get("eop", "dbname", fallback=cls.DEFAULT_DBNAME)
 
         if dbname not in cls._dbs.keys():
-            raise EopError("Unknown database '%s'" % dbname)
+            raise EopError(f"Unknown database '{dbname}'")
 
         if isclass(cls._dbs[dbname]):
             # Instanciation
@@ -251,7 +251,7 @@ class EopDb:
             value = cls.db(dbname)[mjd]
         except (EopError, KeyError) as e:
             if isinstance(e, KeyError):
-                msg = "Missing EOP data for mjd = '%s'" % e
+                msg = f"Missing EOP data for mjd = '{e}'"
             else:
                 msg = str(e)
 
@@ -283,9 +283,7 @@ class EopDb:
         """
 
         if name in cls._dbs:
-            msg = "'{}' is already registered for an Eop database. Skipping".format(
-                name
-            )
+            msg = f"'{name}' is already registered for an Eop database. Skipping"
             log.warning(msg)
         else:
             cls._dbs[name] = klass
@@ -368,8 +366,8 @@ class SimpleEopDatabase:
         type = config.get("eop", "type", fallback="all")
 
         # Data reading
-        f = Finals(path / ("finals.%s" % type))
-        f2 = Finals2000A(path / ("finals2000A.%s" % type))
+        f = Finals(path / (f"finals.{type}"))
+        f2 = Finals2000A(path / (f"finals2000A.{type}"))
         t = TaiUtc(path / "tai-utc.dat")
 
         # Extracting data from finals files

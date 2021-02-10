@@ -19,7 +19,7 @@ class _Unknown(BeyondError):
         return self.__class__.__name__[7:-5].lower()
 
     def __str__(self):
-        return "Unknown {} '{}'".format(self.type, self.name)
+        return f"Unknown {self.type} '{self.name}'"
 
 
 class UnknownBodyError(_Unknown):

@@ -69,7 +69,7 @@ class Form(Node):
         coord = orbit.copy()
         if new_form != orbit.form.name:
             for a, b in self.steps(new_form):
-                name = "_{}_to_{}".format(a.name.lower(), b.name.lower())
+                name = f"_{a.name.lower()}_to_{b.name.lower()}"
                 coord = getattr(self, name)(coord, orbit.frame.center.body)
 
         return coord

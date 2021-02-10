@@ -101,7 +101,7 @@ class TopocentricFrame(frames.Frame):
         """Linear interpolation between two points of the mask"""
 
         if self.mask is None:
-            raise ValueError("No mask defined for the station {}".format(self.name))
+            raise ValueError(f"No mask defined for the station {self.name}")
 
         azim %= 2 * np.pi
 
@@ -165,7 +165,7 @@ def create_station(
         o = orient.TopocentricOrientation(
             name, latlonalt, parent=parent_frame.orientation
         )
-        mtd = "{}_to_{}".format(name, parent_frame.orientation.name)
+        mtd = f"{name}_to_{parent_frame.orientation.name}"
         setattr(orient.Orientation, mtd, o._to_parent)
         o + parent_frame.orientation
 

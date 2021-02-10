@@ -90,7 +90,7 @@ class Frame:
 
         if exists_warning and name in dynamic:
             log.warning(
-                "A frame with the name '%s' is already registered. Overriding" % name
+                f"A frame with the name '{name}' is already registered. Overriding"
             )
 
         dynamic[name] = self
@@ -99,9 +99,7 @@ class Frame:
         return self.name
 
     def __repr__(self):  # pragma: no cover
-        return "<{} '{}' at {}>".format(
-            self.__class__.__name__, self.name, hex(id(self))
-        )
+        return f"<{self.__class__.__name__} '{self.name}' at {hex(id(self))}>"
 
     def transform(self, orbit, new_frame):
 
@@ -209,7 +207,7 @@ def orbit2frame(name, ref_orbit, orientation=None, parent=EME2000, exists_warnin
         orientation = ref_orbit.frame.orientation
     else:
         if orientation.upper() not in ("QSW", "TNW"):
-            raise ValueError("Unknown orientation '%s'" % orientation)
+            raise ValueError(f"Unknown orientation '{orientation}'")
 
         orientation = orient.LocalOrbitalOrientation(
             name, ref_orbit, orientation, parent

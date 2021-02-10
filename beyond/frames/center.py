@@ -20,9 +20,7 @@ class Center:
         self.body = body
 
     def __repr__(self):
-        return "<{} '{}' at {}>".format(
-            self.__class__.__name__, self.name, hex(id(self))
-        )
+        return f"<{self.__class__.__name__} '{self.name}' at {hex(id(self))}>"
 
     def add_link(self, center, orientation, offset):
         """Attach the center to an already defined center.
@@ -42,7 +40,7 @@ class Center:
         self.offset = offset
         self.orientation = orientation
 
-        setattr(Center, "{}_to_{}".format(self.name, center.name), self._to_parent)
+        setattr(Center, f"{self.name}_to_{center.name}", self._to_parent)
 
     def convert_to(self, date, new_center, orientation):
         """Compute the offset between to centers, in the given orientation.

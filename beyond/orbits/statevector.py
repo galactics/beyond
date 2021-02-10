@@ -113,9 +113,7 @@ class StateVector(np.ndarray):
         elif name in self._data.keys():
             res = self._data[name]
         else:
-            raise AttributeError(
-                "'{}' object has no attribute {!r}".format(self.__class__, name)
-            )
+            raise AttributeError(f"'{self.__class__}' object has no attribute {name!r}")
 
         return res
 
@@ -140,17 +138,14 @@ class StateVector(np.ndarray):
             ]
         )
 
-        fmt = """
+        fmt = f"""
 StateVector =
-  date = {date}
-  form = {form}
-  frame = {frame}
-  coord =\n{coord}\n""".format(
-            date=self.date,
-            coord=coord_str,
-            form=self.form,
-            frame=self.frame,
-        )
+  date = {self.date}
+  form = {self.form}
+  frame = {self.frame}
+  coord =
+{coord_str}
+"""
 
         # Add covariance to the repr
         if self.cov is not None:
@@ -191,7 +186,7 @@ StateVector =
     def cov(self, value):
 
         if not isinstance(value, Cov):
-            raise TypeError("Unknwon covariance type : {}".format(type(value)))
+            raise TypeError(f"Unknwon covariance type : {type(value)}")
 
         self._data["cov"] = value
         self._data["cov"].orb = self

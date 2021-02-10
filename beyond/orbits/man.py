@@ -42,14 +42,14 @@ class ImpulsiveMan(Man):
         self.comment = comment
 
     def __repr__(self):  # pragma: no cover
-        txt = "Man =\n  date = {}\n".format(self.date)
+        txt = f"Man =\n  date = {self.date}\n"
         if self.frame:
-            txt += "  frame = {}\n".format(self.frame)
+            txt += f"  frame = {self.frame}\n"
         if self.comment:
-            txt += "  comment = {}\n".format(self.comment)
+            txt += f"  comment = {self.comment}\n"
         txt += "  dv = \n"
         for i, x in enumerate("xyz"):
-            txt += "    {} = {:0.2g} m/s\n".format(x, self._dv[i])
+            txt += f"    {x} = {self._dv[i]:0.2g} m/s\n"
         return txt
 
     def check(self, date, step):
@@ -103,15 +103,15 @@ class KeplerianImpulsiveMan(ImpulsiveMan):
         self.comment = comment
 
     def __repr__(self):  # pragma: no cover
-        txt = "Man =\n  date = {}\n".format(self.date)
+        txt = f"Man =\n  date = {self.date}\n"
         if self.da:
-            txt += "  da = {} m\n".format(self.da)
+            txt += f"  da = {self.da} m\n"
         if self.di:
-            txt += "  di = {} deg\n".format(np.degrees(self.di))
+            txt += f"  di = {np.degrees(self.di)} deg\n"
         if self.dOmega:
-            txt += "  dOmega = {} deg\n".format(np.degrees(self.dOmega))
+            txt += f"  dOmega = {np.degrees(self.dOmega)} deg\n"
         if self.comment:
-            txt += "  comment = {}\n".format(self.comment)
+            txt += f"  comment = {self.comment}\n"
         return txt
 
     def dv(self, orb, **kwargs):
@@ -133,7 +133,7 @@ class ContinuousMan(Man):
         accel=None,
         date_pos="start",
         frame=None,
-        comment=None
+        comment=None,
     ):
         """
         Args:
@@ -184,7 +184,7 @@ class ContinuousMan(Man):
         self.frame = frame
         self.comment = comment
 
-        log.debug("Man [{}; {}[".format(self.start, self.stop))
+        log.debug(f"Man [{self.start}; {self.stop}[")
 
     def __repr__(self):  # pragma: no cover
         txt = """ContinuousMan =
@@ -199,7 +199,7 @@ class ContinuousMan(Man):
             txt += "  comment  = {0.comment}\n"
         txt += "  dv\n"
         for i, x in enumerate("xyz"):
-            txt += "    {} = {:0.2g} m/s²\n".format(x, self._accel[i])
+            txt += f"    {x} = {self._accel[i]:0.2g} m/s²\n"
         return txt.format(self)
 
     def check(self, date):
@@ -262,7 +262,7 @@ def dkep2dv(orb, *, da=0, di=0, dOmega=0):
     """Convert a increment in keplerian elements to a delta v in TNW
 
     Args:
-        orb (Orbit) : 
+        orb (Orbit) :
         da (float) : semi major-axis increment (meters)
         di (float) : inclination increment (radians)
         dOmega (float) : right ascension of ascending node increment (radians)

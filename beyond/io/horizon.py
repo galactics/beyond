@@ -79,7 +79,7 @@ def loads(text):
             k, _, v = line.partition(":")
             header[k.strip()] = v.strip()
         else:
-            comments += "\n{}".format(line)
+            comments += f"\n{line}"
 
     # Header conversion
     name = header["Target body name"].partition("{")[0].strip()
@@ -100,11 +100,11 @@ def loads(text):
 
     _format = header["Output format"]
     if _format not in formats:
-        raise HorizonParseError("Unknown format : '{}'".format(_format))
+        raise HorizonParseError(f"Unknown format : '{_format}'")
 
     frame = header["Reference frame"]
     if frame not in frames:
-        raise HorizonParseError("Unknown frame : {}".format(frame))
+        raise HorizonParseError(f"Unknown frame : {frame}")
     frame = frames[frame.strip()]
 
     if frame == "EME2000":

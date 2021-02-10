@@ -291,7 +291,7 @@ class Sgp4Beta:
             tdiff = date.total_seconds() / 60.0
             date = self.tle.date + date
         else:
-            raise TypeError("Unhandled type for 'date': %s" % type(date))
+            raise TypeError(f"Unhandled type for 'date': {type(date)}")
 
         bstar = self.tle.bstar
         µ = self.gravity.µ_e

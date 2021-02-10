@@ -18,7 +18,7 @@ class Route:
         self.steps = steps
 
     def __repr__(self):  # pragma: no cover
-        return "<d={0}, s={1}>".format(self.direction, self.steps)
+        return f"<d={self.direction}, s={self.steps}>"
 
 
 class Node:
@@ -134,7 +134,7 @@ class Node:
             return [self]
 
         if goal not in self.routes:
-            raise ValueError("Unknown '{0}'".format(goal))
+            raise ValueError(f"Unknown '{goal}'")
 
         obj = self
         path = [obj]
@@ -162,6 +162,4 @@ class Node:
         return self.name
 
     def __repr__(self):  # pragma: no cover
-        return "<{} '{}' at '{}'>".format(
-            self.__class__.__name__, self.name, hex(id(self))
-        )
+        return f"<{self.__class__.__name__} '{self.name}' at '{hex(id(self))}'>"

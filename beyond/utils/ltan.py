@@ -61,7 +61,7 @@ def raan2ltan(date, raan, type="mean"):
         )
         ltan = ((24 * (raan - theta_sun) / (2 * np.pi)) + 12) % 24
     else:  # pragma: no cover
-        raise ValueError("Unknwon Local Time type : {}".format(type))
+        raise ValueError(f"Unknwon Local Time type : {type}")
 
     return ltan
 
@@ -85,6 +85,6 @@ def ltan2raan(date, ltan, type="mean"):
         hour_angle = np.pi * (ltan - 12) / 12
         raan = (sun.theta + hour_angle) % (2 * np.pi)
     else:  # pragma: no cover
-        raise ValueError("Unknwon Local Time type : {}".format(type))
+        raise ValueError(f"Unknwon Local Time type : {type}")
 
     return raan
