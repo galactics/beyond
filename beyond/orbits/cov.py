@@ -11,16 +11,29 @@ class Cov(np.ndarray):
         """Create a covariance matrix
 
         Args:
-            orb (Orbit): Covariance from which this is the covariance
-            values: 2D matrix
+            orb (StateVector): State vector from which this is the covariance
+            values: 2D matrix (6x6)
             frame (str): Frame in which the covariance is expressed
+
+        .. warning:: For the time being, only 6x6 matrices are handled, but in the
+            future there is no reason why NxN matrix can't be used as well
         """
 
         if isinstance(values, cls):
             frame = values.frame
             values = values.base
 
-        obj = np.ndarray.__new__(cls, (6, 6), buffer=np.array(values), dtype=float)
+        buf = np.array(values)
+
+        if buf.ndim != 2 or buf.shape[0] != buf.shape[1] or buf.shape[0] != 6:
+            raise ValueError(
+                f"covariance should be 6x6, {buf.shape[0]}x{buf.shape[1]} provided"
+            )
+
+        if not np.allclose(buf, buf.T):
+            raise ValueError("Non-symmetric covariance")
+
+        obj = np.ndarray.__new__(cls, (6, 6), buffer=buf, dtype=float)
         obj._data = {}
         obj._frame = frame
         obj.orb = orb
