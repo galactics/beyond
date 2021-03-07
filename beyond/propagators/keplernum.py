@@ -258,5 +258,3 @@ class KeplerNum(NumericalPropagator):
 
         for orb in ephem_iter:
             yield orb.as_orbit(self.copy())
-
-

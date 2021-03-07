@@ -204,7 +204,9 @@ class SoINumerical(_SoI, KeplerNum):
             # If needed, stop the iteration, change the parameters of the
             # propagation (frame, step, central body), then start it again from the
             # remaining dates point
-            for orb in super(_SoI, self)._iter(start=start, stop=stop, step=self.step, **kwargs):
+            for orb in super(_SoI, self)._iter(
+                start=start, stop=stop, step=self.step, **kwargs
+            ):
                 yield orb.copy(frame=self.out_frame)
                 soi = self._soi(orb)
                 if soi != current:
