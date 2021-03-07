@@ -312,6 +312,13 @@ StateVector =
         return orbit2frame(name, self, **kwargs)
 
     def as_orbit(self, propagator):
+        """Attach a propagator to a StateVector, creating a new Orbit object
+
+        Args:
+            propagator (~beyond.propabator.base.Propagator) :
+        Return:
+            Orbit : New Orbit object, with the same state as the creating StateVector
+        """
         from .orbit import Orbit
 
         new_dict = self._data.copy()
