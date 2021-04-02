@@ -10,24 +10,6 @@ from ..env.solarsystem import get_body
 from ..frames.iau1980 import _sideral
 
 
-def orb2ltan(orb, type="mean"):
-    """Compute the Local Time at Ascending Node (LTAN) for a given orbit
-
-    Args:
-        orb (Orbit): Orbit
-        type (str) : either "mean" or "true"
-    Return
-        float : LTAN in hours
-    """
-
-    # if type == "old_mean":
-    #     # This gives MLTAN only if orb is at Ascending Node
-    #     theta = orb.copy(form="spherical", frame="ITRF").theta
-    #     return (24 * (theta / (2 * np.pi) + orb.date.s / 86400)) % 24
-
-    return raan2ltan(orb.date, orb.copy(frame="EME2000", form="keplerian").raan, type)
-
-
 def _mean_sun_raan(date):
     """Mean Sun RAAN in EME2000"""
     # Not so sure about the UT1 thing
@@ -38,32 +20,42 @@ def _mean_sun_raan(date):
     )
 
 
+def _true_sun_raan(date):
+    """True Sun RAAN"""
+    return get_body("Sun").propagate(date).copy(frame="EME2000", form="spherical").theta
+
+
+def orb2ltan(orb, type="mean"):  # pragma: no cover
+    """Compute the Local Time at Ascending Node (LTAN) for a given orbit
+
+    Args:
+        orb (Orbit): Orbit
+        type (str) : either "mean" or "true"
+    Return
+        float : LTAN in hours
+    """
+    return raan2ltan(orb.date, orb.copy(frame="EME2000", form="keplerian").raan, type)
+
+
 def raan2ltan(date, raan, type="mean"):
-    """Conversion to True Local Time at Ascending Node (LTAN)
+    """Conversion to Local Time at Ascending Node (LTAN)
 
     Args:
         date (Date) : Date of the conversion
         raan (float) : RAAN in radians, in EME2000
         type (str) : either "mean" or "true"
     Return:
-        float : LTAN in hours
+        float : LTAN in seconds
     """
 
     if type == "mean":
-        mean_solar_angle = raan - _mean_sun_raan(date)
-        ltan = (12 + mean_solar_angle * 12 / np.pi) % 24
+        sun_raan = _mean_sun_raan(date)
     elif type == "true":
-        theta_sun = (
-            get_body("Sun")
-            .propagate(date)
-            .copy(frame="EME2000", form="spherical")
-            .theta
-        )
-        ltan = ((24 * (raan - theta_sun) / (2 * np.pi)) + 12) % 24
+        sun_raan = _true_sun_raan(date)
     else:  # pragma: no cover
         raise ValueError(f"Unknwon Local Time type : {type}")
 
-    return ltan
+    return (43200 + (raan - sun_raan) * 43200 / np.pi) % 86400
 
 
 def ltan2raan(date, ltan, type="mean"):
@@ -71,20 +63,19 @@ def ltan2raan(date, ltan, type="mean"):
 
     Args:
         date (Date) : Date of the conversion
-        ltan (float) : LTAN in hours
+        ltan (float) : LTAN in seconds
         type (str) : either "mean" or "true"
     Return:
         float : RAAN in radians in EME2000
     """
 
+    solar_angle = (ltan - 43200) * np.pi / 43200
+
     if type == "mean":
-        mean_solar_angle = (ltan - 12) * np.pi / 12
-        raan = (mean_solar_angle + _mean_sun_raan(date)) % (2 * np.pi)
+        sun_raan = _mean_sun_raan(date)
     elif type == "true":
-        sun = get_body("Sun").propagate(date).copy(frame="EME2000", form="spherical")
-        hour_angle = np.pi * (ltan - 12) / 12
-        raan = (sun.theta + hour_angle) % (2 * np.pi)
+        sun_raan = _true_sun_raan(date)
     else:  # pragma: no cover
         raise ValueError(f"Unknwon Local Time type : {type}")
 
-    return raan
+    return (solar_angle + sun_raan) % (2 * np.pi)
