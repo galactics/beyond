@@ -32,7 +32,7 @@ def orb2ltan(orb, type="mean"):  # pragma: no cover
         orb (Orbit): Orbit
         type (str) : either "mean" or "true"
     Return
-        float : LTAN in hours
+        float : LTAN in seconds
     """
     return raan2ltan(orb.date, orb.copy(frame="EME2000", form="keplerian").raan, type)
 
