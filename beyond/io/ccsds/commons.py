@@ -253,6 +253,11 @@ def dump_xml_header(data, ccsds_type, version="1.0", **kwargs):
 
 def dump_kvn_meta_odm(data, meta_tag=True, extras={}, **kwargs):
 
+    center = data.frame.center.name
+
+    if "Barycenter" in center:
+        center = " ".join(re.findall("[A-Z][^A-Z]*", center))
+
     meta = """{meta}OBJECT_NAME          = {name}
 OBJECT_ID            = {cospar_id}
 CENTER_NAME          = {center}
@@ -262,7 +267,7 @@ TIME_SYSTEM          = {timesystem}
         meta="META_START\n" if meta_tag else "",
         name=kwargs.get("name", getattr(data, "name", "N/A")),
         cospar_id=kwargs.get("cospar_id", getattr(data, "cospar_id", "N/A")),
-        center=data.frame.center.name.upper(),
+        center=center.upper(),
         frame=data.frame.orientation.name.upper(),
         timesystem=data.date.scale.name
         if isinstance(data, StateVector)
@@ -290,8 +295,12 @@ def dump_xml_meta_odm(segment, data, **kwargs):
     cospar_id = ET.SubElement(metadata, "OBJECT_ID")
     cospar_id.text = kwargs.get("cospar_id", getattr(data, "cospar_id", "N/A"))
 
+    center_txt = data.frame.center.name
+    if "Barycenter" in center_txt:
+        center_txt = " ".join(re.findall("[A-Z][^A-Z]*", center_txt))
+
     center = ET.SubElement(metadata, "CENTER_NAME")
-    center.text = data.frame.center.name.upper()
+    center.text = center_txt.upper()
 
     frame = ET.SubElement(metadata, "REF_FRAME")
     frame.text = data.frame.orientation.name.upper()

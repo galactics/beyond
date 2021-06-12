@@ -9,7 +9,7 @@
       <metadata>
         <OBJECT_NAME>ISS (ZARYA)</OBJECT_NAME>
         <OBJECT_ID>1998-067A</OBJECT_ID>
-        <CENTER_NAME>MARS</CENTER_NAME>
+        <CENTER_NAME>MARS BARYCENTER</CENTER_NAME>
         <REF_FRAME>EME2000</REF_FRAME>
         <TIME_SYSTEM>UTC</TIME_SYSTEM>
       </metadata>
@@ -30,7 +30,7 @@
           <RA_OF_ASC_NODE units="deg">358.011</RA_OF_ASC_NODE>
           <ARG_OF_PERICENTER units="deg">14.0143</ARG_OF_PERICENTER>
           <TRUE_ANOMALY units="deg">8.56701</TRUE_ANOMALY>
-          <GM units="km**3/s**2"> 42828.3736</GM>
+          <GM units="km**3/s**2"> 42828.3752</GM>
         </keplerianElements>
       </data>
     </segment>
