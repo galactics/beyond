@@ -361,7 +361,7 @@ class Date:
         Args:
             new_scale (str)
         Return:
-            Date
+            Date: new Date object representing the same instant, with a different timescale
         """
         offset = self.scale.offset(self._mjd, new_scale, self.eop)
         result = self.datetime + timedelta(seconds=offset)

@@ -73,9 +73,8 @@ class Cov(np.ndarray):
     def frame(self):
         """Frame of the covariance
 
-        When this value is changed, the covariance is converted
-        Accepted frames are regular frames (defined in
-        :ref:`frames`) and 'TNW' or 'QSW'.
+        When this value is changed, the covariance is converted. Accepted
+        frames are regular frames (defined in :ref:`frames`) and 'TNW' or 'QSW'.
 
         If the frame of this covariance is the same as its parent statevector/orbit,
         a change of its parent frame will trigger a change of this covariance frame

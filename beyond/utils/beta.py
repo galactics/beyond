@@ -18,7 +18,7 @@ def beta(orb, ref="Sun"):
         orb (Orbit) : Orbit of the primary spacecraft, expressed in a
             reference frame whose centre is the obscuring body.
         ref (str or Orbit or Ephem) : Secondary object
-    Return
+    Return:
         float: Angle beta in radians
     """
 
@@ -45,7 +45,7 @@ def beta_limit(orb):
     Args:
         orb (Orbit) : Orbit of the primary spacecraft, expressed in a
             reference frame whose centre is the obscuring body.
-    Return
+    Return:
         float : Angle in radians
     """
 
