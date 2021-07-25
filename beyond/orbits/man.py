@@ -149,8 +149,6 @@ class ContinuousMan(Man):
             raise ValueError("date_pos accepted values are start, stop and median")
         if isinstance(frame, str):
             frame = frame.upper()
-        if frame in ("RSW", "LVLH", "QSW"):
-            frame = "QSW"
 
         self.date = date
         self.duration = duration
