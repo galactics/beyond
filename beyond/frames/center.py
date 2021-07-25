@@ -19,7 +19,7 @@ class Center:
         self.node = Node(name)
         self.body = body
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return f"<{self.__class__.__name__} '{self.name}' at {hex(id(self))}>"
 
     def add_link(self, center, orientation, offset):
@@ -92,7 +92,7 @@ class Center:
 Earth = Center("Earth", body=constants.Earth)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
 
     from ..dates import Date
     from .iau1980 import rate
