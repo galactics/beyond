@@ -38,7 +38,7 @@ def loads(string, fmt):
     elif fmt == "xml":
         orb = _loads_xml(string)
     else:  # pragma: no cover
-        raise CcsdsError("Unknown format '{}'".format(fmt))
+        raise CcsdsError(f"Unknown format '{fmt}'")
 
     return orb
 
@@ -53,7 +53,7 @@ def dumps(data, **kwargs):
     elif fmt == "xml":
         return _dumps_xml(data, **kwargs)
     else:  # pragma: no cover
-        raise CcsdsError("Unknown format '{}'".format(fmt))
+        raise CcsdsError(f"Unknown format '{fmt}'")
 
 
 def _loads_kvn(string):
@@ -80,7 +80,7 @@ def _loads_kvn(string):
         y = decode_unit(data, "Y", "km")
         z = decode_unit(data, "Z", "km")
     except KeyError as e:
-        raise CcsdsError("Missing mandatory parameter {}".format(e))
+        raise CcsdsError(f"Missing mandatory parameter {e}")
 
     orb = StateVector(
         [x, y, z, vx, vy, vz], date, "cartesian", frame, name=name, cospar_id=cospar_id
@@ -99,7 +99,7 @@ def _loads_kvn(string):
         man["comment"] = raw_man["COMMENT"].text if "COMMENT" in raw_man else None
 
         for i in range(1, 4):
-            f_name = "MAN_DV_{}".format(i)
+            f_name = f"MAN_DV_{i}"
             man.setdefault("dv", []).append(decode_unit(raw_man, f_name, "km/s"))
 
         if man["duration"].total_seconds() == 0:
@@ -165,7 +165,7 @@ def _loads_xml(string):
         y = decode_unit(statevector, "Y", "km")
         z = decode_unit(statevector, "Z", "km")
     except KeyError as e:
-        raise CcsdsError("Missing mandatory parameter {}".format(e))
+        raise CcsdsError(f"Missing mandatory parameter {e}")
 
     orb = StateVector(
         [x, y, z, vx, vy, vz], date, "cartesian", frame, name=name, cospar_id=cospar_id
@@ -187,7 +187,7 @@ def _loads_xml(string):
             man["comment"] = raw_man["COMMENT"].text if "COMMENT" in raw_man else None
 
             for i in range(1, 4):
-                f_name = "MAN_DV_{}".format(i)
+                f_name = f"MAN_DV_{i}"
                 man.setdefault("dv", []).append(decode_unit(raw_man, f_name, "km/s"))
 
             if man["duration"].total_seconds() == 0:
@@ -267,7 +267,7 @@ GM                   = {gm:11.4f} [km**3/s**2]
 
     if cart.maneuvers:
         for i, man in enumerate(cart.maneuvers):
-            comment = "\nCOMMENT  {}".format(man.comment) if man.comment else ""
+            comment = f"\nCOMMENT  {man.comment}" if man.comment else ""
 
             if man.frame is None:
                 frame = cart.frame
@@ -305,7 +305,7 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
     if "ccsds_user_defined" in data._data:
         text += "\n"
         for k, v in data._data["ccsds_user_defined"].items():
-            text += "USER_DEFINED_{} = {}\n".format(k, v)
+            text += f"USER_DEFINED_{k} = {v}\n"
 
     return header + "\n" + meta + text
 
@@ -345,15 +345,15 @@ def _dumps_xml(data, **kwargs):
 
     for k, v in elems.items():
         x = ET.SubElement(statevector, k, units="km" if "DOT" not in k else "km/s")
-        x.text = "{:0.6f}".format(getattr(cart, v) / units.km)
+        x.text = f"{getattr(cart, v) / units.km:0.6f}"
 
     if cart.frame.orientation in (G50, EME2000, GCRF, MOD, TOD, TEME, CIRF):
         keplerian = ET.SubElement(data_tag, "keplerianElements")
 
         sma = ET.SubElement(keplerian, "SEMI_MAJOR_AXIS", units="km")
-        sma.text = "{:0.6}".format(kep.a / units.km)
+        sma.text = f"{kep.a / units.km:0.6}"
         ecc = ET.SubElement(keplerian, "ECCENTRICITY")
-        ecc.text = "{:0.6}".format(kep.e)
+        ecc.text = f"{kep.e:0.6}"
 
         elems = {
             "INCLINATION": "i",
@@ -364,10 +364,10 @@ def _dumps_xml(data, **kwargs):
 
         for k, v in elems.items():
             x = ET.SubElement(keplerian, k, units="deg")
-            x.text = "{:0.6}".format(np.degrees(getattr(kep, v)))
+            x.text = f"{np.degrees(getattr(kep, v)):0.6}"
 
         gm = ET.SubElement(keplerian, "GM", units="km**3/s**2")
-        gm.text = "{:11.4f}".format(kep.frame.center.body.mu / (units.km ** 3))
+        gm.text = f"{kep.frame.center.body.mu / units.km ** 3:11.4f}"
 
     if cart.cov is not None:
         cov = ET.SubElement(data_tag, "covarianceMatrix")
@@ -378,13 +378,13 @@ def _dumps_xml(data, **kwargs):
                 frame = "RSW"
 
             cov_frame = ET.SubElement(cov, "COV_REF_FRAME")
-            cov_frame.text = "{frame}".format(frame=frame)
+            cov_frame.text = f"{frame}"
 
         elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
         for i, a in enumerate(elems):
             for j, b in enumerate(elems[: i + 1]):
-                x = ET.SubElement(cov, "C{a}_{b}".format(a=a, b=b))
-                x.text = "{:0.12e}".format(cart.cov[i, j] / 1e6)
+                x = ET.SubElement(cov, f"C{a}_{b}")
+                x.text = f"{cart.cov[i, j] / 1000000.0:0.12e}"
 
     if cart.maneuvers:
         for man in cart.maneuvers:
@@ -410,17 +410,17 @@ def _dumps_xml(data, **kwargs):
             man_epoch = ET.SubElement(mans, "MAN_EPOCH_IGNITION")
             man_epoch.text = date.strftime(DATE_FMT_DEFAULT)
             man_dur = ET.SubElement(mans, "MAN_DURATION", units="s")
-            man_dur.text = "{:0.3f}".format(duration)
+            man_dur.text = f"{duration:0.3f}"
 
             man_mass = ET.SubElement(mans, "MAN_DELTA_MASS", units="kg")
             man_mass.text = "-0.001"
 
             man_frame = ET.SubElement(mans, "MAN_REF_FRAME")
-            man_frame.text = "{}".format(frame)
+            man_frame.text = f"{frame}"
 
             for i in range(3):
-                x = ET.SubElement(mans, "MAN_DV_{}".format(i + 1), units="km/s")
-                x.text = "{:.6f}".format(man._dv[i] / units.km)
+                x = ET.SubElement(mans, f"MAN_DV_{i + 1}", units="km/s")
+                x.text = f"{man._dv[i] / units.km:.6f}"
 
     if "ccsds_user_defined" in data._data:
         ud = ET.SubElement(data_tag, "userDefinedParameters")

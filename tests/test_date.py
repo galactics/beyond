@@ -289,21 +289,25 @@ def test_daterange():
     step = timedelta(seconds=30)
 
     # classic range
-    l1 = list(Date.range(start, stop, step))
+    l1 = Date.range(start, stop, step)
     assert len(l1) == stop // step
+    assert len(l1) == len(list(l1))
 
     # Inclusive range
-    l2 = list(Date.range(start, stop, step, inclusive=True))
+    l2 = Date.range(start, stop, step, inclusive=True)
     assert len(l2) == stop // step + 1
+    assert len(l2) == len(list(l2))
 
     r = Date.range(start, stop, step)
     rlist = list(r)
+    assert len(r) == len(rlist)
     assert isinstance(r, DateRange)
     assert rlist[0] == r.start
     assert rlist[-1] == r.stop - r.step
 
     r = Date.range(start, stop, step, inclusive=True)
     rlist = list(r)
+    assert len(r) == len(rlist)
     assert isinstance(r, DateRange)
     assert rlist[0] == r.start
     assert rlist[-1] == r.stop
@@ -318,7 +322,7 @@ def test_daterange():
     # assert r.stop == start + 2*stop
     # assert r.steps == {step, step*2}
 
-    # l = list(r)
+    # l = r
     # assert len(l) == stop // step + stop // (step * 2)
 
     # stop as a Date object
@@ -330,13 +334,35 @@ def test_daterange():
     stop = - timedelta(minutes=2)
     step = - timedelta(seconds=30)
 
-    l4 = list(Date.range(start, stop, step))
+    l4 = Date.range(start, stop, step)
     assert len(l4) == stop // step
 
     # Error when the date range (start/stop) is not coherent with the step
     with raises(ValueError):
-        list(Date.range(start, stop, -step))
+        Date.range(start, stop, -step)
 
     # Error when the step is null.
     with raises(ValueError):
-        list(Date.range(start, stop, timedelta(0)))
+        Date.range(start, stop, timedelta(0))
+
+
+def test_daterange2():
+
+    start = Date(2021, 2, 9, 22, 35)
+    stop = timedelta(hours=1, seconds=37)
+    step = timedelta(seconds=17)
+
+    r = Date.range(start, stop, step)
+    l = list(r)
+
+    assert np.ceil((r.stop - r.start) / r.step) == len(l)
+    assert len(r) == len(l)
+    assert l[0] == r.start
+    assert l[-1] < r.stop
+
+    r = Date.range(start, stop, step, inclusive=True)
+    l = list(r)
+
+    assert len(r) == len(l)
+    assert l[0] == r.start
+    assert l[-1] < r.stop

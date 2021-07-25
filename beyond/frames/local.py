@@ -38,7 +38,7 @@ def to_local(frame, orbit, expanded=True):
     elif frame.upper() == "TNW":
         m = to_tnw(orbit)
     else:
-        raise ValueError("Unknown local orbital frame : {}".format(frame))
+        raise ValueError(f"Unknown local orbital frame : {frame}")
 
     if expanded:
         m = expand(m)

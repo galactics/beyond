@@ -11,16 +11,29 @@ class Cov(np.ndarray):
         """Create a covariance matrix
 
         Args:
-            orb (Orbit): Covariance from which this is the covariance
-            values: 2D matrix
+            orb (StateVector): State vector from which this is the covariance
+            values: 2D matrix (6x6)
             frame (str): Frame in which the covariance is expressed
+
+        .. warning:: For the time being, only 6x6 matrices are handled, but in the
+            future there is no reason why NxN matrix can't be used as well
         """
 
         if isinstance(values, cls):
             frame = values.frame
             values = values.base
 
-        obj = np.ndarray.__new__(cls, (6, 6), buffer=np.array(values), dtype=float)
+        buf = np.array(values)
+
+        if buf.ndim != 2 or buf.shape[0] != buf.shape[1] or buf.shape[0] != 6:
+            raise ValueError(
+                f"covariance should be 6x6, {buf.shape[0]}x{buf.shape[1]} provided"
+            )
+
+        if not np.allclose(buf, buf.T):
+            raise ValueError("Non-symmetric covariance")
+
+        obj = np.ndarray.__new__(cls, (6, 6), buffer=buf, dtype=float)
         obj._data = {}
         obj._frame = frame
         obj.orb = orb
@@ -32,14 +45,14 @@ class Cov(np.ndarray):
         cols = "x,y,z,vx,vy,vz".split(",")
 
         txt = "Cov =\n"
-        txt += "  frame = {}\n".format(self.frame)
+        txt += f"  frame = {self.frame}\n"
         txt += " " * 7
         txt += "".join([" {:^9} ".format(x) for x in cols])
         txt += "\n"
         for i in range(6):
-            txt += " {:>4} ".format(cols[i])
+            txt += f" {cols[i]:>4} "
             for j in range(i + 1):
-                txt += " {: 0.2e} ".format(self[i, j])
+                txt += f" {self[i, j]: 0.2e} "
             txt += "\n"
         return txt
 
@@ -60,9 +73,8 @@ class Cov(np.ndarray):
     def frame(self):
         """Frame of the covariance
 
-        When this value is changed, the covariance is converted
-        Accepted frames are regular frames (defined in
-        :ref:`frames`) and 'TNW' or 'QSW'.
+        When this value is changed, the covariance is converted. Accepted
+        frames are regular frames (defined in :ref:`frames`) and 'TNW' or 'QSW'.
 
         If the frame of this covariance is the same as its parent statevector/orbit,
         a change of its parent frame will trigger a change of this covariance frame

@@ -71,7 +71,7 @@ def test_dump_opm_man_continuous(orbit_continuous_man, datafile, ccsds_format, h
 
 @mark.jpl
 def test_dump_opm_interplanetary(jplfiles, orbit, ccsds_format, datafile, helper):
-    orbit.frame = "Mars"
+    orbit.frame = "MarsBarycenter"
 
     txt = dumps(orbit, fmt=ccsds_format)
     helper.assert_string(datafile("opm_interplanetary"), txt)
@@ -201,7 +201,7 @@ def test_load_opm_man_continuous(orbit_continuous_man, datafile, ccsds_format, h
 @mark.jpl
 def test_load_interplanetary(jplfiles, orbit, datafile, helper):
 
-    orbit.frame = "Mars"
+    orbit.frame = "MarsBarycenter"
 
     data_opm = loads(datafile("opm_interplanetary"))
 

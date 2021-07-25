@@ -41,7 +41,7 @@ def test_dump_oem_linear(ephem, ccsds_format):
 @mark.jpl
 def test_dump_oem_interplanetary(jplfiles, ephem, ccsds_format, datafile, helper):
 
-    ephem.frame = "Mars"
+    ephem.frame = "MarsBarycenter"
 
     ref = datafile("oem_interplanetary")
     txt = dumps(ephem, fmt=ccsds_format)
@@ -115,7 +115,7 @@ def test_load_oem_cov_tnw(ephem_cov, datafile, helper):
 @mark.jpl
 def test_load_oem_interplanetary(jplfiles, ephem, datafile, helper):
 
-    ephem.frame = "Mars"
+    ephem.frame = "MarsBarycenter"
 
     data = loads(datafile("oem_interplanetary"))
 

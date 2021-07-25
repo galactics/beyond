@@ -7,6 +7,9 @@ The Date object
 .. autoclass:: beyond.dates.date.Date
     :members: datetime, mjd, jd, now, change_scale, strftime, strptime, range
 
+.. autoclass:: beyond.dates.date.DateRange
+    :members: start, stop, step, inclusive, dur
+
 .. _eop:
 
 Earth Orientation and leap second

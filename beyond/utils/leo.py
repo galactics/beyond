@@ -58,7 +58,7 @@ def sso_frozen(a):
 
     Args:
         a (float): Semi major axis in meters
-    Return
+    Return:
         Tuple[float, float, float]:
             eccentricity (e), inclination (i, in radians)
             and argument of perigee (ω, in radians)

@@ -52,21 +52,25 @@ def get_frame(frame):
     Args:
         frame (str): name of the desired frame
     Return:
-        ~beyond.frames.frames.Frame
+        Frame: the object representing the frame demanded
+    Raise:
+        ~beyond.frames.frames.UnknownFrameError
     """
 
-    if frame not in dynamic.keys():
-        if config.get("env", "jpl", "dynamic_frames", fallback=False):
-            from ..env.jpl import create_frames, JplConfigError
+    if frame not in dynamic.keys() and config.get(
+        "env", "jpl", "dynamic_frames", fallback=False
+    ):
+        from ..env.jpl import create_frames, JplConfigError
 
-            try:
-                create_frames()
-            except (JplConfigError, UnknownBodyError) as e:
-                raise UnknownFrameError(frame) from e
-        else:
-            raise UnknownFrameError(frame)
+        try:
+            create_frames()
+        except (JplConfigError, UnknownBodyError) as e:
+            raise UnknownFrameError(frame) from e
 
-    return dynamic[frame]
+    try:
+        return dynamic[frame]
+    except KeyError:
+        raise UnknownFrameError(frame)
 
 
 class Frame:
@@ -86,7 +90,7 @@ class Frame:
 
         if exists_warning and name in dynamic:
             log.warning(
-                "A frame with the name '%s' is already registered. Overriding" % name
+                f"A frame with the name '{name}' is already registered. Overriding"
             )
 
         dynamic[name] = self
@@ -95,9 +99,7 @@ class Frame:
         return self.name
 
     def __repr__(self):  # pragma: no cover
-        return "<{} '{}' at {}>".format(
-            self.__class__.__name__, self.name, hex(id(self))
-        )
+        return f"<{self.__class__.__name__} '{self.name}' at {hex(id(self))}>"
 
     def transform(self, orbit, new_frame):
 
@@ -205,7 +207,7 @@ def orbit2frame(name, ref_orbit, orientation=None, parent=EME2000, exists_warnin
         orientation = ref_orbit.frame.orientation
     else:
         if orientation.upper() not in ("QSW", "TNW"):
-            raise ValueError("Unknown orientation '%s'" % orientation)
+            raise ValueError(f"Unknown orientation '{orientation}'")
 
         orientation = orient.LocalOrbitalOrientation(
             name, ref_orbit, orientation, parent

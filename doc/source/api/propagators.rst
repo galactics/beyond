@@ -7,8 +7,10 @@ All propagators follow the :py:class:`Propagator` interface.
     :members:
 
 .. autoclass:: beyond.propagators.base.NumericalPropagator
+    :show-inheritance:
 
 .. autoclass:: beyond.propagators.base.AnalyticalPropagator
+    :show-inheritance:
 
 Kepler
 ------
@@ -18,6 +20,7 @@ the mean anomaly into account.
 
 .. automodule:: beyond.propagators.kepler
     :members:
+    :show-inheritance:
 
 J2
 --
@@ -26,6 +29,7 @@ Analytical propagator, taking the central body effect on the orbit, and the J2 t
 
 .. automodule:: beyond.propagators.j2
     :members:
+    :show-inheritance:
 
 SGP4
 ----
@@ -51,6 +55,7 @@ over the rewrite.
 
 .. automodule:: beyond.propagators.sgp4
     :members:
+    :show-inheritance:
 
 
 Rewrite
@@ -58,6 +63,7 @@ Rewrite
 
 .. automodule:: beyond.propagators.sgp4beta
     :members:
+    :show-inheritance:
 
 Following are gravitational constants used in the SGP4 propagator, the default
 being WGS72.
@@ -85,6 +91,16 @@ ClohessyWiltshire
 
 .. automodule:: beyond.propagators.cw
     :members:
+    :special-members: __init__
+    :show-inheritance:
+
+Sphere of Influence
+-------------------
+
+There is two propagators handling `Sphere of Influence <https://en.wikipedia.org/wiki/Sphere_of_influence_(astrodynamics)>`__ transitions.
+
+.. automodule:: beyond.propagators.soi
+    :members: SoIAnalytical, SoINumerical
     :special-members: __init__
     :show-inheritance:
 

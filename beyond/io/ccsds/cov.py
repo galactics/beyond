@@ -64,7 +64,7 @@ def load_cov(orb, data):
         ],
     ]
 
-    cov = Cov(orb, np.array(values).astype(np.float) * 1e6, frame)
+    cov = Cov(orb, np.array(values).astype(np.float64) * 1e6, frame)
 
     return cov
 
@@ -75,13 +75,13 @@ def dump_cov(cov):
         frame = cov.frame
         if frame == "QSW":
             frame = "RSW"
-        text += "COV_REF_FRAME        = {frame}\n".format(frame=frame)
+        text += f"COV_REF_FRAME        = {frame}\n"
 
     elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
     for i, a in enumerate(elems):
         for j, b in enumerate(elems[: i + 1]):
-            txt = "{a}_{b}".format(a=a, b=b)
+            txt = f"{a}_{b}"
 
-            text += "C{txt:<19} = {v: 0.12e}\n".format(txt=txt, v=cov[i, j] / 1e6)
+            text += f"C{txt:<19} = {cov[i, j] / 1000000.0: 0.12e}\n"
 
     return text

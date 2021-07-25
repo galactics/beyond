@@ -113,9 +113,7 @@ class Ephem(Speaker):
         """
 
         if not self.start <= date <= self.stop:
-            raise ValueError(
-                "Date '{}' not in range [{}, {}]".format(date, self.start, self.stop)
-            )
+            raise ValueError(f"Date '{date}' not in range [{self.start}, {self.stop}]")
 
         prev_idx = 0
         ephem = self
@@ -162,7 +160,9 @@ class Ephem(Speaker):
             result = np.zeros(6)
 
             if len(subset) < order:
-                raise ValueError("len(ephem) < order : impossible to interpolate")
+                raise ValueError(
+                    f"len={len(ephem)} < order={order} : impossible to interpolate"
+                )
 
             # Everything is on wikipedia
             #        k
@@ -273,7 +273,7 @@ class Ephem(Speaker):
             elif start < self.start:
                 if strict:
                     raise ValueError(
-                        "Start date not in range [{}, {}]".format(self.start, self.stop)
+                        f"Start date not in range [{self.start}, {self.stop}]"
                     )
                 else:
                     real_start = self.start
@@ -286,9 +286,7 @@ class Ephem(Speaker):
                 if stop > self.stop:
                     if strict:
                         raise ValueError(
-                            "Stop date not in range [{}, {}]".format(
-                                self.start, self.stop
-                            )
+                            f"Stop date not in range [{self.start}, {self.stop}]"
                         )
                     else:
                         stop = self.stop
@@ -346,9 +344,47 @@ class Ephem(Speaker):
 
         return self.__class__(self.ephemeris(*args, **kwargs))
 
-    def copy(self, *, form=None, frame=None):  # pragma: no cover
-        """Create a deep copy of the ephemeris, and allow frame and form changing"""
+    def copy(self, *, form=None, frame=None, same=None):  # pragma: no cover
+        """Create a deep copy of the ephemeris. Optionally, allow frame and form changing
+
+        Keyword Args:
+            form (str or Form): Form to convert the new instance into
+            frame (str or Frame): Frame to convert the new instance into
+            same (StateVector): A statevector from which to copy the frame and form
+        Return:
+            Ephem : New ephemeris object
+
+        If the argument *same* is used, it overwrites *frame* and *form*.
+
+        Example:
+
+        .. code-block:: python
+
+            # New instance of the same ephemeris
+            e1 = e.copy()
+
+            # ephemeris converted into spherical form
+            e2 = e.copy(form="spherical")
+
+            # ephemeris converted into EME2000 frame, keplerian form
+            e3 = e.copy(form="keplerian", frame="EME2000")
+
+            # ephemeris in the same frame and form as e3 (EME2000, keplerian)
+            e4 = e.copy(same=sv3)
+
+        Override :py:meth:`numpy.ndarray.copy()` to include additional
+        fields
+        """
+
         new = self.ephem()
+
+        if same is not None:
+            if hasattr(same, "form") and hasattr(same, "frame"):
+                frame = same.frame
+                form = same.form
+            else:
+                raise TypeError("'same' does not have a frame and/or a form attribute")
+
         if frame:
             new.frame = frame
         if form:

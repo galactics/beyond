@@ -3,6 +3,30 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [Unreleased]
+
+### Added
+
+- python 3.9 support and tests
+- Sphere of Influence propagators (both analytical and numerical) have their own module
+- ``StateVector.copy()`` now accepts "same" argument, to express two StateVector objects
+  in the same form and frame.
+- Maneuvers in terms of keplerian elements
+
+### Modified
+
+- ``beyond.orbits.man.dkep2dv()`` function has clearer arguments, is better documented
+- Better exception messages when failing to parse a TLE
+- Clarification of matrix building when handling rotating frames
+- ``DateRange`` object simplification
+- f-string everywhere
+- LTAN now computed in seconds
+
+### Fixed
+
+- A dangling modulo messed with hyperbolic keplerian representation
+- Barycentric frames correctly handled in CCSDS files
+
 ## [v0.7.2] - 2020-11-11
 
 ### Added

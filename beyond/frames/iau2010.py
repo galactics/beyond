@@ -80,7 +80,10 @@ def sideral(date):
 
 
 def rate(date):
-    """Return the rotation rate vector of the earth for a given date"""
+    """Return the rotation rate vector of the earth for a given date
+
+    This rate is given in the pseudo-inertial frame (CIRF)
+    """
     lod = date.eop.lod / 1000.0
     return np.array([0, 0, 7.292115146706979e-5 * (1 - lod / 86400.0)])
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from pytest import fixture, yield_fixture
+from pytest import fixture
 from unittest.mock import patch
 
 from beyond.dates.date import Date
@@ -15,7 +15,7 @@ def date(model_correction):
     return Date(2004, 4, 6, 7, 51, 28, 386009)
 
 
-@yield_fixture()
+@fixture
 def model_correction():
     with patch('beyond.dates.date.EopDb.get') as m:
         m.return_value = Eop(

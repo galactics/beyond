@@ -21,9 +21,7 @@ class CWHelper:
             return getattr(self.propagator, name)
         except AttributeError:
             raise AttributeError(
-                "'{}' object has no attribute '{}'".format(
-                    self.__class__.__name__, name
-                )
+                f"'{self.__class__.__name__}' object has no attribute '{name}'"
             ) from None
 
     @property

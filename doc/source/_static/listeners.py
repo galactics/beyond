@@ -25,4 +25,4 @@ step = timedelta(seconds=180)
 
 for orb in tle.iter(start=start, stop=stop, step=step, listeners=listeners):
     event = orb.event if orb.event is not None else ""
-    print("{orb.date:%Y-%m-%d %H:%M:%S} {event}".format(orb=orb, event=event))
+    print(f"{orb.date:%Y-%m-%d %H:%M:%S} {event}")

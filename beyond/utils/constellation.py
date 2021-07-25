@@ -31,7 +31,7 @@ class WalkerStar:
         self.raan0 = raan0
 
     def __repr__(self):  # pragma: cover
-        return "<{0.__class__.__name__} {0.total}/{0.planes}/{0.spacing}>".format(self)
+        return f"<{self.__class__.__name__} {self.total}/{self.planes}/{self.spacing}>"
 
     @property
     def per_plane(self):

@@ -42,14 +42,14 @@ class ImpulsiveMan(Man):
         self.comment = comment
 
     def __repr__(self):  # pragma: no cover
-        txt = "Man =\n  date = {}\n".format(self.date)
+        txt = f"Man =\n  date = {self.date}\n"
         if self.frame:
-            txt += "  frame = {}\n".format(self.frame)
+            txt += f"  frame = {self.frame}\n"
         if self.comment:
-            txt += "  comment = {}\n".format(self.comment)
+            txt += f"  comment = {self.comment}\n"
         txt += "  dv = \n"
         for i, x in enumerate("xyz"):
-            txt += "    {} = {:0.2g} m/s\n".format(x, self._dv[i])
+            txt += f"    {x} = {self._dv[i]:0.2g} m/s\n"
         return txt
 
     def check(self, date, step):
@@ -82,37 +82,42 @@ class KeplerianImpulsiveMan(ImpulsiveMan):
 
     For maximum efficiency:
 
-    * 'a' should be modified at apoapsis or periapsis, via delta_a
-    * 'i' should be modified at descending or ascending node, via delta_angle
-    * 'Ω' should be modified at argument of latitude +/- 90 deg, via delta_angle
+    * 'a' should be modified at apoapsis or periapsis, via da
+    * 'i' should be modified at descending or ascending node, via di
+    * 'Ω' should be modified at argument of latitude +/- 90 deg, via dOmega
     """
 
-    def __init__(self, date, *, delta_a=0, delta_angle=0, comment=None):
+    def __init__(self, date, *, da=0, di=0, dOmega=0, comment=None):
         """
         Args:
             date (Date): Date of application of the impulsive maneuver
-            delta_a (float): Semi major axis increment
-            delta_angle (float): inclination or right ascention of ascending node increment (radians)
+            da (float): Semi major axis increment
+            di (float): inclination increment (radians)
+            dOmega (float) : right ascension of ascending node increment (radians)
             comment (str):
         """
         self.date = date
-        self.delta_a = delta_a
-        self.delta_angle = delta_angle
+        self.da = da
+        self.di = di
+        self.dOmega = dOmega
         self.comment = comment
 
     def __repr__(self):  # pragma: no cover
-        txt = "Man =\n  date = {}\n".format(self.date)
-        if self.delta_a:
-            txt += "  delta_a = {} m\n".format(self.delta_a)
-        if self.delta_angle:
-            txt += "  delta_angle = {} rad\n".format(self.delta_angle)
+        txt = f"Man =\n  date = {self.date}\n"
+        if self.da:
+            txt += f"  da = {self.da} m\n"
+        if self.di:
+            txt += f"  di = {np.degrees(self.di)} deg\n"
+        if self.dOmega:
+            txt += f"  dOmega = {np.degrees(self.dOmega)} deg\n"
         if self.comment:
-            txt += "  comment = {}\n".format(self.comment)
+            txt += f"  comment = {self.comment}\n"
         return txt
 
     def dv(self, orb, **kwargs):
-        self._dv = dkep2dv(orb, delta_a=self.delta_a, delta_angle=self.delta_angle)
+        self._dv = dkep2dv(orb, da=self.da, di=self.di, dOmega=self.dOmega)
 
+        # dv converted to the inertial frame
         return to_tnw(orb).T @ self._dv
 
 
@@ -128,7 +133,7 @@ class ContinuousMan(Man):
         accel=None,
         date_pos="start",
         frame=None,
-        comment=None
+        comment=None,
     ):
         """
         Args:
@@ -144,8 +149,6 @@ class ContinuousMan(Man):
             raise ValueError("date_pos accepted values are start, stop and median")
         if isinstance(frame, str):
             frame = frame.upper()
-        if frame in ("RSW", "LVLH", "QSW"):
-            frame = "QSW"
 
         self.date = date
         self.duration = duration
@@ -179,7 +182,7 @@ class ContinuousMan(Man):
         self.frame = frame
         self.comment = comment
 
-        log.debug("Man [{}; {}[".format(self.start, self.stop))
+        log.debug(f"Man [{self.start}; {self.stop}[")
 
     def __repr__(self):  # pragma: no cover
         txt = """ContinuousMan =
@@ -194,7 +197,7 @@ class ContinuousMan(Man):
             txt += "  comment  = {0.comment}\n"
         txt += "  dv\n"
         for i, x in enumerate("xyz"):
-            txt += "    {} = {:0.2g} m/s²\n".format(x, self._accel[i])
+            txt += f"    {x} = {self._accel[i]:0.2g} m/s²\n"
         return txt.format(self)
 
     def check(self, date):
@@ -229,27 +232,55 @@ class KeplerianContinuousMan(ContinuousMan):
     def __init__(self, date, duration, **kwargs):
         kwargs["frame"] = "TNW"
         self.delta_a = kwargs.pop("delta_a", 0)
-        self.delta_angle = kwargs.pop("delta_i", 0)
+        self.di = kwargs.pop("di", 0)
+        self.dOmega = kwargs.pop("dOmega", 0)
         super().__init__(date, duration, np.zeros(3), **kwargs)
 
     def accel(self, orb):
-        self._dv = dkep2dv(orb, delta_a=self.delta_a, delta_angle=self.delta_angle)
+        self._dv = dkep2dv(orb, delta_a=self.delta_a, di=self.di, dOmega=self.dOmega)
         return super().accel(orb)
 
 
-def dkep2dv(orb, *, delta_a=0, delta_angle=0):
-    """Convert a increment in keplerian elements to a delta v in TNW"""
-    dv_a = orb.frame.center.body.mu * delta_a / (2 * orb.infos.v * orb.infos.kep.a ** 2)
+def dkep2aol(orb, di, dOmega):
+    """Compute the ideal argument of latitude for a correction of inclination
+    and/or right ascension of ascending node
+
+    Args:
+        orb (Orbit) :
+        di (float) : inclination increment (radians)
+        dOmega (float) : right ascension of ascending node (radians)
+
+    Return:
+        float : argument of latitude (ω+ν, in radians)
+    """
+    return np.arctan2(dOmega * np.sin(orb.infos.kep.i), di)
+
+
+def dkep2dv(orb, *, da=0, di=0, dOmega=0):
+    """Convert a increment in keplerian elements to a delta v in TNW
+
+    Args:
+        orb (Orbit) :
+        da (float) : semi major-axis increment (meters)
+        di (float) : inclination increment (radians)
+        dOmega (float) : right ascension of ascending node increment (radians)
+
+    Return:
+        numpy.array : delta-v in TNW
+    """
+
+    µ, a, i, v = orb.frame.center.body.mu, orb.infos.kep.a, orb.infos.kep.i, orb.infos.v
+
+    dv_a = µ * da / (2 * v * a ** 2)
+    dangle = np.sqrt(di ** 2 + dOmega ** 2 * np.sin(i) ** 2)
 
     v_final = orb.infos.v + dv_a
 
     # Al-Kashi
     dv = np.sqrt(
-        orb.infos.v ** 2
-        + v_final ** 2
-        - 2 * orb.infos.v * v_final * np.cos(delta_angle)
+        orb.infos.v ** 2 + v_final ** 2 - 2 * orb.infos.v * v_final * np.cos(dangle)
     )
-    dv_t = v_final * np.cos(delta_angle) - orb.infos.v
+    dv_t = v_final * np.cos(dangle) - orb.infos.v
 
     ratio = abs(dv_t / dv)
 

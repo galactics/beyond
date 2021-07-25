@@ -161,7 +161,7 @@ class PVT(Measure):
         return self.__class__(self.frame, self.date, value)
 
     def residual(self, ref):
-        name = "Residual{}".format(self.__class__.__name__)
+        name = f"Residual{self.__class__.__name__}"
         dct = {"type": self.__class__.__name__}
         klass = type(name, (Residual,), dct)
 

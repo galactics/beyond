@@ -373,7 +373,7 @@ class AnomalyListener(Listener):
     @property
     def _anomaly(self):
         if self.anomaly not in self.ANOMALIES:  # pragma: no cover
-            raise ValueError("Unknown anomaly type : {}".format(self.anomaly))
+            raise ValueError(f"Unknown anomaly type : {self.anomaly}")
 
         return self.ANOMALIES[self.anomaly]
 
@@ -396,11 +396,9 @@ class AnomalyListener(Listener):
         if self.anomaly == "aol":
             txt = "Argument of Latitude"
         else:
-            txt = "{} Anomaly".format(self.anomaly.title())
+            txt = f"{self.anomaly.title()} Anomaly"
 
-        return AnomalyEvent(
-            self, "{} = {:.2f}".format(txt, np.degrees(self._convert(orb)))
-        )
+        return AnomalyEvent(self, f"{txt} = {np.degrees(self._convert(orb)):.2f}")
 
     def _convert(self, orb):
         return getattr(orb.copy(frame=self.frame, form=self.form), self.attr)
@@ -411,7 +409,7 @@ class AnomalyListener(Listener):
 
 class SignalEvent(Event):  # pragma: no cover
     def __str__(self):
-        return "{} {} {}".format(self.info, self.elev, self.station)
+        return f"{self.info} {self.elev} {self.station}"
 
     @property
     def elev(self):
@@ -487,7 +485,7 @@ class MaxEvent(Event):  # pragma: no cover
         super().__init__(listener, "MAX")
 
     def __str__(self):
-        return "MAX {}".format(self.station)
+        return f"MAX {self.station}"
 
     @property
     def station(self):
@@ -532,7 +530,7 @@ class RadialVelocityEvent(Event):  # pragma: no cover
         return self.listener.frame
 
     def __str__(self):
-        return "Zero Doppler {}".format(self.frame)
+        return f"Zero Doppler {self.frame}"
 
 
 class RadialVelocityListener(Listener):
@@ -610,7 +608,7 @@ def find_event(iterator, event, offset=0):
         if i == offset:
             break
     else:
-        raise RuntimeError("No event '{}' found at offset={}".format(event, offset))
+        raise RuntimeError(f"No event '{event}' found at offset={offset}")
 
     return orb
 

@@ -21,7 +21,7 @@ def test_xsd(helper):
 
     schema = xmlschema.XMLSchema(str(xsdpath))
 
-    failing = {"opm_strange_units.xml": "invalid value 'm', it must be one of ['km']"}
+    failing = {"opm_strange_units.xml": "attribute units='m': value must be one of ['km']"}
 
     for file in folder.glob("*.xml"):
         if file.name not in failing:

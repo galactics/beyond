@@ -50,21 +50,17 @@ class Orbit(StateVector):
         elif self.propagator.orbit is None:
             propagator = self.propagator.__class__.__name__
         else:
-            propagator = "%s (initialised)" % self.propagator.__class__.__name__
+            propagator = f"{self.propagator.__class__.__name__} (initialised)"
 
-        fmt = """
+        fmt = f"""
 Orbit =
-  date = {date}
-  form = {form}
-  frame = {frame}
-  propag = {propag}
-  coord =\n{coord}\n""".format(
-            date=self.date,
-            coord=coord_str,
-            form=self.form,
-            frame=self.frame,
-            propag=propagator,
-        )
+  date = {self.date}
+  form = {self.form}
+  frame = {self.frame}
+  propag = {propagator}
+  coord =
+{coord_str}
+"""
 
         # Add covariance to the repr
         if self.cov is not None:

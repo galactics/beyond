@@ -36,7 +36,7 @@ def dumps(data, **kwargs):
     elif fmt == "xml":
         string = _dumps_xml(data, **kwargs)
     else:  # pragma: no cover
-        raise CcsdsError("Unknown format : {}".format(fmt))
+        raise CcsdsError(f"Unknown format : {fmt}")
 
     return string
 
@@ -86,7 +86,7 @@ def _loads_kvn(string):
             elif key == "ANGLE_2" and meta["ANGLE_TYPE"] == "AZEL":
                 obj = Elevation(path, date, np.radians(value))
             else:
-                raise CcsdsError("Unknown type : {}".format(key))
+                raise CcsdsError(f"Unknown type : {key}")
 
             data.append(obj)
 
@@ -138,7 +138,7 @@ def _loads_xml(string):
             elif meas_type == "ANGLE_2" and angle_type == "AZEL":
                 measures.append(Elevation(path, date, np.radians(value)))
             else:
-                raise CcsdsError("Unknown type : {}".format(meas_type))
+                raise CcsdsError(f"Unknown type : {meas_type}")
 
     if len(sets) == 1:
         sets = sets.pop()
@@ -169,7 +169,7 @@ def _dumps_kvn(data, **kwargs):
             else:
                 i += 1
             parts[p] = i
-            meta["PARTICIPANT_{}".format(i)] = p
+            meta[f"PARTICIPANT_{i}"] = p
 
         meta["MODE"] = "SEQUENTIAL"
         meta["PATH"] = ",".join([str(parts[p]) for p in path])
@@ -182,7 +182,7 @@ def _dumps_kvn(data, **kwargs):
         txt = ["META_START"]
 
         for k, v in meta.items():
-            txt.append("{:20} = {}".format(k, v))
+            txt.append(f"{k:20} = {v}")
 
         txt.append("META_STOP")
         txt.append("")
@@ -252,7 +252,7 @@ def _dumps_xml(data, **kwargs):
             else:
                 i += 1
             parts[p] = i
-            participant = ET.SubElement(meta, "PARTICIPANT_{}".format(i))
+            participant = ET.SubElement(meta, f"PARTICIPANT_{i}")
             participant.text = p
 
         mode = ET.SubElement(meta, "MODE")

@@ -36,7 +36,7 @@ class Body:
             setattr(self, k, v)
 
     def __repr__(self):
-        return "<Body '%s'>" % self.name
+        return f"<Body '{self.name}'>"
 
     def __getattr__(self, name):
         attrs = {

@@ -56,7 +56,7 @@ plt.plot([-np.degrees(callisto.theta)], [np.degrees(callisto.phi)], 'o', zorder=
 plt.plot([-np.degrees(jupiter.theta)], [np.degrees(jupiter.phi)], 'o', zorder=-jupiter.r, ms=12, label="Jupiter")
 
 plt.suptitle("Jupiter as seen from Toulouse")
-plt.title("{:%Y-%m-%d %H:%M:%S UTC}".format(date))
+plt.title(f"{date:%Y-%m-%d %H:%M:%S UTC}")
 plt.legend()
 plt.axis('equal')
 plt.show()

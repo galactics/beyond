@@ -120,7 +120,7 @@ class Bsp:
                     continue
 
                 if not filepath.exists():
-                    log.warning("File not found : {}".format(filepath))
+                    log.warning(f"File not found : {filepath}")
                     continue
 
                 self._spk.append(SPK.open(str(filepath)))
@@ -180,7 +180,7 @@ class Pck(dict):
                 continue
 
             if not filepath.exists():
-                log.warning("File not found : {}".format(filepath))
+                log.warning(f"File not found : {filepath}")
                 continue
 
             with filepath.open() as fp:
@@ -235,7 +235,7 @@ class Pck(dict):
 
                         body_dict[key.upper().strip()] = value
             except Exception as e:
-                raise JplError("Parsing error on file '{}'".format(filepath)) from e
+                raise JplError(f"Parsing error on file '{filepath}'") from e
 
     def __getitem__(self, name):
         """Retrieve infos for a given body, if available.
@@ -281,9 +281,7 @@ class JplPropagator(AnalyticalPropagator):
         self.frame = frame
 
     def __repr__(self):
-        return "<{} '{}' at {}>".format(
-            self.__class__.__name__, self.name, hex(id(self))
-        )
+        return f"<{self.__class__.__name__} '{self.name}' at {hex(id(self))}>"
 
     def copy(self):
         return self.__class__(self.obj, self.frame)
@@ -453,9 +451,6 @@ if __name__ == "__main__":  # pragma: no cover
 
             center = target_names.get(segment.center, "Unknown")
             target = target_names.get(segment.target, "Unknown")
-            print(
-                "from {start:{fmt}} to {end:{fmt}} : {center} -> {target}".format(
-                    start=start, end=end, center=center, target=target, fmt="%Y-%m-%d"
-                )
-            )
+            fmt = "%Y-%m-%d"
+            print(f"from {start:{fmt}} to {end:{fmt}} : {center} -> {target}")
         print()

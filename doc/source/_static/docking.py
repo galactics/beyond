@@ -98,9 +98,9 @@ result = np.asarray(chaser_ephem)
 
 # Display the trajectory
 print("Final position")
-print("{} = {: 7.3f}".format("Q", chaser_ephem[-1, 0]))
-print("{} = {: 7.3f}".format("S", chaser_ephem[-1, 1]))
-print("{} = {: 7.3f}".format("W", chaser_ephem[-1, 2]))
+print(f"Q = {chaser_ephem[-1, 0]: 7.3f}")
+print(f"S = {chaser_ephem[-1, 1]: 7.3f}")
+print(f"W = {chaser_ephem[-1, 2]: 7.3f}")
 
 man_dates = [man.date for man in orb.maneuvers if isinstance(man, ImpulsiveMan)]
 cont_man = [man for man in orb.maneuvers if isinstance(man, ContinuousMan)]

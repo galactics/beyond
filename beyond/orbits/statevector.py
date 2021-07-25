@@ -76,14 +76,34 @@ class StateVector(np.ndarray):
         super().__setstate__(state["basestate"])
         self._data = state["data"]
 
-    def copy(self, *, frame=None, form=None):
-        """Provide a new instance of the same point in space-time
+    def copy(self, *, frame=None, form=None, same=None):
+        """Provide a new object of the same point in space-time. Optionally,
+        allow for frame and form conversion
 
         Keyword Args:
             frame (str or Frame): Frame to convert the new instance into
             form (str or Form): Form to convert the new instance into
+            same (StateVector): A statevector from which to copy the frame and form
         Return:
-            Orbit:
+            StateVector :
+
+        If the argument *same* is used, it overwrites *frame* and *form*.
+
+        Example:
+
+        .. code-block:: python
+
+            # New instance of the same statevector
+            sv1 = sv.copy()
+
+            # statevector converted into spherical form
+            sv2 = sv.copy(form="spherical")
+
+            # statevector converted into EME2000 frame, keplerian form
+            sv3 = sv.copy(form="keplerian", frame="EME2000")
+
+            # statevector in the same frame and form as sv3 (EME2000, keplerian)
+            sv4 = sv.copy(same=sv3)
 
         Override :py:meth:`numpy.ndarray.copy()` to include additional
         fields
@@ -94,6 +114,13 @@ class StateVector(np.ndarray):
             new_compl[k] = v.copy() if hasattr(v, "copy") else v
 
         new_obj = self.__class__(self.base, **new_compl)
+
+        if same is not None:
+            if hasattr(same, "frame") and hasattr(same, "form"):
+                frame = same.frame
+                form = same.form
+            else:
+                raise TypeError("'same' does not have a frame and/or a form attribute")
 
         if frame and frame != self.frame:
             new_obj.frame = frame
@@ -113,9 +140,7 @@ class StateVector(np.ndarray):
         elif name in self._data.keys():
             res = self._data[name]
         else:
-            raise AttributeError(
-                "'{}' object has no attribute {!r}".format(self.__class__, name)
-            )
+            raise AttributeError(f"'{self.__class__}' object has no attribute {name!r}")
 
         return res
 
@@ -140,17 +165,14 @@ class StateVector(np.ndarray):
             ]
         )
 
-        fmt = """
+        fmt = f"""
 StateVector =
-  date = {date}
-  form = {form}
-  frame = {frame}
-  coord =\n{coord}\n""".format(
-            date=self.date,
-            coord=coord_str,
-            form=self.form,
-            frame=self.frame,
-        )
+  date = {self.date}
+  form = {self.form}
+  frame = {self.frame}
+  coord =
+{coord_str}
+"""
 
         # Add covariance to the repr
         if self.cov is not None:
@@ -191,7 +213,7 @@ StateVector =
     def cov(self, value):
 
         if not isinstance(value, Cov):
-            raise TypeError("Unknwon covariance type : {}".format(type(value)))
+            raise TypeError(f"Unknwon covariance type : {type(value)}")
 
         self._data["cov"] = value
         self._data["cov"].orb = self
@@ -290,6 +312,13 @@ StateVector =
         return orbit2frame(name, self, **kwargs)
 
     def as_orbit(self, propagator):
+        """Attach a propagator to a StateVector, creating a new Orbit object
+
+        Args:
+            propagator (~beyond.propabator.base.Propagator) :
+        Return:
+            Orbit : New Orbit object, with the same state as the creating StateVector
+        """
         from .orbit import Orbit
 
         new_dict = self._data.copy()

@@ -29,41 +29,19 @@ class Orientation(Node):
             reverse = f"{b}_to_{a}"
 
             if hasattr(self, direct):
-                m1, m2 = getattr(self, direct)(date)
+                m1, rate = getattr(self, direct)(date)
             elif hasattr(self, reverse):
-                m1, m2 = getattr(self, reverse)(date)
+                m1, rate = getattr(self, reverse)(date)
                 m1 = m1.T
-                if m2 is not None:
-                    m2 = m2.T
+                rate = -rate if rate is not None else None
             else:
                 raise ValueError(f"Unknown transformation {a} <-> {b}")
 
-            M = expand(m1)
-
-            if m2 is not None:
-                M[3:, :3] = m2
+            M = expand(m1, rate=rate)
 
             m = M @ m
 
         return m
-
-    def _rate2mat(self, rate):
-        """Create a 3x3 matrix from a rate vector"""
-
-        # Each line of the rotation matrix is constructed by computing the cross product
-        # of the rate vector by the unit vector, which gives
-        # np.array(
-        #     [
-        #         np.cross(rate, [1, 0, 0]),
-        #         np.cross(rate, [0, 1, 0]),
-        #         np.cross(rate, [0, 0, 1]),
-        #     ]
-        # ).T
-        # This is equivatent to the following, which has the benefit of not requiring
-        # extra computation
-        return np.array(
-            [[0, -rate[2], rate[1]], [rate[2], 0, -rate[0]], [-rate[1], rate[0], 0]]
-        )
 
     def TEME_to_TOD(self, date):
         equin = iau1980.equinox(date, eop_correction=False, terms=4, kinematic=False)
@@ -71,8 +49,7 @@ class Orientation(Node):
 
     def PEF_to_TOD(self, date):
         m = iau1980.sideral(date, model="apparent", eop_correction=False)
-        m2 = m @ self._rate2mat(iau1980.rate(date))
-        return m, m2
+        return m, -iau1980.rate(date)
 
     def TOD_to_MOD(self, date):
         return iau1980.nutation(date, eop_correction=False), None
@@ -88,8 +65,7 @@ class Orientation(Node):
 
     def TIRF_to_CIRF(self, date):
         m = iau2010.sideral(date)
-        m2 = m @ self._rate2mat(iau2010.rate(date))
-        return m, m2
+        return m, -iau2010.rate(date)
 
     def CIRF_to_GCRF(self, date):
         return iau2010.precesion_nutation(date), None
@@ -156,7 +132,7 @@ class TopocentricOrientation(Orientation):
         self.parent = parent
         self.latlonalt = latlonalt
 
-        mtd = "{}_to_{}".format(name, parent.name)
+        mtd = f"{name}_to_{parent.name}"
         setattr(self, mtd, self._to_parent)
 
         self.parent + self
@@ -186,7 +162,7 @@ class LocalOrbitalOrientation(Orientation):
         self.orient = orient
         self.parent = parent
 
-        mtd = "{}_to_{}".format(name, parent.orientation.name)
+        mtd = f"{name}_to_{parent.orientation.name}"
         setattr(Orientation, mtd, self._to_parent)
 
         self.parent.orientation + self

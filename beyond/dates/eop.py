@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 class TaiUtc:
     """File listing all leap seconds throught history
 
-    This file can be retrieved `here <http://maia.usno.navy.mil/ser7/tai-utc.dat>`__.
+    This file could be retrieved `here <http://maia.usno.navy.mil/ser7/tai-utc.dat>`__, but this server seems discontinued.
     """
 
     def __init__(self, path):
@@ -68,14 +68,13 @@ class TaiUtc:
 class Finals2000A:
     """History of Earth orientation correction for IAU2000 model
 
-    Three files are available `here <http://maia.usno.navy.mil/ser7/>`__ for this model:
+    Three files are available `here <https://datacenter.iers.org/eop.php>`__ for this model:
 
         - **finals2000A.all**, from 1976-01-02 to present, updated weekly
         - **finals2000A.data**, from 1992-01-01 to present, updated weekly
         - **finals2000A.daily**, last 90 days + 90 days of prediction, updated daily
 
-    See the associated `readme <http://maia.usno.navy.mil/ser7/readme.finals2000A>`__ for more
-    informations about the content of these files.
+    See the associated metadata for more informations about the content of these files.
     """
 
     deltas = ("dx", "dy")
@@ -139,14 +138,13 @@ class Finals2000A:
 class Finals(Finals2000A):
     """History of Earth orientation correction for IAU1980 model
 
-    Three files are available `here <http://maia.usno.navy.mil/ser7/>`__ for this model:
+    Three files are available `here <https://datacenter.iers.org/eop.php>`__ for this model:
 
         - **finals.all**, from 1976-01-02 to present, updated weekly
         - **finals.data**, from 1992-01-01 to present, updated weekly
         - **finals.daily**, last 90 days + 90 days of prediction, updated daily
 
-    See the associated `readme <http://maia.usno.navy.mil/ser7/readme.finals>`__ for more
-    informations about the content of these files.
+    See the associated metadata for more informations about the content of these files.
     """
 
     deltas = ("dpsi", "deps")
@@ -217,7 +215,7 @@ class EopDb:
         dbname = dbname or config.get("eop", "dbname", fallback=cls.DEFAULT_DBNAME)
 
         if dbname not in cls._dbs.keys():
-            raise EopError("Unknown database '%s'" % dbname)
+            raise EopError(f"Unknown database '{dbname}'")
 
         if isclass(cls._dbs[dbname]):
             # Instanciation
@@ -251,7 +249,7 @@ class EopDb:
             value = cls.db(dbname)[mjd]
         except (EopError, KeyError) as e:
             if isinstance(e, KeyError):
-                msg = "Missing EOP data for mjd = '%s'" % e
+                msg = f"Missing EOP data for mjd = '{e}'"
             else:
                 msg = str(e)
 
@@ -283,9 +281,7 @@ class EopDb:
         """
 
         if name in cls._dbs:
-            msg = "'{}' is already registered for an Eop database. Skipping".format(
-                name
-            )
+            msg = f"'{name}' is already registered for an Eop database. Skipping"
             log.warning(msg)
         else:
             cls._dbs[name] = klass
@@ -368,8 +364,8 @@ class SimpleEopDatabase:
         type = config.get("eop", "type", fallback="all")
 
         # Data reading
-        f = Finals(path / ("finals.%s" % type))
-        f2 = Finals2000A(path / ("finals2000A.%s" % type))
+        f = Finals(path / (f"finals.{type}"))
+        f2 = Finals2000A(path / (f"finals2000A.{type}"))
         t = TaiUtc(path / "tai-utc.dat")
 
         # Extracting data from finals files

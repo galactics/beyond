@@ -5,7 +5,7 @@ ORIGINATOR = N/A
 META_START
 OBJECT_NAME          = ISS (ZARYA)
 OBJECT_ID            = 1998-067A
-CENTER_NAME          = MARS
+CENTER_NAME          = MARS BARYCENTER
 REF_FRAME            = EME2000
 TIME_SYSTEM          = UTC
 META_STOP
@@ -21,9 +21,9 @@ Z_DOT                =    18.953278 [km/s]
 
 COMMENT  Keplerian elements
 SEMI_MAJOR_AXIS      =   -14.083875 [km]
-ECCENTRICITY         =  25866220.707400
+ECCENTRICITY         =  25866219.745125
 INCLINATION          =    20.747121 [deg]
 RA_OF_ASC_NODE       =   358.011234 [deg]
 ARG_OF_PERICENTER    =    14.014314 [deg]
 TRUE_ANOMALY         =     8.567013 [deg]
-GM                   =  42828.3736 [km**3/s**2]
+GM                   =  42828.3752 [km**3/s**2]
