@@ -5,9 +5,9 @@ Beyond
     :alt: Documentation Status
     :target: http://beyond.readthedocs.io/en/latest/?badge=latest
 
-.. image:: https://travis-ci.org/galactics/beyond.svg?branch=master
+.. image:: https://travis-ci.com/galactics/beyond.svg?branch=master
     :alt: Tests
-    :target: https://travis-ci.org/galactics/beyond
+    :target: https://travis-ci.com/galactics/beyond
 
 .. image:: https://coveralls.io/repos/github/galactics/beyond/badge.svg?branch=master
     :alt: Coverage Status
