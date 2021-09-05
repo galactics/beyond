@@ -444,7 +444,7 @@ if __name__ == "__main__":  # pragma: no cover
     for file in sys.argv[1:]:
         print(file)
         print("*" * len(file))
-        for segment in SPK.open(file, encoding="ascii").segments:
+        for segment in SPK.open(file).segments:
 
             start = Date(segment.start_jd - Date.JD_MJD)
             end = Date(segment.end_jd - Date.JD_MJD)
