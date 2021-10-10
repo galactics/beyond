@@ -11,6 +11,8 @@ matrix:
     env: TOX_ENV=py38
   - python: 3.9
     env: TOX_ENV=py39
+  - python: 3.10
+    env: TOX_ENV=py310
 
 install: 
   - pip install tox coveralls
