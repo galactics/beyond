@@ -139,8 +139,8 @@ class Ephem(Speaker):
             y0 = self[prev_idx]
             y1 = self[prev_idx + 1]
 
-            result = y0[:] + (y1[:] - y0[:]) * (date.mjd - y0.date.mjd) / (
-                y1.date.mjd - y0.date.mjd
+            result = y0[:] + (y1[:] - y0[:]) * (date._mjd - y0.date._mjd) / (
+                y1.date._mjd - y0.date._mjd
             )
 
         elif method == self.LAGRANGE:
@@ -155,7 +155,7 @@ class Ephem(Speaker):
 
             # selection of the subset of data, of length 'order' around the desired value
             subset = self[start:stop]
-            date_subset = np.array([x.date.mjd for x in subset])
+            date_subset = np.array([x.date._mjd for x in subset])
 
             result = np.zeros(6)
 
@@ -175,7 +175,7 @@ class Ephem(Speaker):
             for j in range(order):
                 # This mask is here to enforce the m != j in the lagrange polynomials
                 mask = date_subset != date_subset[j]
-                l_j = (date.mjd - date_subset[mask]) / (
+                l_j = (date._mjd - date_subset[mask]) / (
                     date_subset[j] - date_subset[mask]
                 )
                 result = result + l_j.prod() * subset[j]
