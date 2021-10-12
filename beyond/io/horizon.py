@@ -113,7 +113,7 @@ def loads(text):
         if center != "Earth (399)":
             frame = center.partition("(")[0].strip()
 
-    coord = header.get("Coordinate systm", "equatorial")
+    coord = header.get("Coordinate systm", "Earth Mean Equator and Equinox of Reference Epoch")
     if coord == "Earth Mean Equator and Equinox of Reference Epoch":
         coord = "equatorial"
     elif coord == "Ecliptic and Mean Equinox of Reference Epoch":
