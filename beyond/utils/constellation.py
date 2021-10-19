@@ -35,15 +35,29 @@ class WalkerStar:
 
     @property
     def per_plane(self):
+        """Number of satellites per orbital plane"""
         return self.total // self.planes
 
     def raan(self, i_plane):
+        """
+        Args:
+            i_plane (int) : index of the plane
+        Return:
+            float : Right Ascension of Ascending Node in radians
+        """
         return np.pi / self.planes * i_plane + self.raan0
 
     def nu(self, i_plane, i_sat):
+        """
+        Args:
+            i_plane (int) : index of the plane
+            i_sat (int) : index of the satellite
+        Return:
+            float : True anomaly in radians
+        """
         return (
             2 * np.pi / self.per_plane * i_sat
-            + self.spacing * 2 * self.raan(i_plane) / self.per_plane
+            + self.spacing * 2 * (self.raan(i_plane) - self.raan0) / self.per_plane
         )
 
     def iter_raan(self):
@@ -64,14 +78,27 @@ class WalkerDelta(WalkerStar):
     """Definition of the Walkek Delta constellation
 
     Example: Galileo is a Walker Delta 24/3/1 constellation
-    so to generate this, one has to call ``WalkerStar(24, 3, 1)``
+    so to generate this, one has to call ``WalkerDelta(24, 3, 1)``
     """
 
     def raan(self, i_plane):
+        """
+        Args:
+            i_plane (int) : index of the plane
+        Return:
+            float : Right Ascension of Ascending Node in radians
+        """
         return 2 * np.pi / self.planes * i_plane + self.raan0
 
     def nu(self, i_plane, i_sat):
+        """
+        Args:
+            i_plane (int) : index of the plane
+            i_sat (int) : index of the satellite
+        Return:
+            float : True anomaly in radians
+        """
         return (
             2 * np.pi / self.per_plane * i_sat
-            + self.spacing * self.raan(i_plane) / self.per_plane
+            + self.spacing * (self.raan(i_plane) - self.raan0) / self.per_plane
         )
