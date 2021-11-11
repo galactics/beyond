@@ -220,7 +220,7 @@ class ContinuousMan(Man):
                 orb.date,
                 self.frame,
                 self._accel.tolist(),
-                orb.propagator.frame,
+                orb.frame,
                 projected_accel.tolist(),
                 np.linalg.norm(self._accel),
             )
