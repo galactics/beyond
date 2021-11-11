@@ -178,6 +178,12 @@ StateVector =
         if self.cov is not None:
             fmt += indent(repr(self.cov), " " * 2)
 
+        # Add man to the repr if there is some
+        if self.maneuvers:
+            fmt += "  maneuvers =\n"
+            for man in self.maneuvers:
+                fmt += indent(repr(man), " " * 4)
+
         return fmt
 
     @property
