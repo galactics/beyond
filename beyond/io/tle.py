@@ -280,7 +280,8 @@ class Tle:
         else:
             cospar_id = ""
 
-        orbit = orbit.copy(form="TLE", frame="TEME")
+        if orbit.form.name is not "tle" or orbit.frame.name is not "TEME":
+            orbit = orbit.copy(form="TLE", frame="TEME")
 
         date = orbit.date.datetime
         i, Ω, e, ω, M, n = orbit
