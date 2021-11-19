@@ -516,6 +516,11 @@ _cache = {
 }
 
 
+_cache_param_names = {x for form in _cache.values() for x in form.param_names}
+"""This cache keeps all the names of reserved StateVector attributes
+"""
+
+
 def get_form(form):  # pragma: no cover
     if form.lower() not in _cache:
         raise UnknownFormError(form)

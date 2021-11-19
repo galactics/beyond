@@ -10,7 +10,7 @@ from textwrap import indent
 from ..constants import c
 from ..dates import timedelta
 from ..errors import OrbitError
-from .forms import get_form, Form
+from .forms import get_form, Form, _cache_param_names
 from ..frames.frames import get_frame, orbit2frame
 from .man import Man
 from .cov import Cov
@@ -40,11 +40,11 @@ class StateVector(np.ndarray):
         obj = np.ndarray.__new__(
             cls, (6,), buffer=np.array([float(x) for x in coord]), dtype=float
         )
-        obj._data = kwargs
 
-        obj._data["date"] = date
-        obj._data["form"] = form
-        obj._data["frame"] = frame
+        kwargs["date"] = date
+        kwargs["form"] = form
+        kwargs["frame"] = frame
+        object.__setattr__(obj, "_data", kwargs)
 
         return obj
 
@@ -52,7 +52,7 @@ class StateVector(np.ndarray):
         if obj is None:
             return
 
-        self._data = obj._data.copy()
+        object.__setattr__(self, "_data", obj._data.copy())
 
     def __reduce__(self):
         """For pickling
@@ -74,7 +74,7 @@ class StateVector(np.ndarray):
         see http://stackoverflow.com/questions/26598109
         """
         super().__setstate__(state["basestate"])
-        self._data = state["data"]
+        object.__setattr__(self, "_data", state["data"])
 
     def copy(self, *, frame=None, form=None, same=None):
         """Provide a new object of the same point in space-time. Optionally,
@@ -137,12 +137,43 @@ class StateVector(np.ndarray):
         if name in self.form.param_names:
             i = self.form.param_names.index(name)
             res = self[i]
+        elif name in _cache_param_names:
+            # The attribute we are trying to access is used in another
+            # form of StateVector that the one currently used by the object
+            raise AttributeError(f"'{name}' is not available in '{self.form}' form")
         elif name in self._data.keys():
             res = self._data[name]
         else:
             raise AttributeError(f"'{self.__class__}' object has no attribute {name!r}")
 
         return res
+
+    def __setattr__(self, name, value):
+
+        propobj = getattr(self.__class__, name, None)
+        if isinstance(propobj, property):
+            # If the attribute we are trying to set is a property
+            # (i.e. getter and setters functions defined below)
+            # we have to call it, in lieu of setting the value directly
+            # in the __setattr__ method.
+            if propobj.fset is None:  # pragma: no cover
+                raise AttributeError("can't set attribute")
+            else:
+                return propobj.fset(self, value)
+        else:
+            name = Form.alt.get(name, name)
+
+            # Verification if the variable is available in the current form
+            if name in self.form.param_names:
+                i = self.form.param_names.index(name)
+                self[i] = value
+            elif name in _cache_param_names:
+                # The name of the attribute we are trying to set is used in
+                # another form of StateVector that the one currently used by
+                # the object
+                raise AttributeError(f"'{name}' is not available in '{self.form}' form")
+            else:
+                self._data[name] = value
 
     def __getitem__(self, key):
 
@@ -151,6 +182,15 @@ class StateVector(np.ndarray):
         else:
             try:
                 return self.__getattr__(key)
+            except AttributeError as err:
+                raise KeyError(str(err))
+
+    def __setitem__(self, key, value):
+        if isinstance(key, (int, slice)):
+            super().__setitem__(key, value)
+        else:
+            try:
+                self.__setattr__(key, value)
             except AttributeError as err:
                 raise KeyError(str(err))
 
