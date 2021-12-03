@@ -438,7 +438,7 @@ class Infos:
         if not self.elliptic:
             raise ValueError("period undefined : orbit is hyperbolic")
 
-        return timedelta(seconds=2 * np.pi * np.sqrt(self.kep.a ** 3 / self.mu))
+        return timedelta(seconds=2 * np.pi / self.n)
 
     @property
     def apocenter(self):
