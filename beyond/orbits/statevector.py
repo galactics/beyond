@@ -469,6 +469,16 @@ class Infos:
         return self.pericenter
 
     @property
+    def zp(self):
+        """Altitude of the pericenter, relative to the body equatorial surface"""
+        return self.rp - self.orb.frame.center.body.r
+
+    @property
+    def za(self):
+        """Altitude of the apocenter, relative to the body equatorial surface"""
+        return self.ra - self.orb.frame.center.body.r    
+
+    @property
     def v(self):
         """Instantaneous velocity"""
         return np.sqrt(self.mu * (2 / self.r - 1 / self.kep.a))
