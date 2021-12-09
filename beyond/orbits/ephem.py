@@ -157,14 +157,12 @@ class Ephem(Speaker):
             subset = self[start:stop]
             date_subset = np.array([x.date._mjd for x in subset])
 
-            result = np.zeros(6)
-
-            if len(subset) < order:
+            if len(subset) != order:
                 raise ValueError(
-                    f"len={len(ephem)} < order={order} : impossible to interpolate"
+                    f"len={len(subset)} < order={order} : impossible to interpolate"
                 )
 
-            # Everything is on wikipedia
+            # Lagrange polynomial
             #        k
             # L(x) = Σ y_j * l_j(x)
             #        j=0
@@ -172,20 +170,19 @@ class Ephem(Speaker):
             # l_j(x) = Π (x - x_m) / (x_j - x_m)
             #     0 <= m <= k
             #        m != j
-            for j in range(order):
-                # This mask is here to enforce the m != j in the lagrange polynomials
-                mask = date_subset != date_subset[j]
-                l_j = (date._mjd - date_subset[mask]) / (
-                    date_subset[j] - date_subset[mask]
-                )
-                result = result + l_j.prod() * subset[j]
-
+            mask = ~np.identity(order, dtype=bool)
+            dates = np.tile(date_subset, order).reshape(order, order)
+            datesj = np.repeat(np.diag(dates), order, axis=0).reshape(order, order)
+            lj = (
+                ((date._mjd - dates[mask]) / (datesj[mask] - dates[mask]))
+                .reshape(order, order - 1)
+                .prod(axis=1)
+            )
+            result = lj @ subset
         else:
             raise ValueError("Unkown interpolation method", method)
 
-        orb = ephem[0]
-
-        return StateVector(result, date, orb.form, orb.frame)
+        return StateVector(result, date, self.form, self.frame)
 
     def propagate(self, date):
         """Alias of :py:meth:`interpolate`"""
