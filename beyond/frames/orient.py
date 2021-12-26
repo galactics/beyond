@@ -170,11 +170,11 @@ class LocalOrbitalOrientation(Orientation):
     def _to_parent(self, date):
 
         if hasattr(self.statevector, "propagate"):
-            sv = self.statevector.propagate(date).copy(
-                form="cartesian", frame=self.parent
-            )
+            sv = self.statevector.propagate(date)
         else:
-            sv = self.statevector.copy(form="cartesian", frame=self.parent)
+            sv = self.statevector
+
+        sv = sv.copy(form="cartesian", frame=self.parent)
 
         return local.to_local(self.orient, sv, expanded=False).T, None
 

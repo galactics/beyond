@@ -476,7 +476,7 @@ class Infos:
     @property
     def za(self):
         """Altitude of the apocenter, relative to the body equatorial surface"""
-        return self.ra - self.orb.frame.center.body.r    
+        return self.ra - self.orb.frame.center.body.r
 
     @property
     def v(self):
