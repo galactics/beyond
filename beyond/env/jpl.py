@@ -269,7 +269,13 @@ class Pck(dict):
         if "GM" in obj:
             kwargs["mass"] = obj["GM"][0] * 1e9 / G
 
-        return Body(**kwargs)
+        return JplBody(**kwargs)
+
+
+class JplBody(Body):
+
+    def propagate(self, *args, **kwargs):
+        return get_propagator(self.name).propagate(*args, **kwargs)
 
 
 class JplPropagator(AnalyticalPropagator):
@@ -402,7 +408,6 @@ def create_frames():
 def get_body(name):
     """Retrieve a body instance for a given object"""
     body = Pck()[name]
-    body.propagate = get_propagator(name).propagate
     return body
 
 
