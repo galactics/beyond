@@ -13,6 +13,7 @@ from ..utils.units import AU
 from ..propagators.base import AnalyticalPropagator
 from ..frames import frames
 from ..frames.center import Center
+from ..dates import timedelta
 
 
 def get_body(name):
@@ -67,14 +68,33 @@ class EarthPropagator(AnalyticalPropagator):
         return Orbit([0] * 6, date, "cartesian", cls.FRAME, cls())
 
 
-class MoonPropagator(AnalyticalPropagator):
+class _DiffPropagator(AnalyticalPropagator):
+    """As the Moon and Sun propagators only provide position, we have
+    to compute the velocity numerically
+
+    There is certainly better approaches for this, but this works
+    """
+
+    @classmethod
+    def propagate(cls, date):
+        x = cls._propagate(date)
+        x0 = cls._propagate(date - cls._diff_step)
+        x1 = cls._propagate(date + cls._diff_step)
+
+        x[3:] = (x1[:3] - x0[:3]) / (2 * cls._diff_step.total_seconds())
+
+        return x
+
+
+class MoonPropagator(_DiffPropagator):
     """Dummy propagator for moon position"""
 
     orbit = None
     FRAME = "EME2000"
+    _diff_step = timedelta(days=1)
 
     @classmethod
-    def propagate(cls, date):
+    def _propagate(cls, date):
         """Compute the Moon position at a given date
 
         Args:
@@ -158,14 +178,15 @@ class MoonPropagator(AnalyticalPropagator):
         return Orbit(state_vector, date, "cartesian", cls.FRAME, cls())
 
 
-class SunPropagator(AnalyticalPropagator):
+class SunPropagator(_DiffPropagator):
     """Dummy propagator for Sun position"""
 
     orbit = None
     FRAME = "MOD"
+    _diff_step = timedelta(days=5)
 
     @classmethod
-    def propagate(cls, date):
+    def _propagate(cls, date):
         """Compute the position of the sun at a given date
 
         Args:
