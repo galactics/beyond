@@ -11,6 +11,8 @@ from ..errors import UnknownBodyError
 from ..orbits import Orbit
 from ..utils.units import AU
 from ..propagators.base import AnalyticalPropagator
+from ..frames import frames
+from ..frames.center import Center
 
 
 def get_body(name):
@@ -33,19 +35,43 @@ def get_body(name):
     return body
 
 
+def get_frame(name):
+    """
+    Args:
+        name (str) : Object name
+    Return:
+        Frame: A frame centered on a solar system object
+    Raise:
+        UnknownBodyError : when the object is not handled
+    """
+
+    body = get_body(name)
+
+    # Retrieve the parent frame from the propagator attribute
+    parent_frame = frames.get_frame(body.propagator.FRAME)
+
+    # Create the center of the frame, and use the propagator as offset
+    center = Center(name.title(), body)
+    center.add_link(parent_frame.center, parent_frame.orientation, body.propagator)
+
+    return frames.Frame(name, parent_frame.orientation, center)
+
+
 class EarthPropagator(AnalyticalPropagator):
 
     orbit = None
+    FRAME = "EME2000"
 
     @classmethod
     def propagate(cls, date):
-        return Orbit([0] * 6, date, "cartesian", "EME2000", cls())
+        return Orbit([0] * 6, date, "cartesian", cls.FRAME, cls())
 
 
 class MoonPropagator(AnalyticalPropagator):
     """Dummy propagator for moon position"""
 
     orbit = None
+    FRAME = "EME2000"
 
     @classmethod
     def propagate(cls, date):
@@ -129,13 +155,14 @@ class MoonPropagator(AnalyticalPropagator):
             ]
         )
 
-        return Orbit(state_vector, date, "cartesian", "EME2000", cls())
+        return Orbit(state_vector, date, "cartesian", cls.FRAME, cls())
 
 
 class SunPropagator(AnalyticalPropagator):
     """Dummy propagator for Sun position"""
 
     orbit = None
+    FRAME = "MOD"
 
     @classmethod
     def propagate(cls, date):
@@ -194,7 +221,7 @@ class SunPropagator(AnalyticalPropagator):
             * AU
         )
 
-        return Orbit(pv, date, "cartesian", "MOD", cls())
+        return Orbit(pv, date, "cartesian", cls.FRAME, cls())
 
 
 Moon = deepcopy(Moon)
