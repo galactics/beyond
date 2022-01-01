@@ -7,6 +7,7 @@ All units are in `SI <https://en.wikipedia.org/wiki/International_System_of_Unit
 """
 
 from numpy import sqrt
+from .errors import BeyondError
 
 
 c = 299792458
@@ -31,6 +32,8 @@ class Body:
         """Equatorial radius of the celestial body"""
         self.flattening = flattening
         """Flattening of the celestial body"""
+        self.propagator = kwargs.get("propagator")
+        """Propagator, not set by default"""
 
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -66,6 +69,28 @@ class Body:
     def polar_radius(self):
         """Polar radius of the body"""
         return self.r * (1 - self.f)
+
+    def propagate(self, date):
+        """Gives the statevector of the celestial body
+
+        Warning:
+            A propagator should be attached to this body, as there is none provided
+            by default. This can be done by setting :py:attr:`Body.propagator`.
+            See :py:mod:`~beyond.env.solarsystem` or :py:mod:`~beyond.env.jpl`
+            and their respective ``get_body()`` functions.
+
+        Args:
+            date (Date) :
+        Return:
+            StateVector:
+        Raise:
+            BeyondError: when no propagator is attached to the object
+        """
+
+        if self.propagator is None:
+            raise BeyondError("No propagator attached to this body")
+
+        return self.propagator.propagate(date)
 
 
 Earth = Body(

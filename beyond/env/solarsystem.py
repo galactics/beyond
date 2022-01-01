@@ -1,7 +1,10 @@
 """Analytical computation of Solar System bodies
+
+At the moment, only the Earth, the Moon and the Sun are available
 """
 
 import numpy as np
+from copy import deepcopy
 
 from ..constants import Earth, Moon, Sun
 from ..errors import UnknownBodyError
@@ -16,16 +19,16 @@ def get_body(name):
     Args:
         name (str): Object name
     Return:
-        Body:
+        Body: object containig the main parameters of the celestial body
+            as well as a propagator
+    Raise:
+        UnknownBodyError : when the object is not handled
     """
 
     try:
-
-        body, propag = _bodies[name.lower()]
-        # attach a propagator to the object
-        body.propagate = propag.propagate
-    except KeyError as e:
-        raise UnknownBodyError(e.args[0])
+        body = _bodies[name.lower()]
+    except KeyError:
+        raise UnknownBodyError(name)
 
     return body
 
@@ -194,8 +197,16 @@ class SunPropagator(AnalyticalPropagator):
         return Orbit(pv, date, "cartesian", "MOD", cls())
 
 
+Moon = deepcopy(Moon)
+Moon.propagator = MoonPropagator
+Sun = deepcopy(Sun)
+Sun.propagator = SunPropagator
+Earth = deepcopy(Earth)
+Earth.propagator = EarthPropagator
+
+
 _bodies = {
-    "moon": (Moon, MoonPropagator),
-    "sun": (Sun, SunPropagator),
-    "earth": (Earth, EarthPropagator),
+    "moon": Moon,
+    "sun": Sun,
+    "earth": Earth,
 }

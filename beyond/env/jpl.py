@@ -269,13 +269,7 @@ class Pck(dict):
         if "GM" in obj:
             kwargs["mass"] = obj["GM"][0] * 1e9 / G
 
-        return JplBody(**kwargs)
-
-
-class JplBody(Body):
-
-    def propagate(self, *args, **kwargs):
-        return get_propagator(self.name).propagate(*args, **kwargs)
+        return Body(**kwargs)
 
 
 class JplPropagator(AnalyticalPropagator):
@@ -408,6 +402,7 @@ def create_frames():
 def get_body(name):
     """Retrieve a body instance for a given object"""
     body = Pck()[name]
+    body.propagator = get_propagator(name)
     return body
 
 
@@ -426,7 +421,11 @@ def get_orbit(name, date):
 
 def get_frame(name):
     """Get the frame attached to a celestial body"""
-    return _frame_cache[name]
+    frame = _frame_cache[name]
+    # As the frame cache was populated at the same time as the propagator
+    # cache, we have to attache the correct propagator to its body
+    frame.center.body.propagator = get_propagator(name)
+    return frame
 
 
 def list_frames():
