@@ -19,7 +19,10 @@ def ccsds_format(request):
 
 @fixture
 def datafile(ccsds_format):
-    return lambda name: Helper.datafile(name, suffix=".{}".format(ccsds_format))
+    def func(name, kep=True):
+        name = name if kep else f"{name}-nokep"
+        return Helper.datafile(name, suffix=".{}".format(ccsds_format))
+    return func
 
 
 @fixture

@@ -73,10 +73,14 @@ def dump(data, fp, **kwargs):  # pragma: no cover
         cospar_id (str): International designator of the object
         originator (str): Originator of the CCSDS file
         fmt (str): Output format of the file, can be 'xml' or 'kvn'. Default to 'kvn'
+        kep (bool): For OPM only, if ``False`` disable the optional osculating keplerian elements.
     Raise:
         TypeError: if the data object class is not handled
 
-    It is also possible to set the configuration dict to change the default value
+    If ``kep = True`` **and** the frame of the StateVector is (pseudo-)inertial (i.e. EME2000, CIRF, TOD, etc.)
+    the optional osculating keplerian elements will be added to the OPM.
+
+    It is possible to set the configuration dict to change the default value
     of 'fmt'.
 
     .. code-block:: python
