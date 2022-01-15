@@ -2,6 +2,7 @@ import numpy as np
 from pytest import fixture, mark, skip
 from unittest.mock import patch
 from pathlib import Path
+from itertools import product
 
 from beyond.config import config
 from beyond.dates.eop import Eop
@@ -11,6 +12,8 @@ from beyond.propagators.keplernum import KeplerNum
 from beyond.dates import Date, timedelta
 from beyond.env.solarsystem import get_body
 from beyond.env import jpl
+from beyond.orbits.man import ContinuousMan
+from beyond.orbits import StateVector
 
 np.set_printoptions(linewidth=200)
 
@@ -97,6 +100,109 @@ def jplfiles():
     ])
 
     jpl.create_frames()
+
+
+class Helper:
+
+    @staticmethod
+    def assert_vector(ref, pv, precision=(4, 6)):
+
+        if isinstance(ref, StateVector):
+            ref = ref.base
+        if isinstance(pv, StateVector):
+            pv = pv.base
+
+        np.testing.assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
+        np.testing.assert_almost_equal(ref[3:], pv[3:], precision[1], "Velocity")
+
+    @staticmethod
+    def assert_orbit(orb1, orb2, form="cartesian"):
+
+        cov_eps = 1e-10
+
+        orb1.form = form
+        orb2.form = form
+
+        assert orb1.name == orb2.name
+        assert orb1.cospar_id == orb2.cospar_id
+
+        assert orb1.frame == orb2.frame
+        assert orb1.date == orb2.date
+
+        # Precision down to millimeter due to the truncature when writing the CCSDS OPM
+        assert abs(orb1[0] - orb2[0]) < 1e-3
+        assert abs(orb1[1] - orb2[1]) < 1e-3
+        assert abs(orb1[2] - orb2[2]) < 1e-3
+        assert abs(orb1[3] - orb2[3]) < 1e-3
+        assert abs(orb1[4] - orb2[4]) < 1e-3
+        assert abs(orb1[5] - orb2[5]) < 1e-3
+
+        if orb1.cov is not None and orb2.cov is not None:
+            elems = "X Y Z X_DOT Y_DOT Z_DOT".split()
+            for i, j in product(range(6), repeat=2):
+                assert abs(orb1.cov[i,j] - orb2.cov[i,j]) < cov_eps, "C{}_{}".format(elems[i], elems[j])
+
+        if hasattr(orb1, "maneuvers") and hasattr(orb2, "maneuvers"):
+            assert len(orb1.maneuvers) == len(orb2.maneuvers)
+
+            # Check for maneuvers if there is some
+            for i, (o1_man, o2_man) in enumerate(zip(orb1.maneuvers, orb2.maneuvers)):
+                assert o1_man.date == o2_man.date
+
+                if isinstance(o1_man, ContinuousMan):
+                    assert isinstance(o2_man, ContinuousMan)
+                    assert o1_man.duration == o2_man.duration
+
+                assert o1_man._dv.tolist() == o2_man._dv.tolist()
+                assert o1_man.frame == o2_man.frame
+                assert o1_man.comment == o2_man.comment
+        elif hasattr(orb1, "maneuvers") != hasattr(orb2, "maneuvers"):
+            assert False, "Incoherent structures"
+
+    @classmethod
+    def assert_ephem(cls, ephem1, ephem2):
+
+        assert len(ephem1) == len(ephem2)
+
+        assert ephem1.frame == ephem2.frame
+        assert ephem1.start == ephem2.start
+        assert ephem1.stop == ephem2.stop
+        assert ephem1.method == ephem2.method
+        assert ephem1.order == ephem2.order
+
+        for e1, e2 in zip(ephem1, ephem2):
+            cls.assert_orbit(e1, e2)
+
+    @staticmethod
+    def assert_string(str1, str2, ignore=[]):
+
+        str1 = str1.splitlines()
+        str2 = str2.splitlines()
+
+        assert len(str1) == len(str2)
+
+        if isinstance(ignore, str):
+            ignore = [ignore]
+
+        ignore.append("CREATION_DATE")
+
+        for r, t in zip(str1, str2):
+            _ignore = False
+
+            for ig in ignore:
+                if ig in r:
+                    _ignore = True
+                    break
+            if _ignore:
+                continue
+
+            assert r == t
+
+
+@fixture
+def helper():
+    return Helper
+
 
 
 def _skip_if_no_mpl():

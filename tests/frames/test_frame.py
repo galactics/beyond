@@ -43,17 +43,6 @@ def ref_orbit(date):
     )
 
 
-def assert_vector(ref, pv, precision=(4, 6)):
-
-    if isinstance(ref, StateVector):
-        ref = ref.base
-    if isinstance(pv, StateVector):
-        pv = pv.base
-
-    assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
-    assert_almost_equal(ref[3:], pv[3:], precision[1], "Velocity")
-
-
 pef_ref = np.array([-1033475.03131, 7901305.5856, 6380344.5328,
                     -3225.632747, -2872.442511, 5531.931288])
 tod_ref = np.array([5094514.7804, 6127366.4612, 6380344.5328,
@@ -81,97 +70,97 @@ g50_ref = np.array([5201586.1179, 6065401.818 , 6353101.5731,
 #                      -4743.22016, 790.53650, 5533.75573])
 
 
-def test_unit_iau1980(ref_orbit, model_correction):
+def test_unit_iau1980(ref_orbit, model_correction, helper):
     """These reference data are extracted from Vallado §3.7.3.
 
     The MOD transformation seems to be problematic
     """
 
     pv = ITRF.transform(ref_orbit, PEF)
-    assert_vector(pef_ref, pv)
+    helper.assert_vector(pef_ref, pv)
 
     # Going back to ITRF
     pv2 = PEF.transform(pv, ITRF)
-    assert_vector(ref_orbit, pv2)
+    helper.assert_vector(ref_orbit, pv2)
 
     # PEF to TOD
     pv = PEF.transform(pv, TOD)
-    assert_vector(tod_ref, pv)
+    helper.assert_vector(tod_ref, pv)
 
     # Going back to PEF
     pv2 = TOD.transform(pv, PEF)
-    assert_vector(pef_ref, pv2)
+    helper.assert_vector(pef_ref, pv2)
 
     # TOD to MOD
     pv = TOD.transform(pv, MOD)
-    # assert_vector(mod_ref, pv)
+    # helper.assert_vector(mod_ref, pv)
 
     # Back to TOD
     pv2 = MOD.transform(pv, TOD)
-    assert_vector(tod_ref, pv2)
+    helper.assert_vector(tod_ref, pv2)
 
     # MOD to EME2000
     pv = MOD.transform(pv, EME2000)
-    assert_vector(eme_ref, pv)
+    helper.assert_vector(eme_ref, pv)
 
     # Back to MOD
     pv2 = EME2000.transform(pv, MOD)
-    # assert_vector(mod_ref, pv2)
+    # helper.assert_vector(mod_ref, pv2)
 
 
-def test_unit_iau2010(ref_orbit, model_correction):
+def test_unit_iau2010(ref_orbit, model_correction, helper):
 
     date = ref_orbit.date
 
     tirf = ITRF.transform(ref_orbit, TIRF)
-    assert_vector(tirf_ref, tirf)
+    helper.assert_vector(tirf_ref, tirf)
 
     # Going back to ITRF
     itrf = TIRF.transform(tirf, ITRF)
-    assert_vector(ref_orbit, itrf)
+    helper.assert_vector(ref_orbit, itrf)
 
     # TIRF to CIRF
     cirf = TIRF.transform(tirf, CIRF)
-    assert_vector(cirf_ref, cirf)
+    helper.assert_vector(cirf_ref, cirf)
 
     # Back to TIRF
     tirf = CIRF.transform(cirf, TIRF)
-    assert_vector(tirf_ref, tirf)
+    helper.assert_vector(tirf_ref, tirf)
 
     # CIRF to GCRF
     gcrf = CIRF.transform(cirf, GCRF)
-    assert_vector(gcrf_ref, gcrf)
+    helper.assert_vector(gcrf_ref, gcrf)
 
     # Back to CIRF
     cirf = GCRF.transform(gcrf, CIRF)
-    assert_vector(cirf_ref, cirf)
+    helper.assert_vector(cirf_ref, cirf)
 
 
-def test_unit_g50(ref_orbit, model_correction):
+def test_unit_g50(ref_orbit, model_correction, helper):
 
     ref_orbit.frame = EME2000
 
     g50 = EME2000.transform(ref_orbit, G50)
-    assert_vector(g50_ref, g50)
+    helper.assert_vector(g50_ref, g50)
 
     # back to EME2000
     eme = G50.transform(g50, EME2000)
-    assert_vector(eme_ref, eme)
+    helper.assert_vector(eme_ref, eme)
 
 
-def test_global_change(ref_orbit, model_correction):
+def test_global_change(ref_orbit, model_correction, helper):
 
     pv = ITRF.transform(ref_orbit, GCRF)
-    assert_vector(gcrf_ref, pv)
+    helper.assert_vector(gcrf_ref, pv)
 
     pv = ITRF.transform(ref_orbit, EME2000)
-    assert_vector(eme_ref, pv)
+    helper.assert_vector(eme_ref, pv)
 
     pv = EME2000.transform(pv, ITRF)
-    assert_vector(ref_orbit, pv)
+    helper.assert_vector(ref_orbit, pv)
 
 
-def test_change_tle():
+def test_change_tle(helper):
 
     # lines = """1 00005U 58002B   00179.78495062  .00000023  00000-0  28098-4 0  4753
     #            2 00005  34.2682 348.7242 1859667 331.7664  19.3264 10.82419157413667"""
@@ -203,7 +192,7 @@ def test_change_tle():
         eme2000_ref = [-9059942.6552, 4659694.9162, 813957.7525,
                        -2233.346698, -4110.136822, -3157.394202]
 
-        assert_vector(eme2000_ref, tle)
+        helper.assert_vector(eme2000_ref, tle)
 
 
 def test_errors(ref_orbit):
@@ -212,7 +201,7 @@ def test_errors(ref_orbit):
         ref_orbit.frame = 'Inexistant'
 
 
-def test_orbit2frame():
+def test_orbit2frame(helper):
 
     iss = Tle("""0 ISS (ZARYA)
 1 25544U 98067A   16333.80487076  .00003660  00000-0  63336-4 0  9996
@@ -234,13 +223,13 @@ def test_orbit2frame():
     assert tnw.orientation.orient == "TNW"
 
     s1 = soyouz.copy(frame='iss_inert')
-    assert_vector(s1, np.array([70.5889585, 73.6584008, -62.5406308, 0.0521557, 0.0998631, -0.0423856]))
+    helper.assert_vector(s1, np.array([70.5889585, 73.6584008, -62.5406308, 0.0521557, 0.0998631, -0.0423856]))
 
     s2 = soyouz.copy(frame="iss_qsw")
-    assert_vector(s2, np.array([4.5450528, -18.6989377, -118.107503, 0.0393978, -0.0046244, -0.1136478]))
+    helper.assert_vector(s2, np.array([4.5450528, -18.6989377, -118.107503, 0.0393978, -0.0046244, -0.1136478]))
 
     s3 = soyouz.copy(frame="iss_tnw")
-    assert_vector(s3, np.array([-18.6974528, -4.5511611, -118.107503, -0.0046116, -0.0393993, -0.1136478]))
+    helper.assert_vector(s3, np.array([-18.6974528, -4.5511611, -118.107503, -0.0046116, -0.0393993, -0.1136478]))
 
     # Whatever the local reference frame, the W vector is the same
     assert s2[2] == s3[2]

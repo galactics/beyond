@@ -11,18 +11,7 @@ from beyond.io.tle import Tle
 from beyond.propagators.listeners import SignalEvent, MaxEvent, MaskEvent, stations_listeners
 
 
-def assert_vector(ref, pv, precision=(4, 6)):
-
-    if isinstance(ref, Orbit):
-        ref = ref.base
-    if isinstance(pv, Orbit):
-        pv = pv.base
-
-    assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
-    assert_almost_equal(ref[3:], pv[3:], precision[1], "Velocity")
-
-
-def test_station(station):
+def test_station(station, helper):
 
     # lines = """ISS (ZARYA)
     #            1 25544U 98067A   16038.20499631  .00009950  00000-0  15531-3 0  9993
@@ -57,7 +46,7 @@ def test_station(station):
 
     orb.frame = archive.frame
     orb.form = archive.form
-    assert_vector(archive, orb)
+    helper.assert_vector(archive, orb)
 
 
 def test_station_visibility(orbit, station):
