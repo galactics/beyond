@@ -3,6 +3,24 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [v0.7.4] - 2022-01-15
+
+### Added
+
+- Altitude of periapsis/apoapsis in Info object
+- Python 3.10 support
+- Lagrange Points frames
+- Propagators can be attached to Body objects in a clean fashion
+
+### Modified
+
+- Ephem interpolation is made in TAI
+- W component of local orbital frames were miscomputed. The effect was very small for circular
+  orbit, hence the difficulty to spot it.
+- Setting an attribute of StateVector/Orbit objects is handled more robustly.
+- Analytical propagators of the Sun and the Moon are now differentiated to provide velocity
+- Osculating keplerian elements in CCSDS OPM can be disabled
+
 ## [v0.7.3] - 2021-07-25
 
 ### Added
