@@ -273,10 +273,10 @@ def test_listener(orbit_kepler):
 
         events = [x for x in data if x.event]
         assert len(events) == 2
-        assert events[0].date == Date(2018, 5, 4, 13, 8, 38, 869128)
+        assert events[0].date == Date(2018, 5, 4, 13, 8, 38, 869126)
         assert events[0].event.info == "Umbra exit"
 
-        assert events[1].date == Date(2018, 5, 4, 14, 5, 21, 256924)
+        assert events[1].date == Date(2018, 5, 4, 14, 5, 21, 256923)
         assert events[1].event.info == "Umbra entry"
 
     with mock_step(orbit_kepler) as mock:
@@ -297,10 +297,10 @@ def test_listener(orbit_kepler):
 
         events = [x for x in data if x.event]
         assert len(events) == 2
-        assert str(events[0].date) == "2018-05-04T13:08:30.765143 UTC"
+        assert str(events[0].date) == "2018-05-04T13:08:30.765145 UTC"
         assert events[0].event.info == "Periapsis"
 
-        assert str(events[1].date) == "2018-05-04T13:54:50.178229 UTC"
+        assert str(events[1].date) == "2018-05-04T13:54:50.178231 UTC"
         assert events[1].event.info == "Apoapsis"
 
 

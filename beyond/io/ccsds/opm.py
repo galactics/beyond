@@ -223,9 +223,8 @@ def _loads_xml(string):
     return orb
 
 
-def _dumps_kvn(data, **kwargs):
+def _dumps_kvn(data, *, kep=True, **kwargs):
     cart = data.copy(form="cartesian")
-    kep = data.copy(form="keplerian")
 
     header = dump_kvn_header(data, "OPM", version="2.0", **kwargs)
 
@@ -244,7 +243,8 @@ Z_DOT                = {cartesian.vz: 12.6f} [km/s]
         dfmt=DATE_FMT_DEFAULT,
     )
 
-    if cart.frame.orientation in (G50, EME2000, GCRF, MOD, TOD, TEME, CIRF):
+    if kep and cart.frame.orientation in (G50, EME2000, GCRF, MOD, TOD, TEME, CIRF):
+        kep = data.copy(form="keplerian")
         text += """
 COMMENT  Keplerian elements
 SEMI_MAJOR_AXIS      = {kep_a: 12.6f} [km]
@@ -310,10 +310,9 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
     return header + "\n" + meta + text
 
 
-def _dumps_xml(data, **kwargs):
+def _dumps_xml(data, *, kep=True, **kwargs):
 
     cart = data.copy(form="cartesian")
-    kep = data.copy(form="keplerian")
 
     # Write an intermediary, with field name, unit and value
     # like a dict of tuple
@@ -347,7 +346,8 @@ def _dumps_xml(data, **kwargs):
         x = ET.SubElement(statevector, k, units="km" if "DOT" not in k else "km/s")
         x.text = f"{getattr(cart, v) / units.km:0.6f}"
 
-    if cart.frame.orientation in (G50, EME2000, GCRF, MOD, TOD, TEME, CIRF):
+    if kep and cart.frame.orientation in (G50, EME2000, GCRF, MOD, TOD, TEME, CIRF):
+        kep = data.copy(form="keplerian")
         keplerian = ET.SubElement(data_tag, "keplerianElements")
 
         sma = ET.SubElement(keplerian, "SEMI_MAJOR_AXIS", units="km")

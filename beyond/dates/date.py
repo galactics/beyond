@@ -538,16 +538,22 @@ else:  # pragma: no cover
 
     class DateConverter(mdates.DateConverter):
         @staticmethod
+        def _conv(v):
+            if isinstance(v, (datetime, date)):
+                v = mdates.date2num(v)
+            else:
+                v = mdates.date2num(v.datetime)
+            return v
+
+        @staticmethod
         def convert(values, unit, axis):
+
             try:
                 iter(values)
             except TypeError:
-                if isinstance(values, (datetime, date)):
-                    values = mdates.date2num(values)
-                else:
-                    values = mdates.date2num(values.datetime)
-            else:
-                values = [mdates.date2num(v.datetime) for v in values]
+                values = [values]
+
+            values = [DateConverter._conv(v) for v in values]
 
             return values
 

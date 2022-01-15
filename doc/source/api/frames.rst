@@ -73,6 +73,11 @@ will ensure correct frames conversions.
 .. autoclass:: beyond.frames.stations.TopocentricFrame
     :members:
 
+Lagrange Points
+---------------
+
+.. autofunction:: beyond.frames.lagrange.lagrange
+
 Creating new frames
 -------------------
 

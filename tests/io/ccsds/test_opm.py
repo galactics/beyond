@@ -5,10 +5,13 @@ import numpy as np
 from beyond.io.ccsds import dumps, loads, CcsdsError
 
 
-def test_dump_opm(orbit, datafile, ccsds_format, helper):
+@mark.parametrize("kep", ("kep", "nokep"))
+def test_dump_opm(orbit, datafile, ccsds_format, helper, kep):
 
-    ref = datafile("opm")
-    txt = dumps(orbit, fmt=ccsds_format)
+    kep = kep == "kep"
+
+    ref = datafile("opm", kep)
+    txt = dumps(orbit, fmt=ccsds_format, kep=kep)
 
     helper.assert_string(ref, txt)
 

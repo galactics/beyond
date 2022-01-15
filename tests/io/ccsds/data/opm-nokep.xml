@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd" id="CCSDS_OPM_VERS" version="2.0">
+  <header>
+    <CREATION_DATE>2019-11-21T21:41:41</CREATION_DATE>
+    <ORIGINATOR>N/A</ORIGINATOR>
+  </header>
+  <body>
+    <segment>
+      <metadata>
+        <OBJECT_NAME>ISS (ZARYA)</OBJECT_NAME>
+        <OBJECT_ID>1998-067A</OBJECT_ID>
+        <CENTER_NAME>EARTH</CENTER_NAME>
+        <REF_FRAME>TEME</REF_FRAME>
+        <TIME_SYSTEM>UTC</TIME_SYSTEM>
+      </metadata>
+      <data>
+        <stateVector>
+          <EPOCH>2008-09-20T12:25:40.104192</EPOCH>
+          <X units="km">4086.147180</X>
+          <Y units="km">-994.936814</Y>
+          <Z units="km">5250.678791</Z>
+          <X_DOT units="km/s">2.511071</X_DOT>
+          <Y_DOT units="km/s">7.255240</Y_DOT>
+          <Z_DOT units="km/s">-0.583165</Z_DOT>
+        </stateVector>
+      </data>
+    </segment>
+  </body>
+</opm>

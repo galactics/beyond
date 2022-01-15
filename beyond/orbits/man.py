@@ -195,9 +195,10 @@ class ContinuousMan(Man):
             txt += "  frame    = {0.frame}\n"
         if self.comment:
             txt += "  comment  = {0.comment}\n"
-        txt += "  dv\n"
+        txt += "  accel    =\n"
         for i, x in enumerate("xyz"):
             txt += f"    {x} = {self._accel[i]:0.2g} m/s²\n"
+
         return txt.format(self)
 
     def check(self, date):
@@ -219,7 +220,7 @@ class ContinuousMan(Man):
                 orb.date,
                 self.frame,
                 self._accel.tolist(),
-                orb.propagator.frame,
+                orb.frame,
                 projected_accel.tolist(),
                 np.linalg.norm(self._accel),
             )

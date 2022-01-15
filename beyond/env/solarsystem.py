@@ -1,13 +1,19 @@
 """Analytical computation of Solar System bodies
+
+At the moment, only the Earth, the Moon and the Sun are available
 """
 
 import numpy as np
+from copy import deepcopy
 
 from ..constants import Earth, Moon, Sun
 from ..errors import UnknownBodyError
 from ..orbits import Orbit
 from ..utils.units import AU
 from ..propagators.base import AnalyticalPropagator
+from ..frames import frames
+from ..frames.center import Center
+from ..dates import timedelta
 
 
 def get_body(name):
@@ -16,36 +22,79 @@ def get_body(name):
     Args:
         name (str): Object name
     Return:
-        Body:
+        Body: object containig the main parameters of the celestial body
+            as well as a propagator
+    Raise:
+        UnknownBodyError : when the object is not handled
     """
 
     try:
-
-        body, propag = _bodies[name.lower()]
-        # attach a propagator to the object
-        body.propagate = propag.propagate
-    except KeyError as e:
-        raise UnknownBodyError(e.args[0])
+        body = _bodies[name.lower()]
+    except KeyError:
+        raise UnknownBodyError(name)
 
     return body
+
+
+def get_frame(name):
+    """
+    Args:
+        name (str) : Object name
+    Return:
+        Frame: A frame centered on a solar system object
+    Raise:
+        UnknownBodyError : when the object is not handled
+    """
+
+    body = get_body(name)
+
+    # Retrieve the parent frame from the propagator attribute
+    parent_frame = frames.get_frame(body.propagator.FRAME)
+
+    # Create the center of the frame, and use the propagator as offset
+    center = Center(name.title(), body)
+    center.add_link(parent_frame.center, parent_frame.orientation, body.propagator)
+
+    return frames.Frame(name, parent_frame.orientation, center)
 
 
 class EarthPropagator(AnalyticalPropagator):
 
     orbit = None
+    FRAME = "EME2000"
 
     @classmethod
     def propagate(cls, date):
-        return Orbit([0] * 6, date, "cartesian", "EME2000", cls())
+        return Orbit([0] * 6, date, "cartesian", cls.FRAME, cls())
 
 
-class MoonPropagator(AnalyticalPropagator):
+class _DiffPropagator(AnalyticalPropagator):
+    """As the Moon and Sun propagators only provide position, we have
+    to compute the velocity numerically
+
+    There is certainly better approaches for this, but this works
+    """
+
+    @classmethod
+    def propagate(cls, date):
+        x = cls._propagate(date)
+        x0 = cls._propagate(date - cls._diff_step)
+        x1 = cls._propagate(date + cls._diff_step)
+
+        x[3:] = (x1[:3] - x0[:3]) / (2 * cls._diff_step.total_seconds())
+
+        return x
+
+
+class MoonPropagator(_DiffPropagator):
     """Dummy propagator for moon position"""
 
     orbit = None
+    FRAME = "EME2000"
+    _diff_step = timedelta(days=1)
 
     @classmethod
-    def propagate(cls, date):
+    def _propagate(cls, date):
         """Compute the Moon position at a given date
 
         Args:
@@ -126,16 +175,18 @@ class MoonPropagator(AnalyticalPropagator):
             ]
         )
 
-        return Orbit(state_vector, date, "cartesian", "EME2000", cls())
+        return Orbit(state_vector, date, "cartesian", cls.FRAME, cls())
 
 
-class SunPropagator(AnalyticalPropagator):
+class SunPropagator(_DiffPropagator):
     """Dummy propagator for Sun position"""
 
     orbit = None
+    FRAME = "MOD"
+    _diff_step = timedelta(days=5)
 
     @classmethod
-    def propagate(cls, date):
+    def _propagate(cls, date):
         """Compute the position of the sun at a given date
 
         Args:
@@ -191,11 +242,19 @@ class SunPropagator(AnalyticalPropagator):
             * AU
         )
 
-        return Orbit(pv, date, "cartesian", "MOD", cls())
+        return Orbit(pv, date, "cartesian", cls.FRAME, cls())
+
+
+Moon = deepcopy(Moon)
+Moon.propagator = MoonPropagator
+Sun = deepcopy(Sun)
+Sun.propagator = SunPropagator
+Earth = deepcopy(Earth)
+Earth.propagator = EarthPropagator
 
 
 _bodies = {
-    "moon": (Moon, MoonPropagator),
-    "sun": (Sun, SunPropagator),
-    "earth": (Earth, EarthPropagator),
+    "moon": Moon,
+    "sun": Sun,
+    "earth": Earth,
 }

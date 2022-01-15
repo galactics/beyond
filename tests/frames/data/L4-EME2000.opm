@@ -1,0 +1,20 @@
+CCSDS_OPM_VERS = 2.0
+CREATION_DATE = 2022-01-15T16:36:22.416664
+ORIGINATOR = N/A
+
+META_START
+OBJECT_NAME          = Gaia
+OBJECT_ID            = 2013-074A
+CENTER_NAME          = SUN EARTH L4
+REF_FRAME            = EME2000
+TIME_SYSTEM          = TDB
+META_STOP
+
+COMMENT  State Vector
+EPOCH                = 2022-01-01T00:00:00.000000
+X                    =  112315233.238835 [km]
+Y                    =  88522094.024985 [km]
+Z                    =  38226091.885797 [km]
+X_DOT                =    -0.357679 [km/s]
+Y_DOT                =    -0.030066 [km/s]
+Z_DOT                =    -0.046038 [km/s]

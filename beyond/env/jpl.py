@@ -183,7 +183,7 @@ class Pck(dict):
                 log.warning(f"File not found : {filepath}")
                 continue
 
-            with filepath.open() as fp:
+            with filepath.open(encoding="ascii") as fp:
                 lines = fp.read().splitlines()
 
             datablock = False
@@ -402,7 +402,7 @@ def create_frames():
 def get_body(name):
     """Retrieve a body instance for a given object"""
     body = Pck()[name]
-    body.propagate = get_propagator(name).propagate
+    body.propagator = get_propagator(name)
     return body
 
 
@@ -421,7 +421,11 @@ def get_orbit(name, date):
 
 def get_frame(name):
     """Get the frame attached to a celestial body"""
-    return _frame_cache[name]
+    frame = _frame_cache[name]
+    # As the frame cache was populated at the same time as the propagator
+    # cache, we have to attache the correct propagator to its body
+    frame.center.body.propagator = get_propagator(name)
+    return frame
 
 
 def list_frames():

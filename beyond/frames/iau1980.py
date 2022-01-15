@@ -19,7 +19,7 @@ def _tab(max_i=None):
     filepath = Path(__file__).parent / "data" / "tab5.1.txt"
 
     result = []
-    with filepath.open() as fhd:
+    with filepath.open(encoding="utf-8") as fhd:
         i = 0
         for line in fhd.read().splitlines():
             if line.startswith("#") or not line.strip():

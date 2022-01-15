@@ -4,6 +4,8 @@ from collections import namedtuple
 from .kepler import Kepler
 from .keplernum import KeplerNum
 
+__all__ = ["SoIAnalytical", "SoINumerical"]
+
 log = logging.getLogger(__name__)
 
 SOI = namedtuple("SOI", "radius frame")

@@ -87,7 +87,7 @@ def test_apside(orbit, mode):
     events = iter_listeners(orbit, ApsideListener(), mode)
 
     p = next(events)
-    assert abs(p.date - Date(2018, 4, 5, 16, 58, 54, 546919)).total_seconds() <= 36e-6
+    assert abs(p.date - Date(2018, 4, 5, 16, 58, 54, 546919)).total_seconds() <= 37e-6
     assert p.event.info == "Apoapsis"
 
     p = next(events)

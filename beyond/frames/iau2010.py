@@ -24,7 +24,7 @@ def _tab():
         filepath = Path(__file__).parent / "data" / element
 
         total = []
-        with filepath.open() as fhd:
+        with filepath.open(encoding="ascii") as fhd:
 
             for line in fhd.read().splitlines():
 

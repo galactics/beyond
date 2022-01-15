@@ -24,12 +24,12 @@ class TaiUtc:
     This file could be retrieved `here <http://maia.usno.navy.mil/ser7/tai-utc.dat>`__, but this server seems discontinued.
     """
 
-    def __init__(self, path):
+    def __init__(self, path, encoding="ascii"):
 
         self.path = Path(path)
         self.data = []
 
-        with self.path.open() as fhandler:
+        with self.path.open(encoding=encoding) as fhandler:
             lines = fhandler.read().splitlines()
 
         for line in lines:
@@ -79,12 +79,12 @@ class Finals2000A:
 
     deltas = ("dx", "dy")
 
-    def __init__(self, path):
+    def __init__(self, path, encoding="ascii"):
 
         self.path = Path(path)
         d1, d2 = self.deltas
 
-        with self.path.open() as fp:
+        with self.path.open(encoding=encoding) as fp:
             lines = fp.read().splitlines()
 
         self.data = {}

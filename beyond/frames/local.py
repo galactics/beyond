@@ -72,7 +72,8 @@ def to_tnw(orbit):
     pos, vel = _split(orbit)
 
     t = vel / norm(vel)
-    w = np.cross(pos, vel) / (norm(pos) * norm(vel))
+    w = np.cross(pos, vel)
+    w /= norm(w)
     n = np.cross(w, t)
 
     return np.array([t, n, w])
@@ -107,7 +108,8 @@ def to_qsw(orbit):
     pos, vel = _split(orbit)
 
     q = pos / norm(pos)
-    w = np.cross(pos, vel) / (norm(pos) * norm(vel))
+    w = np.cross(pos, vel)
+    w /= norm(w)
     s = np.cross(w, q)
 
     return np.array([q, s, w])
