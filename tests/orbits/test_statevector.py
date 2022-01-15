@@ -1,4 +1,5 @@
 from pytest import fixture, raises
+import numpy as np
 
 from beyond.io.tle import Tle
 
@@ -54,8 +55,8 @@ def sv(request):
 def test_getter(sv):
 
     for n, v in cases[sv.form.name].items():
-        assert getattr(sv, n) == v
-        assert sv[n] == v
+        np.testing.assert_almost_equal(getattr(sv, n), v)
+        np.testing.assert_almost_equal(sv[n], v)
 
     assert sv.ndot == 3.048e-05
     assert sv.ndotdot == 0.0
