@@ -173,6 +173,35 @@ def collect_metadata(path, measure_set):
     return meta
 
 
+def encode_measurement(m):
+    if isinstance(m, Doppler):
+        name = "DOPPLER_INSTANTANEOUS"
+        value_fmt = ".6f"
+        value = m.value
+    elif isinstance(m, Range):
+        name = "RANGE"
+        value_fmt = ".6f"
+        value = m.value / units.km
+    elif isinstance(m, Azimut):
+        name = "ANGLE_1"
+        value_fmt = ".2f"
+        value = -np.degrees(m.value) % 360
+    elif isinstance(m, Elevation):
+        name = "ANGLE_2"
+        value_fmt = ".2f"
+        value = np.degrees(m.value)
+    elif isinstance(m, RightAscension):
+        name = "ANGLE_1"
+        value_fmt = ".8f"
+        value = np.degrees(m.value)
+    elif isinstance(m, Declination):
+        name = "ANGLE_2"
+        value_fmt = ".8f"
+        value = np.degrees(m.value)
+
+    return name, value, value_fmt
+
+
 def _dumps_kvn(data, **kwargs):
 
     filtered = ((path, data.filter(path=path)) for path in data.paths)
@@ -194,22 +223,7 @@ def _dumps_kvn(data, **kwargs):
 
         for m in measure_set:
 
-            if isinstance(m, Doppler):
-                name = "DOPPLER_INSTANTANEOUS"
-                value_fmt = "16.6f"
-                value = m.value
-            elif isinstance(m, Range):
-                name = "RANGE"
-                value_fmt = "16.6f"
-                value = m.value / units.km
-            elif isinstance(m, Azimut):
-                name = "ANGLE_1"
-                value_fmt = "12.2f"
-                value = -np.degrees(m.value) % 360
-            elif isinstance(m, Elevation):
-                name = "ANGLE_2"
-                value_fmt = "12.2f"
-                value = np.degrees(m.value)
+            name, value, value_fmt = encode_measurement(m)
 
             txt.append(
                 "{name:20} = {date:{DATE_FMT_DEFAULT}} {value:{value_fmt}}".format(
@@ -253,23 +267,7 @@ def _dumps_xml(data, **kwargs):
 
             epoch = ET.SubElement(obs, "EPOCH")
             epoch.text = m.date.strftime(DATE_FMT_DEFAULT)
-
-            if isinstance(m, Doppler):
-                name = "DOPPLER_INSTANTANEOUS"
-                value_fmt = ".6f"
-                value = m.value
-            elif isinstance(m, Range):
-                name = "RANGE"
-                value_fmt = ".6f"
-                value = m.value / units.km
-            elif isinstance(m, Azimut):
-                name = "ANGLE_1"
-                value_fmt = ".2f"
-                value = -np.degrees(m.value) % 360
-            elif isinstance(m, Elevation):
-                name = "ANGLE_2"
-                value_fmt = ".2f"
-                value = np.degrees(m.value)
+            name, value, value_fmt = encode_measurement(m)
 
             field = ET.SubElement(obs, name)
             field.text = "{:{}}".format(value, value_fmt)
