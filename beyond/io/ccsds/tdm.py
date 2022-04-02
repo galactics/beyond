@@ -146,6 +146,33 @@ def _loads_xml(string):
     return sets
 
 
+def collect_metadata(path, measure_set):
+    meta = {
+        "TIME_SYSTEM": measure_set.start.scale.name,
+        "START_TIME": measure_set.start.strftime(DATE_FMT_DEFAULT),
+        "STOP_TIME": measure_set.stop.strftime(DATE_FMT_DEFAULT),
+    }
+
+    i = 0
+    parts = {}
+    for p in path:
+        if p in parts:
+            continue
+        else:
+            i += 1
+        parts[p] = i
+        meta[f"PARTICIPANT_{i}"] = p
+
+    meta["MODE"] = "SEQUENTIAL"
+    meta["PATH"] = ",".join([str(parts[p]) for p in path])
+
+    if "Range" in measure_set.types:
+        meta["RANGE_UNITS"] = "km"
+    if "Azimut" in measure_set.types:
+        meta["ANGLE_TYPE"] = "AZEL"
+    return meta
+
+
 def _dumps_kvn(data, **kwargs):
 
     filtered = ((path, data.filter(path=path)) for path in data.paths)
@@ -154,30 +181,7 @@ def _dumps_kvn(data, **kwargs):
 
     text = ""
     for path, measure_set in filtered:
-
-        meta = {
-            "TIME_SYSTEM": measure_set.start.scale.name,
-            "START_TIME": measure_set.start.strftime(DATE_FMT_DEFAULT),
-            "STOP_TIME": measure_set.stop.strftime(DATE_FMT_DEFAULT),
-        }
-
-        i = 0
-        parts = {}
-        for p in path:
-            if p in parts:
-                continue
-            else:
-                i += 1
-            parts[p] = i
-            meta[f"PARTICIPANT_{i}"] = p
-
-        meta["MODE"] = "SEQUENTIAL"
-        meta["PATH"] = ",".join([str(parts[p]) for p in path])
-
-        if "Range" in measure_set.types:
-            meta["RANGE_UNITS"] = "km"
-        if "Azimut" in measure_set.types:
-            meta["ANGLE_TYPE"] = "AZEL"
+        meta = collect_metadata(path, measure_set)
 
         txt = ["META_START"]
 
@@ -234,39 +238,13 @@ def _dumps_xml(data, **kwargs):
 
     for path, measure_set in filtered:
         segment = ET.SubElement(body, "segment")
-        meta = ET.SubElement(segment, "metadata")
-        ts = ET.SubElement(meta, "TIME_SYSTEM")
-        ts.text = measure_set.start.scale.name
+        meta_element = ET.SubElement(segment, "metadata")
 
-        start = ET.SubElement(meta, "START_TIME")
-        start.text = measure_set.start.strftime(DATE_FMT_DEFAULT)
+        meta = collect_metadata(path, measure_set)
 
-        stop = ET.SubElement(meta, "STOP_TIME")
-        stop.text = measure_set.stop.strftime(DATE_FMT_DEFAULT)
-
-        i = 0
-        parts = {}
-        for p in path:
-            if p in parts:
-                continue
-            else:
-                i += 1
-            parts[p] = i
-            participant = ET.SubElement(meta, f"PARTICIPANT_{i}")
-            participant.text = p
-
-        mode = ET.SubElement(meta, "MODE")
-        mode.text = "SEQUENTIAL"
-
-        path_tag = ET.SubElement(meta, "PATH")
-        path_tag.text = ",".join([str(parts[p]) for p in path])
-
-        if "Range" in measure_set.types:
-            r_unit = ET.SubElement(meta, "RANGE_UNITS")
-            r_unit.text = "km"
-        if "Azimut" in measure_set.types:
-            angle_type = ET.SubElement(meta, "ANGLE_TYPE")
-            angle_type.text = "AZEL"
+        for key, value in meta.items():
+            element = ET.SubElement(meta_element, key)
+            element.text = value
 
         data_tag = ET.SubElement(segment, "data")
 
