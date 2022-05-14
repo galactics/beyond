@@ -29,15 +29,11 @@ class Orientation(Node):
             reverse = f"{b}_to_{a}"
 
             if hasattr(self, direct):
-                m1, rate = getattr(self, direct)(date)
+                M = expand(*getattr(self, direct)(date))
             elif hasattr(self, reverse):
-                m1, rate = getattr(self, reverse)(date)
-                m1 = m1.T
-                rate = -rate if rate is not None else None
+                M = np.linalg.inv(expand(*getattr(self, reverse)(date)))
             else:
                 raise ValueError(f"Unknown transformation {a} <-> {b}")
-
-            M = expand(m1, rate=rate)
 
             m = M @ m
 
