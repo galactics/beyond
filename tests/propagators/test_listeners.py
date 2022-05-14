@@ -105,15 +105,15 @@ def test_station_signal(station, orbit, mode):
     events = iter_listeners(orbit, listeners, mode)
 
     p = next(events)
-    assert abs(p.date - Date(2018, 4, 5, 17, 51, 6, 475978)).total_seconds() <= 502e-6
+    assert abs(p.date - Date(2018, 4, 5, 17, 51, 6, 460368)).total_seconds() <= 502e-6
     assert p.event.info == "AOS"
 
     p = next(events)
-    assert abs(p.date - Date(2018, 4, 5, 17, 56, 5, 542270)).total_seconds() <= 715e-6
+    assert abs(p.date - Date(2018, 4, 5, 17, 56, 5, 372888)).total_seconds() <= 715e-6
     assert p.event.info == "MAX"
 
     p = next(events)
-    assert abs(p.date - Date(2018, 4, 5, 18, 1, 4, 828355)).total_seconds() <= 859e-6
+    assert abs(p.date - Date(2018, 4, 5, 18, 1, 4, 843966)).total_seconds() <= 859e-6
     assert p.event.info == "LOS"
 
 
@@ -138,11 +138,11 @@ def test_radial_velocity(station, orbit, mode):
     events = iter_listeners(orbit, RadialVelocityListener(station), mode)
     p = next(events)
 
-    assert abs(p.date - Date(2018, 4, 5, 17, 7, 29, 581221)).total_seconds() <= 2e-5
+    assert abs(p.date - Date(2018, 4, 5, 17, 7, 28, 784242)).total_seconds() <= 2e-5
     assert p.event.info == "Radial Velocity"
 
     p = next(events)
-    assert abs(p.date - Date(2018, 4, 5, 17, 56, 5, 511934)).total_seconds() <= 3.5e-5
+    assert abs(p.date - Date(2018, 4, 5, 17, 56, 5, 262811)).total_seconds() <= 3.5e-5
     assert p.event.info == "Radial Velocity"
 
     # Test for RadialVelocity triggered only when in sight of the station
