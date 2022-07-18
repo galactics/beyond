@@ -13,9 +13,11 @@ from beyond.config import config
 # Load the ".bsp" file
 config.update({
     "env": {
-        "jpl": [
-            "/home/jules/.space/jpl/jup310.bsp"
-        ]
+        "jpl": {
+            "files" :[
+                "/home/jules/.space/jpl/jup310.bsp"
+            ]
+        }
     }
 })
 
