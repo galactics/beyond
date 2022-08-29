@@ -64,3 +64,13 @@ def test_j2(iss_tle):
     assert orbit.date + orbit.infos.period == orb2.date
     # a, e and i should not be modified
     assert_almost_equal(np.asarray(orbit[:3]), np.asarray(orb2[:3]))
+
+
+def test_kepler_ephem(iss_tle):
+    orbit = iss_tle.orbit().copy(form="keplerian", frame="EME2000")
+    orbit.propagator = "Kepler"
+
+    # These two calls should be equivalent, and use the orbit date as a starting point
+    eph = orbit.ephem(stop=timedelta(days=1), step=timedelta(seconds=60))
+    eph = orbit.ephem(start=None, stop=timedelta(days=1), step=timedelta(seconds=60))
+
