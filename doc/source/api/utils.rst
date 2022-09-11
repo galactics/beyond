@@ -47,6 +47,13 @@ Lambert's problem
 .. automodule:: beyond.utils.lambert
     :members:
 
+Interplanetary
+--------------
+
+.. automodule:: beyond.utils.interplanetary
+    :members:
+
+
 Relative Motion Helper
 ----------------------
 
