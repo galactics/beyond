@@ -174,7 +174,10 @@ class Tle:
         self.kwargs = kwargs
 
     def __str__(self):
-        return self.text
+        if self.name:
+            return f"{self.name}\n{self.text}"
+        else:
+            return self.text
 
     @classmethod
     def _check_validity(cls, text):
@@ -259,9 +262,9 @@ class Tle:
         """
 
         if name is not None:
-            name = f"0 {name}\n"
-        elif hasattr(orbit, "name"):
-            name = f"0 {orbit.name}\n"
+            name = f"{name}\n"
+        elif hasattr(orbit, "name") and orbit.name:
+            name = f"{orbit.name}\n"
         else:
             name = ""
 
@@ -285,7 +288,7 @@ class Tle:
         date = orbit.date.datetime
         i, Ω, e, ω, M, n = orbit
 
-        line1 = "1 {norad_id}U {cospar_id:<8} {date:%y}{day:012.8f} {ndot:>10} {ndotdot:>8} {bstar:>8} 0 {elnb:>4}".format(
+        line1 = "1 {norad_id:0>5}U {cospar_id:<8} {date:%y}{day:012.8f} {ndot:>10} {ndotdot:>8} {bstar:>8} 0 {elnb:>4}".format(
             norad_id=norad_id,
             cospar_id=cospar_id,
             date=date,
@@ -299,7 +302,7 @@ class Tle:
             bstar=_unfloat(orbit.bstar),
             elnb=orbit.element_nb,
         )
-        line2 = "2 {norad_id} {i:8.4f} {Ω:8.4f} {e} {ω:8.4f} {M:8.4f} {n:11.8f}{revolutions:>5}".format(
+        line2 = "2 {norad_id:0>5} {i:8.4f} {Ω:8.4f} {e} {ω:8.4f} {M:8.4f} {n:11.8f}{revolutions:>5}".format(
             norad_id=norad_id,
             i=np.degrees(i),
             Ω=np.degrees(Ω),
