@@ -7,6 +7,7 @@ from datetime import timedelta
 from .statevector import StateVector
 from ..propagators.listeners import Speaker
 from ..frames.frames import orbit2frame
+from ..utils.interp import DatedInterp
 
 
 class Ephem(Speaker):
@@ -68,7 +69,51 @@ class Ephem(Speaker):
     @property
     def dates(self):
         """Generator yielding Dates of each Orbit object of the ephem"""
-        return (o.date for o in self)
+        # use self._orbits to not start an ephem iterator
+        return (o.date for o in self._orbits)
+
+    @property
+    def interp(self):
+        """Interpolator object. Callable"""
+        if not hasattr(self, "_interp"):
+
+            self._interp = DatedInterp(
+                list(self.dates), self._orbits, self._method, self._order
+            )
+            del self._method
+            del self._order
+
+        return self._interp
+
+    @property
+    def method(self):
+        if hasattr(self, "_interp"):
+            return self.interp.method
+        else:
+            return self._method
+
+    @method.setter
+    def method(self, value):
+        if hasattr(self, "_interp"):
+            self.interp.method = value
+        else:
+            # This serves when the interpolator does not exist yet
+            self._method = value
+
+    @property
+    def order(self):
+        if hasattr(self, "_interp"):
+            return self.interp.order
+        else:
+            return self._order
+
+    @order.setter
+    def order(self, value):
+        if hasattr(self, "_interp"):
+            self.interp.order = value
+        else:
+            # This serves when the interpolator does not exist yet
+            self._order = value
 
     # @property
     # def steps(self):
@@ -98,91 +143,18 @@ class Ephem(Speaker):
         for orb in self:
             orb.form = form
 
-    def interpolate(self, date, method=None, order=None):
+    def interpolate(self, date):
         """Interpolate data at a given date
 
         Args:
             date (Date):
-            method (str): Method of interpolation to use
-            order (int): In case of ``LAGRANGE`` method is used
         Return:
             Orbit:
         Raise:
             ValueError: when date is not in the range of the ephemeris
             ValueError: when the order of interpolation is insufficient
         """
-
-        if not self.start <= date <= self.stop:
-            raise ValueError(f"Date '{date}' not in range [{self.start}, {self.stop}]")
-
-        prev_idx = 0
-        ephem = self
-
-        # Binary search of the orbit step just before the desired date
-        while True:
-            idx = len(ephem)
-            if idx == 1:
-                break
-            k = idx // 2
-
-            if date > ephem[k].date:
-                prev_idx += k
-                ephem = ephem[k:]
-            else:
-                ephem = ephem[:k]
-
-        method = method if method is not None else self.method
-        order = order if order is not None else self.order
-
-        if method == self.LINEAR:
-
-            y0 = self[prev_idx]
-            y1 = self[prev_idx + 1]
-
-            result = y0[:] + (y1[:] - y0[:]) * (date._mjd - y0.date._mjd) / (
-                y1.date._mjd - y0.date._mjd
-            )
-
-        elif method == self.LAGRANGE:
-
-            stop = prev_idx + 1 + order // 2 + order % 2
-            start = prev_idx - order // 2 + 1
-            if stop >= len(self):
-                start -= stop - len(self)
-            elif start < 0:
-                stop -= start
-                start = 0
-
-            # selection of the subset of data, of length 'order' around the desired value
-            subset = self[start:stop]
-            date_subset = np.array([x.date._mjd for x in subset])
-
-            if len(subset) != order:
-                raise ValueError(
-                    f"len={len(subset)} < order={order} : impossible to interpolate"
-                )
-
-            # Lagrange polynomial
-            #        k
-            # L(x) = Σ y_j * l_j(x)
-            #        j=0
-            #
-            # l_j(x) = Π (x - x_m) / (x_j - x_m)
-            #     0 <= m <= k
-            #        m != j
-            mask = ~np.identity(order, dtype=bool)
-            dates = np.tile(date_subset, order).reshape(order, order)
-            datesj = np.repeat(np.diag(dates), order, axis=0).reshape(order, order)
-            lj = (
-                ((date._mjd - dates[mask]) / (datesj[mask] - dates[mask]))
-                .reshape(order, order - 1)
-                .prod(axis=1)
-            )
-            result = lj @ subset
-        else:
-            raise ValueError("Unkown interpolation method", method)
-
-        return StateVector(result, date, self.form, self.frame)
+        return StateVector(self.interp(date), date, self.form, self.frame)
 
     def propagate(self, date):
         """Alias of :py:meth:`interpolate`"""

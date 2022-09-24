@@ -1,12 +1,24 @@
 Utils
 =====
 
-Matrix
-------
+Matrices
+--------
 
 .. automodule:: beyond.utils.matrix
     :members:
     :show-inheritance:
+
+Interpolations
+--------------
+
+.. autoclass:: beyond.utils.interp.Interp
+    :members:
+    :special-members: __init__, __call__
+
+.. autoclass:: beyond.utils.interp.DatedInterp
+    :members:
+    :show-inheritance:
+    :special-members: __init__, __call__
 
 Node
 ----
