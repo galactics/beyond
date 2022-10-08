@@ -29,7 +29,7 @@ class StateVector(np.ndarray):
         """
 
         if len(coord) != 6:
-            raise OrbitError("Should be 6 in length")
+            raise OrbitError(f"Should be 6 in length, got {len(coord)}")
 
         if isinstance(form, str):
             form = get_form(form)
