@@ -29,15 +29,11 @@ class Orientation(Node):
             reverse = f"{b}_to_{a}"
 
             if hasattr(self, direct):
-                m1, rate = getattr(self, direct)(date)
+                M = expand(*getattr(self, direct)(date))
             elif hasattr(self, reverse):
-                m1, rate = getattr(self, reverse)(date)
-                m1 = m1.T
-                rate = -rate if rate is not None else None
+                M = np.linalg.inv(expand(*getattr(self, reverse)(date)))
             else:
                 raise ValueError(f"Unknown transformation {a} <-> {b}")
-
-            M = expand(m1, rate=rate)
 
             m = M @ m
 
@@ -131,6 +127,8 @@ class TopocentricOrientation(Orientation):
         super().__init__(name)
         self.parent = parent
         self.latlonalt = latlonalt
+        lat, lon = latlonalt[:-1]
+        self._m = rot3(-lon) @ rot2(lat - np.pi / 2.0) @ rot3(np.pi)
 
         mtd = f"{name}_to_{parent.name}"
         setattr(self, mtd, self._to_parent)
@@ -138,10 +136,11 @@ class TopocentricOrientation(Orientation):
         self.parent + self
 
     def _to_parent(self, date):
-        lat, lon, _ = self.latlonalt
         # the 'rot3(np.pi)' is here to place the X axis along the north direction
-        m = rot3(-lon) @ rot2(lat - np.pi / 2.0) @ rot3(np.pi)
-        return m, None
+        return self._m, None
+
+    def _from_parent(self, date):
+        return rot3(np.pi) @ rot2(np.pi/2 - lat) @ rot3(lon)
 
 
 class LocalOrbitalOrientation(Orientation):

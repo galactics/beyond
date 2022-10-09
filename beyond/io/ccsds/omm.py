@@ -72,8 +72,17 @@ def _loads_kvn(string):
             Omega = decode_unit(data, "RA_OF_ASC_NODE", "deg")
             omega = decode_unit(data, "ARG_OF_PERICENTER", "deg")
             M = decode_unit(data, "MEAN_ANOMALY", "deg")
-            ephemeris_type = int(data["EPHEMERIS_TYPE"].text)
-            classification_type = data["CLASSIFICATION_TYPE"].text
+
+            if "EPHEMERIS_TYPE" in data:
+                ephemeris_type = int(data["EPHEMERIS_TYPE"].text)
+            else:
+                ephemeris_type = 0
+
+            if "CLASSIFICATION_TYPE" in data:
+                classification_type = data["CLASSIFICATION_TYPE"].text
+            else:
+                classification_type = "U"
+
             norad_id = int(data["NORAD_CAT_ID"].text)
             revolutions = int(data["REV_AT_EPOCH"].text)
             element_nb = int(data["ELEMENT_SET_NO"].text)
@@ -142,8 +151,16 @@ def _loads_xml(string):
             Omega = decode_unit(mean_elements, "RA_OF_ASC_NODE", "deg")
             omega = decode_unit(mean_elements, "ARG_OF_PERICENTER", "deg")
             M = decode_unit(mean_elements, "MEAN_ANOMALY", "deg")
-            ephemeris_type = int(tle_params["EPHEMERIS_TYPE"].text)
-            classification_type = tle_params["CLASSIFICATION_TYPE"].text
+            if "EPHEMERIS_TYPE" in tle_params:
+                ephemeris_type = int(tle_params["EPHEMERIS_TYPE"].text)
+            else:
+                ephemeris_type = 0
+
+            if "CLASSIFICATION_TYPE" in tle_params:
+                classification_type = tle_params["CLASSIFICATION_TYPE"].text
+            else:
+                classification_type = "U"
+
             norad_id = int(tle_params["NORAD_CAT_ID"].text)
             revolutions = int(tle_params["REV_AT_EPOCH"].text)
             element_nb = int(tle_params["ELEMENT_SET_NO"].text)

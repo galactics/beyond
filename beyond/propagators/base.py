@@ -87,6 +87,8 @@ class AnalyticalPropagator(Speaker, Propagator):
             start = self.orbit.date if start is None else start
             step = self.step if step is None else step
 
+            kwargs["start"] = start
+
             if isinstance(kwargs["stop"], timedelta):
                 kwargs["stop"] = start + kwargs["stop"]
             if start > kwargs["stop"] and step.total_seconds() > 0:

@@ -125,7 +125,7 @@ Orbit =
             Orbit
         """
 
-        for orb in self.iter(inclusive=True, **kwargs):
+        for orb in self.iter(**kwargs):
             yield orb
 
     def ephem(self, **kwargs):

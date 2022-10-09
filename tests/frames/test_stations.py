@@ -1,7 +1,4 @@
-
-
 import numpy as np
-from numpy.testing import assert_almost_equal
 
 from pytest import fixture, raises
 
@@ -9,6 +6,7 @@ from beyond.dates import Date, timedelta
 from beyond.orbits import Orbit
 from beyond.io.tle import Tle
 from beyond.propagators.listeners import SignalEvent, MaxEvent, MaskEvent, stations_listeners
+from beyond.frames.stations import TopocentricFrame
 
 
 def test_station(station, helper):
@@ -38,11 +36,11 @@ def test_station(station, helper):
     orb.form = 'spherical'
 
     # azimuth
-    assert np.isclose(-np.degrees(orb.theta), 159.75001561831209)
+    assert np.isclose(np.degrees(orb.theta), -157.913470813252)
     # elevation
-    assert np.isclose(np.degrees(orb.phi), 57.894234049230583)
+    assert np.isclose(np.degrees(orb.phi), 59.99310662752075)
     # range
-    assert np.isclose(orb.r, 471467.65510239213)
+    assert np.isclose(orb.r, 461220.80468740925)
 
     orb.frame = archive.frame
     orb.form = archive.form
@@ -79,25 +77,25 @@ def test_station_visibility(orbit, station):
     assert points[10].event.info == "AOS"
     assert points[10].event.elev == "Mask"
     assert points[10].event.station == station
-    assert (points[10].date - Date(2018, 4, 5, 21, 9, 4, 977230)).total_seconds() <= 1e-5
+    assert (points[10].date - Date(2018, 4, 5, 21, 9, 7, 895781)).total_seconds() <= 1e-5
 
     assert isinstance(points[13].event, MaxEvent)
     assert points[13].event.info == "MAX"
     assert points[13].event.station == station
-    assert (points[13].date - Date(2018, 4, 5, 21, 10, 2, 884540)).total_seconds() <= 1e-5
+    assert (points[13].date - Date(2018, 4, 5, 21, 10, 4, 514666)).total_seconds() <= 1e-5
 
     assert isinstance(points[23].event, MaskEvent)
     assert points[23].event.info == "LOS"
     assert points[23].event.elev == "Mask"
     assert points[23].event.station == station
-    assert (points[23].date - Date(2018, 4, 5, 21, 14, 33, 978945)).total_seconds() <= 5e-5
+    assert (points[23].date - Date(2018, 4, 5, 21, 14, 35, 771010)).total_seconds() <= 5e-5
 
     assert isinstance(points[-1].event, SignalEvent)
     assert points[-1].event.info == 'LOS'
     assert points[-1].event.elev == 0
     assert abs(points[-1].phi) < 1e-5
     assert points[-1].event.station == station
-    assert (points[-1].date - Date(2018, 4, 5, 21, 15, 25, 169655)).total_seconds() <= 1e-5
+    assert (points[-1].date - Date(2018, 4, 5, 21, 15, 25, 183817)).total_seconds() <= 5e-5
 
 
 def test_station_no_mask(orbit, station):
@@ -121,3 +119,23 @@ def test_station_no_mask(orbit, station):
 
     with raises(ValueError):
         points = list(points)
+
+
+_cases = {    
+    "3.2": ((56, np.radians(345 + 35/60 + 51/3600), np.radians(-7 -54/60-23.886/3600)), [6119400.27666, -1571479.55734, -871561.12598, 0, 0, 0]),
+    "7.1": ((2187, np.radians(-104.883), np.radians(39.007)), [-1275121.9, -4797989.0, 3994297.5, 0, 0, 0]),
+}
+
+@fixture(params=_cases.keys())
+def case(request):
+    return _cases[request.param]
+
+
+def test_geodetic_cartesian(case):
+
+    (r, theta, phi), ref = case
+
+    sv_station = TopocentricFrame._geodetic_to_cartesian(phi, theta, r)
+
+    assert np.linalg.norm(sv_station) - np.linalg.norm(ref) < 1e-1
+    assert np.allclose(sv_station, ref)
