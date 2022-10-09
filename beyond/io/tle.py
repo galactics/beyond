@@ -304,11 +304,11 @@ class Tle:
         )
         line2 = "2 {norad_id:0>5} {i:8.4f} {Ω:8.4f} {e} {ω:8.4f} {M:8.4f} {n:11.8f}{revolutions:>5}".format(
             norad_id=norad_id,
-            i=np.degrees(i),
-            Ω=np.degrees(Ω),
+            i=np.degrees(i) % 360,
+            Ω=np.degrees(Ω) % 360,
             e="{:.7f}".format(e)[2:],
-            ω=np.degrees(ω),
-            M=np.degrees(M),
+            ω=np.degrees(ω) % 360,
+            M=np.degrees(M) % 360,
             n=n * 86400 / (2 * np.pi),
             revolutions=orbit.revolutions,
         )
