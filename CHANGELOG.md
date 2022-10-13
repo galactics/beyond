@@ -3,6 +3,26 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [v0.7.5] - 2022-10-13
+
+### Added
+
+- B-plane computation for planetary capture of flyby
+- Generic Lagrange and linear interpolators
+
+### Modified
+
+- CCSDS : OEM and OMM optional fields are now optionals
+- Consistency of API between impulsive and continuous thrusts
+- Simplification of frame transition matrices
+- Printing a TLE object display its name, if available
+- CCSDS : TDM de-duplication of code
+
+### Fixed
+
+- CCSDS : OEM interpolation degree
+- Improve error messages
+
 ## [v0.7.4] - 2022-01-15
 
 ### Added
