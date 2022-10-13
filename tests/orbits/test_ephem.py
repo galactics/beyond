@@ -40,12 +40,14 @@ def test_create(ephem, start):
 
 def test_interpolate(ephem):
 
-    orb = ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27), method="linear")
+    ephem.method = "linear"
+    orb = ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27))
 
     assert np.allclose(orb[:3], [-2348566.346123897, 4148355.890326985, -4755222.226501104])
     assert np.allclose(orb[3:], [-4578.0740694225515, -5585.023397109828, -2619.4707804499653])
 
-    orb = ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27), method="lagrange")
+    ephem.method = "lagrange"
+    orb = ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27))
 
     assert np.allclose(orb[:3], [-2349933.1374301873, 4150754.2288609436, -4757989.96860434])
     assert np.allclose(orb[3:], [-4580.715466516539, -5588.283144821399, -2620.9683124126564])
@@ -55,7 +57,8 @@ def test_interpolate(ephem):
         ephem.propagate(ephem.start + timedelta(days=2))
 
     with raises(ValueError):
-        ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27), method='dummy')
+        ephem.method = "dummy"
+        ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27))
 
 
 def test_subephem(ref_orb, ephem, start):

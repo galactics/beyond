@@ -87,6 +87,11 @@ def test_load_oem(ephem, datafile, helper):
     assert str(e.value) == "Missing mandatory parameter 'REF_FRAME'"
 
 
+def test_load_oem_minimal(ephem, datafile, helper):
+    data = loads(datafile("oem_minimal"))
+    helper.assert_ephem(ephem, data)
+
+
 def test_load_double_oem(ephem, ephem2, datafile, helper):
 
     data, data2 = loads(datafile("oem_double"))

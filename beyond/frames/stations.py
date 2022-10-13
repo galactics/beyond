@@ -87,15 +87,15 @@ class TopocentricFrame(frames.Frame):
         Return:
             numpy.array: 3D element (in meters)
         """
-        C = Earth.r / np.sqrt(1 - (Earth.e * np.sin(lat)) ** 2)
-        S = Earth.r * (1 - Earth.e ** 2) / np.sqrt(1 - (Earth.e * np.sin(lat)) ** 2)
-        r_d = (C + alt) * np.cos(lat)
-        r_k = (S + alt) * np.sin(lat)
 
-        norm = np.sqrt(r_d ** 2 + r_k ** 2)
-        return norm * np.array(
-            [np.cos(lat) * np.cos(lon), np.cos(lat) * np.sin(lon), np.sin(lat), 0, 0, 0]
-        )
+        C = Earth.r / np.sqrt(1 - (Earth.e * np.sin(lat)) ** 2)
+        S = C * (1 - Earth.e**2)
+
+        x = (C + alt) * np.cos(lat) * np.cos(lon)
+        y = (C + alt) * np.cos(lat) * np.sin(lon)
+        z = (S + alt) * np.sin(lat)
+
+        return np.array([x, y, z, 0, 0, 0])
 
     def get_mask(self, azim):
         """Linear interpolation between two points of the mask"""

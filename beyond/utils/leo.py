@@ -66,15 +66,14 @@ def sso_frozen(a):
 
     log.debug("Iterating over sso+frozen orbit parameters")
     MAX_ITER = 10
-    k = e = last = 0
-    while k < MAX_ITER:
+    e = last = 0
+    for k in range(MAX_ITER):
         i = sso(a=a, e=e)
         e, ω = frozen(a, i)
         log.debug(f"{k}  {e:.6e}  {np.degrees(i):10.6f}  {last-e:.6e}")
         if abs(last - e) < 1e-12:
             break
         last = e
-        k += 1
     else:
         raise ValueError("Impossible to find a sso/frozen orbit")
 

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <tdm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd" id="CCSDS_TDM_VERS" version="1.0">
   <header>
-    <CREATION_DATE>2019-12-03T22:13:29</CREATION_DATE>
+    <CREATION_DATE>2022-05-14T13:26:38.552754</CREATION_DATE>
     <ORIGINATOR>N/A</ORIGINATOR>
   </header>
   <body>
@@ -20,11 +20,11 @@
       <data>
         <observation>
           <EPOCH>2008-09-20T18:16:03.690790</EPOCH>
-          <RANGE>4344.529679</RANGE>
+          <RANGE>4304.325558</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:03.690790</EPOCH>
-          <ANGLE_1>199.65</ANGLE_1>
+          <ANGLE_1>199.84</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:03.690790</EPOCH>
@@ -32,331 +32,331 @@
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:08.690790</EPOCH>
-          <RANGE>4281.276863</RANGE>
+          <RANGE>4240.967767</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:08.690790</EPOCH>
-          <ANGLE_1>199.22</ANGLE_1>
+          <ANGLE_1>199.41</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:08.690790</EPOCH>
-          <ANGLE_2>0.28</ANGLE_2>
+          <ANGLE_2>0.29</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:13.690790</EPOCH>
-          <RANGE>4218.251560</RANGE>
+          <RANGE>4177.837581</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:13.690790</EPOCH>
-          <ANGLE_1>198.79</ANGLE_1>
+          <ANGLE_1>198.98</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:13.690790</EPOCH>
-          <ANGLE_2>0.57</ANGLE_2>
+          <ANGLE_2>0.58</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:18.690790</EPOCH>
-          <RANGE>4155.466727</RANGE>
+          <RANGE>4114.948083</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:18.690790</EPOCH>
-          <ANGLE_1>198.34</ANGLE_1>
+          <ANGLE_1>198.52</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:18.690790</EPOCH>
-          <ANGLE_2>0.86</ANGLE_2>
+          <ANGLE_2>0.87</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:23.690790</EPOCH>
-          <RANGE>4092.935966</RANGE>
+          <RANGE>4052.313019</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:23.690790</EPOCH>
-          <ANGLE_1>197.87</ANGLE_1>
+          <ANGLE_1>198.06</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:23.690790</EPOCH>
-          <ANGLE_2>1.16</ANGLE_2>
+          <ANGLE_2>1.17</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:28.690790</EPOCH>
-          <RANGE>4030.672076</RANGE>
+          <RANGE>3989.945347</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:28.690790</EPOCH>
-          <ANGLE_1>197.39</ANGLE_1>
+          <ANGLE_1>197.58</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:28.690790</EPOCH>
-          <ANGLE_2>1.46</ANGLE_2>
+          <ANGLE_2>1.47</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:33.690790</EPOCH>
-          <RANGE>3968.690195</RANGE>
+          <RANGE>3927.860384</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:33.690790</EPOCH>
-          <ANGLE_1>196.90</ANGLE_1>
+          <ANGLE_1>197.08</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:33.690790</EPOCH>
-          <ANGLE_2>1.76</ANGLE_2>
+          <ANGLE_2>1.78</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:38.690790</EPOCH>
-          <RANGE>3907.006251</RANGE>
+          <RANGE>3866.074264</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:38.690790</EPOCH>
-          <ANGLE_1>196.39</ANGLE_1>
+          <ANGLE_1>196.56</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:38.690790</EPOCH>
-          <ANGLE_2>2.07</ANGLE_2>
+          <ANGLE_2>2.09</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:43.690790</EPOCH>
-          <RANGE>3845.635549</RANGE>
+          <RANGE>3804.602514</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:43.690790</EPOCH>
-          <ANGLE_1>195.86</ANGLE_1>
+          <ANGLE_1>196.03</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:43.690790</EPOCH>
-          <ANGLE_2>2.37</ANGLE_2>
+          <ANGLE_2>2.40</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:48.690790</EPOCH>
-          <RANGE>3784.595872</RANGE>
+          <RANGE>3743.463168</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:48.690790</EPOCH>
-          <ANGLE_1>195.31</ANGLE_1>
+          <ANGLE_1>195.48</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:48.690790</EPOCH>
-          <ANGLE_2>2.69</ANGLE_2>
+          <ANGLE_2>2.72</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:53.690790</EPOCH>
-          <RANGE>3723.905972</RANGE>
+          <RANGE>3682.675261</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:53.690790</EPOCH>
-          <ANGLE_1>194.75</ANGLE_1>
+          <ANGLE_1>194.92</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:53.690790</EPOCH>
-          <ANGLE_2>3.01</ANGLE_2>
+          <ANGLE_2>3.04</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:58.690790</EPOCH>
-          <RANGE>3663.584189</RANGE>
+          <RANGE>3622.257445</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:58.690790</EPOCH>
-          <ANGLE_1>194.16</ANGLE_1>
+          <ANGLE_1>194.33</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:16:58.690790</EPOCH>
-          <ANGLE_2>3.33</ANGLE_2>
+          <ANGLE_2>3.37</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:03.690790</EPOCH>
-          <RANGE>3603.651515</RANGE>
+          <RANGE>3562.231061</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:03.690790</EPOCH>
-          <ANGLE_1>193.56</ANGLE_1>
+          <ANGLE_1>193.72</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:03.690790</EPOCH>
-          <ANGLE_2>3.65</ANGLE_2>
+          <ANGLE_2>3.70</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:08.690790</EPOCH>
-          <RANGE>3544.130124</RANGE>
+          <RANGE>3502.618671</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:08.690790</EPOCH>
-          <ANGLE_1>192.93</ANGLE_1>
+          <ANGLE_1>193.09</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:08.690790</EPOCH>
-          <ANGLE_2>3.98</ANGLE_2>
+          <ANGLE_2>4.03</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:13.690790</EPOCH>
-          <RANGE>3485.042036</RANGE>
+          <RANGE>3443.442724</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:13.690790</EPOCH>
-          <ANGLE_1>192.29</ANGLE_1>
+          <ANGLE_1>192.44</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:13.690790</EPOCH>
-          <ANGLE_2>4.32</ANGLE_2>
+          <ANGLE_2>4.37</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:18.690790</EPOCH>
-          <RANGE>3426.412127</RANGE>
+          <RANGE>3384.728574</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:18.690790</EPOCH>
-          <ANGLE_1>191.62</ANGLE_1>
+          <ANGLE_1>191.76</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:18.690790</EPOCH>
-          <ANGLE_2>4.65</ANGLE_2>
+          <ANGLE_2>4.71</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:23.690790</EPOCH>
-          <RANGE>3368.266711</RANGE>
+          <RANGE>3326.503065</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:23.690790</EPOCH>
-          <ANGLE_1>190.92</ANGLE_1>
+          <ANGLE_1>191.06</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:23.690790</EPOCH>
-          <ANGLE_2>5.00</ANGLE_2>
+          <ANGLE_2>5.06</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:28.690790</EPOCH>
-          <RANGE>3310.632246</RANGE>
+          <RANGE>3268.793242</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:28.690790</EPOCH>
-          <ANGLE_1>190.20</ANGLE_1>
+          <ANGLE_1>190.34</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:28.690790</EPOCH>
-          <ANGLE_2>5.35</ANGLE_2>
+          <ANGLE_2>5.42</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:33.690790</EPOCH>
-          <RANGE>3253.538291</RANGE>
+          <RANGE>3211.629311</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:33.690790</EPOCH>
-          <ANGLE_1>189.46</ANGLE_1>
+          <ANGLE_1>189.58</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:33.690790</EPOCH>
-          <ANGLE_2>5.70</ANGLE_2>
+          <ANGLE_2>5.77</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:38.690790</EPOCH>
-          <RANGE>3197.016134</RANGE>
+          <RANGE>3155.043276</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:38.690790</EPOCH>
-          <ANGLE_1>188.68</ANGLE_1>
+          <ANGLE_1>188.80</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:38.690790</EPOCH>
-          <ANGLE_2>6.05</ANGLE_2>
+          <ANGLE_2>6.14</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:43.690790</EPOCH>
-          <RANGE>3141.097558</RANGE>
+          <RANGE>3099.067710</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:43.690790</EPOCH>
-          <ANGLE_1>187.88</ANGLE_1>
+          <ANGLE_1>187.99</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:43.690790</EPOCH>
-          <ANGLE_2>6.42</ANGLE_2>
+          <ANGLE_2>6.50</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:48.690790</EPOCH>
-          <RANGE>3085.817714</RANGE>
+          <RANGE>3043.738635</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:48.690790</EPOCH>
-          <ANGLE_1>187.04</ANGLE_1>
+          <ANGLE_1>187.14</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:48.690790</EPOCH>
-          <ANGLE_2>6.78</ANGLE_2>
+          <ANGLE_2>6.88</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:53.690790</EPOCH>
-          <RANGE>3031.213808</RANGE>
+          <RANGE>2989.094212</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:53.690790</EPOCH>
-          <ANGLE_1>186.18</ANGLE_1>
+          <ANGLE_1>186.26</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:53.690790</EPOCH>
-          <ANGLE_2>7.15</ANGLE_2>
+          <ANGLE_2>7.25</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:58.690790</EPOCH>
-          <RANGE>2977.323925</RANGE>
+          <RANGE>2935.173577</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:58.690790</EPOCH>
-          <ANGLE_1>185.28</ANGLE_1>
+          <ANGLE_1>185.35</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:17:58.690790</EPOCH>
-          <ANGLE_2>7.52</ANGLE_2>
+          <ANGLE_2>7.64</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:03.690790</EPOCH>
-          <RANGE>2924.189801</RANGE>
+          <RANGE>2882.019615</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:03.690790</EPOCH>
-          <ANGLE_1>184.34</ANGLE_1>
+          <ANGLE_1>184.41</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:03.690790</EPOCH>
-          <ANGLE_2>7.90</ANGLE_2>
+          <ANGLE_2>8.02</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:08.690790</EPOCH>
-          <RANGE>2871.855564</RANGE>
+          <RANGE>2829.677711</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:08.690790</EPOCH>
-          <ANGLE_1>183.37</ANGLE_1>
+          <ANGLE_1>183.42</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:08.690790</EPOCH>
-          <ANGLE_2>8.29</ANGLE_2>
+          <ANGLE_2>8.41</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:13.690790</EPOCH>
-          <RANGE>2820.366608</RANGE>
+          <RANGE>2778.194632</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:13.690790</EPOCH>
-          <ANGLE_1>182.36</ANGLE_1>
+          <ANGLE_1>182.40</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:13.690790</EPOCH>
-          <ANGLE_2>8.67</ANGLE_2>
+          <ANGLE_2>8.81</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:18.690790</EPOCH>
-          <RANGE>2769.772242</RANGE>
+          <RANGE>2727.621175</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:18.690790</EPOCH>
-          <ANGLE_1>181.31</ANGLE_1>
+          <ANGLE_1>181.33</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:18.690790</EPOCH>
-          <ANGLE_2>9.06</ANGLE_2>
+          <ANGLE_2>9.20</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:23.690790</EPOCH>
-          <RANGE>2720.124464</RANGE>
+          <RANGE>2678.010953</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:23.690790</EPOCH>
@@ -364,615 +364,615 @@
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:23.690790</EPOCH>
-          <ANGLE_2>9.45</ANGLE_2>
+          <ANGLE_2>9.61</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:28.690790</EPOCH>
-          <RANGE>2671.476886</RANGE>
+          <RANGE>2629.419323</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:28.690790</EPOCH>
-          <ANGLE_1>179.09</ANGLE_1>
+          <ANGLE_1>179.07</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:28.690790</EPOCH>
-          <ANGLE_2>9.85</ANGLE_2>
+          <ANGLE_2>10.01</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:33.690790</EPOCH>
-          <RANGE>2623.887194</RANGE>
+          <RANGE>2581.905849</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:33.690790</EPOCH>
-          <ANGLE_1>177.91</ANGLE_1>
+          <ANGLE_1>177.87</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:33.690790</EPOCH>
-          <ANGLE_2>10.25</ANGLE_2>
+          <ANGLE_2>10.42</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:38.690790</EPOCH>
-          <RANGE>2577.415949</RANGE>
+          <RANGE>2535.533101</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:38.690790</EPOCH>
-          <ANGLE_1>176.68</ANGLE_1>
+          <ANGLE_1>176.62</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:38.690790</EPOCH>
-          <ANGLE_2>10.64</ANGLE_2>
+          <ANGLE_2>10.82</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:43.690790</EPOCH>
-          <RANGE>2532.125528</RANGE>
+          <RANGE>2490.365598</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:43.690790</EPOCH>
-          <ANGLE_1>175.41</ANGLE_1>
+          <ANGLE_1>175.33</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:43.690790</EPOCH>
-          <ANGLE_2>11.04</ANGLE_2>
+          <ANGLE_2>11.23</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:48.690790</EPOCH>
-          <RANGE>2488.082341</RANGE>
+          <RANGE>2446.472017</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:48.690790</EPOCH>
-          <ANGLE_1>174.08</ANGLE_1>
+          <ANGLE_1>173.98</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:48.690790</EPOCH>
-          <ANGLE_2>11.44</ANGLE_2>
+          <ANGLE_2>11.64</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:53.690790</EPOCH>
-          <RANGE>2445.355595</RANGE>
+          <RANGE>2403.923951</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:53.690790</EPOCH>
-          <ANGLE_1>172.71</ANGLE_1>
+          <ANGLE_1>172.58</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:53.690790</EPOCH>
-          <ANGLE_2>11.84</ANGLE_2>
+          <ANGLE_2>12.05</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:58.690790</EPOCH>
-          <RANGE>2404.016233</RANGE>
+          <RANGE>2362.794836</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:58.690790</EPOCH>
-          <ANGLE_1>171.28</ANGLE_1>
+          <ANGLE_1>171.12</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:18:58.690790</EPOCH>
-          <ANGLE_2>12.23</ANGLE_2>
+          <ANGLE_2>12.45</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:03.690790</EPOCH>
-          <RANGE>2364.138808</RANGE>
+          <RANGE>2323.161801</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:03.690790</EPOCH>
-          <ANGLE_1>169.80</ANGLE_1>
+          <ANGLE_1>169.61</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:03.690790</EPOCH>
-          <ANGLE_2>12.63</ANGLE_2>
+          <ANGLE_2>12.85</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:08.690790</EPOCH>
-          <RANGE>2325.800163</RANGE>
+          <RANGE>2285.104326</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:08.690790</EPOCH>
-          <ANGLE_1>168.26</ANGLE_1>
+          <ANGLE_1>168.04</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:08.690790</EPOCH>
-          <ANGLE_2>13.01</ANGLE_2>
+          <ANGLE_2>13.25</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:13.690790</EPOCH>
-          <RANGE>2289.078308</RANGE>
+          <RANGE>2248.703095</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:13.690790</EPOCH>
-          <ANGLE_1>166.67</ANGLE_1>
+          <ANGLE_1>166.41</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:13.690790</EPOCH>
-          <ANGLE_2>13.39</ANGLE_2>
+          <ANGLE_2>13.64</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:18.690790</EPOCH>
-          <RANGE>2254.053857</RANGE>
+          <RANGE>2214.041382</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:18.690790</EPOCH>
-          <ANGLE_1>165.02</ANGLE_1>
+          <ANGLE_1>164.73</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:18.690790</EPOCH>
-          <ANGLE_2>13.77</ANGLE_2>
+          <ANGLE_2>14.02</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:23.690790</EPOCH>
-          <RANGE>2220.808565</RANGE>
+          <RANGE>2181.203547</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:23.690790</EPOCH>
-          <ANGLE_1>163.32</ANGLE_1>
+          <ANGLE_1>162.99</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:23.690790</EPOCH>
-          <ANGLE_2>14.13</ANGLE_2>
+          <ANGLE_2>14.39</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:28.690790</EPOCH>
-          <RANGE>2189.424107</RANGE>
+          <RANGE>2150.273769</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:28.690790</EPOCH>
-          <ANGLE_1>161.56</ANGLE_1>
+          <ANGLE_1>161.19</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:28.690790</EPOCH>
-          <ANGLE_2>14.48</ANGLE_2>
+          <ANGLE_2>14.75</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:33.690790</EPOCH>
-          <RANGE>2159.982977</RANGE>
+          <RANGE>2121.336876</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:33.690790</EPOCH>
-          <ANGLE_1>159.74</ANGLE_1>
+          <ANGLE_1>159.33</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:33.690790</EPOCH>
-          <ANGLE_2>14.81</ANGLE_2>
+          <ANGLE_2>15.09</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:38.690790</EPOCH>
-          <RANGE>2132.566881</RANGE>
+          <RANGE>2094.476663</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:38.690790</EPOCH>
-          <ANGLE_1>157.87</ANGLE_1>
+          <ANGLE_1>157.42</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:38.690790</EPOCH>
-          <ANGLE_2>15.13</ANGLE_2>
+          <ANGLE_2>15.42</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:43.690790</EPOCH>
-          <RANGE>2107.255404</RANGE>
+          <RANGE>2069.774521</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:43.690790</EPOCH>
-          <ANGLE_1>155.95</ANGLE_1>
+          <ANGLE_1>155.45</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:43.690790</EPOCH>
-          <ANGLE_2>15.44</ANGLE_2>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:19:48.690790</EPOCH>
-          <RANGE>2084.126371</RANGE>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:19:48.690790</EPOCH>
-          <ANGLE_1>153.97</ANGLE_1>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:19:48.690790</EPOCH>
           <ANGLE_2>15.72</ANGLE_2>
         </observation>
         <observation>
-          <EPOCH>2008-09-20T18:19:53.690790</EPOCH>
-          <RANGE>2063.253991</RANGE>
+          <EPOCH>2008-09-20T18:19:48.690790</EPOCH>
+          <RANGE>2047.309684</RANGE>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:19:48.690790</EPOCH>
+          <ANGLE_1>153.43</ANGLE_1>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:19:48.690790</EPOCH>
+          <ANGLE_2>16.01</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:53.690790</EPOCH>
-          <ANGLE_1>151.95</ANGLE_1>
+          <RANGE>2027.157324</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:53.690790</EPOCH>
-          <ANGLE_2>15.97</ANGLE_2>
+          <ANGLE_1>151.36</ANGLE_1>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:19:53.690790</EPOCH>
+          <ANGLE_2>16.27</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:58.690790</EPOCH>
-          <RANGE>2044.708272</RANGE>
+          <RANGE>2009.387891</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:58.690790</EPOCH>
-          <ANGLE_1>149.89</ANGLE_1>
+          <ANGLE_1>149.25</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:19:58.690790</EPOCH>
-          <ANGLE_2>16.21</ANGLE_2>
+          <ANGLE_2>16.50</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:03.690790</EPOCH>
-          <RANGE>2028.553457</RANGE>
+          <RANGE>1994.065506</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:03.690790</EPOCH>
-          <ANGLE_1>147.78</ANGLE_1>
+          <ANGLE_1>147.10</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:03.690790</EPOCH>
-          <ANGLE_2>16.41</ANGLE_2>
+          <ANGLE_2>16.71</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:08.690790</EPOCH>
-          <RANGE>2014.847795</RANGE>
+          <RANGE>1981.247648</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:08.690790</EPOCH>
-          <ANGLE_1>145.64</ANGLE_1>
+          <ANGLE_1>144.91</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:08.690790</EPOCH>
-          <ANGLE_2>16.59</ANGLE_2>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:13.690790</EPOCH>
-          <RANGE>2003.642163</RANGE>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:13.690790</EPOCH>
-          <ANGLE_1>143.46</ANGLE_1>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:13.690790</EPOCH>
-          <ANGLE_2>16.73</ANGLE_2>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:18.690790</EPOCH>
-          <RANGE>1994.979015</RANGE>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:18.690790</EPOCH>
-          <ANGLE_1>141.27</ANGLE_1>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:18.690790</EPOCH>
-          <ANGLE_2>16.84</ANGLE_2>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:23.690790</EPOCH>
-          <RANGE>1988.892011</RANGE>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:23.690790</EPOCH>
-          <ANGLE_1>139.05</ANGLE_1>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:23.690790</EPOCH>
-          <ANGLE_2>16.92</ANGLE_2>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:28.690790</EPOCH>
-          <RANGE>1985.405165</RANGE>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:28.690790</EPOCH>
-          <ANGLE_1>136.82</ANGLE_1>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:28.690790</EPOCH>
-          <ANGLE_2>16.97</ANGLE_2>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:33.690790</EPOCH>
-          <RANGE>1984.532400</RANGE>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:33.690790</EPOCH>
-          <ANGLE_1>134.59</ANGLE_1>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:33.690790</EPOCH>
-          <ANGLE_2>16.97</ANGLE_2>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:38.690790</EPOCH>
-          <RANGE>1986.277288</RANGE>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:38.690790</EPOCH>
-          <ANGLE_1>132.36</ANGLE_1>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:38.690790</EPOCH>
-          <ANGLE_2>16.95</ANGLE_2>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:43.690790</EPOCH>
-          <RANGE>1990.632958</RANGE>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:43.690790</EPOCH>
-          <ANGLE_1>130.13</ANGLE_1>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:20:43.690790</EPOCH>
           <ANGLE_2>16.88</ANGLE_2>
         </observation>
         <observation>
-          <EPOCH>2008-09-20T18:20:48.690790</EPOCH>
-          <RANGE>1997.582440</RANGE>
+          <EPOCH>2008-09-20T18:20:13.690790</EPOCH>
+          <RANGE>1970.983764</RANGE>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:13.690790</EPOCH>
+          <ANGLE_1>142.69</ANGLE_1>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:13.690790</EPOCH>
+          <ANGLE_2>17.02</ANGLE_2>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:18.690790</EPOCH>
+          <RANGE>1963.314220</RANGE>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:18.690790</EPOCH>
+          <ANGLE_1>140.45</ANGLE_1>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:18.690790</EPOCH>
+          <ANGLE_2>17.13</ANGLE_2>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:23.690790</EPOCH>
+          <RANGE>1958.269898</RANGE>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:23.690790</EPOCH>
+          <ANGLE_1>138.19</ANGLE_1>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:23.690790</EPOCH>
+          <ANGLE_2>17.20</ANGLE_2>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:28.690790</EPOCH>
+          <RANGE>1955.871385</RANGE>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:28.690790</EPOCH>
+          <ANGLE_1>135.93</ANGLE_1>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:28.690790</EPOCH>
+          <ANGLE_2>17.23</ANGLE_2>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:33.690790</EPOCH>
+          <RANGE>1956.128616</RANGE>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:33.690790</EPOCH>
+          <ANGLE_1>133.66</ANGLE_1>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:33.690790</EPOCH>
+          <ANGLE_2>17.23</ANGLE_2>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:38.690790</EPOCH>
+          <RANGE>1959.040628</RANGE>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:38.690790</EPOCH>
+          <ANGLE_1>131.39</ANGLE_1>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:38.690790</EPOCH>
+          <ANGLE_2>17.19</ANGLE_2>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:43.690790</EPOCH>
+          <RANGE>1964.595580</RANGE>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:43.690790</EPOCH>
+          <ANGLE_1>129.14</ANGLE_1>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:43.690790</EPOCH>
+          <ANGLE_2>17.12</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:48.690790</EPOCH>
-          <ANGLE_1>127.92</ANGLE_1>
+          <RANGE>1972.771240</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:48.690790</EPOCH>
-          <ANGLE_2>16.79</ANGLE_2>
+          <ANGLE_1>126.90</ANGLE_1>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:20:48.690790</EPOCH>
+          <ANGLE_2>17.01</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:53.690790</EPOCH>
-          <RANGE>2007.098610</RANGE>
+          <RANGE>1983.534970</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:53.690790</EPOCH>
-          <ANGLE_1>125.74</ANGLE_1>
+          <ANGLE_1>124.69</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:53.690790</EPOCH>
-          <ANGLE_2>16.66</ANGLE_2>
+          <ANGLE_2>16.86</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:58.690790</EPOCH>
-          <RANGE>2019.144888</RANGE>
+          <RANGE>1996.844581</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:58.690790</EPOCH>
-          <ANGLE_1>123.57</ANGLE_1>
+          <ANGLE_1>122.51</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:20:58.690790</EPOCH>
-          <ANGLE_2>16.49</ANGLE_2>
+          <ANGLE_2>16.69</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:03.690790</EPOCH>
-          <RANGE>2033.676315</RANGE>
+          <RANGE>2012.649550</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:03.690790</EPOCH>
-          <ANGLE_1>121.44</ANGLE_1>
+          <ANGLE_1>120.36</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:03.690790</EPOCH>
-          <ANGLE_2>16.30</ANGLE_2>
+          <ANGLE_2>16.48</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:08.690790</EPOCH>
-          <RANGE>2050.639580</RANGE>
+          <RANGE>2030.891088</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:08.690790</EPOCH>
-          <ANGLE_1>119.35</ANGLE_1>
+          <ANGLE_1>118.26</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:08.690790</EPOCH>
-          <ANGLE_2>16.08</ANGLE_2>
+          <ANGLE_2>16.24</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:13.690790</EPOCH>
-          <RANGE>2069.974324</RANGE>
+          <RANGE>2051.503577</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:13.690790</EPOCH>
-          <ANGLE_1>117.30</ANGLE_1>
+          <ANGLE_1>116.20</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:13.690790</EPOCH>
-          <ANGLE_2>15.83</ANGLE_2>
+          <ANGLE_2>15.98</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:18.690790</EPOCH>
-          <RANGE>2091.614678</RANGE>
+          <RANGE>2074.416218</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:18.690790</EPOCH>
-          <ANGLE_1>115.30</ANGLE_1>
+          <ANGLE_1>114.19</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:18.690790</EPOCH>
-          <ANGLE_2>15.56</ANGLE_2>
+          <ANGLE_2>15.70</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:23.690790</EPOCH>
-          <RANGE>2115.489130</RANGE>
+          <RANGE>2099.552901</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:23.690790</EPOCH>
-          <ANGLE_1>113.34</ANGLE_1>
+          <ANGLE_1>112.23</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:23.690790</EPOCH>
-          <ANGLE_2>15.27</ANGLE_2>
+          <ANGLE_2>15.39</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:28.690790</EPOCH>
-          <RANGE>2141.522125</RANGE>
+          <RANGE>2126.833886</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:28.690790</EPOCH>
-          <ANGLE_1>111.44</ANGLE_1>
+          <ANGLE_1>110.33</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:28.690790</EPOCH>
-          <ANGLE_2>14.95</ANGLE_2>
+          <ANGLE_2>15.06</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:33.690790</EPOCH>
-          <RANGE>2169.635765</RANGE>
+          <RANGE>2156.177563</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:33.690790</EPOCH>
-          <ANGLE_1>109.59</ANGLE_1>
+          <ANGLE_1>108.48</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:33.690790</EPOCH>
-          <ANGLE_2>14.62</ANGLE_2>
+          <ANGLE_2>14.72</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:38.690790</EPOCH>
-          <RANGE>2199.749267</RANGE>
+          <RANGE>2187.499868</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:38.690790</EPOCH>
-          <ANGLE_1>107.79</ANGLE_1>
+          <ANGLE_1>106.69</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:38.690790</EPOCH>
-          <ANGLE_2>14.28</ANGLE_2>
+          <ANGLE_2>14.36</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:43.690790</EPOCH>
-          <RANGE>2231.780605</RANGE>
+          <RANGE>2220.715961</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:43.690790</EPOCH>
-          <ANGLE_1>106.05</ANGLE_1>
+          <ANGLE_1>104.96</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:43.690790</EPOCH>
-          <ANGLE_2>13.92</ANGLE_2>
+          <ANGLE_2>13.99</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:48.690790</EPOCH>
-          <RANGE>2265.648154</RANGE>
+          <RANGE>2255.741879</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:48.690790</EPOCH>
-          <ANGLE_1>104.37</ANGLE_1>
+          <ANGLE_1>103.29</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:48.690790</EPOCH>
-          <ANGLE_2>13.55</ANGLE_2>
+          <ANGLE_2>13.61</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:53.690790</EPOCH>
-          <RANGE>2301.269609</RANGE>
+          <RANGE>2292.493393</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:53.690790</EPOCH>
-          <ANGLE_1>102.74</ANGLE_1>
+          <ANGLE_1>101.67</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:53.690790</EPOCH>
-          <ANGLE_2>13.17</ANGLE_2>
+          <ANGLE_2>13.22</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:58.690790</EPOCH>
-          <RANGE>2338.563542</RANGE>
+          <RANGE>2330.887553</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:58.690790</EPOCH>
-          <ANGLE_1>101.17</ANGLE_1>
+          <ANGLE_1>100.11</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:21:58.690790</EPOCH>
-          <ANGLE_2>12.78</ANGLE_2>
+          <ANGLE_2>12.82</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:03.690790</EPOCH>
-          <RANGE>2377.450858</RANGE>
+          <RANGE>2370.844150</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:03.690790</EPOCH>
-          <ANGLE_1>99.65</ANGLE_1>
+          <ANGLE_1>98.61</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:03.690790</EPOCH>
-          <ANGLE_2>12.39</ANGLE_2>
+          <ANGLE_2>12.42</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:08.690790</EPOCH>
-          <RANGE>2417.853325</RANGE>
+          <RANGE>2412.284153</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:08.690790</EPOCH>
-          <ANGLE_1>98.19</ANGLE_1>
+          <ANGLE_1>97.17</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:08.690790</EPOCH>
-          <ANGLE_2>11.99</ANGLE_2>
+          <ANGLE_2>12.02</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:13.690790</EPOCH>
-          <RANGE>2459.694740</RANGE>
+          <RANGE>2455.130868</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:13.690790</EPOCH>
-          <ANGLE_1>96.79</ANGLE_1>
+          <ANGLE_1>95.78</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:13.690790</EPOCH>
-          <ANGLE_2>11.59</ANGLE_2>
+          <ANGLE_2>11.61</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:18.690790</EPOCH>
-          <RANGE>2502.902506</RANGE>
+          <RANGE>2499.311500</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:18.690790</EPOCH>
-          <ANGLE_1>95.43</ANGLE_1>
+          <ANGLE_1>94.44</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:18.690790</EPOCH>
-          <ANGLE_2>11.19</ANGLE_2>
+          <ANGLE_2>11.20</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:23.690790</EPOCH>
-          <RANGE>2547.405576</RANGE>
+          <RANGE>2544.755017</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:23.690790</EPOCH>
-          <ANGLE_1>94.13</ANGLE_1>
+          <ANGLE_1>93.15</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:23.690790</EPOCH>
-          <ANGLE_2>10.78</ANGLE_2>
+          <ANGLE_2>10.80</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:28.690790</EPOCH>
-          <RANGE>2593.135565</RANGE>
+          <RANGE>2591.393244</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:28.690790</EPOCH>
-          <ANGLE_1>92.87</ANGLE_1>
+          <ANGLE_1>91.91</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:28.690790</EPOCH>
-          <ANGLE_2>10.38</ANGLE_2>
+          <ANGLE_2>10.39</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:33.690790</EPOCH>
-          <RANGE>2640.028222</RANGE>
+          <RANGE>2639.162341</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:33.690790</EPOCH>
-          <ANGLE_1>91.67</ANGLE_1>
+          <ANGLE_1>90.73</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:33.690790</EPOCH>
-          <ANGLE_2>9.98</ANGLE_2>
+          <ANGLE_2>9.99</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:38.690790</EPOCH>
-          <RANGE>2688.021037</RANGE>
+          <RANGE>2688.000318</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:38.690790</EPOCH>
-          <ANGLE_1>90.51</ANGLE_1>
+          <ANGLE_1>89.58</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:38.690790</EPOCH>
@@ -980,11 +980,11 @@
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:43.690790</EPOCH>
-          <RANGE>2737.054302</RANGE>
+          <RANGE>2737.848110</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:43.690790</EPOCH>
-          <ANGLE_1>89.39</ANGLE_1>
+          <ANGLE_1>88.48</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:43.690790</EPOCH>
@@ -992,11 +992,11 @@
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:48.690790</EPOCH>
-          <RANGE>2787.072562</RANGE>
+          <RANGE>2788.651010</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:48.690790</EPOCH>
-          <ANGLE_1>88.32</ANGLE_1>
+          <ANGLE_1>87.43</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:48.690790</EPOCH>
@@ -1004,167 +1004,167 @@
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:53.690790</EPOCH>
-          <RANGE>2838.021949</RANGE>
+          <RANGE>2840.355950</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:53.690790</EPOCH>
-          <ANGLE_1>87.28</ANGLE_1>
+          <ANGLE_1>86.41</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:53.690790</EPOCH>
-          <ANGLE_2>8.40</ANGLE_2>
+          <ANGLE_2>8.39</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:58.690790</EPOCH>
-          <RANGE>2889.851267</RANGE>
+          <RANGE>2892.912588</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:58.690790</EPOCH>
-          <ANGLE_1>86.29</ANGLE_1>
+          <ANGLE_1>85.44</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:22:58.690790</EPOCH>
-          <ANGLE_2>8.01</ANGLE_2>
+          <ANGLE_2>8.00</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:03.690790</EPOCH>
-          <RANGE>2942.513431</RANGE>
+          <RANGE>2946.274745</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:03.690790</EPOCH>
-          <ANGLE_1>85.33</ANGLE_1>
+          <ANGLE_1>84.50</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:03.690790</EPOCH>
-          <ANGLE_2>7.63</ANGLE_2>
+          <ANGLE_2>7.62</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:08.690790</EPOCH>
-          <RANGE>2995.962628</RANGE>
+          <RANGE>3000.397523</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:08.690790</EPOCH>
-          <ANGLE_1>84.41</ANGLE_1>
+          <ANGLE_1>83.60</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:08.690790</EPOCH>
-          <ANGLE_2>7.25</ANGLE_2>
+          <ANGLE_2>7.24</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:13.690790</EPOCH>
-          <RANGE>3050.155439</RANGE>
+          <RANGE>3055.238427</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:13.690790</EPOCH>
-          <ANGLE_1>83.53</ANGLE_1>
+          <ANGLE_1>82.73</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:13.690790</EPOCH>
-          <ANGLE_2>6.87</ANGLE_2>
+          <ANGLE_2>6.86</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:18.690790</EPOCH>
-          <RANGE>3105.052303</RANGE>
+          <RANGE>3110.758842</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:18.690790</EPOCH>
-          <ANGLE_1>82.68</ANGLE_1>
+          <ANGLE_1>81.89</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:18.690790</EPOCH>
-          <ANGLE_2>6.50</ANGLE_2>
+          <ANGLE_2>6.49</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:23.690790</EPOCH>
-          <RANGE>3160.614550</RANGE>
+          <RANGE>3166.921021</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:23.690790</EPOCH>
-          <ANGLE_1>81.86</ANGLE_1>
+          <ANGLE_1>81.09</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:23.690790</EPOCH>
-          <ANGLE_2>6.14</ANGLE_2>
+          <ANGLE_2>6.13</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:28.690790</EPOCH>
-          <RANGE>3216.805572</RANGE>
+          <RANGE>3223.689270</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:28.690790</EPOCH>
-          <ANGLE_1>81.07</ANGLE_1>
+          <ANGLE_1>80.31</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:28.690790</EPOCH>
-          <ANGLE_2>5.78</ANGLE_2>
+          <ANGLE_2>5.77</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:33.690790</EPOCH>
-          <RANGE>3273.592332</RANGE>
+          <RANGE>3281.031463</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:33.690790</EPOCH>
-          <ANGLE_1>80.30</ANGLE_1>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:23:33.690790</EPOCH>
-          <ANGLE_2>5.42</ANGLE_2>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:23:38.690790</EPOCH>
-          <RANGE>3330.942300</RANGE>
-        </observation>
-        <observation>
-          <EPOCH>2008-09-20T18:23:38.690790</EPOCH>
           <ANGLE_1>79.57</ANGLE_1>
         </observation>
         <observation>
+          <EPOCH>2008-09-20T18:23:33.690790</EPOCH>
+          <ANGLE_2>5.41</ANGLE_2>
+        </observation>
+        <observation>
           <EPOCH>2008-09-20T18:23:38.690790</EPOCH>
-          <ANGLE_2>5.07</ANGLE_2>
+          <RANGE>3338.915946</RANGE>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:23:38.690790</EPOCH>
+          <ANGLE_1>78.85</ANGLE_1>
+        </observation>
+        <observation>
+          <EPOCH>2008-09-20T18:23:38.690790</EPOCH>
+          <ANGLE_2>5.06</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:43.690790</EPOCH>
-          <RANGE>3388.825175</RANGE>
+          <RANGE>3397.313277</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:43.690790</EPOCH>
-          <ANGLE_1>78.86</ANGLE_1>
+          <ANGLE_1>78.15</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:43.690790</EPOCH>
-          <ANGLE_2>4.72</ANGLE_2>
+          <ANGLE_2>4.71</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:48.690790</EPOCH>
-          <RANGE>3447.211970</RANGE>
+          <RANGE>3456.195296</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:48.690790</EPOCH>
-          <ANGLE_1>78.18</ANGLE_1>
+          <ANGLE_1>77.48</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:48.690790</EPOCH>
-          <ANGLE_2>4.38</ANGLE_2>
+          <ANGLE_2>4.37</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:53.690790</EPOCH>
-          <RANGE>3506.076813</RANGE>
+          <RANGE>3515.536947</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:53.690790</EPOCH>
-          <ANGLE_1>77.52</ANGLE_1>
+          <ANGLE_1>76.84</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:53.690790</EPOCH>
-          <ANGLE_2>4.04</ANGLE_2>
+          <ANGLE_2>4.03</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:58.690790</EPOCH>
-          <RANGE>3565.393802</RANGE>
+          <RANGE>3575.313098</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:58.690790</EPOCH>
-          <ANGLE_1>76.88</ANGLE_1>
+          <ANGLE_1>76.22</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:23:58.690790</EPOCH>
@@ -1172,11 +1172,11 @@
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:03.690790</EPOCH>
-          <RANGE>3625.138539</RANGE>
+          <RANGE>3635.500096</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:03.690790</EPOCH>
-          <ANGLE_1>76.27</ANGLE_1>
+          <ANGLE_1>75.62</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:03.690790</EPOCH>
@@ -1184,71 +1184,71 @@
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:08.690790</EPOCH>
-          <RANGE>3685.289502</RANGE>
+          <RANGE>3696.077146</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:08.690790</EPOCH>
-          <ANGLE_1>75.68</ANGLE_1>
+          <ANGLE_1>75.03</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:08.690790</EPOCH>
-          <ANGLE_2>3.05</ANGLE_2>
+          <ANGLE_2>3.04</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:13.690790</EPOCH>
-          <RANGE>3745.824842</RANGE>
+          <RANGE>3757.023084</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:13.690790</EPOCH>
-          <ANGLE_1>75.10</ANGLE_1>
+          <ANGLE_1>74.47</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:13.690790</EPOCH>
-          <ANGLE_2>2.73</ANGLE_2>
+          <ANGLE_2>2.72</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:18.690790</EPOCH>
-          <RANGE>3806.723970</RANGE>
+          <RANGE>3818.317978</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:18.690790</EPOCH>
-          <ANGLE_1>74.55</ANGLE_1>
+          <ANGLE_1>73.93</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:18.690790</EPOCH>
-          <ANGLE_2>2.41</ANGLE_2>
+          <ANGLE_2>2.40</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:23.690790</EPOCH>
-          <RANGE>3867.968963</RANGE>
+          <RANGE>3879.944544</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:23.690790</EPOCH>
-          <ANGLE_1>74.01</ANGLE_1>
+          <ANGLE_1>73.41</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:23.690790</EPOCH>
-          <ANGLE_2>2.10</ANGLE_2>
+          <ANGLE_2>2.09</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:28.690790</EPOCH>
-          <RANGE>3929.541326</RANGE>
+          <RANGE>3941.884886</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:28.690790</EPOCH>
-          <ANGLE_1>73.50</ANGLE_1>
+          <ANGLE_1>72.90</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:28.690790</EPOCH>
-          <ANGLE_2>1.79</ANGLE_2>
+          <ANGLE_2>1.78</ANGLE_2>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:33.690790</EPOCH>
-          <RANGE>3991.423611</RANGE>
+          <RANGE>4004.122132</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:33.690790</EPOCH>
-          <ANGLE_1>72.99</ANGLE_1>
+          <ANGLE_1>72.41</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:33.690790</EPOCH>
@@ -1256,11 +1256,11 @@
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:38.690790</EPOCH>
-          <RANGE>4053.600869</RANGE>
+          <RANGE>4066.641889</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:38.690790</EPOCH>
-          <ANGLE_1>72.51</ANGLE_1>
+          <ANGLE_1>71.93</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:38.690790</EPOCH>
@@ -1268,11 +1268,11 @@
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:43.690790</EPOCH>
-          <RANGE>4116.057366</RANGE>
+          <RANGE>4129.428944</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:43.690790</EPOCH>
-          <ANGLE_1>72.04</ANGLE_1>
+          <ANGLE_1>71.48</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:43.690790</EPOCH>
@@ -1280,11 +1280,11 @@
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:48.690790</EPOCH>
-          <RANGE>4178.778249</RANGE>
+          <RANGE>4192.468944</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:48.690790</EPOCH>
-          <ANGLE_1>71.58</ANGLE_1>
+          <ANGLE_1>71.03</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:48.690790</EPOCH>
@@ -1292,11 +1292,11 @@
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:53.690790</EPOCH>
-          <RANGE>4241.751019</RANGE>
+          <RANGE>4255.749871</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:53.690790</EPOCH>
-          <ANGLE_1>71.14</ANGLE_1>
+          <ANGLE_1>70.60</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:53.690790</EPOCH>
@@ -1304,11 +1304,11 @@
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:58.690790</EPOCH>
-          <RANGE>4304.962221</RANGE>
+          <RANGE>4319.258722</RANGE>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:58.690790</EPOCH>
-          <ANGLE_1>70.71</ANGLE_1>
+          <ANGLE_1>70.18</ANGLE_1>
         </observation>
         <observation>
           <EPOCH>2008-09-20T18:24:58.690790</EPOCH>

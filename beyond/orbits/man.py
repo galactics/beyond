@@ -232,13 +232,13 @@ class ContinuousMan(Man):
 class KeplerianContinuousMan(ContinuousMan):
     def __init__(self, date, duration, **kwargs):
         kwargs["frame"] = "TNW"
-        self.delta_a = kwargs.pop("delta_a", 0)
+        self.da = kwargs.pop("da", 0)
         self.di = kwargs.pop("di", 0)
         self.dOmega = kwargs.pop("dOmega", 0)
-        super().__init__(date, duration, np.zeros(3), **kwargs)
+        super().__init__(date, duration, accel=np.zeros(3), **kwargs)
 
     def accel(self, orb):
-        self._dv = dkep2dv(orb, delta_a=self.delta_a, di=self.di, dOmega=self.dOmega)
+        self._accel = dkep2dv(orb, da=self.da, di=self.di, dOmega=self.dOmega) / self.duration.total_seconds()
         return super().accel(orb)
 
 

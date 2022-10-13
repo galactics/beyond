@@ -393,6 +393,9 @@ def create_frames():
         # Link between the JplCenter objects (see beyond.frames.center)
         target.add_link(center, _propagator_cache[target.name])
 
+    if not _frame_cache:
+        raise JplError("No frame loaded")
+
     # We take the Earth JplCenter and attach it to the existing Earth center
     # (defined in beyond.frames.center)
     first_frame = _frame_cache["Earth"]

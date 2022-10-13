@@ -163,7 +163,7 @@ def _loads_kvn(string):
         # In case there is no recommendation for interpolation
         # default to a Lagrange 8th order
         method = ephem_dict.get("INTERPOLATION", "Lagrange").lower()
-        order = int(ephem_dict.get("INTERPOLATION_DEGREE", 7)) + 1
+        order = int(ephem_dict.get("INTERPOLATION_DEGREE", 8))
         ephem = Ephem(ephem_dict["orbits"], method=method, order=order)
 
         ephem.name = ephem_dict["OBJECT_NAME"]
@@ -200,12 +200,12 @@ def _loads_xml(string):
             for statevector in data_tag["stateVector"]:
                 orb = StateVector(
                     [
-                        decode_unit(statevector, "X", units.km),
-                        decode_unit(statevector, "Y", units.km),
-                        decode_unit(statevector, "Z", units.km),
-                        decode_unit(statevector, "X_DOT", units.km),
-                        decode_unit(statevector, "Y_DOT", units.km),
-                        decode_unit(statevector, "Z_DOT", units.km),
+                        decode_unit(statevector, "X", "km"),
+                        decode_unit(statevector, "Y", "km"),
+                        decode_unit(statevector, "Z", "km"),
+                        decode_unit(statevector, "X_DOT", "km/s"),
+                        decode_unit(statevector, "Y_DOT", "km/s"),
+                        decode_unit(statevector, "Z_DOT", "km/s"),
                     ],
                     parse_date(statevector["EPOCH"].text, metadata["TIME_SYSTEM"].text),
                     "cartesian",
@@ -228,8 +228,8 @@ def _loads_xml(string):
 
             ephem = Ephem(
                 ephem,
-                method=metadata.get("INTERPOLATION", "Lagrange").text.lower(),
-                order=int(metadata.get("INTERPOLATION_DEGREE", 7).text) + 1,
+                method=metadata.get("INTERPOLATION", Field("Lagrange", {})).text.lower(),
+                order=int(metadata.get("INTERPOLATION_DEGREE", Field("8", {})).text),
             )
             ephem.name = metadata["OBJECT_NAME"].text
             ephem.cospar_id = metadata["OBJECT_ID"].text
@@ -258,7 +258,7 @@ def _dumps_kvn(data, **kwargs):
             "INTERPOLATION": data.method.upper(),
         }
         if data.method != data.LINEAR:
-            extras["INTERPOLATION_DEGREE"] = f"{data.order - 1}"
+            extras["INTERPOLATION_DEGREE"] = str(data.order)
 
         meta = dump_kvn_meta_odm(data, extras=extras, **kwargs)
 
@@ -322,7 +322,7 @@ def _dumps_xml(data, **kwargs):
             "INTERPOLATION": data.method.upper(),
         }
         if data.method != data.LINEAR:
-            extras["INTERPOLATION_DEGREE"] = str(data.order - 1)
+            extras["INTERPOLATION_DEGREE"] = str(data.order)
 
         dump_xml_meta_odm(segment, data, extras=extras, **kwargs)
 

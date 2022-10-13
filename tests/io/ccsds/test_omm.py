@@ -4,7 +4,7 @@ from pytest import raises
 
 import numpy as np
 
-from beyond.dates import Date
+from beyond.dates import Date, timedelta
 from beyond.io.tle import Tle
 from beyond.io.ccsds import dumps, loads, CcsdsError
 
@@ -36,8 +36,7 @@ def test_dump_omm_cov(orbit_cov, datafile, ccsds_format, helper):
 
 
 def test_dump_omm_bluebook(ccsds_format, datafile, str_tle_bluebook):
-    """Example from the CCSDS Blue Book (4-1 and 4-2)
-    """
+    """Example from the CCSDS Blue Book (4-1 and 4-2)"""
 
     tle = Tle(str_tle_bluebook)
     omm = tle.orbit()
@@ -105,7 +104,33 @@ def test_load_omm_missing_sgp4(datafile):
     with raises(CcsdsError) as e:
         loads(truncated_omm)
 
-    assert str(e.value) == "Missing mandatory parameter 'MEAN_MOTION'"  
+    assert str(e.value) == "Missing mandatory parameter 'MEAN_MOTION'"
+
+
+def test_load_omm_missing_optional_sgp4(tle, datafile, helper):
+    """Test of optionality"""
+    list_omm = datafile("omm").splitlines()
+    for i, line in enumerate(list_omm):
+        if "CLASSIFICATION_TYPE" in line:
+            list_omm.pop(i)
+            break
+    truncated_omm = "\n".join(list_omm)
+
+    data = loads(truncated_omm)
+    helper.assert_orbit(tle, data, "TLE")
+    data.propagate(timedelta(1))
+
+    list_omm = datafile("omm").splitlines()
+    for i, line in enumerate(list_omm):
+        if "EPHEMERIS_TYPE" in line:
+            list_omm.pop(i)
+            break
+    truncated_omm = "\n".join(list_omm)
+
+    data = loads(truncated_omm)
+    helper.assert_orbit(tle, data, "TLE")
+    data.propagate(timedelta(1))
+
 
 
 def test_load_omm_cov(orbit_cov, datafile, helper):

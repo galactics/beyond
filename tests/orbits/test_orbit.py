@@ -54,7 +54,7 @@ def test_coord_init(ref_date, ref_orbit):
 
     with raises(OrbitError) as e:
         Orbit(ref_coord[:-1], ref_date, ref_form, ref_frame, ref_propagator)
-    assert str(e.value) == "Should be 6 in length"
+    assert str(e.value) == "Should be 6 in length, got 5"
 
 
 def test_init_cart(ref_date):
