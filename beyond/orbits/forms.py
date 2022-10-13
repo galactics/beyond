@@ -236,19 +236,6 @@ class Form(Node):
             return H1
 
     @classmethod
-    def _e_e_sin_e(cls, e, E):
-        x = (1 - e) * sin(E)
-        term = float(E)
-        d = 0
-        x0 = np.nan
-        while x != x0:
-            d += 2
-            term *= -(E ** 2) / (d * (d + 1))
-            x0 = x
-            x = x - term
-        return x
-
-    @classmethod
     def _keplerian_circular_to_keplerian(cls, coord, body):
         """Conversion from Keplerian near-circular elements to Mean Keplerian"""
         a, ex, ey, i, Ω, u = coord

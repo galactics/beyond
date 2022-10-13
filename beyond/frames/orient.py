@@ -128,6 +128,8 @@ class TopocentricOrientation(Orientation):
         self.parent = parent
         self.latlonalt = latlonalt
         lat, lon = latlonalt[:-1]
+
+        # the 'rot3(np.pi)' is here to place the X axis along the north direction
         self._m = rot3(-lon) @ rot2(lat - np.pi / 2.0) @ rot3(np.pi)
 
         mtd = f"{name}_to_{parent.name}"
@@ -136,11 +138,7 @@ class TopocentricOrientation(Orientation):
         self.parent + self
 
     def _to_parent(self, date):
-        # the 'rot3(np.pi)' is here to place the X axis along the north direction
         return self._m, None
-
-    def _from_parent(self, date):
-        return rot3(np.pi) @ rot2(np.pi/2 - lat) @ rot3(lon)
 
 
 class LocalOrbitalOrientation(Orientation):
@@ -178,7 +176,7 @@ class LocalOrbitalOrientation(Orientation):
         return local.to_local(self.orient, sv, expanded=False).T, None
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
 
     from ..dates import Date
 
