@@ -71,7 +71,7 @@ plt.grid(linestyle=':', alpha=0.4)
 plt.tight_layout()
 
 fig = plt.figure()
-ax = plt.gca(projection='3d')
+ax = plt.subplot(projection='3d')
 ax.view_init(elev=52, azim=140)
 
 x, y, z = zip(perigee[:3], apogee[:3])
