@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Some matrix basic operations
+"""The rotation matrices defined here are taken from David Vallado's *Fundamentals of Astrodynamics
+and Applications*. They allow to change reference frame, and as such are inverse of classical rotation
+matrices.
 """
 
 import numpy as np
