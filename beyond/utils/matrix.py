@@ -82,9 +82,9 @@ def expand(m, rate=None):
     [[ 0. -1.  0.  0.  0.  0.]
      [-1.  0.  0.  0.  0.  0.]
      [ 0.  0.  1.  0.  0.  0.]
-     [-3.  0. -2.  0. -1.  0.]
-     [ 0.  3.  1. -1.  0.  0.]
-     [ 1. -2.  0.  0.  0.  1.]]
+     [ 3.  0. -1.  0. -1.  0.]
+     [ 0. -3.  2. -1.  0.  0.]
+     [ 2. -1.  0.  0.  0.  1.]]
     """
 
     out = np.zeros((6, 6))
@@ -92,9 +92,12 @@ def expand(m, rate=None):
     out[3:, 3:] = m
 
     if rate is not None:
-        R = np.array(
+        # v' = m (v - w x r)
+        # converted into matrix, such as W v = w x v
+        # This is the equivalent of W = np.cross(np.identity(3), rate)
+        W = np.array(
             [[0, -rate[2], rate[1]], [rate[2], 0, -rate[0]], [-rate[1], rate[0], 0]]
         )
-        out[3:, :3] = -R @ m
+        out[3:, :3] = -m @ W
 
     return out
