@@ -138,6 +138,25 @@ class KeplerNum(NumericalPropagator):
         return new_body
 
     def _make_step(self, orb, step):
+
+        # If an impulsive manoeuver is present, make a microstep
+        # to integrate the manoeuver at the required date,
+        # then another microstep to recover the integrating steps
+
+        for man in self.orbit.maneuvers:
+            if isinstance(man, ImpulsiveMan) and man.check(orb.date, step):
+                microstep1 = man.date - orb.date
+                microstep2 = orb.date + step - man.date
+                _, tmp = self._make_step_for_real(orb, microstep1)
+                tmp[3:] += man.dv(tmp)
+                _, y_n_1 = self._make_step_for_real(tmp, microstep2)
+                break
+        else:
+            step, y_n_1 = self._make_step_for_real(orb, step)
+
+        return step, y_n_1
+
+    def _make_step_for_real(self, orb, step):
         """Compute the next step with the selected method"""
 
         aa, bb, cc = self.butcher["a"], self.butcher["b"], self.butcher["c"]
@@ -184,10 +203,6 @@ class KeplerNum(NumericalPropagator):
                     self.method, MAX_ITER
                 )
             )
-
-        for man in self.orbit.maneuvers:
-            if isinstance(man, ImpulsiveMan) and man.check(orb.date, step):
-                y_n_1[3:] += man.dv(y_n_1, step=step)
 
         return step, y_n_1
 

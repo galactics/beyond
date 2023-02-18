@@ -341,7 +341,7 @@ def test_man_impulsive(molniya_kepler):
     ecc_after = np.mean(eccentricity[man_idx:])
 
     assert np.isclose(ecc_before, 0.6470965029271583)
-    assert np.isclose(ecc_after, 0.002995193656146718)
+    assert np.isclose(ecc_after, 0.0016253320646998854)
 
     assert str(man.date) == "2018-05-03T16:29:23.246451 UTC"
 
