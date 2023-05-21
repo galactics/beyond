@@ -1,18 +1,33 @@
 Orbits
 ======
 
-StateVector
------------
+.. image::
+    /_static/orb.png
+
+Abstract classes
+----------------
+
+.. autoclass:: beyond.orbits.statevector.AbstractStateVector
+    :members:
+    :special-members: __new__
+
+.. autoclass:: beyond.orbits.orbit.AbstractOrbit
+    :members:
+    :special-members: __new__
+
+Concrete classes
+----------------
 
 .. autoclass:: beyond.orbits.statevector.StateVector
     :members:
     :special-members: __new__
     :show-inheritance:
 
-Orbit
------
-
 .. autoclass:: beyond.orbits.orbit.Orbit
+    :members:
+    :show-inheritance:
+
+.. autoclass:: beyond.orbits.orbit.MeanOrbit
     :members:
     :show-inheritance:
 

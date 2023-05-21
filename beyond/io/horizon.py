@@ -4,7 +4,7 @@ retrievable from NASA's https://ssd.jpl.nasa.gov/horizons.cgi
 
 import numpy as np
 
-from ..orbits import Orbit, Ephem
+from ..orbits import StateVector, Ephem
 from ..dates import Date
 from ..utils import units, matrix
 from ..frames.iau1980 import _nutation
@@ -157,7 +157,7 @@ def loads(text):
             elif desc == "vel":
                 vector[3:] = rotation @ [float(x) * vel_unit for x in line]
 
-        orbs.append(Orbit(vector, date, "cartesian", frame, None))
+        orbs.append(StateVector(vector, date, "cartesian", frame))
 
     ephem = Ephem(orbs)
     ephem.name = name

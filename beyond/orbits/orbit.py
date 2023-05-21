@@ -6,16 +6,17 @@
 
 import numpy as np
 from textwrap import indent
+from abc import ABCMeta
 
 from .ephem import Ephem
-from .statevector import StateVector
+from .statevector import AbstractStateVector, StateVector
 from ..frames.frames import orbit2frame
 from ..propagators import Propagator, get_propagator, UnknownPropagatorError
 
 
-class Orbit(StateVector):
+class AbstractOrbit(AbstractStateVector, metaclass=ABCMeta):
     """Extrapolable coordinates (i.e. a :py:class:`~beyond.orbits.statevector.StateVector`
-    associated to a :py:class:`~beyond.propagators.base.Propagator` via the :py:meth:`Orbit.propagate` method)
+    associated to a :py:class:`~beyond.propagators.base.Propagator` via the :py:meth:`propagate` method)
     """
 
     def __new__(cls, coord, date, form, frame, propagator, **kwargs):
@@ -53,7 +54,7 @@ class Orbit(StateVector):
             propagator = f"{self.propagator.__class__.__name__} (initialised)"
 
         fmt = f"""
-Orbit =
+{self.__class__.__name__} =
   date = {self.date}
   form = {self.form}
   frame = {self.frame}
@@ -145,6 +146,20 @@ Orbit =
         see :py:func:`beyond.frames.frames.orbit2frame` for details of the arguments
         """
         return orbit2frame(name, self, **kwargs)
+
+
+class MeanOrbit(AbstractOrbit):
+    """Mean orbit associated with a mean propagator"""
+
+    def to_osculating(self):
+        return self.propagate(self.date)
+
+
+class Orbit(StateVector, AbstractOrbit):
+    """Osculating orbit, associated with a numerical propagator"""
+
+    def to_mean(self, mean_propagator):
+        raise NotImplementedError
 
     def as_statevector(self):
         new_dict = self._data.copy()

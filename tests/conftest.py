@@ -13,7 +13,7 @@ from beyond.dates import Date, timedelta
 from beyond.env.solarsystem import get_body
 from beyond.env import jpl
 from beyond.orbits.man import ContinuousMan
-from beyond.orbits import StateVector
+from beyond.orbits.statevector import AbstractStateVector
 
 np.set_printoptions(linewidth=200)
 
@@ -107,9 +107,9 @@ class Helper:
     @staticmethod
     def assert_vector(ref, pv, precision=(4, 6)):
 
-        if isinstance(ref, StateVector):
+        if isinstance(ref, AbstractStateVector):
             ref = ref.base
-        if isinstance(pv, StateVector):
+        if isinstance(pv, AbstractStateVector):
             pv = pv.base
 
         np.testing.assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
@@ -128,6 +128,9 @@ class Helper:
 
         assert orb1.frame == orb2.frame
         assert orb1.date == orb2.date
+
+        # Check if the two orb objects are of the same type (StateVector, MeanOrbit, or Orbit)
+        assert orb1.__class__ is orb2.__class__
 
         # Precision down to millimeter due to the truncature when writing the CCSDS OPM
         assert abs(orb1[0] - orb2[0]) < 1e-3

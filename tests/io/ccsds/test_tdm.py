@@ -7,15 +7,15 @@ from beyond.utils.measures import MeasureSet, Range, Azimut, Elevation
 
 
 @fixture
-def measureset(orbit, station):
+def measureset(tle, station):
 
-    path = "{0} {1} {0}".format(station.name, orbit.cospar_id).split()
+    path = "{0} {1} {0}".format(station.name, tle.cospar_id).split()
 
     aos = Date(2008, 9, 20, 18, 16, 3, 690790)
     los = Date(2008, 9, 20, 18, 24, 58, 852563)
 
     measures = MeasureSet([])
-    for orb in orbit.iter(start=aos, stop=los, step=timedelta(seconds=5)):
+    for orb in tle.iter(start=aos, stop=los, step=timedelta(seconds=5)):
         sph = orb.copy(frame=station, form='spherical')
         measures.append(Range(path, orb.date, sph.r * 2))
         measures.append(Azimut(path, orb.date, sph.theta))

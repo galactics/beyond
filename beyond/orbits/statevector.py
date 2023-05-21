@@ -5,6 +5,7 @@
 """
 
 import numpy as np
+from abc import ABCMeta
 from textwrap import indent
 
 from ..constants import c
@@ -16,7 +17,7 @@ from .man import Man
 from .cov import Cov
 
 
-class StateVector(np.ndarray):
+class AbstractStateVector(np.ndarray, metaclass=ABCMeta):
     """Coordinate representation"""
 
     def __new__(cls, coord, date, form, frame, **kwargs):
@@ -361,11 +362,14 @@ StateVector =
         Return:
             Orbit : New Orbit object, with the same state as the creating StateVector
         """
-        from .orbit import Orbit
+        from .orbit import Orbit, MeanOrbit
+        from ..propagators.base import AnalyticalPropagator
+
+        _class = MeanOrbit if isinstance(propagator, AnalyticalPropagator) else Orbit
 
         new_dict = self._data.copy()
         new_dict["propagator"] = propagator
-        return Orbit(self.base, **new_dict)
+        return _class(self.base, **new_dict)
 
     @property
     def infos(self):
@@ -373,6 +377,12 @@ StateVector =
         if not hasattr(self, "_infos"):
             self._data["infos"] = Infos(self)
         return self._data["infos"]
+
+
+class StateVector(AbstractStateVector):
+    """Represents a coordinate in time and space"""
+
+    pass
 
 
 class Infos:

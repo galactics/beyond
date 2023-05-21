@@ -40,7 +40,7 @@ import numpy as np
 from string import ascii_uppercase
 from datetime import datetime, timedelta
 
-from ..orbits import Orbit
+from ..orbits import MeanOrbit
 from ..dates.date import Date
 from ..errors import ParseError
 
@@ -247,19 +247,27 @@ class Tle:
             "revolutions": self.revolutions,
             "type": self.type,
         }
-        return Orbit(self.to_list(), self.epoch, "TLE", "TEME", "Sgp4", **data)
+        return MeanOrbit(self.to_list(), self.epoch, "TLE", "TEME", "Sgp4", **data)
 
     @classmethod
     def from_orbit(cls, orbit, name=None, norad_id=None, cospar_id=None):
         """Convert an orbit to it's TLE representation
 
         Args:
-            orbit (Orbit)
+            orbit (MeanOrbit)
             norad_id (str or int):
             cospar_id (str):
         Return:
             str: TLE representation
         """
+
+        from ..propagators.sgp4 import Sgp4
+
+        if not isinstance(orbit, MeanOrbit):
+            raise TypeError(f"MeanOrbit expected, got {type(orbit)}")
+
+        if not isinstance(orbit.propagator, Sgp4):
+            raise TypeError(f"SGP4 propagator expected, got {type(orbit.propagator)}")
 
         if name is not None:
             name = f"{name}\n"

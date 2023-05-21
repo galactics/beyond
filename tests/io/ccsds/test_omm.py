@@ -1,12 +1,20 @@
 from itertools import product
 
-from pytest import raises
+from pytest import raises, fixture
 
 import numpy as np
 
 from beyond.dates import Date, timedelta
+from beyond.orbits import MeanOrbit
+from beyond.orbits.cov import Cov
 from beyond.io.tle import Tle
 from beyond.io.ccsds import dumps, loads, CcsdsError
+
+@fixture
+def orbit_cov(tle, cov):
+    orbit = tle.copy()
+    orbit.cov = Cov(orbit, cov, orbit.frame)
+    return orbit
 
 
 def test_dump_omm(tle, datafile, ccsds_format, helper):
@@ -67,6 +75,8 @@ def test_dump_omm_user_defined(tle, ccsds_format, datafile, helper):
 
 def test_load_omm(tle, datafile, helper):
     data = loads(datafile("omm"))
+
+    assert isinstance(data, MeanOrbit)
     helper.assert_orbit(tle, data, "TLE")
 
     # omm3 = loads(ref_omm_no_units)

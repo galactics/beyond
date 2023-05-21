@@ -6,7 +6,8 @@ from collections.abc import Iterable
 
 from ...utils import units
 from ...dates import Date
-from ...orbits import StateVector, Orbit, Ephem
+from ...orbits import Orbit, MeanOrbit, Ephem
+from ...orbits.statevector import AbstractStateVector, StateVector
 from ...errors import ParseError
 from ...utils.measures import Measure
 from ...propagators.base import AnalyticalPropagator
@@ -119,16 +120,10 @@ def detect2dump(data, **kwargs):
         isinstance(data, Iterable) and all(isinstance(x, Ephem) for x in data)
     ):
         type = "oem"
+    elif isinstance(data, MeanOrbit):
+        type = "omm"
     elif isinstance(data, StateVector):
-        if (
-            isinstance(data, Orbit)
-            and isinstance(data.propagator, AnalyticalPropagator)
-            and data.frame == TEME
-            and data.form is TLE
-        ):
-            type = "omm"
-        else:
-            type = "opm"
+        type = "opm"
     elif isinstance(data, Iterable) and all(isinstance(x, Measure) for x in data):
         type = "tdm"
     else:
@@ -267,7 +262,7 @@ TIME_SYSTEM          = {timesystem}
         center=center.upper(),
         frame=data.frame.orientation.name.upper(),
         timesystem=data.date.scale.name
-        if isinstance(data, StateVector)
+        if isinstance(data, AbstractStateVector)
         else data.start.scale.name,
     )
 
@@ -302,7 +297,7 @@ def dump_xml_meta_odm(segment, data, **kwargs):
     frame.text = data.frame.orientation.name.upper()
 
     timescale = ET.SubElement(metadata, "TIME_SYSTEM")
-    if isinstance(data, StateVector):
+    if isinstance(data, AbstractStateVector):
         timescale.text = data.date.scale.name
     else:
         timescale.text = data.start.scale.name

@@ -2,7 +2,7 @@ import numpy as np
 from pytest import raises
 from numpy.testing import assert_almost_equal
 
-from beyond.orbits import Orbit
+from beyond.orbits.orbit import AbstractOrbit
 from beyond.errors import UnknownPropagatorError
 from beyond.dates import Date, timedelta
 
@@ -10,7 +10,7 @@ from beyond.dates import Date, timedelta
 def test_iter_on_dates(orbit):
 
     # Generate a free step ephemeris
-    start = orbit.date if isinstance(orbit, Orbit) else orbit.start
+    start = orbit.date if isinstance(orbit, AbstractOrbit) else orbit.start
     stop1 = start + timedelta(hours=3)
     step1 = timedelta(seconds=10)
     stop2 = stop1 + timedelta(hours=3)

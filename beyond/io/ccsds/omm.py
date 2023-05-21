@@ -1,7 +1,7 @@
 import numpy as np
 import lxml.etree as ET
 
-from ...orbits import Orbit
+from ...orbits import MeanOrbit
 from ...propagators.sgp4 import Sgp4, wgs72
 
 from .cov import load_cov, dump_cov
@@ -105,7 +105,7 @@ def _loads_kvn(string):
     else:  # pragma: no cover
         raise CcsdsError(f"Unknown OMM theory '{data['MEAN_ELEMENT_THEORY'].text}'")
 
-    orb = Orbit(elements, date, form, frame, propagator, **kwargs)
+    orb = MeanOrbit(elements, date, form, frame, propagator, **kwargs)
 
     if "CX_X" in data:
         orb.cov = load_cov(orb, data)
@@ -181,7 +181,7 @@ def _loads_xml(string):
     else:  # pragma: no cover
         raise CcsdsError(f"Unknown OMM theory '{data['MEAN_ELEMENT_THEORY'].text}'")
 
-    orb = Orbit(elements, date, form, frame, propagator, **kwargs)
+    orb = MeanOrbit(elements, date, form, frame, propagator, **kwargs)
     orb.name = name
     orb.cospar_id = cospar_id
 
