@@ -4,7 +4,6 @@ from ...orbits.cov import Cov
 
 
 def load_cov(orb, data):
-
     if "COV_REF_FRAME" in data:
         frame = data["COV_REF_FRAME"].text
     else:

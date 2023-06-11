@@ -69,7 +69,7 @@ class ClohessyWiltshire(AnalyticalPropagator):
     def n(self):
         """Mean motion of the target spacecraft"""
         if not hasattr(self, "_n"):
-            self._n = np.sqrt(self.frame.center.body.µ / self.sma ** 3)
+            self._n = np.sqrt(self.frame.center.body.µ / self.sma**3)
         return self._n
 
     @property
@@ -78,7 +78,6 @@ class ClohessyWiltshire(AnalyticalPropagator):
 
     @orbit.setter
     def orbit(self, orb):
-
         if not isinstance(orb.frame, HillFrame):
             raise TypeError(
                 "Frame should be 'Hill' for ClohessyWiltshire propagator. {} found".format(
@@ -107,7 +106,6 @@ class ClohessyWiltshire(AnalyticalPropagator):
         return self.__class__(self.sma, frame=self.frame)
 
     def propagate(self, date):
-
         if isinstance(date, timedelta):
             date = self.orbit.date + date
 
@@ -166,13 +164,13 @@ class ClohessyWiltshire(AnalyticalPropagator):
         # Acceleration matrix
         accel_mat = np.array(
             [
-                [(1 - cs) / n ** 2, 2 / n ** 2 * (nt - sn), 0],
+                [(1 - cs) / n**2, 2 / n**2 * (nt - sn), 0],
                 [
-                    2 / n ** 2 * (sn - nt),
-                    1 / n ** 2 * (4 * (1 - cs) - 3 / 2 * nt ** 2),
+                    2 / n**2 * (sn - nt),
+                    1 / n**2 * (4 * (1 - cs) - 3 / 2 * nt**2),
                     0,
                 ],
-                [0, 0, (1 - cs) / n ** 2],
+                [0, 0, (1 - cs) / n**2],
                 [sn / n, 2 / n * (1 - cs), 0],
                 [2 / n * (cs - 1), (4 * sn - 3 * nt) / n, 0],
                 [0, 0, sn / n],

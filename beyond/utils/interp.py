@@ -97,7 +97,6 @@ class Interp:
         return y0 + (y1 - y0) * (x - x0) / (x1 - x0)
 
     def _lagrange(self, x):
-
         prev_idx = self._prev_idx(x)
 
         stop = prev_idx + 1 + self.order // 2 + self.order % 2

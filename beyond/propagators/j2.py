@@ -17,7 +17,6 @@ class J2(AnalyticalPropagator):
         self._orbit = orbit.copy(form="keplerian_mean")
 
     def propagate(self, date):
-
         if type(date) is timedelta:  # pragma: no cover
             date = self.orbit.date + date
 
@@ -29,11 +28,11 @@ class J2(AnalyticalPropagator):
         n = self.orbit.infos.n
         a, e, i = self.orbit[:3]
 
-        com = n * re ** 2 * Earth.J2 / (a ** 2 * (1 - e ** 2) ** 2)
+        com = n * re**2 * Earth.J2 / (a**2 * (1 - e**2) ** 2)
 
         dΩ = -3 / 2 * com * np.cos(i)
         dω = 3 / 4 * com * (4 - 5 * np.sin(i) ** 2)
-        dM = 3 / 4 * com * np.sqrt(1 - e ** 2) * (2 - 3 * np.sin(i) ** 2)
+        dM = 3 / 4 * com * np.sqrt(1 - e**2) * (2 - 3 * np.sin(i) ** 2)
 
         delta = np.array([0.0, 0.0, 0.0, dΩ, dω, dM + n]) * delta_t
 

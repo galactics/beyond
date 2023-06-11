@@ -82,14 +82,12 @@ class Node:
         return [self.path(node_name)[-1] for node_name in self.routes.keys()] + [self]
 
     def _update(self, already_updated=None):
-
         self.routes = {}
         for node in self.neighbors:
             self.routes[node.name] = Route(node, 1)
 
             # Retrieve route from neighbors
             for name, route in node.routes.items():
-
                 # check if the node actually at hand (name) is not already
                 # a direct neighbor of self
                 if name in [self.name] + [x.name for x in self.neighbors]:

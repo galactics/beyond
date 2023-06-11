@@ -130,7 +130,6 @@ class StateVector(np.ndarray):
         return new_obj
 
     def __getattr__(self, name):
-
         name = Form.alt.get(name, name)
 
         # Verification if the variable is available in the current form
@@ -149,7 +148,6 @@ class StateVector(np.ndarray):
         return res
 
     def __setattr__(self, name, value):
-
         propobj = getattr(self.__class__, name, None)
         if isinstance(propobj, property):
             # If the attribute we are trying to set is a property
@@ -176,7 +174,6 @@ class StateVector(np.ndarray):
                 self._data[name] = value
 
     def __getitem__(self, key):
-
         if isinstance(key, (int, slice)):
             return super().__getitem__(key)
         else:
@@ -257,7 +254,6 @@ StateVector =
 
     @cov.setter
     def cov(self, value):
-
         if not isinstance(value, Cov):
             raise TypeError(f"Unknwon covariance type : {type(value)}")
 
@@ -514,7 +510,7 @@ class Infos:
     @property
     def cos_fpa(self):
         return (
-            np.sqrt(self.mu / (self.kep.a * (1 - self.kep.e ** 2)))
+            np.sqrt(self.mu / (self.kep.a * (1 - self.kep.e**2)))
             * (1 + self.kep.e * np.cos(self.kep.nu))
             / self.kep.nu
         )
@@ -522,7 +518,7 @@ class Infos:
     @property
     def sin_fpa(self):
         return (
-            np.sqrt(self.mu / (self.kep.a * (1 - self.kep.e ** 2)))
+            np.sqrt(self.mu / (self.kep.a * (1 - self.kep.e**2)))
             * self.kep.e
             * np.sin(self.kep.nu)
             / self.kep.nu

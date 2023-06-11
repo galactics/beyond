@@ -84,7 +84,6 @@ Orbit =
 
     @propagator.setter
     def propagator(self, new_propagator):
-
         if isinstance(new_propagator, str):
             new_propagator = get_propagator(new_propagator)()
 

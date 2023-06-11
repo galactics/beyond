@@ -76,7 +76,6 @@ class Ephem(Speaker):
     def interp(self):
         """Interpolator object. Callable"""
         if not hasattr(self, "_interp"):
-
             self._interp = DatedInterp(
                 list(self.dates), self._orbits, self._method, self._order
             )
@@ -264,10 +263,8 @@ class Ephem(Speaker):
                 start = real_start
 
             if step is None:
-
                 # The step stays the same as the original ephemeris
                 for orb in self:
-
                     if orb.date < start:
                         continue
 
@@ -285,7 +282,6 @@ class Ephem(Speaker):
                 # create as ephemeris with a different step than the original
                 date = start
                 while date <= stop:
-
                     orb = self.propagate(date)
 
                     # Listeners

@@ -229,12 +229,10 @@ class LightListener(Listener):
             pen_vert = np.tan(alpha_pen) * (x + sat_horiz)
 
             if sat_vert <= pen_vert:
-
                 if self.type == self.PENUMBRA:
                     # Penumbra
                     return -1
                 else:
-
                     y = orb.frame.center.body.r / np.sin(alpha_umb)
                     umb_vert = np.tan(alpha_umb) * (y - sat_horiz)
 
@@ -267,7 +265,6 @@ class TerminatorListener(Listener):
         self._frame = self.sun.propagate(Date.now()).as_frame(self._frame_name)
 
     def info(self, orb):
-
         orb2 = orb.copy(frame=self._frame, form="spherical")
 
         if orb2.r_dot > 0:
@@ -278,7 +275,6 @@ class TerminatorListener(Listener):
         return TerminatorEvent(self, msg)
 
     def __call__(self, orb):
-
         sun_pos = self.sun.propagate(orb.date).copy(frame=orb.frame, form="cartesian")[
             :3
         ]
@@ -534,7 +530,6 @@ class RadialVelocityEvent(Event):  # pragma: no cover
 
 
 class RadialVelocityListener(Listener):
-
     event = RadialVelocityEvent
 
     def __init__(self, frame, sight=False):
@@ -551,7 +546,6 @@ class RadialVelocityListener(Listener):
         return self.event(self)
 
     def check(self, orb):
-
         # Override to disable the computation when the object is not in view of the station
         if self.sight and orb.copy(frame=self.frame, form="spherical").phi <= 0:
             return False
@@ -581,7 +575,6 @@ def stations_listeners(stations):
 
     listeners = []
     for sta in stations:
-
         listeners.append(StationSignalListener(sta))
         listeners.append(StationMaxListener(sta))
         if sta.mask is not None:

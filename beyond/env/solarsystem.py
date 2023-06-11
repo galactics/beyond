@@ -59,7 +59,6 @@ def get_frame(name):
 
 
 class EarthPropagator(AnalyticalPropagator):
-
     orbit = None
     FRAME = "EME2000"
 
@@ -159,7 +158,7 @@ class MoonPropagator(_DiffPropagator):
         )
 
         e_bar = (
-            23.439291 - 0.0130042 * t_tdb - 1.64e-7 * t_tdb ** 2 + 5.04e-7 * t_tdb ** 3
+            23.439291 - 0.0130042 * t_tdb - 1.64e-7 * t_tdb**2 + 5.04e-7 * t_tdb**3
         )
 
         r_moon = Earth.r / sin(p)

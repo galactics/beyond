@@ -103,7 +103,6 @@ class Cov(np.ndarray):
 
     @frame.setter
     def frame(self, frame):
-
         _local = ("TNW", "QSW")
 
         if isinstance(frame, str) and frame not in _local:

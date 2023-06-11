@@ -152,7 +152,6 @@ class Date:
     """Default scale"""
 
     def __init__(self, *args, scale=DEFAULT_SCALE, **kwargs):
-
         if type(scale) is str:
             scale = get_scale(scale.upper())
 
@@ -547,7 +546,6 @@ else:  # pragma: no cover
 
         @staticmethod
         def convert(values, unit, axis):
-
             try:
                 iter(values)
             except TypeError:

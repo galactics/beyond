@@ -138,7 +138,6 @@ class KeplerNum(NumericalPropagator):
         return new_body
 
     def _make_step(self, orb, step):
-
         # If an impulsive manoeuver is present, make a microstep
         # to integrate the manoeuver at the required date,
         # then another microstep to recover the integrating steps
@@ -167,7 +166,6 @@ class KeplerNum(NumericalPropagator):
         MAX_ITER = 10
 
         for i in range(MAX_ITER):
-
             ks = [self._accel(y_n)]
             i += 1
             for a, c in zip(aa[1:], cc[1:]):
@@ -207,7 +205,6 @@ class KeplerNum(NumericalPropagator):
         return step, y_n_1
 
     def _iter(self, **kwargs):
-
         dates = kwargs.get("dates")
 
         if dates is not None:

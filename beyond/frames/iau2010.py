@@ -20,14 +20,11 @@ def _tab():
 
     out = []
     for element in elements:
-
         filepath = Path(__file__).parent / "data" / element
 
         total = []
         with filepath.open(encoding="ascii") as fhd:
-
             for line in fhd.read().splitlines():
-
                 line = line.strip()
 
                 if line.startswith("#") or not line.strip():
@@ -89,47 +86,46 @@ def rate(date):
 
 
 def _planets(date):
-
     ttt = date.change_scale("TT").julian_century
 
     M_moon = (
         485868.249036
         + 1717915923.2178 * ttt
-        + 31.8792 * ttt ** 2
-        + 0.051635 * ttt ** 3
-        - 0.0002447 * ttt ** 4
+        + 31.8792 * ttt**2
+        + 0.051635 * ttt**3
+        - 0.0002447 * ttt**4
     )
 
     M_sun = (
         1287104.79305
         + 129596581.0481 * ttt
-        - 0.5532 * ttt ** 2
-        + 0.000136 * ttt ** 3
-        - 0.00001149 * ttt ** 4
+        - 0.5532 * ttt**2
+        + 0.000136 * ttt**3
+        - 0.00001149 * ttt**4
     )
 
     u_M_moon = (
         335779.526232
         + 1739527262.8478 * ttt
-        - 12.7512 * ttt ** 2
-        - 0.001037 * ttt ** 3
-        + 0.00000417 * ttt ** 4
+        - 12.7512 * ttt**2
+        - 0.001037 * ttt**3
+        + 0.00000417 * ttt**4
     )
 
     D_sun = (
         1072260.70369
         + 1602961601.209 * ttt
-        - 6.3706 * ttt ** 2
-        + 0.006593 * ttt ** 3
-        - 0.00003169 * ttt ** 4
+        - 6.3706 * ttt**2
+        + 0.006593 * ttt**3
+        - 0.00003169 * ttt**4
     )
 
     Omega_moon = (
         450160.398036
         - 6962890.5431 * ttt
-        + 7.4722 * ttt ** 2
-        + 0.007702 * ttt ** 3
-        - 0.00005939 * ttt ** 4
+        + 7.4722 * ttt**2
+        + 0.007702 * ttt**3
+        - 0.00005939 * ttt**4
     )
 
     lambda_M_mercury = 4.402608842 + 2608.7903141574 * ttt
@@ -140,7 +136,7 @@ def _planets(date):
     lambda_M_saturn = 0.874016757 + 21.3299104960 * ttt
     lambda_M_uranus = 5.481293872 + 7.4781598567 * ttt
     lambda_M_neptune = 5.311886287 + 3.8133035638 * ttt
-    p_lambda = 0.02438175 * ttt + 0.00000538691 * ttt ** 2
+    p_lambda = 0.02438175 * ttt + 0.00000538691 * ttt**2
 
     planets = np.array(
         [
@@ -187,32 +183,31 @@ def _xysxy2(date):
     X = (
         -16616.99
         + 2004191742.88 * ttt
-        - 427219.05 * ttt ** 2
-        - 198620.54 * ttt ** 3
-        - 46.05 * ttt ** 4
-        + 5.98 * ttt ** 5
+        - 427219.05 * ttt**2
+        - 198620.54 * ttt**3
+        - 46.05 * ttt**4
+        + 5.98 * ttt**5
     )
 
     Y = (
         -6950.78
         - 25381.99 * ttt
-        - 22407250.99 * ttt ** 2
-        + 1842.28 * ttt ** 3
-        + 1113.06 * ttt ** 4
-        + 0.99 * ttt ** 5
+        - 22407250.99 * ttt**2
+        + 1842.28 * ttt**3
+        + 1113.06 * ttt**4
+        + 0.99 * ttt**5
     )
 
     s_xy2 = (
         94.0
         + 3808.65 * ttt
-        - 122.68 * ttt ** 2
-        - 72574.11 * ttt ** 3
-        + 27.98 * ttt ** 4
-        + 15.62 * ttt ** 5
+        - 122.68 * ttt**2
+        - 72574.11 * ttt**3
+        + 27.98 * ttt**4
+        + 15.62 * ttt**5
     )
 
     for j in range(5):
-
         _x, _y, _s = 0, 0, 0
         for Axs, Axc, *p_coefs in x_tab[j]:
             ax_p = np.dot(p_coefs, planets)
@@ -226,9 +221,9 @@ def _xysxy2(date):
             as_p = np.dot(p_coefs, planets)
             _s += Ass * sin(as_p) + Asc * cos(as_p)
 
-        X += _x * ttt ** j
-        Y += _y * ttt ** j
-        s_xy2 += _s * ttt ** j
+        X += _x * ttt**j
+        Y += _y * ttt**j
+        s_xy2 += _s * ttt**j
 
     # Conversion to arcsecond
     return X * 1e-6, Y * 1e-6, s_xy2 * 1e-6
@@ -261,16 +256,13 @@ def precesion_nutation(date):
 
     X, Y, s = _xys(date)
 
-    d = np.arctan(np.sqrt((X ** 2 + Y ** 2) / (1 - X ** 2 - Y ** 2)))
+    d = np.arctan(np.sqrt((X**2 + Y**2) / (1 - X**2 - Y**2)))
     a = 1 / (1 + np.cos(d))
 
-    return (
-        np.array(
-            [
-                [1 - a * X ** 2, -a * X * Y, X],
-                [-a * X * Y, 1 - a * Y ** 2, Y],
-                [-X, -Y, 1 - a * (X ** 2 + Y ** 2)],
-            ]
-        )
-        @ rot3(s)
-    )
+    return np.array(
+        [
+            [1 - a * X**2, -a * X * Y, X],
+            [-a * X * Y, 1 - a * Y**2, Y],
+            [-X, -Y, 1 - a * (X**2 + Y**2)],
+        ]
+    ) @ rot3(s)

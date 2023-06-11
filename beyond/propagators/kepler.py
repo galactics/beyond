@@ -17,7 +17,6 @@ class Kepler(AnalyticalPropagator):
         self._orbit = orbit.copy(form="keplerian_mean")
 
     def propagate(self, date):
-
         if type(date) is timedelta:  # pragma: no cover
             date = self.orbit.date + date
 

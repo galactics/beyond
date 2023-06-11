@@ -165,7 +165,6 @@ class LocalOrbitalOrientation(Orientation):
         self.parent.orientation + self
 
     def _to_parent(self, date):
-
         if hasattr(self.statevector, "propagate"):
             sv = self.statevector.propagate(date)
         else:
@@ -177,7 +176,6 @@ class LocalOrbitalOrientation(Orientation):
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     from ..dates import Date
 
     print(EME2000.convert_to(Date.now(), GCRF))

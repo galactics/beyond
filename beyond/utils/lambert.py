@@ -19,7 +19,7 @@ def _F(nr0, nr1, A, z, duration, mu):
 def _dF(nr0, nr1, A, z):
     if z == 0:
         y_z = _y(nr0, nr1, A, 0)
-        r = np.sqrt(2) * 40 * y_z ** 1.5 + A / 8 * (
+        r = np.sqrt(2) * 40 * y_z**1.5 + A / 8 * (
             np.sqrt(y_z) + A * np.sqrt(1 / 2 / y_z)
         )
     else:

@@ -28,7 +28,6 @@ def loads(string, fmt="kvn"):
 
 
 def dumps(data, **kwargs):
-
     fmt = get_format(**kwargs)
 
     if fmt == "kvn":
@@ -42,12 +41,10 @@ def dumps(data, **kwargs):
 
 
 def _loads_kvn(string):
-
     mode = "meta"
     meta = {}
     sets = []
     for i, line in enumerate(string.splitlines()):
-
         if not line or line.startswith("COMMENT"):
             continue
         elif line.startswith("DATA_START"):
@@ -97,7 +94,6 @@ def _loads_kvn(string):
 
 
 def _loads_xml(string):
-
     data = xml2dict(string.encode())
 
     sets = []
@@ -203,7 +199,6 @@ def encode_measurement(m):
 
 
 def _dumps_kvn(data, **kwargs):
-
     filtered = ((path, data.filter(path=path)) for path in data.paths)
 
     header = dump_kvn_header(data, "TDM", **kwargs)
@@ -222,7 +217,6 @@ def _dumps_kvn(data, **kwargs):
         txt.append("DATA_START")
 
         for m in measure_set:
-
             name, value, value_fmt = encode_measurement(m)
 
             txt.append(

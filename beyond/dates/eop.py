@@ -25,7 +25,6 @@ class TaiUtc:
     """
 
     def __init__(self, path, encoding="ascii"):
-
         self.path = Path(path)
         self.data = []
 
@@ -80,7 +79,6 @@ class Finals2000A:
     deltas = ("dx", "dy")
 
     def __init__(self, path, encoding="ascii"):
-
         self.path = Path(path)
         d1, d2 = self.deltas
 
@@ -192,7 +190,6 @@ class EopDb:
 
     @classmethod
     def _load_entry_points(cls):
-
         if not hasattr(cls, "_entry_points_loaded"):
             # Loading external DB, via entry points
             for entry in iter_entry_points("beyond.eopdb"):

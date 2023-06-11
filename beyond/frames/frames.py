@@ -102,7 +102,6 @@ class Frame:
         return f"<{self.__class__.__name__} '{self.name}' at {hex(id(self))}>"
 
     def transform(self, orbit, new_frame):
-
         new_orb = orbit.copy(form="cartesian")
 
         offset = self.center.convert_to(
@@ -162,7 +161,6 @@ class HillFrame(Frame):
     DEFAULT_ORIENTATION = "QSW"
 
     def __init__(self, orientation=DEFAULT_ORIENTATION, center=center.Earth):
-
         self.name = f"Hill{orientation}"
         self.orientation = orientation
         self.center = center

@@ -39,7 +39,6 @@ def loads(string, fmt):
 
 
 def dumps(data, **kwargs):
-
     fmt = get_format(**kwargs)
 
     if isinstance(data, Ephem):
@@ -56,13 +55,11 @@ def dumps(data, **kwargs):
 
 
 def _loads_kvn(string):
-
     ephems = []
     required = ("REF_FRAME", "CENTER_NAME", "TIME_SYSTEM", "OBJECT_ID", "OBJECT_NAME")
 
     mode = None
     for line in string.splitlines():
-
         if not line or line.startswith("COMMENT"):  # pragma: no cover
             continue
         elif line.startswith("META_START"):
@@ -177,7 +174,6 @@ def _loads_kvn(string):
 
 
 def _loads_xml(string):
-
     data = xml2dict(string.encode())
 
     ephems = []
@@ -228,7 +224,9 @@ def _loads_xml(string):
 
             ephem = Ephem(
                 ephem,
-                method=metadata.get("INTERPOLATION", Field("Lagrange", {})).text.lower(),
+                method=metadata.get(
+                    "INTERPOLATION", Field("Lagrange", {})
+                ).text.lower(),
                 order=int(metadata.get("INTERPOLATION_DEGREE", Field("8", {})).text),
             )
             ephem.name = metadata["OBJECT_NAME"].text
@@ -244,12 +242,10 @@ def _loads_xml(string):
 
 
 def _dumps_kvn(data, **kwargs):
-
     header = dump_kvn_header(data, "OEM", version="2.0", **kwargs)
 
     content = []
     for i, data in enumerate(data):
-
         data.form = "cartesian"
 
         extras = {

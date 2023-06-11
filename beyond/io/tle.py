@@ -333,7 +333,6 @@ class Tle:
 
         cache = []
         for line in text.splitlines():
-
             # If the line is empty or begins with a comment mark, we skip it.
             if not line.strip() or line.startswith(comments):
                 continue

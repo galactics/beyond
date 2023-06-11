@@ -12,7 +12,6 @@ SOI = namedtuple("SOI", "radius frame")
 
 
 class _SoI:
-
     SOIS = {
         "Mercury": SOI(112408000, "Mercury"),
         "Venus": SOI(616270000, "Venus"),
@@ -59,12 +58,10 @@ class _SoI:
             self.frame = soi.frame
 
     def _iter(self, start=None, stop=None, step=None, **kwargs):
-
         orb = self.orbit
         soi = self._soi(orb)
 
         while orb.date < stop:
-
             current = soi
 
             # At each step of the computation, evaluate the need of SOI transition.
@@ -199,7 +196,6 @@ class SoINumerical(_SoI, KeplerNum):
         soi = self._soi(orb)
 
         while orb.date < stop:
-
             current = soi
 
             # At each step of the computation, evaluate the need of SOI transition.

@@ -94,10 +94,10 @@ class Form(Node):
         r_norm = np.linalg.norm(r)
         v_norm = np.linalg.norm(v)
 
-        K = v_norm ** 2 / 2 - body.µ / r_norm  # specific energy
+        K = v_norm**2 / 2 - body.µ / r_norm  # specific energy
         a = -body.µ / (2 * K)  # semi-major axis
-        e = sqrt(1 - h_norm ** 2 / (a * body.µ))  # eccentricity
-        p = a * (1 - e ** 2)  # semi parameter
+        e = sqrt(1 - h_norm**2 / (a * body.µ))  # eccentricity
+        p = a * (1 - e**2)  # semi parameter
         i = arccos(h[2] / h_norm)  # inclination
         Ω = arctan2(h[0], -h[1]) % (2 * np.pi)  # right ascension of the ascending node
 
@@ -113,7 +113,7 @@ class Form(Node):
 
         a, e, i, Ω, ω, ν = coord
 
-        p = a * (1 - e ** 2)
+        p = a * (1 - e**2)
         r = p / (1 + e * cos(ν))
         h = sqrt(body.µ * p)
         x = r * (cos(Ω) * cos(ω + ν) - sin(Ω) * sin(ω + ν) * cos(i))
@@ -137,12 +137,12 @@ class Form(Node):
         if e < 1:
             # Elliptic case
             cos_E = (e + cos(ν)) / (1 + e * cos(ν))
-            sin_E = (sin(ν) * sqrt(1 - e ** 2)) / (1 + e * cos(ν))
+            sin_E = (sin(ν) * sqrt(1 - e**2)) / (1 + e * cos(ν))
             E = arctan2(sin_E, cos_E) % (2 * np.pi)
         else:
             # Hyperbolic case, E usually marked as H
             cosh_E = (e + cos(ν)) / (1 + e * cos(ν))
-            sinh_E = (sin(ν) * sqrt(e ** 2 - 1)) / (1 + e * cos(ν))
+            sinh_E = (sin(ν) * sqrt(e**2 - 1)) / (1 + e * cos(ν))
             E = arctanh(sinh_E / cosh_E)
 
         return np.array([a, e, i, Ω, ω, E], dtype=float)
@@ -155,11 +155,11 @@ class Form(Node):
 
         if e < 1:
             cos_ν = (cos(E) - e) / (1 - e * cos(E))
-            sin_ν = (sin(E) * sqrt(1 - e ** 2)) / (1 - e * cos(E))
+            sin_ν = (sin(E) * sqrt(1 - e**2)) / (1 - e * cos(E))
         else:
             # Hyperbolic case, E usually marked as H
             cos_ν = (cosh(E) - e) / (1 - e * cosh(E))
-            sin_ν = -(sinh(E) * sqrt(e ** 2 - 1)) / (1 - e * cosh(E))
+            sin_ν = -(sinh(E) * sqrt(e**2 - 1)) / (1 - e * cosh(E))
 
         ν = arctan2(sin_ν, cos_ν) % (np.pi * 2)
 
@@ -240,7 +240,7 @@ class Form(Node):
         """Conversion from Keplerian near-circular elements to Mean Keplerian"""
         a, ex, ey, i, Ω, u = coord
 
-        e = sqrt(ex ** 2 + ey ** 2)
+        e = sqrt(ex**2 + ey**2)
         ω = arctan2(ey / e, ex / e)
         ν = u - ω
 
@@ -264,7 +264,7 @@ class Form(Node):
         see :py:class:`Tle` for more information.
         """
         i, Ω, e, ω, M, n = coord
-        a = (body.µ / n ** 2) ** (1 / 3)
+        a = (body.µ / n**2) ** (1 / 3)
 
         return np.array([a, e, i, Ω, ω, M], dtype=float)
 
@@ -272,7 +272,7 @@ class Form(Node):
     def _keplerian_mean_to_tle(cls, coord, body):
         """Mean Keplerian to TLE format conversion"""
         a, e, i, Ω, ω, M = coord
-        n = sqrt(body.µ / a ** 3)
+        n = sqrt(body.µ / a**3)
 
         return np.array([i, Ω, e, ω, M, n], dtype=float)
 
@@ -288,10 +288,10 @@ class Form(Node):
         theta = arctan2(y, x)
 
         r_dot = (x * vx + y * vy + z * vz) / r
-        phi_dot = (vz * (x ** 2 + y ** 2) - z * (x * vx + y * vy)) / (
-            r ** 2 * sqrt(x ** 2 + y ** 2)
+        phi_dot = (vz * (x**2 + y**2) - z * (x * vx + y * vy)) / (
+            r**2 * sqrt(x**2 + y**2)
         )
-        theta_dot = (x * vy - y * vx) / (x ** 2 + y ** 2)
+        theta_dot = (x * vy - y * vx) / (x**2 + y**2)
 
         return np.array([r, theta, phi, r_dot, theta_dot, phi_dot], dtype=float)
 
@@ -330,8 +330,8 @@ class Form(Node):
         Ω = arctan2(iy, ix) % (2 * np.pi)
         ω = (arctan2(ey, ex) - Ω) % (2 * np.pi)
         ν = (l - Ω - ω) % (2 * np.pi)
-        e = sqrt(ex ** 2 + ey ** 2)
-        i = 2 * arctan(sqrt(ix ** 2 + iy ** 2))
+        e = sqrt(ex**2 + ey**2)
+        i = 2 * arctan(sqrt(ix**2 + iy**2))
 
         return np.array([a, e, i, Ω, ω, ν], dtype=float)
 
@@ -340,10 +340,10 @@ class Form(Node):
         """Conversion from Cartesian to Cylindrical"""
         x, y, z, vx, vy, vz = coord
 
-        r = sqrt(x ** 2 + y ** 2)
+        r = sqrt(x**2 + y**2)
         θ = arctan2(y, x)
         r_dot = (x * vx + y * vy) / r
-        θ_dot = (x * vy - y * vx) / (x ** 2 + y ** 2)
+        θ_dot = (x * vy - y * vx) / (x**2 + y**2)
 
         return np.array([r, θ, z, r_dot, θ_dot, vz], dtype=float)
 
@@ -375,7 +375,7 @@ class Form(Node):
         """Conversion from Keplerian Mean Circula to Keplerian Mean"""
         a, ex, ey, i, Ω, α = coord
 
-        e = sqrt(ex ** 2 + ey ** 2)
+        e = sqrt(ex**2 + ey**2)
         ω = arctan2(ey / e, ex / e)
         M = α - ω
 

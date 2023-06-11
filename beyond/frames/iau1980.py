@@ -62,9 +62,9 @@ def _precesion(date):
 
     t = date.change_scale("TT").julian_century
 
-    zeta = (2306.2181 * t + 0.30188 * t ** 2 + 0.017998 * t ** 3) / 3600.0
-    theta = (2004.3109 * t - 0.42665 * t ** 2 - 0.041833 * t ** 3) / 3600.0
-    z = (2306.2181 * t + 1.09468 * t ** 2 + 0.018203 * t ** 3) / 3600.0
+    zeta = (2306.2181 * t + 0.30188 * t**2 + 0.017998 * t**3) / 3600.0
+    theta = (2004.3109 * t - 0.42665 * t**2 - 0.041833 * t**3) / 3600.0
+    z = (2306.2181 * t + 1.09468 * t**2 + 0.018203 * t**3) / 3600.0
 
     # print("zeta = {}\ntheta = {}\nz = {}\n".format(zeta, theta, z))
     return zeta, theta, z
@@ -102,7 +102,7 @@ def _nutation(date, eop_correction=True, terms=106):
     r = 360.0
 
     # in arcsecond
-    epsilon_bar = 84381.448 - 46.8150 * ttt - 5.9e-4 * ttt ** 2 + 1.813e-3 * ttt ** 3
+    epsilon_bar = 84381.448 - 46.8150 * ttt - 5.9e-4 * ttt**2 + 1.813e-3 * ttt**3
 
     # Conversion to degrees
     epsilon_bar /= 3600.0
@@ -111,40 +111,40 @@ def _nutation(date, eop_correction=True, terms=106):
     m_m = (
         134.96298139
         + (1325 * r + 198.8673981) * ttt
-        + 0.0086972 * ttt ** 2
-        + 1.78e-5 * ttt ** 3
+        + 0.0086972 * ttt**2
+        + 1.78e-5 * ttt**3
     )
 
     # mean anomaly of the sun
     m_s = (
         357.52772333
         + (99 * r + 359.0503400) * ttt
-        - 0.0001603 * ttt ** 2
-        - 3.3e-6 * ttt ** 3
+        - 0.0001603 * ttt**2
+        - 3.3e-6 * ttt**3
     )
 
     # L - Omega
     u_m_m = (
         93.27191028
         + (1342 * r + 82.0175381) * ttt
-        - 0.0036825 * ttt ** 2
-        + 3.1e-6 * ttt ** 3
+        - 0.0036825 * ttt**2
+        + 3.1e-6 * ttt**3
     )
 
     # Mean elongation of the moon from the sun
     d_s = (
         297.85036306
         + (1236 * r + 307.11148) * ttt
-        - 0.0019142 * ttt ** 2
-        + 5.3e-6 * ttt ** 3
+        - 0.0019142 * ttt**2
+        + 5.3e-6 * ttt**3
     )
 
     # Mean longitude of the ascending node of the moon
     om_m = (
         125.04452222
         - (5 * r + 134.1362608) * ttt
-        + 0.0020708 * ttt ** 2
-        + 2.2e-6 * ttt ** 3
+        + 0.0020708 * ttt**2
+        + 2.2e-6 * ttt**3
     )
 
     delta_psi = 0.0
@@ -187,8 +187,8 @@ def equinox(date, eop_correction=True, terms=106, kinematic=True):
         om_m = (
             125.04455501
             - (5 * 360.0 + 134.1361851) * ttt
-            + 0.0020756 * ttt ** 2
-            + 2.139e-6 * ttt ** 3
+            + 0.0020756 * ttt**2
+            + 2.139e-6 * ttt**3
         )
 
         equin += 0.00264 * np.sin(np.deg2rad(om_m)) + 6.3e-5 * np.sin(
@@ -221,8 +221,8 @@ def _sideral(date, longitude=0.0, model="mean", eop_correction=True, terms=106):
     theta = (
         67310.54841
         + (876600 * 3600 + 8640184.812866) * t
-        + 0.093104 * t ** 2
-        - 6.2e-6 * t ** 3
+        + 0.093104 * t**2
+        - 6.2e-6 * t**3
     )
 
     # Conversion from second (time) to degrees (angle)

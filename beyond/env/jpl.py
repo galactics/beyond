@@ -95,7 +95,6 @@ class Bsp:
     _instance = None
 
     def __new__(cls, *args, **kwargs):
-
         if cls._instance is None:
             cls._instance = super().__new__(cls, *args, **kwargs)
 
@@ -113,7 +112,6 @@ class Bsp:
 
             # Extraction of segments from each .bsp file
             for filepath in files:
-
                 filepath = Path(filepath)
 
                 if filepath.suffix.lower() != ".bsp":
@@ -146,7 +144,6 @@ class Pck(dict):
     """Parser of PCK file containing orientation and shape models for solar system bodies"""
 
     def __new__(cls, *args, **kwargs):
-
         # Caching mechanism
         if not hasattr(cls, "_instance"):
             cls._instance = super().__new__(cls, *args, **kwargs)
@@ -163,7 +160,6 @@ class Pck(dict):
         return float(txt)
 
     def parse(self):
-
         self.clear()
 
         files = config.get("env", "jpl", "files", fallback=[])
@@ -173,7 +169,6 @@ class Pck(dict):
 
         # Parsing of multiple files provided in the configuration variable
         for filepath in files:
-
             filepath = Path(filepath)
 
             if filepath.suffix.lower() != ".tpc":
@@ -194,7 +189,6 @@ class Pck(dict):
 
             try:
                 for i, line in enumerate(lines):
-
                     # Seek the beginning of a data block
                     if line.strip() == "\\begindata":
                         datablock = True
@@ -207,7 +201,6 @@ class Pck(dict):
 
                     # Variable extraction
                     if datablock and line.strip().lower().startswith("body"):
-
                         # retrieval of body ID, parameter name and value
                         line = line.strip().lower().lstrip("body")
                         body_id, _, param = line.partition("_")
@@ -360,7 +353,6 @@ def create_frames():
     centers = {}
 
     for center_id, target_id in Bsp().pairs:
-
         center_name = target_names.get(center_id, "Unknown")
         target_name = target_names.get(target_id, "Unknown")
 
@@ -442,7 +434,6 @@ def list_bodies():
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     import sys
     from beyond.dates import Date
 
@@ -452,7 +443,6 @@ if __name__ == "__main__":  # pragma: no cover
         print(file)
         print("*" * len(file))
         for segment in SPK.open(file).segments:
-
             start = Date(segment.start_jd - Date.JD_MJD)
             end = Date(segment.end_jd - Date.JD_MJD)
 

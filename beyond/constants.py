@@ -64,7 +64,7 @@ class Body:
     @property
     def eccentricity(self):
         """Eccentricity of the body"""
-        return sqrt(self.f * 2 - self.f ** 2)
+        return sqrt(self.f * 2 - self.f**2)
 
     def polar_radius(self):
         """Polar radius of the body"""

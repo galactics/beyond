@@ -28,12 +28,12 @@ def sso(*, a=None, e=None, i=None):
     """
 
     ω_e = 2 * np.pi / 365.256363004 / 86400
-    cst = np.sqrt(Earth.mu) * Earth.r ** 2 * Earth.J2
+    cst = np.sqrt(Earth.mu) * Earth.r**2 * Earth.J2
 
     if i is None and a is not None and e is not None:
-        return np.arccos(-2 / 3 * ω_e * (a ** (7 / 2) * (1 - e ** 2) ** 2) / cst)
+        return np.arccos(-2 / 3 * ω_e * (a ** (7 / 2) * (1 - e**2) ** 2) / cst)
     elif a is None and e is not None and i is not None:
-        return (-3 / 2 * cst * np.cos(i) / (ω_e * (1 - e ** 2) ** 2)) ** (2 / 7)
+        return (-3 / 2 * cst * np.cos(i) / (ω_e * (1 - e**2) ** 2)) ** (2 / 7)
     elif e is None and a is not None and i is not None:
         return np.sqrt(1 - np.sqrt(-3 / 2 * cst * np.cos(i) / (ω_e * a ** (7 / 2))))
     else:

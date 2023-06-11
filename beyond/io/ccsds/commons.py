@@ -28,7 +28,7 @@ units_dict = {
     "rev/day**2": 1,
     "rev/day**3": 1,
     "1/ER": 1,
-    "km**3/s**2": units.km ** 3,
+    "km**3/s**2": units.km**3,
 }
 
 
@@ -216,7 +216,6 @@ def kvn2dict(string):
 
 
 def dump_kvn_header(data, ccsds_type, version="1.0", **kwargs):
-
     return """CCSDS_{type}_VERS = {version}
 CREATION_DATE = {creation_date:{fmt}}
 ORIGINATOR = {originator}
@@ -230,7 +229,6 @@ ORIGINATOR = {originator}
 
 
 def dump_xml_header(data, ccsds_type, version="1.0", **kwargs):
-
     attrib = {
         "{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation": "http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd",
         "id": f"CCSDS_{ccsds_type.upper()}_VERS",
@@ -252,7 +250,6 @@ def dump_xml_header(data, ccsds_type, version="1.0", **kwargs):
 
 
 def dump_kvn_meta_odm(data, meta_tag=True, extras={}, **kwargs):
-
     center = data.frame.center.name
 
     if re.search(r"Barycenter|L\d", center):
@@ -286,7 +283,6 @@ TIME_SYSTEM          = {timesystem}
 
 
 def dump_xml_meta_odm(segment, data, **kwargs):
-
     metadata = ET.SubElement(segment, "metadata")
 
     name = ET.SubElement(metadata, "OBJECT_NAME")

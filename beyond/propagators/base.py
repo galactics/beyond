@@ -104,7 +104,6 @@ class AnalyticalPropagator(Speaker, Propagator):
             yield orb
 
     def _iter(self, **kwargs):
-
         start = kwargs.get("start")
         stop = kwargs.get("stop")
         step = kwargs.get("step")
@@ -142,7 +141,6 @@ class NumericalPropagator(Propagator):
             yield orb
 
     def propagate(self, date):
-
         if isinstance(date, timedelta):
             date = self.orbit.date + date
 

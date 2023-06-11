@@ -205,7 +205,6 @@ class ContinuousMan(Man):
         return self.start <= date < self.stop
 
     def accel(self, orb):
-
         orb = orb.copy(form="cartesian")
 
         if self.frame in ("QSW", "TNW"):
@@ -238,7 +237,10 @@ class KeplerianContinuousMan(ContinuousMan):
         super().__init__(date, duration, accel=np.zeros(3), **kwargs)
 
     def accel(self, orb):
-        self._accel = dkep2dv(orb, da=self.da, di=self.di, dOmega=self.dOmega) / self.duration.total_seconds()
+        self._accel = (
+            dkep2dv(orb, da=self.da, di=self.di, dOmega=self.dOmega)
+            / self.duration.total_seconds()
+        )
         return super().accel(orb)
 
 
@@ -272,14 +274,14 @@ def dkep2dv(orb, *, da=0, di=0, dOmega=0):
 
     µ, a, i, v = orb.frame.center.body.mu, orb.infos.kep.a, orb.infos.kep.i, orb.infos.v
 
-    dv_a = µ * da / (2 * v * a ** 2)
-    dangle = np.sqrt(di ** 2 + dOmega ** 2 * np.sin(i) ** 2)
+    dv_a = µ * da / (2 * v * a**2)
+    dangle = np.sqrt(di**2 + dOmega**2 * np.sin(i) ** 2)
 
     v_final = orb.infos.v + dv_a
 
     # Al-Kashi
     dv = np.sqrt(
-        orb.infos.v ** 2 + v_final ** 2 - 2 * orb.infos.v * v_final * np.cos(dangle)
+        orb.infos.v**2 + v_final**2 - 2 * orb.infos.v * v_final * np.cos(dangle)
     )
     dv_t = v_final * np.cos(dangle) - orb.infos.v
 
@@ -291,6 +293,6 @@ def dkep2dv(orb, *, da=0, di=0, dOmega=0):
         dv_w = 0
     else:
         # equivalent to dv_w = dv * np.sin(np.arccos(ratio))
-        dv_w = dv * np.sqrt(1 - ratio ** 2)
+        dv_w = dv * np.sqrt(1 - ratio**2)
 
     return np.array([dv_t, 0, dv_w])

@@ -45,7 +45,6 @@ class LagrangePropagator(AnalyticalPropagator):
 
 class LagrangeOrient(Orientation):
     def __init__(self, frame1, body2):
-
         name = f"{frame1.center.body.name}{body2.name}Lagrange"
         super().__init__(name)
 

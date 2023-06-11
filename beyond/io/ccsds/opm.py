@@ -44,7 +44,6 @@ def loads(string, fmt):
 
 
 def dumps(data, **kwargs):
-
     # Inject a default format if it is not provided, either by argument or by configuration
     fmt = get_format(**kwargs)
 
@@ -57,7 +56,6 @@ def dumps(data, **kwargs):
 
 
 def _loads_kvn(string):
-
     data = kvn2dict(string)
 
     try:
@@ -135,7 +133,6 @@ def _loads_kvn(string):
 
 
 def _loads_xml(string):
-
     data = xml2dict(string.encode())
 
     metadata = data["body"]["segment"]["metadata"]
@@ -258,7 +255,7 @@ GM                   = {gm:11.4f} [km**3/s**2]
             kep_a=kep.a / units.km,
             kep_e=kep.e,
             angles=np.degrees(kep[2:]),
-            gm=kep.frame.center.body.mu / (units.km ** 3),
+            gm=kep.frame.center.body.mu / (units.km**3),
         )
 
     # Covariance handling
@@ -311,7 +308,6 @@ MAN_DV_3             = {dv[2]:.6f} [km/s]
 
 
 def _dumps_xml(data, *, kep=True, **kwargs):
-
     cart = data.copy(form="cartesian")
 
     # Write an intermediary, with field name, unit and value

@@ -22,7 +22,6 @@ from .commons import (
 
 
 def loads(string, fmt):
-
     if fmt == "kvn":
         orb = _loads_kvn(string)
     elif fmt == "xml":
@@ -34,7 +33,6 @@ def loads(string, fmt):
 
 
 def dumps(data, **kwargs):
-
     # Inject a default format if it is not provided, either by argument or by configuration
     fmt = get_format(**kwargs)
 
@@ -49,7 +47,6 @@ def dumps(data, **kwargs):
 
 
 def _loads_kvn(string):
-
     data = kvn2dict(string)
     # if "item" in data.keys():
     #     # To process Space-Track's OMM, wich are not CCSDS compliant...
@@ -122,7 +119,6 @@ def _loads_kvn(string):
 
 
 def _loads_xml(string):
-
     data = xml2dict(string.encode())
 
     # if "item" in data.keys():
@@ -202,7 +198,6 @@ def _loads_xml(string):
 
 
 def _dumps_kvn(data, **kwargs):
-
     header = dump_kvn_header(data, "OMM", version="2.0", **kwargs)
 
     if isinstance(data.propagator, Sgp4):
