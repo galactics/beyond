@@ -158,9 +158,6 @@ class MeanOrbit(AbstractOrbit):
 class Orbit(StateVector, AbstractOrbit):
     """Osculating orbit, associated with a numerical propagator"""
 
-    def to_mean(self, mean_propagator):
-        raise NotImplementedError
-
     def as_statevector(self):
         new_dict = self._data.copy()
         new_dict.pop("propagator")

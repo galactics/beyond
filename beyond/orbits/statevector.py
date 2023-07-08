@@ -382,7 +382,18 @@ StateVector =
 class StateVector(AbstractStateVector):
     """Represents a coordinate in time and space"""
 
-    pass
+    def to_mean_orbit(self, propagator):
+        """
+        Args:
+            propagator (AnalyticalPropagator)
+        Return:
+            MeanOrbit: MeanOrbit object which, when propagated at the same date,
+                returns the input StateVector
+        """
+        if not isinstance(propagator, AnalyticalPropagator):
+            raise TypeError(f"AnalyticalPropagator expected, got {type(propagator)}")
+
+        return propagator.fit_statevector(self)
 
 
 class Infos:

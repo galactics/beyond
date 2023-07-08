@@ -116,6 +116,18 @@ class AnalyticalPropagator(Speaker, Propagator):
             for date in Date.range(start, stop, step, inclusive=True):
                 yield self.propagate(date)
 
+    @classmethod
+    def fit_statevector(cls, statevector):
+        """Find the MeanOrbit that provide the input StateVector
+
+        Args:
+            statevector (StateVector)
+        Return:
+            MeanOrbit: MeanOrbit object which, when propagated at the same date,
+                returns the input StateVector
+        """
+        raise NotImplementedError()
+
 
 class NumericalPropagator(Propagator):
     """Base class for numerical propagators (e.g. Cowell)"""
