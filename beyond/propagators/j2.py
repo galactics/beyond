@@ -22,8 +22,6 @@ class J2(AnalyticalPropagator):
 
         delta_t = (date - self.orbit.date).total_seconds()
 
-        mu = Earth.mu
-        r = self.orbit.infos.r
         re = Earth.r
         n = self.orbit.infos.n
         a, e, i = self.orbit[:3]

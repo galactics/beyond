@@ -85,9 +85,9 @@ def flyby(v_inf_in, v_inf_out, µ):
     ĥ = h / h_norm
 
     Bu = np.cross(S, ĥ)
-    N = np.array([0, 0, 1])
-    T = np.cross(S, K)
-    R = np.cross(S, T)
+    # N = np.array([0, 0, 1])
+    # T = np.cross(S, N)
+    # R = np.cross(S, T)
 
     # Turn angle
     δ = np.arccos(v_inf_in @ v_inf_out / (vin_n * vout_n))

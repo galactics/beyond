@@ -2,7 +2,6 @@ import numpy as np
 
 from . import frames, center, orient
 from ..constants import Earth
-from ..utils.matrix import rot2, rot3, expand
 
 
 class TopocentricFrame(frames.Frame):

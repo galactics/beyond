@@ -390,6 +390,8 @@ class StateVector(AbstractStateVector):
             MeanOrbit: MeanOrbit object which, when propagated at the same date,
                 returns the input StateVector
         """
+        from ..propagators.base import AnalyticalPropagator
+
         if not isinstance(propagator, AnalyticalPropagator):
             raise TypeError(f"AnalyticalPropagator expected, got {type(propagator)}")
 

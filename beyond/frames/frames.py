@@ -7,14 +7,11 @@ to each other.
 
 import sys
 import logging
-import numpy as np
 
 from ..config import config
 from ..errors import UnknownFrameError, UnknownBodyError
 from ..constants import Earth
-from ..utils.matrix import rot3, expand
 from . import orient, center
-from .local import to_local
 
 CIO = ["ITRF", "TIRF", "CIRF", "GCRF"]
 IAU1980 = ["TOD", "MOD"]
@@ -175,7 +172,8 @@ class HillFrame(Frame):
 
 
 Hill = HillFrame()
-"""Hill frame, for the :class:`Clohessy-Wiltshire propagator <beyond.propagators.cw.ClohessyWiltshire>`.
+"""Hill frame, for the
+:class:`Clohessy-Wiltshire propagator <beyond.propagators.cw.ClohessyWiltshire>`.
 This frame is curvilinear along it's tangential axis and can't be transformed
 into an other frame.
 It's orientation (see :mod:`beyond.frames.local`) depends on the

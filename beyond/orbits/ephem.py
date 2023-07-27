@@ -188,7 +188,12 @@ class Ephem(Speaker):
 
             # Create two successive ranges of dates, with different steps
             dates = list(Date.range(Date(2019, 3, 23), Date(2019, 3, 24), timedelta(minutes=3)))
-            dates.extend(Date.range(Date(2019, 3, 24), Date(2019, 3, 25), timedelta(minutes=10), inclusive=True))
+            dates.extend(
+                Date.range(Date(2019, 3, 24),
+                Date(2019, 3, 25),
+                timedelta(minutes=10),
+                inclusive=True)
+            )
             ephem.iter(dates=dates)
 
         The alternative, is the use of *start*, *stop* and *step* keyword arguments

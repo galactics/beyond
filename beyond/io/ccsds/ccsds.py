@@ -6,7 +6,6 @@ For XML input/output validation, it is possible to use XSD files provided at
 https://sanaregistry.org/r/ndmxml/.
 """
 
-from ...config import config
 from . import opm
 from . import oem
 from . import omm
@@ -77,8 +76,8 @@ def dump(data, fp, **kwargs):  # pragma: no cover
     Raise:
         TypeError: if the data object class is not handled
 
-    If ``kep = True`` **and** the frame of the StateVector is (pseudo-)inertial (i.e. EME2000, CIRF, TOD, etc.)
-    the optional osculating keplerian elements will be added to the OPM.
+    If ``kep = True`` **and** the frame of the StateVector is (pseudo-)inertial (i.e. EME2000,
+    CIRF, TOD, etc.) the optional osculating keplerian elements will be added to the OPM.
 
     It is possible to set the configuration dict to change the default value
     of 'fmt'.

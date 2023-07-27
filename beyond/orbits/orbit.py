@@ -4,7 +4,6 @@
 """Orbit description
 """
 
-import numpy as np
 from textwrap import indent
 from abc import ABCMeta
 
@@ -16,7 +15,8 @@ from ..propagators import Propagator, get_propagator, UnknownPropagatorError
 
 class AbstractOrbit(AbstractStateVector, metaclass=ABCMeta):
     """Extrapolable coordinates (i.e. a :py:class:`~beyond.orbits.statevector.StateVector`
-    associated to a :py:class:`~beyond.propagators.base.Propagator` via the :py:meth:`propagate` method)
+    associated to a :py:class:`~beyond.propagators.base.Propagator` via the :py:meth:`propagate`
+    method)
     """
 
     def __new__(cls, coord, date, form, frame, propagator, **kwargs):

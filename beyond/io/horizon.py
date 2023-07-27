@@ -84,7 +84,7 @@ def loads(text):
     # Header conversion
     name = header["Target body name"].partition("{")[0].strip()
     center = header["Center body name"].partition("{")[0].strip()
-    center_site = header["Center-site name"]
+    # center_site = header["Center-site name"]
 
     unit = header["Output units"]
     if unit.startswith("KM"):

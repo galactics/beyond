@@ -32,7 +32,7 @@ Mars (because, why not !)
     from beyond.env.jpl import create_frames
 
     iss.frame = "Mars"  # would fail
-    
+
     create_frames()
     iss.frame = "Mars"  # would succeed
 
@@ -245,7 +245,7 @@ class Pck(dict):
             if name in target_names.values():
                 obj = {}
             else:
-                raise UnknownBodyError(name)
+                raise UnknownBodyError(name) from e
 
         kwargs = {
             "name": name.title(),

@@ -1,7 +1,4 @@
-import numpy as np
-
 from .base import AnalyticalPropagator
-from ..constants import Earth
 from ..dates import timedelta
 
 

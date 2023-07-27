@@ -318,14 +318,14 @@ class Form(Node):
         ey = e * sin(Ω + ω)
         ix = tan(i / 2) * cos(Ω)
         iy = tan(i / 2) * sin(Ω)
-        l = Ω + ω + ν
+        l = Ω + ω + ν  # noqa
 
         return np.array([a, ex, ey, ix, iy, l], dtype=float)
 
     @classmethod
     def _equinoctial_to_keplerian(cls, coord, body):
         """Conversion from Equinoctial to Keplerian"""
-        a, ex, ey, ix, iy, l = coord
+        a, ex, ey, ix, iy, l = coord  # noqa
 
         Ω = arctan2(iy, ix) % (2 * np.pi)
         ω = (arctan2(ey, ex) - Ω) % (2 * np.pi)

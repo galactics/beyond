@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """The rotation matrices defined here are taken from David Vallado's *Fundamentals of Astrodynamics
-and Applications*. They allow to change reference frame, and as such are inverse of classical rotation
-matrices.
+and Applications*. They allow to change reference frame, and as such are inverse of classical
+rotation matrices.
 """
 
 import numpy as np

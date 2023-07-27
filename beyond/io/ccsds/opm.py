@@ -289,10 +289,8 @@ MAN_DV_1             = {dv[0]:.6f} [km/s]
 MAN_DV_2             = {dv[1]:.6f} [km/s]
 MAN_DV_3             = {dv[2]:.6f} [km/s]
 """.format(
-                i=i + 1,
                 date=date,
                 duration=duration,
-                man=man,
                 dv=man._dv / units.km,
                 frame=frame,
                 comment=comment,

@@ -38,7 +38,7 @@ class LagrangePropagator(AnalyticalPropagator):
             if self.number == 5:
                 offset[1] *= -1
         else:  # pragma: no cover
-            raise ValueError(f"Unknown Lagrange point : {number}")
+            raise ValueError(f"Unknown Lagrange point : {self.number}")
 
         return offset
 
@@ -68,7 +68,8 @@ def lagrange(frame1, frame2, number, name=None, orientation=None):
         frame2 (Frame) : Less massive object frame
         number (int) : Lagrange point number (1 for L1, 2 for L2, ...)
         name (str) : Name of the frame created.
-        orientation (Orientation): If ``None``, the created frame will be sinodic (i.e. oriented in QSW relative to frame2)
+        orientation (Orientation): If ``None``, the created frame will be sinodic (i.e. oriented
+            in QSW relative to frame2)
 
     Return:
         Frame : Centred on the specified Lagrange point.

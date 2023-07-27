@@ -6,13 +6,10 @@ from collections.abc import Iterable
 
 from ...utils import units
 from ...dates import Date
-from ...orbits import Orbit, MeanOrbit, Ephem
+from ...orbits import MeanOrbit, Ephem
 from ...orbits.statevector import AbstractStateVector, StateVector
 from ...errors import ParseError
 from ...utils.measures import Measure
-from ...propagators.base import AnalyticalPropagator
-from ...frames.frames import TEME
-from ...orbits.forms import TLE
 from ...config import config
 
 
@@ -140,8 +137,6 @@ def xml2dict(string):
 
     root = ET.fromstring(string)
 
-    data = {}
-
     def _recurse(elem):
         data = {}
         for subelem in elem:
@@ -224,8 +219,9 @@ ORIGINATOR = {originator}
 
 
 def dump_xml_header(data, ccsds_type, version="1.0", **kwargs):
+    xsd = "http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd"
     attrib = {
-        "{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation": "http://sanaregistry.org/r/ndmxml/ndmxml-1.0-master.xsd",
+        "{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation": xsd,
         "id": f"CCSDS_{ccsds_type.upper()}_VERS",
         "version": version,
     }

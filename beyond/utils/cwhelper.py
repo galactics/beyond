@@ -7,7 +7,8 @@ from ..dates import timedelta
 
 class CWHelper:
     """This class provides computation helpers for relative motion positioning
-    and maneuvers, to be used with the :py:class:`~beyond.propagators.cw.ClohessyWiltshire` propagator
+    and maneuvers, to be used with the :py:class:`~beyond.propagators.cw.ClohessyWiltshire`
+    propagator
 
     See the :ref:`docking` script in the documentation for an example of utilisation.
     """

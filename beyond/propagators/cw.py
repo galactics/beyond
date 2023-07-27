@@ -1,7 +1,6 @@
 import numpy as np
 
 from ..dates import timedelta
-from ..env.solarsystem import get_body
 from .base import AnalyticalPropagator
 from ..utils.matrix import expand
 from ..orbits.man import ImpulsiveMan, ContinuousMan
@@ -37,15 +36,14 @@ class ClohessyWiltshire(AnalyticalPropagator):
         """
         Args:
             sma (float) : Semi major-axis of the target object (in meters)
-            orientation (str) : Local orbital reference frame orientation (QSW or TNW)
-            body (str) : Central body
+            frame (str) : Local orbital reference frame, must be a HillFrame object
         """
 
         if isinstance(frame, str):
             frame = get_frame(frame)
 
         if not isinstance(frame, HillFrame):  # pragma: no cover
-            raise TypeError(f"Incompatible frame type : {orientation}")
+            raise TypeError(f"Incompatible frame type : {frame}")
 
         self.sma = sma
         self.frame = frame
@@ -62,7 +60,7 @@ class ClohessyWiltshire(AnalyticalPropagator):
             name (str) : name of the reference frame
         """
 
-        frame = orbit.as_frame(name, orientation=orientation)
+        # frame = orbit.as_frame(name, orientation=orientation)
         return cls(orbit.infos.kep.a, frame="Hill")
 
     @property

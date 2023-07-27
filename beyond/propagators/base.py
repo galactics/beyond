@@ -10,9 +10,6 @@ class Propagator(metaclass=ABCMeta):
 
     orbit = None
 
-    def __repr__(self):
-        return f"<{self.__class__.__name__} at {hex(id(self))}>"
-
     @abstractmethod
     def iter(self, **kwargs):
         pass
@@ -60,7 +57,12 @@ class AnalyticalPropagator(Speaker, Propagator):
 
             # Create two successive ranges of dates, with different steps
             dates = list(Date.range(Date(2019, 3, 23), Date(2019, 3, 24), timedelta(minutes=3)))
-            dates.extend(Date.range(Date(2019, 3, 24), Date(2019, 3, 25), timedelta(minutes=10), inclusive=True))
+            dates.extend(
+                Date.range(Date(2019, 3, 24),
+                Date(2019, 3, 25),
+                timedelta(minutes=10),
+                inclusive=True)
+            )
             propag.iter(dates=dates)
 
         The alternative, is the use of *start*, *stop* and *step* keyword arguments
@@ -71,7 +73,7 @@ class AnalyticalPropagator(Speaker, Propagator):
 
         .. code-block:: python
 
-            propag.iter(stop=stop)  # If the iterator has a default step (e.g. numerical propagators)
+            propag.iter(stop=stop)  # If the iterator has a default step (e.g. numerical propagator)
             propag.iter(stop=stop, step=step)
             propag.iter(start=start, stop=stop, step=step)
         """

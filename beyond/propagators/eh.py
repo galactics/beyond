@@ -67,7 +67,8 @@ class EcksteinHechler(AnalyticalPropagator):
         Args:
             date (Date or timedelta)
         Return:
-            :py:class:`~beyond.orbits.statevector.StateVector` if ``osculating == True``, :py:class:`~beyond.orbits.orbit.MeanOrbit` otherwise : Orbit at the given date
+            :py:class:`~beyond.orbits.statevector.StateVector` if ``osculating == True``,
+                :py:class:`~beyond.orbits.orbit.MeanOrbit` otherwise : Orbit at the given date
         """
 
         if isinstance(date, timedelta):

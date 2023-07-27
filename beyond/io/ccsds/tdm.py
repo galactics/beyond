@@ -186,14 +186,14 @@ def encode_measurement(m):
         name = "ANGLE_2"
         value_fmt = ".2f"
         value = np.degrees(m.value)
-    elif isinstance(m, RightAscension):
-        name = "ANGLE_1"
-        value_fmt = ".8f"
-        value = np.degrees(m.value)
-    elif isinstance(m, Declination):
-        name = "ANGLE_2"
-        value_fmt = ".8f"
-        value = np.degrees(m.value)
+    # elif isinstance(m, RightAscension):
+    #     name = "ANGLE_1"
+    #     value_fmt = ".8f"
+    #     value = np.degrees(m.value)
+    # elif isinstance(m, Declination):
+    #     name = "ANGLE_2"
+    #     value_fmt = ".8f"
+    #     value = np.degrees(m.value)
 
     return name, value, value_fmt
 

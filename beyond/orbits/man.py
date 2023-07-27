@@ -141,7 +141,8 @@ class ContinuousMan(Man):
             duration (timedelta): Duration of the thrust
             dv (list[float]): Vector of length 3 describing the velocity increment (in m/s)
             accel (list[float]): Vector of length 3 describing the acceleration (in m/s²)
-            date_pos (str): define the position of the date argument. Accepted values are ``start``, ``stop``, ``median``
+            date_pos (str): define the position of the date argument. Accepted values
+                are ``start``, ``stop``, ``median``
             frame (str): frame of the maneuver
             comment (str):
         """

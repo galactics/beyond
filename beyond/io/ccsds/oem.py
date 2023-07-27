@@ -262,10 +262,9 @@ def _dumps_kvn(data, **kwargs):
         cov = []
         for orb in data:
             text.append(
-                "{date:{dfmt}} {orb[0]:{fmt}} {orb[1]:{fmt}} {orb[2]:{fmt}} {orb[3]:{fmt}} {orb[4]:{fmt}} {orb[5]:{fmt}}".format(
+                "{date:{dfmt}} {orb}".format(
                     date=orb.date,
-                    orb=orb.base / units.km,
-                    fmt=" 10f",
+                    orb=" ".join(f"{x: 10f}" for x in orb.base / units.km),
                     dfmt=DATE_FMT_DEFAULT,
                 )
             )
@@ -285,8 +284,6 @@ def _dumps_kvn(data, **kwargs):
                     if frame == "QSW":
                         frame = "RSW"
                     cov_text.append(f"COV_REF_FRAME = {frame}")
-
-                elems = ["X", "Y", "Z", "X_DOT", "Y_DOT", "Z_DOT"]
 
                 for i in range(6):
                     line = []

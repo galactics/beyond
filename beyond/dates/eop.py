@@ -7,6 +7,7 @@
 import logging
 from pathlib import Path
 from inspect import isclass
+from collections import namedtuple
 from pkg_resources import iter_entry_points
 
 from ..config import config
@@ -21,7 +22,8 @@ log = logging.getLogger(__name__)
 class TaiUtc:
     """File listing all leap seconds throught history
 
-    This file could be retrieved `here <http://maia.usno.navy.mil/ser7/tai-utc.dat>`__, but this server seems discontinued.
+    This file could be retrieved `here <http://maia.usno.navy.mil/ser7/tai-utc.dat>`__,
+    but this server seems discontinued.
     """
 
     def __init__(self, path, encoding="ascii"):
@@ -148,24 +150,8 @@ class Finals(Finals2000A):
     deltas = ("dpsi", "deps")
 
 
-class Eop:
-    """Earth Orientation Parameters"""
-
-    def __init__(self, **kwargs):
-        self.x = kwargs["x"]
-        self.y = kwargs["y"]
-        self.dx = kwargs["dx"]
-        self.dy = kwargs["dy"]
-        self.deps = kwargs["deps"]
-        self.dpsi = kwargs["dpsi"]
-        self.lod = kwargs["lod"]
-        self.ut1_utc = kwargs["ut1_utc"]
-        self.tai_utc = kwargs["tai_utc"]
-
-    def __repr__(self):
-        return "{name}(x={x}, y={y}, dx={dx}, dy={dy}, deps={deps}, dpsi={dpsi}, lod={lod}, ut1_utc={ut1_utc}, tai_utc={tai_utc})".format(
-            name=self.__class__.__name__, **self.__dict__
-        )
+Eop = namedtuple("Eop", "x y dx dy deps dpsi lod ut1_utc tai_utc")
+"""Earth Orientation Parameters"""
 
 
 class EopDb:

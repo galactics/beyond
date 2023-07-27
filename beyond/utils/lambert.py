@@ -68,7 +68,8 @@ def lambert(orb0, orb1, prograde=True):
         prograde (bool) : If True, provides a prograde solution. retrograde
             otherwise
     Return
-        Tuple : Initial and Target :py:class:`Orbits <beyond.orbits.orbit.Orbit>` patched with solution's velocities
+        Tuple : Initial and Target :py:class:`Orbits <beyond.orbits.orbit.Orbit>` patched with
+            solution's velocities
 
     The initial orbit reference frame is the one used for the computation.
     So if one desires to compute an interplanetary opportunity, orb0 should

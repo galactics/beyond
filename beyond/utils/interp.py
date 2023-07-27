@@ -73,10 +73,10 @@ class Interp:
         xs = self.xs
 
         while True:
-            l = len(xs)
-            if l == 1:
+            le = len(xs)
+            if le == 1:
                 break
-            k = l // 2
+            k = le // 2
 
             if x > xs[k]:
                 prev_idx += k

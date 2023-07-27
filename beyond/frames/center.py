@@ -2,7 +2,6 @@ import numpy as np
 
 from .. import constants
 from ..utils.node import Node
-from ..utils.matrix import expand
 
 from . import orient
 
@@ -94,7 +93,6 @@ Earth = Center("Earth", body=constants.Earth)
 
 if __name__ == "__main__":  # pragma: no cover
     from ..dates import Date
-    from .iau1980 import rate
     from ..env import jpl
 
     from space.wspace import ws

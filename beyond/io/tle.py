@@ -221,7 +221,7 @@ class Tle:
         """
         tr_table = str.maketrans({c: None for c in ascii_uppercase + "+ ."})
         no_letters = line[:68].translate(tr_table).replace("-", "1")
-        return sum([int(l) for l in no_letters]) % 10
+        return sum([int(x) for x in no_letters]) % 10
 
     def to_list(self):
         """Convert the tle to a list representation, with the order as it can be found in the TLE
