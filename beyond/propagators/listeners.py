@@ -584,7 +584,7 @@ def stations_listeners(stations):
 
 
 def find_event(iterator, event, offset=0):
-    """Find an specific event in a extropolation
+    """Find a specific event in an extropolation
 
     Args:
         iterator (Iterable[Orbit]): Itertator in which to look for the event
