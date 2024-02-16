@@ -31,7 +31,8 @@ def bplane(orb):
     Args:
         orb (Orbit) :
     Return:
-        BPlane : B-plane characteristics as a namedtuple
+        BPlane : B-plane characteristics as a namedtuple. All vectors computations
+            are made in the same reference frame as orb.
     """
 
     orb = orb.copy(form="cartesian")
@@ -40,7 +41,7 @@ def bplane(orb):
     r, v = orb[:3], orb[3:]
     rn = norm(r)
     vn = norm(v)
-    e = (vn**2 * r - (r @ v) * v) / µ - r / rn
+    e = np.asarray((vn**2 * r - (r @ v) * v) / µ - r / rn)
     e_norm = norm(e)
     ê = e / e_norm
 
@@ -73,14 +74,14 @@ def flyby(v_inf_in, v_inf_out, µ):
         µ (float) : standard gravitational parameter of the body flown-by
     Return:
         tuple : tuple with length 2, the first element being the B vector
-        (a numpy array), the second being the periapsis radius
+            (a numpy array), the second being the periapsis radius
     """
 
     vin_n = norm(v_inf_in)
     vout_n = norm(v_inf_out)
 
     S = v_inf_in / norm(v_inf_in)
-    h = np.cross(r, v)
+    h = np.cross(v_inf_in, v_inf_out)
     h_norm = norm(h)
     ĥ = h / h_norm
 
