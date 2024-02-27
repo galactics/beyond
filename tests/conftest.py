@@ -137,6 +137,11 @@ class Helper:
         # Check if the two orb objects are of the same type (StateVector, MeanOrbit, or Orbit)
         assert orb1.__class__ is orb2.__class__
 
+        assert hasattr(orb1, "propagator") == hasattr(orb2, "propagator")
+        if hasattr(orb1, "propagator"):
+            assert orb1.propagator.__class__ is orb2.propagator.__class__
+            # TODO : It would be nice if we could check the parameters of the propagator
+
         # Precision down to millimeter due to the truncature when writing the CCSDS OPM
         assert abs(orb1[0] - orb2[0]) < 1e-3
         assert abs(orb1[1] - orb2[1]) < 1e-3
