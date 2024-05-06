@@ -4,7 +4,7 @@
 """
 
 from numpy import sin, radians, ceil
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 
 from ..errors import DateError, UnknownScaleError
 from .eop import EopDb
@@ -349,7 +349,8 @@ class Date:
         Return:
             Date: Current time in the chosen scale
         """
-        return cls(datetime.utcnow()).change_scale(scale)
+        utc = datetime.now(timezone.utc).replace(tzinfo=None)
+        return cls(utc).change_scale(scale)
 
     def strftime(self, fmt):  # pragma: no cover
         """Format the date following the given format"""
