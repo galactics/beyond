@@ -189,24 +189,26 @@ class Tle:
             TleParseError
         """
 
+        concat = "\n".join(text)
+
         if not text[0].lstrip().startswith("1 ") or not text[1].lstrip().startswith(
             "2 "
         ):
-            raise TleParseError("Line number check failed")
+            raise TleParseError(f"Line number check failed.\n{concat}")
 
         for i, line in enumerate(text):
             line = line.strip()
 
             if len(line) != 69:
                 raise TleParseError(
-                    f"Invalid TLE size on line {i + 1}. Expected {69}, got {len(line)}."
+                    f"Invalid TLE size on line {i + 1}. Expected {69}, got {len(line)}.\n{concat}"
                 )
 
             check = str(cls._checksum(line))
             if check != line[68]:
                 raise TleParseError(
-                    "TLE checksum validation failed on line {}. Expected {}, got {}.".format(
-                        i + 1, check, line[68]
+                    "TLE checksum validation failed on line {}. Expected {}, got {}.\n{}".format(
+                        i + 1, check, line[68], concat
                     )
                 )
 
