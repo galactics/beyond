@@ -6,6 +6,7 @@ Each time a propagator (a subclass of :py:class:`Speaker`) detects a state trans
 creates an Orbit instance at the date of the event, and add an ``event`` attribute which
 is an :py:class:`Event` instance.
 """
+
 import numpy as np
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta

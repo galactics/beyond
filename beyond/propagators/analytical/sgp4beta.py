@@ -207,11 +207,7 @@ class Sgp4Beta:
             * self._init.a0
             * self._init.β_0**2
             * (1 - self._init.η**2) ** (-7 / 2)
-            * (
-                1
-                + 11 / 4 * self._init.η * (self._init.η + e0)
-                + (e0 * self._init.η**3)
-            )
+            * (1 + 11 / 4 * self._init.η * (self._init.η + e0) + (e0 * self._init.η**3))
         )
         self._init.D2 = 4 * self._init.a0 * self._init.ξ * self._init.C1**2
         self._init.D3 = (
@@ -257,10 +253,7 @@ class Sgp4Beta:
             / (4 * self._init.a0**4 * self._init.β_0**8)
         )
         self._init.Ωdot = (
-            -3
-            * self._init.k2
-            * self._init.θ
-            / (self._init.a0**2 * self._init.β_0**4)
+            -3 * self._init.k2 * self._init.θ / (self._init.a0**2 * self._init.β_0**4)
             + 3
             * self._init.k2**2
             * (4 * self._init.θ - 19 * self._init.θ**3)
@@ -320,16 +313,7 @@ class Sgp4Beta:
 
         Mp = (Mdf + delta_ω + delta_M) % (2 * np.pi)
         ω = ωdf - delta_ω - delta_M
-        Ω = (
-            Ωdf
-            - 21
-            * n0
-            * _i.k2
-            * _i.θ
-            / (2 * _i.a0**2 * _i.β_0**2)
-            * _i.C1
-            * tdiff**2
-        )
+        Ω = Ωdf - 21 * n0 * _i.k2 * _i.θ / (2 * _i.a0**2 * _i.β_0**2) * _i.C1 * tdiff**2
         e = e0 - bstar * _i.C4 * tdiff - bstar * _i.C5 * (sin(Mp) - sin(M0))
 
         if e < 1e-6:
@@ -355,10 +339,7 @@ class Sgp4Beta:
             * (
                 3 / 2 * _i.C1 * tdiff**2
                 + (_i.D2 + 2 * _i.C1**2) * tdiff**3
-                + 1
-                / 4
-                * (3 * _i.D3 + 12 * _i.C1 * _i.D2 + 10 * _i.C1**3)
-                * tdiff**4
+                + 1 / 4 * (3 * _i.D3 + 12 * _i.C1 * _i.D2 + 10 * _i.C1**3) * tdiff**4
                 + 1
                 / 5
                 * (
@@ -421,11 +402,7 @@ class Sgp4Beta:
         )
 
         rk = (
-            r
-            * (
-                1
-                - 3 / 2 * _i.k2 * sqrt(1 - e_L**2) / (p_L**2) * (3 * _i.θ**2 - 1)
-            )
+            r * (1 - 3 / 2 * _i.k2 * sqrt(1 - e_L**2) / (p_L**2) * (3 * _i.θ**2 - 1))
             + Delta_r
         )
         uk = u + Delta_u

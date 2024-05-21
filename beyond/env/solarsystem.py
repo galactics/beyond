@@ -157,9 +157,7 @@ class MoonPropagator(_DiffPropagator):
             + 0.0028 * cos(269.9 + 954397.70 * t_tdb)
         )
 
-        e_bar = (
-            23.439291 - 0.0130042 * t_tdb - 1.64e-7 * t_tdb**2 + 5.04e-7 * t_tdb**3
-        )
+        e_bar = 23.439291 - 0.0130042 * t_tdb - 1.64e-7 * t_tdb**2 + 5.04e-7 * t_tdb**3
 
         r_moon = Earth.r / sin(p)
 

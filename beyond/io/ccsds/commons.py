@@ -257,9 +257,11 @@ TIME_SYSTEM          = {timesystem}
         cospar_id=kwargs.get("cospar_id", getattr(data, "cospar_id", "N/A")),
         center=center.upper(),
         frame=data.frame.orientation.name.upper(),
-        timesystem=data.date.scale.name
-        if isinstance(data, AbstractStateVector)
-        else data.start.scale.name,
+        timesystem=(
+            data.date.scale.name
+            if isinstance(data, AbstractStateVector)
+            else data.start.scale.name
+        ),
     )
 
     for k, v in extras.items():
