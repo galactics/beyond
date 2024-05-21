@@ -6,6 +6,7 @@ from ..base import AnalyticalPropagator
 from ...utils.matrix import expand
 from ...orbits.man import ImpulsiveMan, ContinuousMan
 from ...frames.frames import HillFrame, get_frame
+from ...frames.local import QSW2LVLH
 
 
 class ClohessyWiltshire(AnalyticalPropagator):
@@ -44,7 +45,7 @@ class ClohessyWiltshire(AnalyticalPropagator):
             frame = get_frame(frame)
 
         if not isinstance(frame, HillFrame):  # pragma: no cover
-            raise TypeError(f"Incompatible frame type : {frame}")
+            raise TypeError(f"Incompatible frame type : {frame} of type={type(frame)}")
 
         self.sma = sma
         self.frame = frame
@@ -62,7 +63,8 @@ class ClohessyWiltshire(AnalyticalPropagator):
         """
 
         # frame = orbit.as_frame(name, orientation=orientation)
-        return cls(orbit.infos.kep.a, frame="Hill")
+        frame = HillFrame(orientation)
+        return cls(orbit.infos.kep.a, frame=frame)
 
     @property
     def n(self):
@@ -91,10 +93,14 @@ class ClohessyWiltshire(AnalyticalPropagator):
         """3x3 transformation matrix from the computational frame to the requested frame
         The computational frame is always QSW, and the requested frame may be TNW
         """
-        if self.frame.orientation == HillFrame.DEFAULT_ORIENTATION:
+        if self.frame.orientation == "QSW":
             return np.identity(3)
-        else:
+        elif self.frame.orientation == "LVLH":
+            return QSW2LVLH
+        elif self.frame.orientation == "TNW":
             return self.QSW2TNW
+        else:
+            raise ValueError(f"Unknown frame orientation '{self.frame.orientation}'")
 
     @property
     def _mat6(self):
@@ -176,7 +182,7 @@ class ClohessyWiltshire(AnalyticalPropagator):
             ]
         )
 
-        if self.frame.orientation != HillFrame.DEFAULT_ORIENTATION:
+        if self.frame.orientation != "QSW":
             # As both evolution and acceleration matrices are defined in QSW, if we want to work in
             # an other reference frame, we have to rotate them
             evol_mat = self._mat6 @ evol_mat @ self._mat6.T
