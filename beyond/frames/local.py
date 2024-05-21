@@ -8,6 +8,9 @@ import numpy as np
 from ..utils.matrix import expand
 
 
+QSW2LVLH = np.array([[0, 1, 0], [0, 0, -1], [-1, 0, 0]])
+
+
 def _split(orbit):
     return orbit[:3], orbit[3:]
 
@@ -37,6 +40,8 @@ def to_local(frame, orbit, expanded=True):
         m = to_qsw(orbit)
     elif frame.upper() == "TNW":
         m = to_tnw(orbit)
+    elif frame.upper() == "LVLH":
+        m = to_lvlh(orbit)
     else:
         raise ValueError(f"Unknown local orbital frame : {frame}")
 
@@ -83,8 +88,7 @@ def to_qsw(orbit):
     """In the QSW Local Orbital Reference Frame, x is oriented along the position vector,
     z along the angular momentum, and y complete the frame.
 
-    The frame is sometimes also called RSW (where R stands for radial) or LVLH (Local
-    Vertical Local Horizontal).
+    The frame is sometimes also called RSW (where R stands for radial).
 
     Args:
         orbit (list): Array of length 6
@@ -113,3 +117,28 @@ def to_qsw(orbit):
     s = np.cross(w, q)
 
     return np.array([q, s, w])
+
+
+def to_lvlh(orbit):
+    """In the LVLH Local Orbital Reference Frame, z is oriented opposite the position vector,
+    y opposite the angular momentum, and x complete the frame.
+
+    Args:
+        orbit (list): Array of length 6
+    Return:
+        numpy.ndarray: matrix to convert from inertial frame to LVLH
+
+    >>> delta_lvlh = [0, 0, -1]
+    >>> p = [-6142438.668, 3492467.560, -25767.25680]
+    >>> v = [505.8479685, 942.7809215, 7435.922231]
+    >>> pv = p + v
+    >>> mat = to_lvlh(pv).T
+    >>> delta_inert = mat @ delta_lvlh
+    >>> all(delta_inert == p / norm(p))
+    True
+
+    .. image:: /_static/lvlh.svg
+        :align: center
+        :width: 30%
+    """
+    return QSW2LVLH @ to_qsw(orbit)

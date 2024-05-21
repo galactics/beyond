@@ -189,7 +189,7 @@ def orbit2frame(name, ref_orbit, orientation=None, parent=EME2000, exists_warnin
         ref_orbit (Orbit or Ephem):
         orientation (str): Orientation of the created frame. If orientation is ``None``,
             the new frame will keep the orientation of the reference frame of the Orbit
-            and move along with the orbit. Other acceptable values are ``"QSW"`` or ``"TNW"``.
+            and move along with the orbit. Other acceptable values are ``"QSW"``, ``"TNW"`` or ``"LVLH"``.
         parent (Frame) : Inertial frame to which to attach the LOF
         exists_warning (bool): Disable the warning when creating a frame with an already
             taken name by setting this value to False
@@ -202,7 +202,7 @@ def orbit2frame(name, ref_orbit, orientation=None, parent=EME2000, exists_warnin
     if orientation is None:
         orientation = ref_orbit.frame.orientation
     else:
-        if orientation.upper() not in ("QSW", "TNW"):
+        if orientation.upper() not in ("QSW", "TNW", "LVLH"):
             raise ValueError(f"Unknown orientation '{orientation}'")
 
         orientation = orient.LocalOrbitalOrientation(
