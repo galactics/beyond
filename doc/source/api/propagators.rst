@@ -130,6 +130,14 @@ Clohessy-Wiltshire
     :special-members: __init__
     :show-inheritance:
 
+Yamanaka-Ankersen
+^^^^^^^^^^^^^^^^^
+
+.. automodule:: beyond.propagators.rpo.ya
+    :members:
+    :special-members: __init__
+    :show-inheritance:
+
 Listeners
 =========
 

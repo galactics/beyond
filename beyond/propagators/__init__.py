@@ -15,7 +15,7 @@ def get_propagator(name):
     """
     from .analytical import J2, Kepler, NonePropagator, Sgp4, Sgp4Beta, EcksteinHechler
     from .numerical import KeplerNum
-    from .rpo import ClohessyWiltshire
+    from .rpo import ClohessyWiltshire, YamanakaAnkersen
 
     scope = {
         "J2": J2,
@@ -26,6 +26,7 @@ def get_propagator(name):
         "Sgp4Beta": Sgp4Beta,
         "EcksteinHechler": EcksteinHechler,
         "ClohessyWiltshire": ClohessyWiltshire,
+        "YamanakaAnkersen": YamanakaAnkersen,
     }
 
     if name not in scope:
