@@ -1,5 +1,7 @@
-from .base import AnalyticalPropagator
-from ..dates import timedelta
+import numpy as np
+
+from ..base import AnalyticalPropagator
+from ...dates import timedelta
 
 
 class Kepler(AnalyticalPropagator):

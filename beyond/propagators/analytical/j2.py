@@ -1,8 +1,8 @@
 import numpy as np
 
-from .base import AnalyticalPropagator
-from ..constants import Earth
-from ..dates import timedelta
+from ..base import AnalyticalPropagator
+from ...constants import Earth
+from ...dates import timedelta
 
 
 class J2(AnalyticalPropagator):

@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import numpy as np
 from pytest import fixture
@@ -8,7 +7,7 @@ from beyond.orbits.cov import Cov
 from beyond.orbits.man import ImpulsiveMan, ContinuousMan
 from beyond.io.tle import Tle
 from beyond.dates import Date, timedelta
-from beyond.propagators.keplernum import KeplerNum
+from beyond.propagators.numerical import KeplerNum
 from beyond.env.solarsystem import get_body
 from beyond.orbits import StateVector
 

@@ -1,10 +1,11 @@
 import numpy as np
 
-from ..dates import timedelta
-from .base import AnalyticalPropagator
-from ..utils.matrix import expand
-from ..orbits.man import ImpulsiveMan, ContinuousMan
-from ..frames.frames import HillFrame, get_frame
+from ...dates import timedelta
+from ...env.solarsystem import get_body
+from ..base import AnalyticalPropagator
+from ...utils.matrix import expand
+from ...orbits.man import ImpulsiveMan, ContinuousMan
+from ...frames.frames import HillFrame, get_frame
 
 
 class ClohessyWiltshire(AnalyticalPropagator):
@@ -23,7 +24,7 @@ class ClohessyWiltshire(AnalyticalPropagator):
     This analytical propagator is able to propagate through impulsive and
     continuous maneuvers.
 
-    You can use :py:class:`~beyond.utils.cwhelper.CWHelper` for
+    You can use :py:class:`~beyond.utils.rpohelper.RpoHelper` for
     intilisation and maneuvers
     """
 

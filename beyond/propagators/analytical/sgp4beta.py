@@ -9,8 +9,8 @@ from numpy import cos, sqrt, sin, arctan2
 
 import numpy as np
 
-from ..dates.date import Date
-from ..orbits.forms import TLE
+from ...dates.date import Date
+from ...orbits.forms import TLE
 
 __all__ = ["Sgp4Beta"]
 

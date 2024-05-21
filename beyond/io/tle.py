@@ -263,7 +263,7 @@ class Tle:
             str: TLE representation
         """
 
-        from ..propagators.sgp4 import Sgp4
+        from ..propagators.analytical import Sgp4
 
         if not isinstance(orbit, MeanOrbit):
             raise TypeError(f"MeanOrbit expected, got {type(orbit)}")

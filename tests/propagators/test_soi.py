@@ -3,7 +3,8 @@ from pytest import mark
 from beyond.dates import Date, timedelta
 from beyond.env import jpl
 from beyond.io import ccsds
-from beyond.propagators.soi import SoINumerical, SoIAnalytical
+from beyond.propagators.analytical import SoIAnalytical
+from beyond.propagators.numerical import SoINumerical
 
 
 opm_with_man = """CCSDS_OPM_VERS = 2.0

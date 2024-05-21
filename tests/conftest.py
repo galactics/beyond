@@ -8,7 +8,7 @@ from beyond.config import config
 from beyond.dates.eop import Eop
 from beyond.frames.stations import create_station
 from beyond.io.tle import Tle
-from beyond.propagators.keplernum import KeplerNum
+from beyond.propagators.numerical import KeplerNum
 from beyond.dates import Date, timedelta
 from beyond.env.solarsystem import get_body
 from beyond.env import jpl

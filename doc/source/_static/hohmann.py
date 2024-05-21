@@ -12,7 +12,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from beyond.io.tle import Tle
 from beyond.dates import timedelta
-from beyond.propagators.keplernum import KeplerNum
+from beyond.propagators.numerical import KeplerNum
 from beyond.env.solarsystem import get_body
 from beyond.orbits.man import ImpulsiveMan
 from beyond.propagators.listeners import ApsideListener, find_event

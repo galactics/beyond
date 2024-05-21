@@ -1,8 +1,8 @@
 from numpy import zeros, array, sign, linalg
 
-from .base import NumericalPropagator
-from ..orbits.ephem import Ephem
-from ..orbits.man import ImpulsiveMan, ContinuousMan
+from ..base import NumericalPropagator
+from ...orbits.ephem import Ephem
+from ...orbits.man import ImpulsiveMan, ContinuousMan
 
 __all__ = ["KeplerNum"]
 

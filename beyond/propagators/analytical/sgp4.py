@@ -1,8 +1,8 @@
 from datetime import timedelta
 
-from .base import AnalyticalPropagator
-from ..io.tle import Tle
-from ..orbits.statevector import StateVector
+from ..base import AnalyticalPropagator
+from ...io.tle import Tle
+from ...orbits.statevector import StateVector
 
 from sgp4.earth_gravity import wgs72
 from sgp4.io import twoline2rv

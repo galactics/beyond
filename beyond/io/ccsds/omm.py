@@ -2,8 +2,8 @@ import numpy as np
 import lxml.etree as ET
 
 from ...orbits import MeanOrbit
-from ...propagators.sgp4 import Sgp4, wgs72
-from ...propagators.eh import EcksteinHechler
+from ...propagators.analytical.sgp4 import Sgp4, wgs72
+from ...propagators.analytical import EcksteinHechler
 
 from .cov import load_cov, dump_cov
 from .commons import (

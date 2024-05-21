@@ -66,8 +66,8 @@ Interplanetary
     :members:
 
 
-Relative Motion Helper
-----------------------
+Rendez-vous and Proximity Operations Helper
+-------------------------------------------
 
-.. automodule:: beyond.utils.cwhelper
+.. automodule:: beyond.utils.rpohelper
     :members:

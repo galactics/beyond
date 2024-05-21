@@ -7,8 +7,7 @@ from unittest.mock import patch
 import beyond.io.ccsds as ccsds
 from beyond.dates import Date, timedelta
 from beyond.io.tle import Tle
-from beyond.propagators.keplernum import KeplerNum
-from beyond.propagators.soi import SoINumerical
+from beyond.propagators.numerical import KeplerNum, SoINumerical
 from beyond.env.solarsystem import get_body
 from beyond.propagators.listeners import LightListener, NodeListener, find_event, ApsideListener
 from beyond.orbits.man import ImpulsiveMan, KeplerianImpulsiveMan, ContinuousMan, KeplerianContinuousMan
@@ -44,7 +43,7 @@ def molniya_kepler(molniya_tle):
 
 @contextmanager
 def mock_step(orb):
-    with patch('beyond.propagators.keplernum.KeplerNum._make_step', wraps=orb.propagator._make_step) as mock:
+    with patch('beyond.propagators.numerical.keplernum.KeplerNum._make_step', wraps=orb.propagator._make_step) as mock:
         yield mock
 
 

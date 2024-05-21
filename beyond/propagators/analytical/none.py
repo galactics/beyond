@@ -1,4 +1,4 @@
-from .base import AnalyticalPropagator
+from ..base import AnalyticalPropagator
 
 
 class NonePropagator(AnalyticalPropagator):

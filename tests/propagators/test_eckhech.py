@@ -3,7 +3,7 @@ from pytest import fixture
 
 from beyond.io.tle import Tle
 from beyond.dates import Date, timedelta
-from beyond.propagators.eh import EcksteinHechler
+from beyond.propagators.analytical import EcksteinHechler
 from beyond.orbits import MeanOrbit, StateVector
 
 ref = {

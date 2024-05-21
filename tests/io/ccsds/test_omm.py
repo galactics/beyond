@@ -9,7 +9,7 @@ from beyond.orbits import MeanOrbit
 from beyond.orbits.cov import Cov
 from beyond.io.tle import Tle
 from beyond.io.ccsds import dump, dumps, loads, CcsdsError
-from beyond.propagators.eh import EcksteinHechler
+from beyond.propagators.analytical import EcksteinHechler
 
 
 @fixture

@@ -5,10 +5,10 @@ from ..orbits.man import ContinuousMan, ImpulsiveMan
 from ..dates import timedelta
 
 
-class CWHelper:
+class RpoHelper:
     """This class provides computation helpers for relative motion positioning
-    and maneuvers, to be used with the :py:class:`~beyond.propagators.cw.ClohessyWiltshire`
-    propagator
+    and maneuvers, to be used with the :py:mod:`~beyond.propagators.rpo`
+    propagators
 
     See the :ref:`docking` script in the documentation for an example of utilisation.
     """
