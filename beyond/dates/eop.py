@@ -362,6 +362,7 @@ class SimpleEopDatabase:
     def __getitem__(self, mjd):
         data = self.finals(mjd)
         data["tai_utc"] = self.tai_utc(mjd)
+        data.pop("mjd", None)
 
         return Eop(**data)
 
