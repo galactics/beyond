@@ -105,7 +105,7 @@ def test_propagate_rk4(orbit_kepler):
     assert orb3.propagator.orbit is None
 
     assert np.allclose(
-        orb3,
+        orb3.base,
         [-2267347.5906591383, 3865612.1569156954, -5093932.5567979375, -5238.634675262262, -5326.282920539333, -1708.6895889357945]
     )
 

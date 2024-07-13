@@ -27,7 +27,7 @@ def test_get(jplfiles):
     # Check if conversion to other frame works as espected
     mars.frame = "EME2000"
 
-    assert np.allclose(mars, [
+    assert np.allclose(mars.base, [
         -1.69346160e+11, -2.00501413e+11, -8.26925988e+10,
         36908.14137465, -7756.92562483, -4081.22549533
     ])
@@ -44,7 +44,7 @@ def test_propagate(jplfiles):
     assert abs(32.18435609745404946124835987575 + venus.date._offset) <= np.finfo(float).eps
     assert str(venus.frame) == "SolarSystemBarycenter"
     assert str(venus.form) == "cartesian"
-    assert np.allclose(venus, [
+    assert np.allclose(venus.base, [
         5.23110445e+10, -8.51235950e+10, -4.16279990e+10,
         3.05086795e+04, 1.58745616e+04, 5.21182159e+03
     ])

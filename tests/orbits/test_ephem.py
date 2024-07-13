@@ -43,14 +43,14 @@ def test_interpolate(ephem):
     ephem.method = "linear"
     orb = ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27))
 
-    assert np.allclose(orb[:3], [-2348566.346123897, 4148355.890326985, -4755222.226501104])
-    assert np.allclose(orb[3:], [-4578.0740694225515, -5585.023397109828, -2619.4707804499653])
+    assert np.allclose(orb.base[:3], [-2348566.346123897, 4148355.890326985, -4755222.226501104])
+    assert np.allclose(orb.base[3:], [-4578.0740694225515, -5585.023397109828, -2619.4707804499653])
 
     ephem.method = "lagrange"
     orb = ephem.interpolate(ephem.start + timedelta(minutes=33, seconds=27))
 
-    assert np.allclose(orb[:3], [-2349933.1374301873, 4150754.2288609436, -4757989.96860434])
-    assert np.allclose(orb[3:], [-4580.715466516539, -5588.283144821399, -2620.9683124126564])
+    assert np.allclose(orb.base[:3], [-2349933.1374301873, 4150754.2288609436, -4757989.96860434])
+    assert np.allclose(orb.base[3:], [-4580.715466516539, -5588.283144821399, -2620.9683124126564])
 
     with raises(ValueError):
         # We ask for a value clearly out of range

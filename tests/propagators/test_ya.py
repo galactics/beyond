@@ -87,7 +87,7 @@ def test_propagation(orb, ref):
 
     ref_date, ref_pv = ref
 
-    assert np.allclose(res[:3], ref_pv)
+    assert np.allclose(res.base[:3], ref_pv)
     assert res.date == ref_date
 
 
@@ -110,5 +110,5 @@ def test_ephem_as_target(target, ref_lvlh):
     chaser_ephem = orb.ephem(stop=2 * target.infos.period, step=step)
     res = chaser_ephem[-1]
 
-    assert np.allclose(res[:3], ref_pv)
+    assert np.allclose(res.base[:3], ref_pv)
     assert res.date == ref_date

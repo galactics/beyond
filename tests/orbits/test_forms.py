@@ -268,60 +268,60 @@ def test_hyperbolic(ref_kepl_hyper):
 
     # To cartesian ...
     cart = to_sv(KEPL(ref_kepl_hyper, CART), CART.name)
-    assert np.allclose(cart, [
+    assert np.allclose(cart.base, [
         1687.60352732, -4761.78462622, 14918.72031867,
         -159632.45044557, 140048.25302776, 74649.10622557
     ])
 
     # ... and back
     kepl_h = CART(cart, KEPL)
-    assert np.allclose(kepl_h, ref_kepl_hyper)
+    assert np.allclose(kepl_h, ref_kepl_hyper.base)
 
     # To keplerian eccentric ...
     kepl_e = to_sv(KEPL(ref_kepl_hyper, KEPL_E), KEPL_E.name)
-    assert np.allclose(kepl_e, [
+    assert np.allclose(kepl_e.base, [
         -7.19263111e+06, 1.00218439e+00, 1.71926101e+00,
         5.51044450e+00, 1.17890602e+00, 3.30579237e-03
     ])
 
     # ... and back
     kepl_h = to_sv(KEPL_E(kepl_e, KEPL), KEPL.name)
-    assert np.allclose(kepl_h, ref_kepl_hyper)
+    assert np.allclose(kepl_h.base, ref_kepl_hyper.base)
 
     # To Keplerian mean ...
     kepl_m = to_sv(KEPL_E(kepl_e, KEPL_M), KEPL_M.name)
-    assert np.allclose(kepl_m, [
+    assert np.allclose(kepl_m.base, [
         -7.19263111e+06, 1.00218439e+00, 1.71926101e+00,
         5.51044450e+00, 1.17890602e+00, 7.22717405e-06
     ])
 
     # ... and back
     kepl_e2 = to_sv(KEPL_M(kepl_m, KEPL_E), KEPL_E.name)
-    assert np.allclose(kepl_e, kepl_e2)
+    assert np.allclose(kepl_e.base, kepl_e2.base)
 
 
 def test_equinoctial(ref_kepl, ref_equi):
 
     equi = KEPL(ref_kepl, EQUI)
-    assert np.allclose(ref_equi, equi)
+    assert np.allclose(ref_equi.base, equi)
 
     kepl = EQUI(ref_equi, KEPL)
-    assert np.allclose(ref_kepl, kepl)
+    assert np.allclose(ref_kepl.base, kepl)
 
 
 def test_cylindrical(ref_cart, ref_cyl):
 
     cyl = CART(ref_cart, CYL)
-    assert np.allclose(ref_cyl, cyl)
+    assert np.allclose(ref_cyl.base, cyl)
 
     cart = CYL(ref_cyl, CART)
-    assert np.allclose(ref_cart, cart)
+    assert np.allclose(ref_cart.base, cart)
 
 
 def test_keplerian_mean_circular(ref_kepl_m, ref_kepl_mc):
 
     kepl_mc = KEPL_M(ref_kepl_m, KEPL_MC)
-    assert np.allclose(ref_kepl_mc, kepl_mc)
+    assert np.allclose(ref_kepl_mc.base, kepl_mc)
 
     kepl_m = KEPL_MC(ref_kepl_mc, KEPL_M)
-    assert np.allclose(ref_kepl_m, kepl_m)
+    assert np.allclose(ref_kepl_m.base, kepl_m)
