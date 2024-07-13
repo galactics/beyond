@@ -353,7 +353,7 @@ class EcksteinHechler(AnalyticalPropagator):
 
             log.debug(f"Difference in position {diff.base[:3]}")
             log.debug(f"Difference in velocity {diff.base[3:]}")
-            if (diff[:3] < p_eps).all() and (diff[3:] < v_eps).all():
+            if (abs(diff[:3]) < p_eps).all() and (abs(diff[3:]) < v_eps).all():
                 log.debug(f"Convergence in {n} iterations")
                 break
 
