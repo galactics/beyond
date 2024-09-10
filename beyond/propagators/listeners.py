@@ -22,6 +22,7 @@ __all__ = [
     "StationMaxListener",
     "StationMaskListener",
     "LightListener",
+    "MoonEclipseListener",
     "TerminatorListener",
     "ApsideListener",
     "NodeListener",
@@ -242,6 +243,28 @@ class LightListener(Listener):
                         return -1
 
         return 1
+
+
+class MoonEclipseListener(LightListener):
+    """Eclipse of the Sun by the Moon detection"""
+
+    def __init__(self, type=LightListener.UMBRA):
+        """
+        Args:
+            type (str): Choose which event to trigger between umbra or penumbra
+        """
+
+        super().__init__(type, frame="Moon")
+
+    def info(self, orb):
+        if self.type == self.UMBRA:
+            return LightEvent(
+                self, "Moon umbra entry" if self(orb) <= 0 else "Moon umbra exit"
+            )
+        else:
+            return LightEvent(
+                self, "Moon penumbra entry" if self(orb) <= 0 else "Moon penumbra exit"
+            )
 
 
 class TerminatorEvent(Event):
