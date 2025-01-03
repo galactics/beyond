@@ -33,7 +33,7 @@ dependencies = [
     "sgp4",
     "jplephem",
     "lxml",
-    "setuptools",
+    "importlib_metadata >= 3.6; python_version < '3.10'",
 ]
 keywords = ["flight dynamic", "satellite", "space"]
 
