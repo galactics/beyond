@@ -58,3 +58,9 @@ tests = [
 
 [tool.hatch.version]
 path = "src/beyond/__init__.py"
+
+[tool.pytest.ini_options]
+addopts = "-v --cov src/beyond --cov-report html --doctest-modules src/beyond/ tests/"
+filterwarnings = [
+    "ignore:A frame with the name",
+]
