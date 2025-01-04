@@ -1,0 +1,15 @@
+@startuml
+hide empty members
+
+abstract AbstractStateVector
+abstract AbstractOrbit
+
+numpy.array <|-- AbstractStateVector
+AbstractStateVector <|-- StateVector
+
+AbstractStateVector <|-- AbstractOrbit
+AbstractOrbit <|-- Orbit
+StateVector <|-- Orbit
+AbstractOrbit <|-- MeanOrbit
+
+@enduml

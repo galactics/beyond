@@ -2,6 +2,7 @@ from pytest import fixture, raises
 import numpy as np
 
 from beyond.io.tle import Tle
+from beyond.orbits import StateVector
 
 
 cases = {
@@ -49,7 +50,14 @@ def sv(request):
 1 25544U 98067A   18124.55610684  .00001524  00000-0  30197-4 0  9997
 2 25544  51.6421 236.2139 0003381  47.8509  47.6767 15.54198229111731"""
     )
-    return tle.orbit().as_statevector().copy(form=request.param)
+    morb = tle.orbit().copy(form=request.param)
+    # Quick and dirty transformation of the MeanOrbit into a StateVector, without
+    # any propagation. This is done for simplicity, as the resulting StateVector
+    # will be used for nothing but checks for setters and getters.
+
+    new_dict = morb._data.copy()
+    new_dict.pop("propagator")
+    return StateVector(morb.base, **new_dict)
 
 
 def test_getter(sv):

@@ -12,7 +12,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from beyond.io.tle import Tle
 from beyond.dates import timedelta
-from beyond.propagators.keplernum import KeplerNum
+from beyond.propagators.numerical import KeplerNum
 from beyond.env.solarsystem import get_body
 from beyond.orbits.man import ImpulsiveMan
 from beyond.propagators.listeners import ApsideListener, find_event
@@ -71,7 +71,7 @@ plt.grid(linestyle=':', alpha=0.4)
 plt.tight_layout()
 
 fig = plt.figure()
-ax = plt.gca(projection='3d')
+ax = plt.subplot(projection='3d')
 ax.view_init(elev=52, azim=140)
 
 x, y, z = zip(perigee[:3], apogee[:3])

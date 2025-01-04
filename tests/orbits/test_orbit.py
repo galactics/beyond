@@ -66,11 +66,11 @@ def test_coord_unit_transform(ref_orbit):
 
     kep_e = Form._keplerian_mean_to_keplerian_eccentric(ref_orbit, Earth)
     kep = Form._keplerian_eccentric_to_keplerian(kep_e, Earth)
-    assert np.allclose(ref_orbit[:5], kep[:5])
+    assert np.allclose(ref_orbit.base[:5], kep[:5])
 
     tmp_kep_e = Form._keplerian_to_keplerian_eccentric(kep, Earth)
     new = Form._keplerian_eccentric_to_keplerian_mean(tmp_kep_e, Earth)
-    assert np.allclose(ref_orbit, new)
+    assert np.allclose(ref_orbit.base, new)
 
     tle = Form._keplerian_mean_to_tle(ref_orbit, Earth)
     tle_dict = dict(zip(TLE.param_names, tle))
@@ -81,7 +81,7 @@ def test_coord_unit_transform(ref_orbit):
     assert tle_dict['M'] == ref_orbit['M']
 
     new = Form._tle_to_keplerian_mean(tle, Earth)
-    assert np.allclose(new, ref_orbit)
+    assert np.allclose(new, ref_orbit.base)
 
     cart = Form._keplerian_to_cartesian(kep, Earth)
     assert np.allclose(cart, ref_cart)
@@ -99,7 +99,7 @@ def test_coord_global_transform(ref_orbit):
     assert all(ref_orbit == backup)
 
     ref_orbit.form = CART
-    assert np.allclose(ref_orbit, ref_cart)
+    assert np.allclose(ref_orbit.base, ref_cart)
 
 
 def test_coord_attributes_access(ref_orbit):
@@ -128,7 +128,7 @@ def test_orbit_change_form(ref_orbit):
 
     ref_orbit.form = CART.name
     assert ref_orbit.form == CART
-    assert np.allclose(ref_orbit, ref_cart)
+    assert np.allclose(ref_orbit.base, ref_cart)
 
 
 def test_tle_to_and_from():

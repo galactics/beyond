@@ -2,6 +2,14 @@ from pytest import raises, fixture, mark
 
 from beyond.io.ccsds import dumps, loads, CcsdsError
 from beyond.dates import timedelta
+from beyond.orbits.cov import Cov
+
+
+@fixture
+def orbit_cov(tle, cov):
+    orbit = tle.copy()
+    orbit.cov = Cov(orbit, cov, orbit.frame)
+    return orbit
 
 
 @fixture

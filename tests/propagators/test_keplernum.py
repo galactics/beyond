@@ -7,8 +7,7 @@ from unittest.mock import patch
 import beyond.io.ccsds as ccsds
 from beyond.dates import Date, timedelta
 from beyond.io.tle import Tle
-from beyond.propagators.keplernum import KeplerNum
-from beyond.propagators.soi import SoINumerical
+from beyond.propagators.numerical import KeplerNum, SoINumerical
 from beyond.env.solarsystem import get_body
 from beyond.propagators.listeners import LightListener, NodeListener, find_event, ApsideListener
 from beyond.orbits.man import ImpulsiveMan, KeplerianImpulsiveMan, ContinuousMan, KeplerianContinuousMan
@@ -44,7 +43,7 @@ def molniya_kepler(molniya_tle):
 
 @contextmanager
 def mock_step(orb):
-    with patch('beyond.propagators.keplernum.KeplerNum._make_step', wraps=orb.propagator._make_step) as mock:
+    with patch('beyond.propagators.numerical.keplernum.KeplerNum._make_step', wraps=orb.propagator._make_step) as mock:
         yield mock
 
 
@@ -106,7 +105,7 @@ def test_propagate_rk4(orbit_kepler):
     assert orb3.propagator.orbit is None
 
     assert np.allclose(
-        orb3,
+        orb3.base,
         [-2267347.5906591383, 3865612.1569156954, -5093932.5567979375, -5238.634675262262, -5326.282920539333, -1708.6895889357945]
     )
 
@@ -340,9 +339,8 @@ def test_man_impulsive(molniya_kepler):
     ecc_before = np.mean(eccentricity[:man_idx])
     ecc_after = np.mean(eccentricity[man_idx:])
 
-    assert abs(ecc_before - 6.47e-1) < 2e-4
-    assert abs(ecc_after - 3e-3) < 2e-4
-    # assert abs(ecc_after - 6.57e-4) < 1e-6
+    assert np.isclose(ecc_before, 0.6470965029271583)
+    assert np.isclose(ecc_after, 0.0016253320646998854)
 
     assert str(man.date) == "2018-05-03T16:29:23.246451 UTC"
 

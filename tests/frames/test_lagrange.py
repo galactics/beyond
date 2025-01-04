@@ -5,7 +5,7 @@ from beyond.env import solarsystem as sol
 from beyond.frames.lagrange import lagrange, LagrangeOrient
 from beyond.io import ccsds
 from beyond.dates import Date, timedelta
-from beyond.propagators.keplernum import KeplerNum
+from beyond.propagators.numerical import KeplerNum
 from beyond.frames.orient import EME2000
 
 

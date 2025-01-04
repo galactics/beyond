@@ -4,7 +4,7 @@ import numpy as np
 
 from beyond.orbits import Orbit, Ephem
 from beyond.dates import Date, timedelta
-from beyond.propagators.cw import ClohessyWiltshire
+from beyond.propagators.rpo import ClohessyWiltshire
 from beyond.orbits.man import ImpulsiveMan, ContinuousMan
 from beyond.frames.frames import HillFrame
 

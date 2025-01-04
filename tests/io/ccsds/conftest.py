@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import numpy as np
 from pytest import fixture
@@ -8,8 +7,9 @@ from beyond.orbits.cov import Cov
 from beyond.orbits.man import ImpulsiveMan, ContinuousMan
 from beyond.io.tle import Tle
 from beyond.dates import Date, timedelta
-from beyond.propagators.keplernum import KeplerNum
+from beyond.propagators.numerical import KeplerNum
 from beyond.env.solarsystem import get_body
+from beyond.orbits import StateVector
 
 
 @fixture(params=["kvn", "xml"])
@@ -56,12 +56,17 @@ def tle():
 
 @fixture
 def orbit(tle):
-    return tle.copy(form="cartesian")
+    # Quick and dirty transformation of the MeanOrbit into a StateVector, without
+    # any propagation. This is done for simplicity, as the resulting StateVector
+    # will be used for nothing but CCSDS OPM formatting.
+    new_dict = tle._data.copy()
+    new_dict.pop("propagator")
+    sv = StateVector(tle.base, **new_dict).copy(form="cartesian")
+    return sv
 
 
 @fixture
-def orbit_cov(orbit):
-    orbit = orbit.copy()
+def cov(orbit):
     cov = [
         [
             3.331349476038534e2,
@@ -113,15 +118,18 @@ def orbit_cov(orbit):
         ],
     ]
 
-    orbit.cov = Cov(orbit, cov, orbit.frame)
+    return cov
 
+
+@fixture
+def orbit_cov(orbit, cov):
+    orbit = orbit.copy()
+    orbit.cov = Cov(orbit, cov, orbit.frame)
     return orbit
 
 
 @fixture
 def orbit_man(orbit):
-    orbit = orbit.copy()
-    orbit.propagator = KeplerNum(get_body("Earth"), timedelta(seconds=60))
     orbit.maneuvers = [
         ImpulsiveMan(
             Date(2008, 9, 20, 12, 41, 9, 984493),
@@ -137,7 +145,6 @@ def orbit_man(orbit):
 @fixture
 def orbit_continuous_man(orbit):
     orbit = orbit.copy()
-    orbit.propagator = KeplerNum(get_body("Earth"), timedelta(seconds=60))
     orbit.maneuvers = [
         ContinuousMan(
             Date(2008, 9, 20, 12, 41, 9, 984493),
@@ -157,20 +164,20 @@ def orbit_continuous_man(orbit):
 
 
 @fixture
-def ephem(orbit):
-    ephem = orbit.ephem(
-        start=orbit.date, stop=timedelta(minutes=120), step=timedelta(minutes=3)
+def ephem(tle):
+    ephem = tle.ephem(
+        start=tle.date, stop=timedelta(minutes=120), step=timedelta(minutes=3)
     )
-    ephem.name = orbit.name
-    ephem.cospar_id = orbit.cospar_id
+    ephem.name = tle.name
+    ephem.cospar_id = tle.cospar_id
     return ephem
 
 
 @fixture
-def ephem2(orbit):
-    ephem = orbit.ephem(
-        start=orbit.date, stop=timedelta(hours=5), step=timedelta(minutes=5)
+def ephem2(tle):
+    ephem = tle.ephem(
+        start=tle.date, stop=timedelta(hours=5), step=timedelta(minutes=5)
     )
-    ephem.name = orbit.name
-    ephem.cospar_id = orbit.cospar_id
+    ephem.name = tle.name
+    ephem.cospar_id = tle.cospar_id
     return ephem

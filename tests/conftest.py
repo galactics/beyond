@@ -8,12 +8,12 @@ from beyond.config import config
 from beyond.dates.eop import Eop
 from beyond.frames.stations import create_station
 from beyond.io.tle import Tle
-from beyond.propagators.keplernum import KeplerNum
+from beyond.propagators.numerical import KeplerNum
 from beyond.dates import Date, timedelta
 from beyond.env.solarsystem import get_body
 from beyond.env import jpl
 from beyond.orbits.man import ContinuousMan
-from beyond.orbits import StateVector
+from beyond.orbits.statevector import AbstractStateVector
 
 np.set_printoptions(linewidth=200)
 
@@ -107,9 +107,9 @@ class Helper:
     @staticmethod
     def assert_vector(ref, pv, precision=(4, 6)):
 
-        if isinstance(ref, StateVector):
+        if isinstance(ref, AbstractStateVector):
             ref = ref.base
-        if isinstance(pv, StateVector):
+        if isinstance(pv, AbstractStateVector):
             pv = pv.base
 
         np.testing.assert_almost_equal(ref[:3], pv[:3], precision[0], "Position")
@@ -120,14 +120,27 @@ class Helper:
 
         cov_eps = 1e-10
 
-        orb1.form = form
-        orb2.form = form
+        orb1 = orb1.copy(form=form)
+        orb2 = orb2.copy(form=form)
 
-        assert orb1.name == orb2.name
-        assert orb1.cospar_id == orb2.cospar_id
+        assert hasattr(orb1, "name") == hasattr(orb2, "name")
+        if hasattr(orb1, "name") and hasattr(orb2, "name"):
+            assert orb1.name == orb2.name
+
+        assert hasattr(orb1, "cospar_id") == hasattr(orb2, "cospar_id")
+        if hasattr(orb1, "cospar_id") and hasattr(orb2, "cospar_id"):
+            assert orb1.cospar_id == orb2.cospar_id
 
         assert orb1.frame == orb2.frame
         assert orb1.date == orb2.date
+
+        # Check if the two orb objects are of the same type (StateVector, MeanOrbit, or Orbit)
+        assert orb1.__class__ is orb2.__class__
+
+        assert hasattr(orb1, "propagator") == hasattr(orb2, "propagator")
+        if hasattr(orb1, "propagator"):
+            assert orb1.propagator.__class__ is orb2.propagator.__class__
+            # TODO : It would be nice if we could check the parameters of the propagator
 
         # Precision down to millimeter due to the truncature when writing the CCSDS OPM
         assert abs(orb1[0] - orb2[0]) < 1e-3

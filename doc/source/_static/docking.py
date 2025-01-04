@@ -12,8 +12,8 @@ import matplotlib.patches as mpatches
 
 from beyond.dates import Date, timedelta
 from beyond.orbits import Orbit
-from beyond.propagators.cw import ClohessyWiltshire
-from beyond.utils.cwhelper import CWHelper
+from beyond.propagators.rpo import ClohessyWiltshire
+from beyond.utils.rpohelper import RpoHelper
 from beyond.propagators.listeners import Listener, Event, find_event
 from beyond.orbits.man import ImpulsiveMan, ContinuousMan
 
@@ -37,7 +37,7 @@ class TangentialDistanceListener(Listener):
 
 
 propagator = ClohessyWiltshire(6378000 + 410000)
-helper = CWHelper(propagator)
+helper = RpoHelper(propagator)
 
 radial = -3000  # radial distance at the beginning of the simulation
 date = Date(Date.now().d)

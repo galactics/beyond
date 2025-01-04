@@ -3,7 +3,7 @@
 
 from datetime import timedelta
 
-from beyond.propagators.sgp4beta import Sgp4Beta
+from beyond.propagators.analytical import Sgp4Beta
 from beyond.io.tle import Tle
 
 

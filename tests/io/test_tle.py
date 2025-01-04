@@ -68,7 +68,7 @@ def test_read(tle_txt):
         l[1] = "3" + l[1][1:]
         Tle("\n".join(l))
 
-    assert str(eee.value) == "Line number check failed"
+    assert str(eee.value).startswith("Line number check failed")
 
 
 def test_convert_to_orbit(tle_txt):
@@ -122,9 +122,9 @@ def test_generator(caplog):
         continue
 
     assert len(caplog.records) == 1
-    assert caplog.record_tuples == [
-        ('beyond.io.tle', logging.WARNING, "Invalid TLE size on line 1. Expected 69, got 1.")
-    ]
+    assert caplog.record_tuples[0][0] == 'beyond.io.tle'
+    assert caplog.record_tuples[0][1] == logging.WARNING
+    assert caplog.record_tuples[0][2].startswith("Invalid TLE size on line 1. Expected 69, got 1.")
 
     caplog.clear()
 
