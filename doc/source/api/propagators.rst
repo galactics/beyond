@@ -77,7 +77,7 @@ being WGS72.
 .. autoclass:: beyond.propagators.analytical.sgp4beta.WGS84
 
 Eckstein-Hechler
-----------------
+^^^^^^^^^^^^^^^^
 
 .. automodule:: beyond.propagators.analytical.eh
     :members:
