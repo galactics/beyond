@@ -1,7 +1,6 @@
 import numpy as np
 
 from ...dates import timedelta
-from ...env.solarsystem import get_body
 from ..base import AnalyticalPropagator
 from ...utils.matrix import expand
 from ...orbits.man import ImpulsiveMan, ContinuousMan

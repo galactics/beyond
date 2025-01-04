@@ -1,5 +1,3 @@
-import numpy as np
-
 from ..base import AnalyticalPropagator
 from ...dates import timedelta
 

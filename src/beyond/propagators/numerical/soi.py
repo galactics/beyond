@@ -1,5 +1,4 @@
 import logging
-from collections import namedtuple
 
 from .._soi import _SoI
 from .keplernum import KeplerNum

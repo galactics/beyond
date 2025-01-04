@@ -9,6 +9,7 @@ import logging
 from pathlib import Path
 from inspect import isclass
 from collections import namedtuple
+
 if sys.version_info < (3, 10):
     from importlib_metadata import entry_points
 else:
