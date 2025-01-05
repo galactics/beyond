@@ -34,7 +34,7 @@ are under the MIT license.
 Installation
 ------------
 
-Beyond requires Python 3.6+, numpy and `sgp4 <https://github.com/brandon-rhodes/python-sgp4>`__.
+Beyond requires Python 3.7+, numpy and `sgp4 <https://github.com/brandon-rhodes/python-sgp4>`__.
 To install the library and its dependencies use pip
 
 .. code-block:: shell

@@ -3,6 +3,32 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [v0.8] - 2025-01-04
+
+### Added
+
+- Python 3.11, 3.12 and 3.13 support
+- Differentiation between osculating and mean orbit objects
+- Eckstein-Hechler analytical propagator
+- LVLH local orbital reference frame
+- Yamanaka-Ankersen Rendez-vous and Proximity Operations propagator
+- MoonEclipse Listener to detect, well..., eclipses of the sun by the moon, as seen from a satellite
+- A bunch of tests were created or given more robustness
+
+### Modified
+
+- Change in propagator subpackage structure, now grouped by categories
+- Build process handled by pyproject.toml
+
+### Fixed
+
+- Rotation rate
+- Impulsive maneuvers are integrated at their exact date
+
+### Deprecated
+
+- Beyond is no longer tested with python 3.6, but should still work
+
 ## [v0.7.5] - 2022-10-13
 
 ### Added

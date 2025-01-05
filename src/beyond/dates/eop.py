@@ -4,11 +4,16 @@
 """Retrieve and interpolate data for Earth Orientation and timescales conversions
 """
 
+import sys
 import logging
 from pathlib import Path
 from inspect import isclass
 from collections import namedtuple
-from pkg_resources import iter_entry_points
+
+if sys.version_info < (3, 10):
+    from importlib_metadata import entry_points
+else:
+    from importlib.metadata import entry_points
 
 from ..config import config
 from ..errors import EopError, ConfigError
@@ -178,7 +183,7 @@ class EopDb:
     def _load_entry_points(cls):
         if not hasattr(cls, "_entry_points_loaded"):
             # Loading external DB, via entry points
-            for entry in iter_entry_points("beyond.eopdb"):
+            for entry in entry_points(group="beyond.eopdb"):
                 EopDb.register(entry.load(), entry.name)
             cls._entry_points_loaded = True
 

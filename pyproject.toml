@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "beyond"
+dynamic = ["version"]
+authors = [
+  { name="Jules David", email="jules@onada.fr" },
+]
+description = "Flight Dynamic Library"
+readme = "README.rst"
+requires-python = ">=3.6"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "numpy",
+    "sgp4",
+    "jplephem",
+    "lxml",
+    "importlib_metadata >= 3.6; python_version < '3.10'",
+]
+keywords = ["flight dynamic", "satellite", "space"]
+
+[project.urls]
+Homepage = "https://github.com/galactics/beyond"
+Documentation = "https://beyond.readthedocs.io"
+Repository = "https://github.com/galactics/beyond"
+Issues = "https://github.com/galactics/beyond/issues"
+Changelog = "https://github.com/galactics/beyond/blob/master/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = [
+    "sphinx",
+    "sphinx_rtd_theme",
+    "tox",
+]
+tests = [
+    "pytest",
+    "pytest-cov",
+    "xmlschema>=1.4.1",
+]
+
+[tool.hatch.version]
+path = "src/beyond/__init__.py"
+
+[tool.pytest.ini_options]
+addopts = "-v --cov src/beyond --cov-report html --doctest-modules src/beyond/ tests/"
+filterwarnings = [
+    "ignore:A frame with the name",
+]

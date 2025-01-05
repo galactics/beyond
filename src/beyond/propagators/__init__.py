@@ -2,7 +2,7 @@
 """
 
 from ..errors import UnknownPropagatorError
-from .base import Propagator
+from .base import Propagator as Propagator
 
 
 def get_propagator(name):
