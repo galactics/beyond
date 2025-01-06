@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import pickle
 import logging
 from pytest import raises, fixture
 import numpy as np
 
-from beyond.dates.date import Date
+from beyond.dates.date import Date, timedelta
 from beyond.io.tle import Tle, TleParseError
 
 ref = [
@@ -132,3 +133,16 @@ def test_generator(caplog):
         continue
 
     assert len(caplog.records) == 0
+
+
+def test_pickle(tle_txt):
+
+    orb = Tle(tle_txt).orbit()
+
+    _bytes = pickle.dumps(orb)
+    orb2 = pickle.loads(_bytes)
+
+    # Test that the pickled orbit is useable afterward
+    # and does not raise any exception
+    orb2.copy(frame="EME2000", form="spherical")
+    orb2.propagate(timedelta(3))

@@ -10,7 +10,7 @@ from beyond.errors import UnknownFormError, OrbitError
 from beyond.constants import Earth
 from beyond.dates.date import Date
 from beyond.io.tle import Tle
-from beyond.orbits.orbit import Orbit
+from beyond.orbits.orbit import Orbit, MeanOrbit
 from beyond.orbits.cov import Cov
 from beyond.orbits.forms import Form, CART, KEPL_M, KEPL, TLE
 from beyond.frames.frames import ITRF, MOD, EME2000
@@ -35,7 +35,7 @@ def ref_date():
 
 @fixture
 def ref_orbit(ref_date):
-    return Orbit(ref_coord, ref_date, ref_form, ref_frame, ref_propagator)
+    return MeanOrbit(ref_coord, ref_date, ref_form, ref_frame, ref_propagator)
 
 
 def test_coord_init(ref_date, ref_orbit):
@@ -153,6 +153,9 @@ def test_pickle(ref_orbit):
     assert ref_orbit.frame.name == orb.frame.name
     assert ref_orbit.form.name == orb.form.name
     assert ref_orbit.propagator.__class__ == orb.propagator.__class__
+
+    # Try some simple operations on this pickled orbit
+    orb.copy(frame="EME2000", form="keplerian")
 
 
 def test_orbit_infos(ref_orbit):
