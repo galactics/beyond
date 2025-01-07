@@ -21,6 +21,8 @@ class YamanakaAnkersen(AnalyticalPropagator):
         Koji Yamanaka and Finn Ankersen.
         Journal of Guidance, Control, and Dynamics 25, no. 1 (January 2002): 60–66.
         https://doi.org/10.2514/2.4875.
+
+    The plots of the original paper were reproduced in the example :ref:`ya_example`.
     """
 
     FRAME = "EME2000"
