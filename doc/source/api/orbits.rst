@@ -31,6 +31,29 @@ Concrete classes
     :members:
     :show-inheritance:
 
+Converting between osculating and mean orbits
+---------------------------------------------
+
+Osculating parameters are a weird bunch. They allow to get a general idea of
+the shape of the orbit. It is as if we tried to precisely measure the altitude of
+a lake by only taking one point of measurement with strong waves. Therefore,
+it is necessary to use averaging techniques to better describe the shape and
+dynamics of the orbit.
+
+.. image:: /_static/osculating.svg
+    :align: center
+
+Both :py:class:`~beyond.orbits.statevector.StateVector` and :py:class:`~beyond.orbits.orbit.Orbit` represent
+osculating states. The only difference between them is that :py:class:`~beyond.orbits.orbit.Orbit` has a
+propagator attached.
+
+Methods :py:meth:`~beyond.orbits.orbit.Orbit.as_statevector` and :py:meth:`~beyond.orbits.statevector.AbstractStateVector.as_orbit` don't perform any computation, and simply create a new instance (of StateVector and Orbit, respectively), with exactly the same data as the original object.
+
+Methods :py:meth:`~beyond.orbits.orbit.MeanOrbit.to_osculating` and :py:meth:`~beyond.orbits.statevector.StateVector.to_mean_orbit` compute the new object with the help of a propagator.
+
+.. image:: /_static/orbit_transformations.png
+    :align: center
+
 Forms
 -----
 

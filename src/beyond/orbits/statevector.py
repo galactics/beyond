@@ -364,7 +364,7 @@ StateVector =
         Args:
             propagator (~beyond.propabator.base.Propagator) :
         Return:
-            Orbit : New Orbit object, with the same state as the creating StateVector
+            New Orbit object, with the same state as the creating StateVector
         """
         from .orbit import Orbit, MeanOrbit
         from ..propagators.base import AnalyticalPropagator
@@ -387,7 +387,8 @@ class StateVector(AbstractStateVector):
     """Represents a coordinate in time and space"""
 
     def to_mean_orbit(self, propagator):
-        """
+        """This is the reciprocal function of :py:meth:`MeanOrbit.to_osculating() <beyond.orbits.orbit.MeanOrbit.to_osculating>`
+
         Args:
             propagator (AnalyticalPropagator)
         Return:

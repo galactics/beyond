@@ -1,8 +1,37 @@
 @startuml
 hide empty members
 
-abstract AbstractStateVector
-abstract AbstractOrbit
+abstract AbstractStateVector {
+    date
+    form
+    frame
+    cov
+    maneuvers
+    infos
+
+    copy()
+    as_orbit(propagator)
+}
+
+abstract AbstractOrbit {
+    propagator
+    propagate(date)
+    iter()
+    ephemeris()
+    ephem()
+}
+
+class StateVector {
+    to_mean_orbit()
+}
+
+class MeanOrbit {
+    to_osculating()
+}
+
+class Orbit {
+    as_statevector()
+}
 
 numpy.array <|-- AbstractStateVector
 AbstractStateVector <|-- StateVector
