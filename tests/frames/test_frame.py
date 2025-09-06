@@ -148,6 +148,21 @@ def test_unit_g50(ref_orbit, model_correction, helper):
     helper.assert_vector(eme_ref, eme)
 
 
+def test_shortcut(ref_orbit, model_correction, helper):
+
+    pef = ITRF.transform(ref_orbit, PEF)
+    helper.assert_vector(pef_ref, pef)
+
+    tirf = ITRF.transform(ref_orbit, TIRF)
+    helper.assert_vector(tirf_ref, tirf)
+
+    pef2 = TIRF.transform(tirf, PEF)
+    helper.assert_vector(pef_ref, pef2)
+
+    tirf2 = PEF.transform(pef, TIRF)
+    helper.assert_vector(tirf_ref, tirf2)
+
+
 def test_global_change(ref_orbit, model_correction, helper):
 
     pv = ITRF.transform(ref_orbit, GCRF)
