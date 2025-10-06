@@ -140,7 +140,7 @@ def xml2dict(string):
     def _recurse(elem):
         data = {}
         for subelem in elem:
-            if hasattr(subelem, "text") and subelem.text.strip():
+            if hasattr(subelem, "text") and subelem.text is not None and subelem.text.strip():
                 field = Field(subelem.text, subelem.attrib)
                 if subelem.tag not in data:
                     data[subelem.tag] = field
