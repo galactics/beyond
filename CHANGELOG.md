@@ -3,6 +3,18 @@
 This file tries to regroup all notable modifications of the ``beyond`` library.
 Each release is linked to a git commit.
 
+## [v0.8.1] - 2025-10-07
+
+### Added
+
+- Shortcut conversion between TIRF and PEF frames
+- Various documentation upgrades
+
+### Fixed
+
+- StateVector now picklable
+- Unindented CCSDS OEM are now parsable.
+
 ## [v0.8] - 2025-01-04
 
 ### Added
