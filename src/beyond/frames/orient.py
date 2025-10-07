@@ -59,6 +59,9 @@ class Orientation(Node):
     def ITRF_to_TIRF(self, date):
         return iau2010.earth_orientation(date), None
 
+    def TIRF_to_PEF(self, date):
+        return iau2010.s_prime(date), None
+
     def TIRF_to_CIRF(self, date):
         m = iau2010.sideral(date)
         return m, -iau2010.rate(date)
@@ -118,6 +121,7 @@ GCRF = Orientation("GCRF")
 ITRF + PEF + TOD + MOD + EME2000 + G50
 TOD + TEME
 ITRF + TIRF + CIRF + GCRF
+TIRF + PEF
 
 
 class TopocentricOrientation(Orientation):

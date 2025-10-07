@@ -152,6 +152,15 @@ class MeanOrbit(AbstractOrbit):
     """Mean orbit associated with a mean propagator"""
 
     def to_osculating(self):
+        """Convert the MeanOrbit object to an osculating Orbit object
+        by propagating it at its date.
+
+        This is the reciprocal function of :py:meth:`StateVector.to_mean_orbit() <beyond.orbits.statevector.StateVector.to_mean_orbit>`
+
+        Return:
+            osculating orbit at the same date as the original MeanOrbit. 
+        """
+
         return self.propagate(self.date)
 
 
@@ -159,6 +168,10 @@ class Orbit(StateVector, AbstractOrbit):
     """Osculating orbit, associated with a numerical propagator"""
 
     def as_statevector(self):
+        """Create a new StateVector object containing the same state as the
+        initial Orbit object, but without any propagator attached.
+        """
+
         new_dict = self._data.copy()
         new_dict.pop("propagator")
         return StateVector(self.base, **new_dict)

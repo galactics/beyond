@@ -65,6 +65,12 @@ def earth_orientation(date):
     return rot3(-s_prime) @ rot2(x_p) @ rot1(y_p)
 
 
+def s_prime(date):
+    """Used only for conversion from TIRF to PEF"""
+    _, _, s_prime = np.deg2rad(_earth_orientation(date))
+    return rot3(s_prime)
+
+
 def _sideral(date):
     """Sideral time in radians"""
     jd = date.change_scale("UT1").jd

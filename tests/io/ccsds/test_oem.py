@@ -1,4 +1,4 @@
-from pytest import raises, fixture, mark
+from pytest import raises, fixture, mark, skip
 
 from beyond.io.ccsds import dumps, loads, CcsdsError
 from beyond.dates import timedelta
@@ -97,6 +97,17 @@ def test_load_oem(ephem, datafile, helper):
 
 def test_load_oem_minimal(ephem, datafile, helper):
     data = loads(datafile("oem_minimal"))
+    helper.assert_ephem(ephem, data)
+
+
+def test_load_oem_unidented(ephem, datafile, helper, ccsds_format):
+
+    if ccsds_format == "kvn":
+        skip("Only applicable to XML format")
+
+    print(ccsds_format)
+
+    data = loads(datafile("oem_unidented"))
     helper.assert_ephem(ephem, data)
 
 

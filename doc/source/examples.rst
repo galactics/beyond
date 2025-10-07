@@ -138,3 +138,13 @@ Docking
     W =   0.000
 
 .. image:: _static/docking.png
+
+.. _ya_example:
+
+Yamanaka-Ankersen
+-----------------
+
+.. literalinclude:: _static/cw_vs_ya.py
+
+.. image:: _static/cw_vs_ya1.png
+.. image:: _static/cw_vs_ya2.png

@@ -114,7 +114,11 @@ class AbstractStateVector(np.ndarray, metaclass=ABCMeta):
         for k, v in self._data.items():
             new_compl[k] = v.copy() if hasattr(v, "copy") else v
 
-        new_obj = self.__class__(self.base, **new_compl)
+        if hasattr(self, "base") and self.base is not None:
+            base = self.base
+        else:
+            base = np.asarray(self)
+        new_obj = self.__class__(base, **new_compl)
 
         if same is not None:
             if hasattr(same, "frame") and hasattr(same, "form"):
@@ -360,7 +364,7 @@ StateVector =
         Args:
             propagator (~beyond.propabator.base.Propagator) :
         Return:
-            Orbit : New Orbit object, with the same state as the creating StateVector
+            New Orbit object, with the same state as the creating StateVector
         """
         from .orbit import Orbit, MeanOrbit
         from ..propagators.base import AnalyticalPropagator
@@ -383,7 +387,8 @@ class StateVector(AbstractStateVector):
     """Represents a coordinate in time and space"""
 
     def to_mean_orbit(self, propagator):
-        """
+        """This is the reciprocal function of :py:meth:`MeanOrbit.to_osculating() <beyond.orbits.orbit.MeanOrbit.to_osculating>`
+
         Args:
             propagator (AnalyticalPropagator)
         Return:

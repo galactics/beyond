@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 class TaiUtc:
     """File listing all leap seconds throught history
 
-    This file could be retrieved `here <http://maia.usno.navy.mil/ser7/tai-utc.dat>`__,
+    This file could be retrieved `here <https://maia.usno.navy.mil/ser7/tai-utc.dat>`__,
     but this server seems discontinued.
     """
 
