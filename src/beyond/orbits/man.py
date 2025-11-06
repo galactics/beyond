@@ -290,7 +290,7 @@ def dkep2dv(orb, *, da=0, di=0, dOmega=0):
 
     # Due to some floating point operation rounding, this ratio
     # can be superior to one.
-    if np.isclose(ratio, 1):
+    if ratio > 1:
         dv_w = 0
     else:
         # equivalent to dv_w = dv * np.sin(np.arccos(ratio))
