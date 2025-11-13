@@ -35,7 +35,7 @@ Beyond provides a simple (as simplistic) database implementation for EOP :
     :members:
 
 
-If you need/want another database engine, you just have to create a new class
+If you need/want another database engine, you have to create a new class
 defining a ``__getitem__`` method and register it under the name you wish.
 
 There is two methods for registering a database. The first one, is via the
