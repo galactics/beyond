@@ -316,11 +316,11 @@ class Form(Node):
 
         ex = e * cos(Ω + ω)
         ey = e * sin(Ω + ω)
-        ix = tan(i / 2) * cos(Ω)
-        iy = tan(i / 2) * sin(Ω)
+        hx = tan(i / 2) * cos(Ω)
+        hy = tan(i / 2) * sin(Ω)
         l = Ω + ω + ν  # noqa
 
-        return np.array([a, ex, ey, ix, iy, l], dtype=float)
+        return np.array([a, ex, ey, hx, hy, l], dtype=float)
 
     @classmethod
     def _equinoctial_to_keplerian(cls, coord, body):
@@ -443,14 +443,14 @@ SPHE = Form("spherical", ["r", "θ", "φ", "r_dot", "θ_dot", "φ_dot"])
 CART = Form("cartesian", ["x", "y", "z", "vx", "vy", "vz"])
 """Cartesian form"""
 
-EQUI = Form("equinoctial", ["a", "ex", "ey", "ix", "iy", "l"])
+EQUI = Form("equinoctial", ["a", "ex", "ey", "hx", "hy", "l"])
 """The Equinoctial form is
 
     * a  : semi-major axis
     * ex : first element of the eccentricity vector
     * ey : second element of the eccentricity vector
-    * ix : first element of the inclination vector
-    * iy : second element of the inclination vector
+    * hx : first element of the inclination vector
+    * hy : second element of the inclination vector
     * l  : argument of longitude
 
 This form is not subject to ambiguity when the orbit is circular and/or
